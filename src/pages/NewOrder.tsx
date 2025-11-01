@@ -65,16 +65,25 @@ export function NewOrder() {
         notes: notes || undefined,
       });
 
-      // 2. Créer la session Stripe Checkout
-      const { data: { url }, error } = await supabase.functions.invoke('create-checkout-session', {
-        body: {
+      // 2. Créer la session Stripe Checkout via Netlify Function
+      const response = await fetch('/api/create-checkout-session', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
           serviceType,
           weight,
           orderId: order.id,
-        },
+        }),
       });
 
-      if (error) throw error;
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to create checkout session');
+      }
+
+      const { url } = await response.json();
 
       // 3. Rediriger vers Stripe Checkout
       if (url) {

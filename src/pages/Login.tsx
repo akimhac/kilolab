@@ -23,18 +23,9 @@ export default function Login() {
       if (error) throw error;
 
       if (data.user) {
-        // Récupérer le profil pour rediriger correctement
-        const { data: profile } = await supabase
-          .from('user_profiles')
-          .select('role')
-          .eq('email', data.user.email)
-          .single();
-
-        if (profile?.role === 'partner') {
-          navigate('/partner-dashboard');
-        } else {
-          navigate('/client-dashboard');
-        }
+        // Le hook useAuth va charger le profil automatiquement
+        // et le DashboardRouter dans App.tsx redirigera vers le bon dashboard
+        navigate('/dashboard');
       }
     } catch (error: any) {
       setError(error.message || 'Erreur de connexion');
