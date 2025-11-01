@@ -1,6 +1,6 @@
 import { Toaster } from 'react-hot-toast';
 
-export function ToastContainer() {
+export default function ToastContainer() {
   return (
     <Toaster
       position="top-right"

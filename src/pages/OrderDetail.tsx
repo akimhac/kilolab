@@ -3,9 +3,9 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { supabase } from '@/lib/supabase';
 import { Order } from '@/types/database';
 import { ArrowLeft, Package, MapPin, Calendar, Clock } from 'lucide-react';
-import { PhotoUpload } from '@/components/PhotoUpload';
+import PhotoUpload from '@/components/PhotoUpload';
 
-export function OrderDetail() {
+export default function OrderDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [order, setOrder] = useState<Order | null>(null);

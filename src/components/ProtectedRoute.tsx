@@ -7,7 +7,7 @@ interface ProtectedRouteProps {
   requireRole?: 'client' | 'partner';
 }
 
-export function ProtectedRoute({ children, requireRole }: ProtectedRouteProps) {
+export default function ProtectedRoute({ children, requireRole }: ProtectedRouteProps) {
   const { user, loading } = useAuth();
 
   console.log('ProtectedRoute - Loading:', loading, 'User:', user?.email, 'Role:', user?.role);

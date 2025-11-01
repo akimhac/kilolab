@@ -1,7 +1,7 @@
 import { Link, useSearchParams } from 'react-router-dom';
 import { XCircle } from 'lucide-react';
 
-export function PaymentCancelled() {
+export default function PaymentCancelled() {
   const [searchParams] = useSearchParams();
   const orderId = searchParams.get('order_id');
 
