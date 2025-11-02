@@ -90,24 +90,92 @@ export function PartnersMap() {
           </button>
         </div>
 
-        {/* Partners List */}
+        {/* Partners List - Airbnb Style Cards */}
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
           {partners.map((partner) => (
-            <div key={partner.id} className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-6">
-              <div className="flex items-start gap-3 mb-4">
-                <MapPin className="w-6 h-6 text-purple-400 flex-shrink-0 mt-1" />
-                <div>
-                  <h3 className="text-xl font-bold text-white mb-2">{partner.name}</h3>
-                  <p className="text-gray-400 text-sm mb-1">{partner.address}</p>
-                  <p className="text-gray-400 text-sm">{partner.postal_code} {partner.city}</p>
+            <motion.div
+              key={partner.id}
+              whileHover={{ y: -8, scale: 1.02 }}
+              transition={{ type: "spring", stiffness: 300, damping: 20 }}
+              className="group bg-white/5 backdrop-blur-lg border border-white/10 rounded-2xl overflow-hidden hover:border-purple-500/50 hover:shadow-2xl hover:shadow-purple-500/20 transition-all duration-300 cursor-pointer"
+            >
+              {/* Image placeholder with gradient */}
+              <div className="relative h-48 bg-gradient-to-br from-purple-600 via-pink-500 to-blue-500 overflow-hidden">
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <MapPin className="w-16 h-16 text-white/80" />
+                </div>
+                {/* Overlay effect on hover */}
+                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-300" />
+                {/* Badge */}
+                <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-semibold text-purple-900">
+                  Vérifié ✓
                 </div>
               </div>
-              {partner.phone && (
-                <p className="text-gray-400 text-sm">📞 {partner.phone}</p>
-              )}
-            </div>
+
+              {/* Content */}
+              <div className="p-6">
+                <h3 className="text-xl font-bold text-white mb-2 group-hover:text-purple-400 transition-colors">
+                  {partner.name}
+                </h3>
+
+                <div className="space-y-2 mb-4">
+                  <div className="flex items-start gap-2">
+                    <MapPin className="w-4 h-4 text-gray-400 flex-shrink-0 mt-1" />
+                    <div>
+                      <p className="text-gray-300 text-sm">{partner.address}</p>
+                      <p className="text-gray-400 text-sm">{partner.postal_code} {partner.city}</p>
+                    </div>
+                  </div>
+
+                  {partner.phone && (
+                    <div className="flex items-center gap-2">
+                      <span className="text-gray-400 text-sm">📞</span>
+                      <p className="text-gray-300 text-sm">{partner.phone}</p>
+                    </div>
+                  )}
+                </div>
+
+                {/* Action button */}
+                <button className="w-full px-4 py-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg hover:from-purple-700 hover:to-pink-700 transition-all duration-200 transform group-hover:scale-105">
+                  Choisir ce pressing
+                </button>
+
+                {/* Rating (mock data) */}
+                <div className="flex items-center justify-between mt-4 pt-4 border-t border-white/10">
+                  <div className="flex items-center gap-1">
+                    <span className="text-yellow-400">⭐</span>
+                    <span className="text-white font-semibold">4.9</span>
+                    <span className="text-gray-400 text-sm">(127 avis)</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <span className="text-green-400">●</span>
+                    <span className="text-gray-400 text-sm">Ouvert</span>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
           ))}
         </div>
+
+        {/* Empty state if no partners */}
+        {partners.length === 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-12 text-center"
+          >
+            <MapPin className="w-16 h-16 text-gray-600 mx-auto mb-4" />
+            <h3 className="text-xl font-bold text-white mb-2">Aucun partenaire pour le moment</h3>
+            <p className="text-gray-400 mb-6">Soyez le premier à rejoindre notre réseau !</p>
+            <button
+              onClick={() => setShowForm(true)}
+              className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg hover:from-purple-700 hover:to-pink-700 transition"
+            >
+              <Plus className="w-5 h-5" />
+              Devenir partenaire
+            </button>
+          </motion.div>
+        )}
 
         {/* Map (simplified - real coordinates would need geocoding) */}
         <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6">
