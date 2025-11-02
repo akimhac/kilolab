@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 
-export default function Login() {
+export function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -23,8 +23,6 @@ export default function Login() {
       if (error) throw error;
 
       if (data.user) {
-        // Le hook useAuth va charger le profil automatiquement
-        // et le DashboardRouter dans App.tsx redirigera vers le bon dashboard
         navigate('/dashboard');
       }
     } catch (error: any) {
@@ -93,7 +91,7 @@ export default function Login() {
           <div className="mt-6 text-center">
             <p className="text-white/60 text-sm">
               Pas encore de compte ?{' '}
-              <Link to="/register" className="text-purple-400 hover:text-purple-300 font-medium">
+              <Link to="/signup" className="text-purple-400 hover:text-purple-300 font-medium">
                 Créer un compte
               </Link>
             </p>
