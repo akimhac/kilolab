@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 
-export default function Login() {
+export function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -23,18 +23,8 @@ export default function Login() {
       if (error) throw error;
 
       if (data.user) {
-        // Récupérer le profil pour rediriger correctement
-        const { data: profile } = await supabase
-          .from('user_profiles')
-          .select('role')
-          .eq('email', data.user.email)
-          .single();
-
-        if (profile?.role === 'partner') {
-          navigate('/partner-dashboard');
-        } else {
-          navigate('/client-dashboard');
-        }
+        // Rediriger vers le dashboard qui route automatiquement selon le rôle
+        navigate('/dashboard');
       }
     } catch (error: any) {
       setError(error.message || 'Erreur de connexion');
@@ -102,7 +92,7 @@ export default function Login() {
           <div className="mt-6 text-center">
             <p className="text-white/60 text-sm">
               Pas encore de compte ?{' '}
-              <Link to="/register" className="text-purple-400 hover:text-purple-300 font-medium">
+              <Link to="/signup" className="text-purple-400 hover:text-purple-300 font-medium">
                 Créer un compte
               </Link>
             </p>

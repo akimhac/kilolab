@@ -5,11 +5,17 @@ interface UserProfile {
   id: string;
   email: string;
   role: 'client' | 'partner';
+  full_name?: string;
   created_at: string;
 }
 
+interface User extends UserProfile {
+  role: 'client' | 'partner';
+  full_name?: string;
+}
+
 interface AuthState {
-  user: any | null;
+  user: User | null;
   profile: UserProfile | null;
   loading: boolean;
   isAuthenticated: boolean;
@@ -58,8 +64,12 @@ export function useAuth() {
               .single();
 
             if (!createError && newProfile && mounted) {
+              const mergedUser: User = {
+                ...user,
+                ...newProfile,
+              };
               setState({
-                user,
+                user: mergedUser,
                 profile: newProfile,
                 loading: false,
                 isAuthenticated: true,
@@ -69,8 +79,12 @@ export function useAuth() {
             }
           }
         } else if (profile && mounted) {
+          const mergedUser: User = {
+            ...user,
+            ...profile,
+          };
           setState({
-            user,
+            user: mergedUser,
             profile,
             loading: false,
             isAuthenticated: true,
@@ -153,5 +167,53 @@ export function useAuth() {
     };
   }, []); // Dépendances vides = exécution une seule fois
 
-  return state;
+  const signOut = async () => {
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
+      setState({
+        user: null,
+        profile: null,
+        loading: false,
+        isAuthenticated: false,
+        isClient: false,
+        isPartner: false,
+      });
+    } catch (error) {
+      console.error('Error signing out:', error);
+      throw error;
+    }
+  };
+
+  const signUp = async (email: string, password: string, fullName: string, role: 'client' | 'partner') => {
+    try {
+      // 1. Créer l'utilisateur avec Supabase Auth
+      const { data: authData, error: authError } = await supabase.auth.signUp({
+        email,
+        password,
+      });
+
+      if (authError) throw authError;
+      if (!authData.user) throw new Error('Erreur lors de la création du compte');
+
+      // 2. Créer le profil utilisateur
+      const { error: profileError } = await supabase
+        .from('user_profiles')
+        .insert({
+          id: authData.user.id,
+          email,
+          full_name: fullName,
+          role,
+        });
+
+      if (profileError) throw profileError;
+
+      return authData.user;
+    } catch (error) {
+      console.error('Error signing up:', error);
+      throw error;
+    }
+  };
+
+  return { ...state, signOut, signUp };
 }
