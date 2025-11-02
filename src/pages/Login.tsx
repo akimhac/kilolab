@@ -23,7 +23,6 @@ export function Login() {
       if (error) throw error;
 
       if (data.user) {
-        // Rediriger vers le dashboard qui route automatiquement selon le rôle
         navigate('/dashboard');
       }
     } catch (error: any) {
