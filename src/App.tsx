@@ -4,7 +4,6 @@ import { HelmetProvider } from 'react-helmet-async';
 import PromoPopup from './components/PromoPopup';
 import CookieConsent from './components/CookieConsent';
 
-// Lazy load pages
 const LandingPage = lazy(() => import('./pages/LandingPage'));
 const PartnerLanding = lazy(() => import('./pages/PartnerLanding'));
 const Login = lazy(() => import('./pages/Login'));
@@ -15,6 +14,8 @@ const NewOrder = lazy(() => import('./pages/NewOrder'));
 const Checkout = lazy(() => import('./pages/Checkout'));
 const PartnersMap = lazy(() => import('./pages/PartnersMap'));
 const CGV = lazy(() => import('./pages/CGV'));
+const MentionsLegales = lazy(() => import('./pages/MentionsLegales'));
+const Privacy = lazy(() => import('./pages/Privacy'));
 
 const Loader = () => (
   <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center">
@@ -38,16 +39,11 @@ export default function App() {
             <Route path="/checkout" element={<Checkout />} />
             <Route path="/partners-map" element={<PartnersMap />} />
             <Route path="/cgv" element={<CGV />} />
+            <Route path="/mentions-legales" element={<MentionsLegales />} />
+            <Route path="/privacy" element={<Privacy />} />
           </Routes>
         </Suspense>
       </Router>
     </HelmetProvider>
   );
 }
-
-import MentionsLegales from './pages/MentionsLegales';
-import PrivacyPolicy from './pages/PrivacyPolicy';
-
-// Dans les Routes, ajouter:
-// <Route path="/mentions-legales" element={<MentionsLegales />} />
-// <Route path="/privacy" element={<PrivacyPolicy />} />
