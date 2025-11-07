@@ -44,3 +44,10 @@ export default function App() {
     </HelmetProvider>
   );
 }
+
+import MentionsLegales from './pages/MentionsLegales';
+import PrivacyPolicy from './pages/PrivacyPolicy';
+
+// Dans les Routes, ajouter:
+// <Route path="/mentions-legales" element={<MentionsLegales />} />
+// <Route path="/privacy" element={<PrivacyPolicy />} />
