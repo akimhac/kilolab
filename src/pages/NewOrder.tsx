@@ -1,248 +1,220 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '@/hooks/useAuth';
-import { useOrders } from '@/hooks/useOrders';
-import { supabase } from '@/lib/supabase';
-import { Partner } from '@/types/database';
-import { MapPin, Package, Clock, TrendingUp, Zap, ArrowLeft, CreditCard } from 'lucide-react';
-import toast from 'react-hot-toast';
+import { supabase } from '../lib/supabase';
+import { MapPin, Package, Clock, ArrowLeft, AlertCircle, CheckCircle } from 'lucide-react';
 
-export function NewOrder() {
-  const { user } = useAuth();
-  const { createOrder } = useOrders(user?.id);
+interface Partner {
+  id: string;
+  name: string;
+  address: string;
+  city: string;
+  postal_code: string;
+}
+
+export default function NewOrder() {
   const navigate = useNavigate();
-
   const [partners, setPartners] = useState<Partner[]>([]);
-  const [selectedPartner, setSelectedPartner] = useState<string>('');
-  const [serviceType, setServiceType] = useState<'standard' | 'express' | 'ultra'>('standard');
-  const [weight, setWeight] = useState<number>(1);
-  const [notes, setNotes] = useState('');
   const [loading, setLoading] = useState(false);
+  const [step, setStep] = useState(1);
+
+  const [formData, setFormData] = useState({
+    partnerId: '',
+    speed: 'express',
+    notes: '',
+  });
 
   useEffect(() => {
-    fetchPartners();
+    loadPartners();
   }, []);
 
-  const fetchPartners = async () => {
+  const loadPartners = async () => {
     try {
-      const { data, error } = await supabase
+      const { data } = await supabase
         .from('partners')
-        .select('*')
-        .order('name');
+        .select('id, name, address, city, postal_code')
+        .eq('is_active', true)
+        .order('city');
 
-      if (error) throw error;
       setPartners(data || []);
     } catch (error) {
-      console.error('Error fetching partners:', error);
-      toast.error('Erreur lors du chargement des partenaires');
+      console.error('Erreur chargement partenaires:', error);
     }
   };
-
-  const prices = {
-    standard: 5,
-    express: 10,
-    ultra: 15,
-  };
-
-  const totalPrice = weight * prices[serviceType];
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    if (!selectedPartner) {
-      toast.error('Veuillez sélectionner un point relais');
-      return;
-    }
-
     setLoading(true);
 
     try {
-      // 1. Créer la commande
-      const order = await createOrder({
-        partner_id: selectedPartner,
-        service_type: serviceType,
-        weight,
-        notes: notes || undefined,
-      });
-
-      // 2. Créer la session Stripe Checkout via Netlify Function
-      const response = await fetch('/api/create-checkout-session', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          serviceType,
-          weight,
-          orderId: order.id,
-        }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to create checkout session');
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        navigate('/login');
+        return;
       }
 
-      const { url } = await response.json();
+      const { data: profile } = await supabase
+        .from('user_profiles')
+        .select('id')
+        .eq('email', user.email)
+        .single();
 
-      // 3. Rediriger vers Stripe Checkout
-      if (url) {
-        window.location.href = url;
-      } else {
-        throw new Error('No checkout URL received');
+      if (!profile) {
+        alert('Profil introuvable');
+        return;
       }
+
+      const pricePerKg = formData.speed === 'premium' ? 500 : formData.speed === 'express' ? 1000 : 1500;
+
+      const { data: order, error } = await supabase
+        .from('orders')
+        .insert({
+          client_id: profile.id,
+          partner_id: formData.partnerId,
+          speed: formData.speed,
+          status: 'pending_weight',
+          weight_kg: null,
+          price_gross_cents: 0,
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      alert('✅ Commande créée !\n\nDéposez votre linge au pressing. Vous serez notifié après la pesée pour payer.');
+      navigate('/client-dashboard');
     } catch (error: any) {
-      console.error('Order creation error:', error);
-      toast.error('Erreur lors de la création de la commande');
+      console.error('Erreur:', error);
+      alert('Erreur: ' + error.message);
+    } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
-      <div className="container mx-auto px-4 py-8 max-w-4xl">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 p-6">
+      <div className="max-w-3xl mx-auto">
         <button
-          onClick={() => navigate('/dashboard')}
-          className="flex items-center gap-2 text-gray-400 hover:text-white mb-8 transition"
+          onClick={() => navigate('/client-dashboard')}
+          className="flex items-center gap-2 text-white/60 hover:text-white mb-6"
         >
           <ArrowLeft className="w-5 h-5" />
-          Retour au dashboard
+          Retour
         </button>
 
-        <h1 className="text-4xl font-bold text-white mb-8">Nouvelle commande</h1>
-
-        <form onSubmit={handleSubmit} className="space-y-8">
-          {/* Sélection du partenaire */}
-          <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6">
-            <h2 className="text-2xl font-bold text-white mb-4 flex items-center gap-2">
-              <MapPin className="w-6 h-6 text-purple-400" />
-              Point relais
-            </h2>
-            <select
-              value={selectedPartner}
-              onChange={(e) => setSelectedPartner(e.target.value)}
-              required
-              className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
-            >
-              <option value="">Choisissez un point relais</option>
-              {partners.map((partner) => (
-                <option key={partner.id} value={partner.id}>
-                  {partner.name} - {partner.city} ({partner.postal_code})
-                </option>
-              ))}
-            </select>
+        <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-8 border border-white/20">
+          <div className="text-center mb-8">
+            <Package className="w-16 h-16 text-purple-400 mx-auto mb-4" />
+            <h1 className="text-3xl font-bold text-white mb-2">Nouvelle commande</h1>
+            <p className="text-white/60">Choisissez votre laverie et formule</p>
           </div>
 
-          {/* Type de service */}
-          <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6">
-            <h2 className="text-2xl font-bold text-white mb-4 flex items-center gap-2">
-              <Package className="w-6 h-6 text-purple-400" />
-              Formule
-            </h2>
-            <div className="grid md:grid-cols-3 gap-4">
-              <button
-                type="button"
-                onClick={() => setServiceType('standard')}
-                className={`p-4 rounded-xl border-2 transition ${
-                  serviceType === 'standard'
-                    ? 'border-purple-500 bg-purple-500/20'
-                    : 'border-white/10 bg-white/5 hover:bg-white/10'
-                }`}
-              >
-                <Clock className="w-8 h-8 text-purple-400 mx-auto mb-2" />
-                <h3 className="text-lg font-bold text-white mb-1">Premium</h3>
-                <p className="text-gray-400 text-sm mb-2">72-96h</p>
-                <div className="text-2xl font-bold text-white">5€/kg</div>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => setServiceType('express')}
-                className={`p-4 rounded-xl border-2 transition ${
-                  serviceType === 'express'
-                    ? 'border-blue-500 bg-blue-500/20'
-                    : 'border-white/10 bg-white/5 hover:bg-white/10'
-                }`}
-              >
-                <TrendingUp className="w-8 h-8 text-blue-400 mx-auto mb-2" />
-                <h3 className="text-lg font-bold text-white mb-1">Express</h3>
-                <p className="text-gray-400 text-sm mb-2">24h</p>
-                <div className="text-2xl font-bold text-white">10€/kg</div>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => setServiceType('ultra')}
-                className={`p-4 rounded-xl border-2 transition ${
-                  serviceType === 'ultra'
-                    ? 'border-red-500 bg-red-500/20'
-                    : 'border-white/10 bg-white/5 hover:bg-white/10'
-                }`}
-              >
-                <Zap className="w-8 h-8 text-red-400 mx-auto mb-2" />
-                <h3 className="text-lg font-bold text-white mb-1">Ultra Express</h3>
-                <p className="text-gray-400 text-sm mb-2">6h</p>
-                <div className="text-2xl font-bold text-white">15€/kg</div>
-              </button>
-            </div>
-          </div>
-
-          {/* Poids */}
-          <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6">
-            <h2 className="text-2xl font-bold text-white mb-4">Poids du linge</h2>
-            <div className="flex items-center gap-4">
-              <input
-                type="number"
-                min="0.5"
-                step="0.5"
-                value={weight}
-                onChange={(e) => setWeight(Number(e.target.value))}
+          <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Étape 1: Choix laverie */}
+            <div>
+              <label className="block text-white/80 font-semibold mb-3 flex items-center gap-2">
+                <MapPin className="w-5 h-5" />
+                1. Choisissez votre laverie
+              </label>
+              <select
                 required
-                className="flex-1 px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
-              />
-              <span className="text-2xl font-bold text-white">kg</span>
+                value={formData.partnerId}
+                onChange={(e) => setFormData({ ...formData, partnerId: e.target.value })}
+                className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+              >
+                <option value="">-- Sélectionnez --</option>
+                {partners.map((p) => (
+                  <option key={p.id} value={p.id} className="bg-slate-800">
+                    {p.name} - {p.city}
+                  </option>
+                ))}
+              </select>
             </div>
-          </div>
 
-          {/* Notes */}
-          <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6">
-            <h2 className="text-2xl font-bold text-white mb-4">Notes (optionnel)</h2>
-            <textarea
-              value={notes}
-              onChange={(e) => setNotes(e.target.value)}
-              rows={4}
-              placeholder="Instructions particulières..."
-              className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500"
-            />
-          </div>
-
-          {/* Total */}
-          <div className="bg-gradient-to-r from-purple-600 to-pink-600 rounded-2xl p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-white/80 mb-1">Total à payer</p>
-                <p className="text-sm text-white/60">{weight} kg × {prices[serviceType]}€</p>
+            {/* Étape 2: Choix formule */}
+            <div>
+              <label className="block text-white/80 font-semibold mb-3 flex items-center gap-2">
+                <Clock className="w-5 h-5" />
+                2. Choisissez votre formule
+              </label>
+              <div className="grid md:grid-cols-3 gap-4">
+                {[
+                  { value: 'premium', label: 'Premium', time: '72-96h', price: '5€/kg', desc: 'Économique' },
+                  { value: 'express', label: 'Express', time: '24h', price: '10€/kg', desc: 'Rapide', popular: true },
+                  { value: 'ultra', label: 'Ultra Express', time: '6h', price: '15€/kg', desc: 'Urgent' },
+                ].map((option) => (
+                  <button
+                    key={option.value}
+                    type="button"
+                    onClick={() => setFormData({ ...formData, speed: option.value })}
+                    className={`relative p-6 rounded-xl border-2 transition-all ${
+                      formData.speed === option.value
+                        ? 'border-purple-500 bg-purple-500/20'
+                        : 'border-white/20 bg-white/5 hover:border-white/40'
+                    }`}
+                  >
+                    {option.popular && (
+                      <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-yellow-500 text-slate-900 text-xs font-bold px-3 py-1 rounded-full">
+                        POPULAIRE
+                      </div>
+                    )}
+                    <p className="text-white font-bold text-lg mb-1">{option.label}</p>
+                    <p className="text-white/60 text-sm mb-2">{option.time}</p>
+                    <p className="text-purple-300 font-bold text-xl mb-1">{option.price}</p>
+                    <p className="text-white/50 text-xs">{option.desc}</p>
+                  </button>
+                ))}
               </div>
-              <div className="text-5xl font-bold text-white">{totalPrice}€</div>
             </div>
-          </div>
 
-          {/* Submit avec Stripe */}
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full px-8 py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white text-lg font-semibold rounded-lg hover:from-purple-700 hover:to-pink-700 transition disabled:opacity-50 flex items-center justify-center gap-3"
-          >
-            {loading ? (
-              'Redirection vers le paiement...'
-            ) : (
-              <>
-                <CreditCard className="w-6 h-6" />
-                Payer avec Stripe
-              </>
-            )}
-          </button>
-        </form>
+            {/* Notes optionnelles */}
+            <div>
+              <label className="block text-white/80 font-semibold mb-3">
+                3. Notes (optionnel)
+              </label>
+              <textarea
+                value={formData.notes}
+                onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+                placeholder="Instructions spéciales, vêtements délicats..."
+                rows={3}
+                className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500"
+              />
+            </div>
+
+            {/* Info */}
+            <div className="bg-blue-500/20 border border-blue-500/50 rounded-lg p-4">
+              <div className="flex gap-3">
+                <AlertCircle className="w-5 h-5 text-blue-300 flex-shrink-0 mt-0.5" />
+                <div className="text-blue-200 text-sm">
+                  <p className="font-semibold mb-1">Comment ça marche ?</p>
+                  <ol className="list-decimal list-inside space-y-1">
+                    <li>Déposez votre linge à la laverie choisie</li>
+                    <li>Le pressing pèse et vous notifie du prix exact</li>
+                    <li>Vous payez en ligne de manière sécurisée</li>
+                    <li>Récupérez votre linge propre et plié !</li>
+                  </ol>
+                </div>
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              disabled={loading || !formData.partnerId}
+              className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-bold py-4 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            >
+              {loading ? (
+                <>
+                  <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  Création...
+                </>
+              ) : (
+                <>
+                  <CheckCircle className="w-5 h-5" />
+                  Créer ma commande
+                </>
+              )}
+            </button>
+          </form>
+        </div>
       </div>
     </div>
   );
