@@ -42,7 +42,7 @@ export default function PartnerLanding() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     alert(
-      `✅ Merci ${lead.name} !\nNous vous recontactons pour activer votre compte à ${lead.city}.\n\n(À connecter à Supabase/CRM)`
+      `✅ Merci ${lead.name} !\nNous vous recontactons pour activer votre compte.\n\n(À connecter à Supabase/CRM)`
     );
     setLead({ name: '', email: '', phone: '', city: '' });
   };
@@ -94,11 +94,11 @@ export default function PartnerLanding() {
         </div>
 
         <h2 className="text-4xl md:text-6xl font-extrabold text-white leading-tight mb-4">
-          Développez votre <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-300 to-green-300">chiffre d'affaires</span>
+          Développez votre <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-300 to-green-300">chiffre d affaires</span>
         </h2>
         <p className="text-white/80 text-lg md:text-xl max-w-3xl mx-auto mb-8">
-          Recevez des commandes qualifiées près de chez vous et augmentez vos revenus en moyenne de <b>30%</b>. 
-          On s'occupe de l'acquisition, vous vous concentrez sur la production.
+          Recevez des commandes qualifiées et augmentez vos revenus en moyenne de <b>30%</b>. 
+          On s occupe de l acquisition, vous vous concentrez sur la production.
         </p>
 
         <div className="flex flex-wrap gap-4 justify-center">
@@ -115,7 +115,7 @@ export default function PartnerLanding() {
           {[
             { icon: LineChart, label: 'Croissance moyenne', value: '+30%' },
             { icon: Users, label: 'Pressings partenaires', value: '500+' },
-            { icon: Timer, label: 'Délai d'activation', value: '24h' },
+            { icon: Timer, label: 'Delai activation', value: '24h' },
             { icon: Star, label: 'Satisfaction', value: '4.8/5' },
           ].map((s, i) => (
             <div
@@ -169,13 +169,13 @@ export default function PartnerLanding() {
         <div className="text-center mb-8">
           <h3 className="text-3xl font-bold text-white mb-2">Commission transparente</h3>
           <p className="text-white/75">
-            Pas de frais d'entrée. Pas d'abonnement mensuel. Vous gagnez sur chaque kilo traité.
+            Pas de frais d entrée. Pas d abonnement mensuel. Vous gagnez sur chaque kilo traité.
           </p>
         </div>
 
         <div className="grid md:grid-cols-3 gap-6">
           {[
-            { name: 'Premium (72–96h)', price: '5€ / kg', note: 'Vous gardez 100%' },
+            { name: 'Premium (72-96h)', price: '5€ / kg', note: 'Vous gardez 100%' },
             { name: 'Express (24h)', price: '10€ / kg', note: 'Vous gardez 100%' },
             { name: 'Ultra Express (6h)', price: '15€ / kg', note: 'Vous gardez 100%' },
           ].map((p, i) => (
@@ -261,7 +261,7 @@ export default function PartnerLanding() {
 
             <div className="flex items-center gap-2 text-sm text-white/60">
               <Check className="w-4 h-4 text-emerald-300" />
-              Sans frais d'entrée. Sans engagement.
+              Sans frais d entrée. Sans engagement.
             </div>
           </form>
         </div>
