@@ -1,15 +1,15 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
-import { 
-  Package, 
-  Clock, 
-  CheckCircle, 
-  LogOut, 
-  TrendingUp, 
+import { sendWeightNotification, sendReadyNotification } from '../lib/notifications';
+import {
+  Package,
+  Clock,
+  CheckCircle,
+  LogOut,
+  TrendingUp,
   DollarSign,
   User,
-  Save,
   MapPin,
   Phone,
   Mail,
@@ -19,7 +19,7 @@ import {
 interface Order {
   id: string;
   status: string;
-  speed: string;
+  speed: 'premium' | 'express' | 'ultra';
   weight_kg: number | null;
   price_gross_cents: number;
   created_at: string;
@@ -38,6 +38,7 @@ interface PartnerProfile {
   address: string | null;
   city: string | null;
   postal_code: string | null;
+  role?: string;
 }
 
 export default function PartnerDashboard() {
@@ -46,14 +47,14 @@ export default function PartnerDashboard() {
   const [partnerId, setPartnerId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'orders' | 'profile' | 'stats'>('orders');
-  
+
   const [stats, setStats] = useState({
     total: 0,
     pending: 0,
     inProgress: 0,
     completed: 0,
     revenue: 0,
-    revenueThisMonth: 0,
+    revenueThisMonth: 0
   });
 
   const navigate = useNavigate();
@@ -65,7 +66,6 @@ export default function PartnerDashboard() {
   const loadData = async () => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
-      
       if (!user) {
         navigate('/login');
         return;
@@ -86,7 +86,6 @@ export default function PartnerDashboard() {
 
       setProfile(profileData);
 
-      // Charger le partner_id
       const { data: partner } = await supabase
         .from('partners')
         .select('id')
@@ -95,14 +94,10 @@ export default function PartnerDashboard() {
 
       if (partner) {
         setPartnerId(partner.id);
-        
-        // Charger les commandes
+
         const { data: ordersData, error: ordersError } = await supabase
           .from('orders')
-          .select(`
-            *,
-            user_profiles:client_id (name, email)
-          `)
+          .select(`*, user_profiles:client_id (name, email)`)
           .eq('partner_id', partner.id)
           .order('created_at', { ascending: false });
 
@@ -110,36 +105,26 @@ export default function PartnerDashboard() {
 
         setOrders(ordersData || []);
 
-        // Calculer les stats
         const total = ordersData?.length || 0;
         const pending = ordersData?.filter(o => o.status === 'pending_weight').length || 0;
         const inProgress = ordersData?.filter(o => o.status === 'paid' || o.status === 'in_progress').length || 0;
         const completed = ordersData?.filter(o => o.status === 'ready' || o.status === 'delivered').length || 0;
-        
+
         const revenue = ordersData
           ?.filter(o => o.status !== 'cancelled')
           .reduce((sum, o) => sum + (o.price_gross_cents || 0), 0) || 0;
 
-        const thisMonth = new Date();
-        thisMonth.setDate(1);
-        const revenueThisMonth = ordersData
-          ?.filter(o => {
-            const orderDate = new Date(o.created_at);
-            return orderDate >= thisMonth && o.status !== 'cancelled';
-          })
-          .reduce((sum, o) => sum + (o.price_gross_cents || 0), 0) || 0;
+        const firstOfMonth = new Date();
+        firstOfMonth.setDate(1);
+        const revenueThisMonth =
+          ordersData
+            ?.filter(o => new Date(o.created_at) >= firstOfMonth && o.status !== 'cancelled')
+            .reduce((sum, o) => sum + (o.price_gross_cents || 0), 0) || 0;
 
-        setStats({
-          total,
-          pending,
-          inProgress,
-          completed,
-          revenue,
-          revenueThisMonth,
-        });
+        setStats({ total, pending, inProgress, completed, revenue, revenueThisMonth });
       }
-    } catch (error) {
-      console.error('Error loading data:', error);
+    } catch (e) {
+      console.error('Error loading data:', e);
     } finally {
       setLoading(false);
     }
@@ -169,27 +154,48 @@ export default function PartnerDashboard() {
 
       if (error) throw error;
 
-      alert(`✅ Poids enregistré : ${weight} kg\nPrix mis à jour : ${(newPrice / 100).toFixed(2)}€\n\nLe client peut maintenant payer !`);
+      // 🚀 ENVOYER EMAIL CLIENT
+      if (order.user_profiles?.email) {
+        await sendWeightNotification(order.user_profiles.email, {
+          weight,
+          price: newPrice / 100,
+          orderId,
+          partnerName: profile?.name || 'Votre pressing',
+        });
+      }
+
+      alert(
+        `✅ Poids enregistré : ${weight} kg\nPrix : ${(newPrice / 100).toFixed(2)}€\n\n📧 Email envoyé au client !`
+      );
       loadData();
     } catch (error: any) {
-      console.error('Error updating weight:', error);
+      console.error('Error:', error);
       alert('Erreur : ' + error.message);
     }
   };
 
   const handleStatusUpdate = async (orderId: string, newStatus: string) => {
     try {
-      const { error } = await supabase
-        .from('orders')
-        .update({ status: newStatus })
-        .eq('id', orderId);
-
+      const order = orders.find(o => o.id === orderId);
+      
+      const { error } = await supabase.from('orders').update({ status: newStatus }).eq('id', orderId);
       if (error) throw error;
 
-      alert('✅ Statut mis à jour !');
+      // 🚀 ENVOYER EMAIL SI COMMANDE PRÊTE
+      if (newStatus === 'ready' && order?.user_profiles?.email) {
+        await sendReadyNotification(order.user_profiles.email, {
+          orderId,
+          partnerName: profile?.name || 'Votre pressing',
+          partnerAddress: profile?.address || '',
+        });
+        alert('✅ Statut mis à jour !\n📧 Email envoyé au client !');
+      } else {
+        alert('✅ Statut mis à jour !');
+      }
+      
       loadData();
     } catch (error: any) {
-      console.error('Error updating status:', error);
+      console.error('Error:', error);
       alert('Erreur : ' + error.message);
     }
   };
@@ -202,7 +208,7 @@ export default function PartnerDashboard() {
       in_progress: '🔄 En cours',
       ready: '✅ Prêt',
       delivered: '📦 Livré',
-      cancelled: '❌ Annulé',
+      cancelled: '❌ Annulé'
     };
     return labels[status] || status;
   };
@@ -215,7 +221,7 @@ export default function PartnerDashboard() {
       in_progress: 'bg-purple-500/20 text-purple-300 border-purple-500/50',
       ready: 'bg-green-500/20 text-green-300 border-green-500/50',
       delivered: 'bg-gray-500/20 text-gray-300 border-gray-500/50',
-      cancelled: 'bg-red-500/20 text-red-300 border-red-500/50',
+      cancelled: 'bg-red-500/20 text-red-300 border-red-500/50'
     };
     return colors[status] || 'bg-gray-500/20 text-gray-300';
   };
@@ -231,7 +237,6 @@ export default function PartnerDashboard() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-green-900 to-slate-900 p-6">
       <div className="max-w-7xl mx-auto">
-        {/* Header */}
         <div className="flex justify-between items-center mb-8">
           <div>
             <h1 className="text-4xl font-bold text-white mb-2">🏢 Espace Partenaire</h1>
@@ -246,64 +251,40 @@ export default function PartnerDashboard() {
           </button>
         </div>
 
-        {/* Tabs */}
         <div className="flex gap-4 mb-8">
-          <button
-            onClick={() => setActiveTab('orders')}
-            className={`px-6 py-3 rounded-lg font-semibold transition-all ${
-              activeTab === 'orders'
-                ? 'bg-green-600 text-white'
-                : 'bg-white/10 text-white/60 hover:bg-white/20'
-            }`}
-          >
-            📦 Commandes
-          </button>
-          <button
-            onClick={() => setActiveTab('stats')}
-            className={`px-6 py-3 rounded-lg font-semibold transition-all ${
-              activeTab === 'stats'
-                ? 'bg-green-600 text-white'
-                : 'bg-white/10 text-white/60 hover:bg-white/20'
-            }`}
-          >
-            📊 Statistiques
-          </button>
-          <button
-            onClick={() => setActiveTab('profile')}
-            className={`px-6 py-3 rounded-lg font-semibold transition-all ${
-              activeTab === 'profile'
-                ? 'bg-green-600 text-white'
-                : 'bg-white/10 text-white/60 hover:bg-white/20'
-            }`}
-          >
-            👤 Mon Profil
-          </button>
+          {(['orders', 'stats', 'profile'] as const).map((tab) => (
+            <button
+              key={tab}
+              onClick={() => setActiveTab(tab)}
+              className={`px-6 py-3 rounded-lg font-semibold transition-all ${
+                activeTab === tab ? 'bg-green-600 text-white' : 'bg-white/10 text-white/70 hover:bg-white/20'
+              }`}
+            >
+              {tab === 'orders' ? '📦 Commandes' : tab === 'stats' ? '📊 Statistiques' : '👤 Mon Profil'}
+            </button>
+          ))}
         </div>
 
-        {/* Stats Cards */}
         {activeTab === 'stats' && (
           <>
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
               <div className="bg-white/10 backdrop-blur-lg rounded-xl p-6 border border-white/20">
-                <Package className="w-10 h-10 text-blue-400 mb-2" />
+                <Package className="w-10 h-10 text-blue-300 mb-2" />
                 <p className="text-white/60 text-sm">Commandes totales</p>
                 <p className="text-3xl font-bold text-white">{stats.total}</p>
               </div>
-
               <div className="bg-white/10 backdrop-blur-lg rounded-xl p-6 border border-white/20">
-                <Scale className="w-10 h-10 text-yellow-400 mb-2" />
+                <Scale className="w-10 h-10 text-yellow-300 mb-2" />
                 <p className="text-white/60 text-sm">À peser</p>
                 <p className="text-3xl font-bold text-white">{stats.pending}</p>
               </div>
-
               <div className="bg-white/10 backdrop-blur-lg rounded-xl p-6 border border-white/20">
-                <TrendingUp className="w-10 h-10 text-purple-400 mb-2" />
+                <TrendingUp className="w-10 h-10 text-purple-300 mb-2" />
                 <p className="text-white/60 text-sm">En cours</p>
                 <p className="text-3xl font-bold text-white">{stats.inProgress}</p>
               </div>
-
               <div className="bg-white/10 backdrop-blur-lg rounded-xl p-6 border border-white/20">
-                <CheckCircle className="w-10 h-10 text-green-400 mb-2" />
+                <CheckCircle className="w-10 h-10 text-green-300 mb-2" />
                 <p className="text-white/60 text-sm">Terminées</p>
                 <p className="text-3xl font-bold text-white">{stats.completed}</p>
               </div>
@@ -311,27 +292,26 @@ export default function PartnerDashboard() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
               <div className="bg-gradient-to-br from-green-600/20 to-emerald-600/20 backdrop-blur-lg rounded-2xl p-8 border border-green-500/30">
-                <DollarSign className="w-12 h-12 text-green-400 mb-3" />
-                <p className="text-white/80 text-lg mb-2">Chiffre d'affaires total</p>
-                <p className="text-5xl font-bold text-white mb-2">
-                  {(stats.revenue / 100).toFixed(2)} €
-                </p>
+                <DollarSign className="w-12 h-12 text-green-300 mb-3" />
+                <p className="text-white/80 text-lg mb-2">CA total</p>
+                <p className="text-5xl font-bold text-white mb-2">{(stats.revenue / 100).toFixed(2)} €</p>
                 <p className="text-green-300 text-sm">Depuis le début</p>
               </div>
 
               <div className="bg-gradient-to-br from-blue-600/20 to-purple-600/20 backdrop-blur-lg rounded-2xl p-8 border border-blue-500/30">
-                <TrendingUp className="w-12 h-12 text-blue-400 mb-3" />
+                <TrendingUp className="w-12 h-12 text-blue-300 mb-3" />
                 <p className="text-white/80 text-lg mb-2">CA ce mois-ci</p>
                 <p className="text-5xl font-bold text-white mb-2">
                   {(stats.revenueThisMonth / 100).toFixed(2)} €
                 </p>
-                <p className="text-blue-300 text-sm">{new Date().toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' })}</p>
+                <p className="text-blue-300 text-sm">
+                  {new Date().toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' })}
+                </p>
               </div>
             </div>
           </>
         )}
 
-        {/* Profile Tab */}
         {activeTab === 'profile' && profile && (
           <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-8 border border-white/20">
             <h2 className="text-2xl font-bold text-white mb-6">Mon Profil Partenaire</h2>
@@ -352,7 +332,7 @@ export default function PartnerDashboard() {
                   <Mail className="w-5 h-5" />
                   Email
                 </label>
-                <div className="px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white/60">
+                <div className="px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white/70">
                   {profile.email}
                 </div>
               </div>
@@ -390,7 +370,6 @@ export default function PartnerDashboard() {
           </div>
         )}
 
-        {/* Orders Tab */}
         {activeTab === 'orders' && (
           <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20">
             <h2 className="text-2xl font-bold text-white mb-6">📦 Commandes à traiter</h2>
@@ -403,36 +382,35 @@ export default function PartnerDashboard() {
             ) : (
               <div className="space-y-4">
                 {orders.map((order) => (
-                  <div
-                    key={order.id}
-                    className="bg-white/5 rounded-lg p-6 border border-white/10"
-                  >
+                  <div key={order.id} className="bg-white/5 rounded-lg p-6 border border-white/10">
                     <div className="flex justify-between items-start mb-4">
                       <div>
-                        <p className="text-white font-semibold text-lg mb-1">
-                          Commande #{order.id.slice(0, 8)}
-                        </p>
+                        <p className="text-white font-semibold text-lg mb-1">Commande #{order.id.slice(0, 8)}</p>
                         <p className="text-white/60 text-sm">
                           {new Date(order.created_at).toLocaleDateString('fr-FR')}
                         </p>
                         {order.user_profiles && (
-                          <p className="text-white/60 text-sm mt-1">
-                            👤 Client: {order.user_profiles.name}
-                          </p>
+                          <p className="text-white/60 text-sm mt-1">👤 Client: {order.user_profiles.name}</p>
                         )}
                       </div>
-                      <span className={`px-4 py-2 rounded-full text-sm font-semibold border-2 ${getStatusColor(order.status)}`}>
+                      <span
+                        className={`px-4 py-2 rounded-full text-sm font-semibold border-2 ${getStatusColor(
+                          order.status
+                        )}`}
+                      >
                         {getStatusLabel(order.status)}
                       </span>
                     </div>
 
-                    <div className="grid grid-cols-3 gap-4 mb-4">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                       <div>
                         <p className="text-white/60 text-sm">Formule</p>
                         <p className="text-white font-medium">
-                          {order.speed === 'premium' ? '🕐 Premium (72-96h)' : 
-                           order.speed === 'express' ? '⚡ Express (24h)' : 
-                           '🚀 Ultra Express (6h)'}
+                          {order.speed === 'premium'
+                            ? '🕐 Premium (72-96h)'
+                            : order.speed === 'express'
+                            ? '⚡ Express (24h)'
+                            : '🚀 Ultra Express (6h)'}
                         </p>
                       </div>
 
@@ -445,9 +423,7 @@ export default function PartnerDashboard() {
 
                       <div>
                         <p className="text-white/60 text-sm">Prix</p>
-                        <p className="text-white font-medium">
-                          {(order.price_gross_cents / 100).toFixed(2)} €
-                        </p>
+                        <p className="text-white font-medium">{(order.price_gross_cents / 100).toFixed(2)} €</p>
                       </div>
                     </div>
 
