@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
-import { supabase } from '@/lib/supabase';
-import { Partner } from '@/types/database';
+import { supabase } from '../lib/supabase';
+import { Partner } from '../types/database';
 import { MapPin, Plus, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';

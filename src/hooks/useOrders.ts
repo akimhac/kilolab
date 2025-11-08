@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { supabase } from '@/lib/supabase';
-import { Order } from '@/types/database';
+import { supabase } from '../lib/supabase';
+import { Order } from '../types/database';
 
 export function useOrders(userId: string | undefined) {
   const [orders, setOrders] = useState<Order[]>([]);
