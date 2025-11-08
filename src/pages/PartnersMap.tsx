@@ -304,3 +304,4 @@ export function PartnersMap() {
     </div>
   );
 }
+export default PartnersMap;
