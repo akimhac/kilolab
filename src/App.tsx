@@ -31,6 +31,7 @@ export default function App() {
           <Routes>
             <Route path="/" element={<><LandingPage /><PromoPopup /><CookieConsent /></>} />
             <Route path="/partners" element={<PartnerLanding />} />
+            <Route path="/partner-landing" element={<PartnerLanding />} />
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
             <Route path="/client-dashboard" element={<ClientDashboard />} />
@@ -38,6 +39,7 @@ export default function App() {
             <Route path="/new-order" element={<NewOrder />} />
             <Route path="/checkout" element={<Checkout />} />
             <Route path="/partners-map" element={<PartnersMap />} />
+            <Route path="/map" element={<PartnersMap />} />
             <Route path="/cgv" element={<CGV />} />
             <Route path="/mentions-legales" element={<MentionsLegales />} />
             <Route path="/privacy" element={<Privacy />} />
