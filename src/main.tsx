@@ -1,13 +1,11 @@
-import React from 'react';
-import ReactDOM from 'react-dom/client';
-import App from './App';
+import 'whatwg-fetch'; // Polyfill fetch pour iOS
+import { StrictMode } from 'react';
+import { createRoot } from 'react-dom/client';
 import './index.css';
-import { initAnalytics } from './lib/analytics';
+import App from './App.tsx';
 
-initAnalytics();
-
-ReactDOM.createRoot(document.getElementById('root')!).render(
-  <React.StrictMode>
+createRoot(document.getElementById('root')!).render(
+  <StrictMode>
     <App />
-  </React.StrictMode>
+  </StrictMode>,
 );
