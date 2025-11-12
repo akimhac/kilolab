@@ -10,16 +10,24 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
+  // DEBUG
+  console.log('🔍 Supabase URL:', import.meta.env.VITE_SUPABASE_URL);
+  console.log('🔍 Has Supabase Key:', !!import.meta.env.VITE_SUPABASE_ANON_KEY);
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError('');
+
+    console.log('🔄 Tentative de connexion...');
 
     try {
       const { data, error: signInError } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
+
+      console.log('📊 Résultat connexion:', { data, error: signInError });
 
       if (signInError) throw signInError;
 
@@ -35,7 +43,8 @@ export default function Login() {
         navigate('/client-dashboard');
       }
     } catch (err: any) {
-      setError(err.message || 'Erreur de connexion');
+      console.error('❌ Erreur connexion:', err);
+      setError(err.message || 'Erreur lors de la connexion');
     } finally {
       setLoading(false);
     }
