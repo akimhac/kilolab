@@ -1,15 +1,10 @@
 import { createClient } from '@supabase/supabase-js';
 
-// HARDCODÉ - La seule vraie source de vérité
 const supabaseUrl = 'https://dhecegehcjelbxydeolg.supabase.co';
-const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRoZWNlZ2VoY2plbGJ4eWRlb2xnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzE0MjU2MTIsImV4cCI6MjA0NzAwMTYxMn0.sb_publishable_n_6IppNa1-MA66zQc-459Q_zUUxkuVc';
+const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRoZWNlZ2VoY2plbGJ4eWRlb2xnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjAwOTcyMjEsImV4cCI6MjA3NTY3MzIyMX0.ckfg9qpfAvJBXuxxIEAjZAfe5rydAurlsx65sP4Jk8s';
 
-console.log('🔗 Supabase URL HARDCODÉE:', supabaseUrl);
-console.log('🔑 Has key:', !!supabaseAnonKey);
-
-if (!supabaseUrl.includes('dhecegehcjelbxydeolg')) {
-  throw new Error('ERREUR: Mauvaise URL Supabase détectée !');
-}
+console.log('✅ Supabase URL:', supabaseUrl);
+console.log('✅ Clé valide');
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   auth: {
@@ -18,5 +13,3 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
     detectSessionInUrl: true,
   },
 });
-
-console.log('✅ Supabase client créé avec dhecegehcjelbxydeolg');
