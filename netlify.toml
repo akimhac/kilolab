@@ -1,5 +1,5 @@
 [build]
-  command = "npm run build"
+  command = "rm -rf node_modules/.vite && rm -rf dist && npm run build"
   publish = "dist"
 
 [[redirects]]
@@ -9,3 +9,5 @@
 
 [build.environment]
   NODE_VERSION = "22"
+  # Forcer rebuild complet
+  NETLIFY_USE_YARN = "false"
