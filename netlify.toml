@@ -9,5 +9,3 @@
 
 [build.environment]
   NODE_VERSION = "22"
-
-# PAS DE HEADERS CSP - On les retire complètement pour le moment
