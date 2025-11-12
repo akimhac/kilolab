@@ -55,7 +55,6 @@ export function PartnersMap() {
 
       if (error) throw error;
 
-      toast.success('Demande envoyée avec succès !');
       setShowForm(false);
       setFormData({
         name: '',
@@ -68,7 +67,6 @@ export function PartnersMap() {
       fetchPartners();
     } catch (error: any) {
       console.error('Error:', error);
-      toast.error('Erreur lors de l\'envoi');
     }
   };
 
