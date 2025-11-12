@@ -1,6 +1,4 @@
-import { Handler } from '@netlify/functions';
-
-export const handler: Handler = async (event, context) => {
+exports.handler = async (event, context) => {
   // CORS preflight
   if (event.httpMethod === 'OPTIONS') {
     return {
@@ -18,13 +16,14 @@ export const handler: Handler = async (event, context) => {
   const supabaseKey = process.env.VITE_SUPABASE_ANON_KEY;
 
   if (!supabaseKey) {
+    console.error('❌ Missing Supabase key');
     return {
       statusCode: 500,
       body: JSON.stringify({ error: 'Missing Supabase key' }),
     };
   }
 
-  // Extraire le path API
+  // Extraire le path
   const apiPath = event.path.replace('/.netlify/functions/supabase-proxy', '');
   const queryString = event.rawQuery ? `?${event.rawQuery}` : '';
   const targetUrl = `${supabaseUrl}${apiPath}${queryString}`;
@@ -32,20 +31,17 @@ export const handler: Handler = async (event, context) => {
   console.log('🔄 Proxying:', event.httpMethod, targetUrl);
 
   try {
-    // Préparer les headers
-    const headers: Record<string, string> = {
+    const headers = {
       'apikey': supabaseKey,
       'Content-Type': 'application/json',
     };
 
-    // Copier l'authorization header si présent
     if (event.headers.authorization) {
       headers['Authorization'] = event.headers.authorization;
     } else {
       headers['Authorization'] = `Bearer ${supabaseKey}`;
     }
 
-    // Faire la requête vers Supabase
     const response = await fetch(targetUrl, {
       method: event.httpMethod,
       headers,
@@ -53,7 +49,7 @@ export const handler: Handler = async (event, context) => {
     });
 
     const responseText = await response.text();
-
+    
     console.log('✅ Response:', response.status);
 
     return {
@@ -65,7 +61,7 @@ export const handler: Handler = async (event, context) => {
       },
       body: responseText,
     };
-  } catch (error: any) {
+  } catch (error) {
     console.error('❌ Proxy error:', error);
     return {
       statusCode: 500,
@@ -75,7 +71,7 @@ export const handler: Handler = async (event, context) => {
       },
       body: JSON.stringify({ 
         error: error.message,
-        details: error.toString(),
+        stack: error.stack,
       }),
     };
   }
