@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import { supabase } from '../lib/supabase';
-import { MapPin, Plus, X } from 'lucide-react';
+import { MapPin, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
@@ -29,6 +29,7 @@ const customIcon = L.divIcon({
 export default function PartnersMap() {
   const [partners, setPartners] = useState<Partner[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
   const [selectedPartner, setSelectedPartner] = useState<Partner | null>(null);
 
   useEffect(() => {
@@ -36,19 +37,35 @@ export default function PartnersMap() {
   }, []);
 
   const loadPartners = async () => {
+    console.log('🔄 Chargement des pressings...');
+    setLoading(true);
+    setError('');
+
     try {
-      const { data, error } = await supabase
+      const { data, error: fetchError } = await supabase
         .from('partners')
         .select('*')
         .eq('is_active', true)
         .not('latitude', 'is', null)
         .not('longitude', 'is', null);
 
-      if (error) throw error;
+      console.log('📊 Résultat Supabase:', { data, error: fetchError });
 
-      setPartners(data || []);
+      if (fetchError) {
+        console.error('❌ Erreur Supabase:', fetchError);
+        throw fetchError;
+      }
+
+      if (!data || data.length === 0) {
+        setError('Aucun pressing trouvé');
+        console.warn('⚠️ Aucune donnée retournée');
+      } else {
+        console.log(`✅ ${data.length} pressings chargés`);
+        setPartners(data);
+      }
     } catch (err: any) {
-      console.error('Erreur chargement partenaires:', err.message);
+      console.error('❌ Erreur:', err);
+      setError(err.message || 'Erreur de chargement');
     } finally {
       setLoading(false);
     }
@@ -62,6 +79,22 @@ export default function PartnersMap() {
     );
   }
 
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center">
+        <div className="text-center">
+          <div className="text-red-400 text-xl mb-4">⚠️ {error}</div>
+          <button
+            onClick={loadPartners}
+            className="bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700"
+          >
+            Réessayer
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 p-6">
       <div className="max-w-7xl mx-auto">
@@ -70,7 +103,7 @@ export default function PartnersMap() {
             <MapPin className="w-10 h-10 text-purple-400" />
             Carte des Partenaires
           </h1>
-          <p className="text-white/80">
+          <p className="text-white/80 text-xl">
             {partners.length} pressing{partners.length > 1 ? 's' : ''} partenaire
             {partners.length > 1 ? 's' : ''} en France et Belgique
           </p>
