@@ -42,10 +42,10 @@ export default function PartnersMap() {
     setError('');
 
     try {
+      // ENLEVER LE FILTRE .eq('is_active', true)
       const { data, error: fetchError } = await supabase
         .from('partners')
         .select('*')
-        .eq('is_active', true)
         .not('latitude', 'is', null)
         .not('longitude', 'is', null);
 
