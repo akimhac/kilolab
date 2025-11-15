@@ -1,0 +1,63 @@
+#!/bin/bash
+
+echo "🔧 Correction des problèmes d'authentification Kilolab..."
+
+# 1. Supprimer l'ancien fichier supabaseClient.ts
+echo "📝 Suppression de supabaseClient.ts..."
+rm -f src/lib/supabaseClient.ts
+
+# 2. Créer/Remplacer src/lib/supabase.ts avec la bonne configuration
+echo "📝 Création du fichier supabase.ts avec la configuration correcte..."
+cat > src/lib/supabase.ts << 'ENDOFFILE'
+import { createClient } from '@supabase/supabase-js';
+
+const supabaseUrl = 'https://dhecegehcjelbxydeolg.supabase.co';
+const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRoZWNlZ2VoY2plbGJ4eWRlb2xnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjAwOTcyMjEsImV4cCI6MjA3NTY3MzIyMX0.ckfg9qpfAvJBXuxxIEAjZAfe5rydAurlsx65sP4Jk8s';
+
+export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+  auth: {
+    autoRefreshToken: true,
+    persistSession: true,
+    detectSessionInUrl: true,
+    flowType: 'pkce',
+    storage: window.localStorage
+  }
+});
+ENDOFFILE
+
+# 3. Rechercher et remplacer toutes les imports de supabaseClient par supabase
+echo "🔍 Remplacement des imports..."
+
+# Trouver tous les fichiers TypeScript/JavaScript
+find src -type f \( -name "*.ts" -o -name "*.tsx" -o -name "*.js" -o -name "*.jsx" \) -exec sed -i.bak \
+  -e "s|from './lib/supabaseClient'|from './lib/supabase'|g" \
+  -e "s|from '@/lib/supabaseClient'|from '@/lib/supabase'|g" \
+  -e "s|from '../lib/supabaseClient'|from '../lib/supabase'|g" \
+  -e "s|from '../../lib/supabaseClient'|from '../../lib/supabase'|g" \
+  {} \;
+
+# Supprimer les fichiers de backup
+find src -name "*.bak" -delete
+
+# 4. Vérifier et afficher les fichiers modifiés
+echo ""
+echo "✅ Fichiers corrigés :"
+grep -r "from.*supabase" src --include="*.ts" --include="*.tsx" --include="*.js" --include="*.jsx" | grep -v "node_modules" | cut -d: -f1 | sort -u
+
+echo ""
+echo "🎯 Corrections terminées !"
+echo ""
+echo "⚠️  IMPORTANT : Vérifiez maintenant dans Supabase Dashboard :"
+echo "1. Allez dans Authentication > URL Configuration"
+echo "2. Vérifiez que ces URLs sont dans 'Redirect URLs' :"
+echo "   - https://kilolab.fr"
+echo "   - https://kilolab.fr/**"
+echo "   - https://kilolab.fr/partners-map"
+echo "   - https://www.kilolab.fr"
+echo ""
+echo "3. Vérifiez que 'Site URL' contient : https://kilolab.fr"
+echo ""
+echo "Puis redéployez votre application !"
+./fix-auth.sh
+^T
+
