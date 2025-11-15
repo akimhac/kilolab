@@ -6,25 +6,25 @@ import { motion, AnimatePresence } from 'framer-motion';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 
+// Fix Leaflet icons
+delete (L.Icon.Default.prototype as any)._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
+  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+});
+
 interface Partner {
   id: string;
-  business_name: string;
+  name: string;
   address: string;
   city: string;
   postal_code: string;
-  latitude: number;
-  longitude: number;
+  lat: number;
+  lon: number;
   phone?: string;
   email?: string;
 }
-
-const customIcon = L.divIcon({
-  className: 'custom-marker',
-  html: `<div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); width: 40px; height: 40px; border-radius: 50% 50% 50% 0; transform: rotate(-45deg); display: flex; align-items: center; justify-content: center; border: 3px solid white; box-shadow: 0 4px 12px rgba(0,0,0,0.3);"><div style="transform: rotate(45deg); color: white; font-size: 20px;">📍</div></div>`,
-  iconSize: [40, 40],
-  iconAnchor: [20, 40],
-  popupAnchor: [0, -40],
-});
 
 export default function PartnersMap() {
   const [partners, setPartners] = useState<Partner[]>([]);
@@ -42,29 +42,29 @@ export default function PartnersMap() {
     setError('');
 
     try {
-      // ENLEVER LE FILTRE .eq('is_active', true)
       const { data, error: fetchError } = await supabase
         .from('partners')
         .select('*')
-        .not('latitude', 'is', null)
-        .not('longitude', 'is', null);
+        .not('lat', 'is', null)
+        .not('lon', 'is', null)
+        .eq('is_active', true);
 
-      console.log('📊 Résultat Supabase:', { data, error: fetchError });
+      console.log('📊 Résultat:', data);
 
       if (fetchError) {
-        console.error('❌ Erreur Supabase:', fetchError);
+        console.error('❌ Erreur:', fetchError);
         throw fetchError;
       }
 
       if (!data || data.length === 0) {
         setError('Aucun pressing trouvé');
-        console.warn('⚠️ Aucune donnée retournée');
+        console.warn('⚠️ Aucune donnée');
       } else {
         console.log(`✅ ${data.length} pressings chargés`);
         setPartners(data);
       }
     } catch (err: any) {
-      console.error('❌ Erreur:', err);
+      console.error('💥 Erreur:', err);
       setError(err.message || 'Erreur de chargement');
     } finally {
       setLoading(false);
@@ -104,8 +104,7 @@ export default function PartnersMap() {
             Carte des Partenaires
           </h1>
           <p className="text-white/80 text-xl">
-            {partners.length} pressing{partners.length > 1 ? 's' : ''} partenaire
-            {partners.length > 1 ? 's' : ''} en France et Belgique
+            {partners.length} pressing{partners.length > 1 ? 's' : ''} partenaire{partners.length > 1 ? 's' : ''}
           </p>
         </div>
 
@@ -117,20 +116,19 @@ export default function PartnersMap() {
           >
             <TileLayer
               url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-              attribution='&copy; OpenStreetMap contributors'
+              attribution='&copy; OpenStreetMap'
             />
             {partners.map((partner) => (
               <Marker
                 key={partner.id}
-                position={[partner.latitude, partner.longitude]}
-                icon={customIcon}
+                position={[partner.lat, partner.lon]}
                 eventHandlers={{
                   click: () => setSelectedPartner(partner),
                 }}
               >
                 <Popup>
                   <div className="p-2">
-                    <h3 className="font-bold text-lg">{partner.business_name}</h3>
+                    <h3 className="font-bold text-lg">{partner.name}</h3>
                     <p className="text-sm text-gray-600 mt-1">{partner.address}</p>
                     <p className="text-sm text-gray-600">
                       {partner.postal_code} {partner.city}
@@ -163,7 +161,7 @@ export default function PartnersMap() {
               >
                 <div className="flex items-start justify-between mb-4">
                   <h3 className="text-2xl font-bold text-slate-900">
-                    {selectedPartner.business_name}
+                    {selectedPartner.name}
                   </h3>
                   <button
                     onClick={() => setSelectedPartner(null)}
