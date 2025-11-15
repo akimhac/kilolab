@@ -1,3 +1,8 @@
+#!/bin/bash
+
+echo "🔧 Correction du flow d'authentification..."
+
+cat > src/lib/supabase.ts << 'ENDOFFILE'
 import { createClient } from '@supabase/supabase-js';
 
 const supabaseUrl = 'https://dhecegehcjelbxydeolg.supabase.co';
@@ -11,3 +16,12 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
     flowType: 'implicit' // ← CHANGEMENT ICI (au lieu de pkce)
   }
 });
+ENDOFFILE
+
+echo "✅ Fichier supabase.ts corrigé !"
+echo ""
+echo "📝 Prochaines étapes :"
+echo "1. git add ."
+echo "2. git commit -m 'fix: change auth flow to implicit'"
+echo "3. git push"
+echo "4. Testez sur https://kilolab.fr"
