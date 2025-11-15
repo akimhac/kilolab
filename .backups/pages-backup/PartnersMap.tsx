@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
-import { supabase } from '@/lib/supabase';
-import { Partner } from '@/types/database';
+import { supabase } from '../lib/supabase'; // 
 import { MapPin, Plus, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
@@ -16,8 +15,23 @@ L.Icon.Default.mergeOptions({
   shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
 });
 
-export function PartnersMap() {
+interface Partner {
+  id: string;
+  name: string;
+  address: string;
+  city: string;
+  postal_code: string;
+  latitude: number | null;
+  longitude: number | null;
+  lat: number | null;
+  lon: number | null;
+  phone?: string;
+  email?: string;
+}
+
+export default function PartnersMap() {
   const [partners, setPartners] = useState<Partner[]>([]);
+  const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
@@ -33,16 +47,34 @@ export function PartnersMap() {
   }, []);
 
   const fetchPartners = async () => {
+    console.log('🔄 Chargement des pressings...');
+    setLoading(true);
+
     try {
       const { data, error } = await supabase
         .from('partners')
         .select('*')
-        .order('name');
+        .eq('is_active', true);
 
-      if (error) throw error;
-      setPartners(data || []);
+      console.log('📊 Données reçues:', data);
+
+      if (error) {
+        console.error('❌ Erreur:', error);
+        throw error;
+      }
+
+      // Filtrer les partenaires avec coordonnées
+      const partnersWithCoords = (data || []).filter((p: Partner) =>  // ← CORRECTION ICI
+        (p.latitude && p.longitude) || (p.lat && p.lon)
+      );
+
+      console.log(`✅ ${partnersWithCoords.length} pressings avec coordonnées`);
+      setPartners(partnersWithCoords);
     } catch (error) {
-      console.error('Error fetching partners:', error);
+      console.error('Erreur chargement:', error);
+      toast.error('Erreur de chargement des pressings');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -69,17 +101,30 @@ export function PartnersMap() {
       fetchPartners();
     } catch (error: any) {
       console.error('Error:', error);
-      toast.error('Erreur lors de l\'envoi');
+      toast.error("Erreur lors de l'envoi");
     }
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center">
+        <div className="text-white text-xl">Chargement de la carte...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
       <div className="container mx-auto px-4 py-8">
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-4xl font-bold text-white mb-2">Nos partenaires</h1>
-            <p className="text-gray-400">Trouvez le point relais le plus proche</p>
+            <h1 className="text-4xl font-bold text-white mb-2">
+              <MapPin className="inline w-10 h-10 text-purple-400 mr-3" />
+              Nos partenaires
+            </h1>
+            <p className="text-gray-400">
+              {partners.length} pressing{partners.length > 1 ? 's' : ''} disponible{partners.length > 1 ? 's' : ''}
+            </p>
           </div>
           <button
             onClick={() => setShowForm(true)}
@@ -93,44 +138,57 @@ export function PartnersMap() {
         {/* Partners List */}
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
           {partners.map((partner) => (
-            <div key={partner.id} className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-6">
-              <div className="flex items-start gap-3 mb-4">
-                <MapPin className="w-6 h-6 text-purple-400 flex-shrink-0 mt-1" />
-                <div>
-                  <h3 className="text-xl font-bold text-white mb-2">{partner.name}</h3>
-                  <p className="text-gray-400 text-sm mb-1">{partner.address}</p>
-                  <p className="text-gray-400 text-sm">{partner.postal_code} {partner.city}</p>
-                </div>
-              </div>
+            <div
+              key={partner.id}
+              className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-6 hover:border-purple-500/50 transition"
+            >
+              <h3 className="text-xl font-bold text-white mb-2">{partner.name}</h3>
+              <p className="text-gray-300 text-sm mb-1">{partner.address}</p>
+              <p className="text-gray-300 text-sm mb-3">
+                {partner.postal_code} {partner.city}
+              </p>
               {partner.phone && (
                 <p className="text-gray-400 text-sm">📞 {partner.phone}</p>
+              )}
+              {partner.email && (
+                <p className="text-gray-400 text-sm">✉️ {partner.email}</p>
               )}
             </div>
           ))}
         </div>
 
-        {/* Map (simplified - real coordinates would need geocoding) */}
-        <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6">
+        {/* Map */}
+        <div className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-2xl p-6">
           <h2 className="text-2xl font-bold text-white mb-4">Carte interactive</h2>
           <div className="h-96 rounded-xl overflow-hidden">
             <MapContainer
-              center={[48.8566, 2.3522]}
+              center={[46.603354, 1.888334]}
               zoom={6}
               style={{ height: '100%', width: '100%' }}
             >
               <TileLayer
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+                attribution='&copy; OpenStreetMap contributors'
               />
-              {/* Note: Real implementation would need geocoding API */}
-              {partners.slice(0, 5).map((partner, i) => (
-                <Marker key={partner.id} position={[48.8566 + i * 0.5, 2.3522 + i * 0.5]}>
-                  <Popup>
-                    <strong>{partner.name}</strong><br />
-                    {partner.city}
-                  </Popup>
-                </Marker>
-              ))}
+              {partners.map((partner) => {
+                const lat = partner.latitude || partner.lat;
+                const lon = partner.longitude || partner.lon;
+                
+                if (!lat || !lon) return null;
+
+                return (
+                  <Marker key={partner.id} position={[lat, lon]}>
+                    <Popup>
+                      <div className="p-2">
+                        <strong className="text-lg">{partner.name}</strong>
+                        <p className="text-sm mt-1">{partner.address}</p>
+                        <p className="text-sm">{partner.postal_code} {partner.city}</p>
+                        {partner.phone && <p className="text-sm mt-2">📞 {partner.phone}</p>}
+                      </div>
+                    </Popup>
+                  </Marker>
+                );
+              })}
             </MapContainer>
           </div>
         </div>
