@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Sparkles, MapPin, Clock, Shield, Package, TrendingUp, Users, ChevronRight, Star, Check } from 'lucide-react';
+import { Sparkles, MapPin, Clock, Shield, Package, Users, ChevronRight, Star, Search, Truck, CheckCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 export default function LandingPage() {
@@ -62,8 +62,13 @@ export default function LandingPage() {
           </div>
           <div className="hidden md:flex items-center gap-8">
             <a href="#how" className="text-gray-700 hover:text-purple-600 transition">Comment ça marche</a>
-            <a href="#pricing" className="text-gray-700 hover:text-purple-600 transition">Tarifs</a>
             <a href="#reviews" className="text-gray-700 hover:text-purple-600 transition">Avis</a>
+            <button
+              onClick={() => navigate('/login')}
+              className="text-gray-700 hover:text-purple-600 transition font-medium"
+            >
+              Connexion
+            </button>
             <button
               onClick={() => navigate('/partners-map')}
               className="px-6 py-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-full font-semibold hover:shadow-lg transition"
@@ -84,13 +89,14 @@ export default function LandingPage() {
               transition={{ duration: 0.6 }}
             >
               <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6 leading-tight">
-                Service de laverie & pressing en{' '}
+                Votre pressing{' '}
                 <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-                  24h
+                  au kilo
                 </span>
+                , livré chez vous
               </h1>
               <p className="text-xl text-gray-600 mb-8">
-                Reprenez votre temps. Laissez-nous nous occuper du linge.
+                Trouvez le pressing parfait près de chez vous. Simple, rapide, transparent.
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
                 <button
@@ -101,10 +107,10 @@ export default function LandingPage() {
                   <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition" />
                 </button>
                 <button
-                  onClick={() => navigate('/become-partner')}
+                  onClick={() => navigate('/signup')}
                   className="px-8 py-4 bg-white border-2 border-gray-300 text-gray-900 rounded-full font-semibold text-lg hover:border-purple-600 transition"
                 >
-                  Devenir partenaire
+                  Créer un compte
                 </button>
               </div>
             </motion.div>
@@ -131,24 +137,20 @@ export default function LandingPage() {
       {/* Stats */}
       <section className="bg-gradient-to-r from-purple-600 to-pink-600 py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid md:grid-cols-3 gap-8 text-center text-white">
+          <div className="grid md:grid-cols-2 gap-8 text-center text-white">
             <div>
               <div className="text-5xl font-bold mb-2">2600+</div>
               <div className="text-purple-100">Pressings partenaires</div>
             </div>
             <div>
-              <div className="text-5xl font-bold mb-2">200k+</div>
-              <div className="text-purple-100">Articles nettoyés/semaine</div>
-            </div>
-            <div>
               <div className="text-5xl font-bold mb-2">24h</div>
-              <div className="text-purple-100">Service express</div>
+              <div className="text-purple-100">Service express disponible</div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* How it works */}
+      {/* How it works - AMÉLIORÉ */}
       <section id="how" className="py-20 px-4 bg-gray-50">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
@@ -156,67 +158,94 @@ export default function LandingPage() {
               Comment ça fonctionne
             </h2>
             <p className="text-xl text-gray-600">
-              Simple, rapide et sans effort
+              4 étapes simples pour un linge impeccable
             </p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             {[
               {
                 step: '1',
-                title: 'Réservez et préparez',
-                description: 'Choisissez votre pressing et planifiez un ramassage au moment qui vous convient',
-                icon: Package
+                title: 'Trouvez votre pressing',
+                description: 'Parcourez la carte interactive et sélectionnez le pressing le plus proche de chez vous',
+                icon: Search,
+                color: 'from-blue-500 to-cyan-500'
               },
               {
                 step: '2',
-                title: 'Nettoyé avec soin',
-                description: 'Votre linge est collecté et nettoyé soigneusement par nos partenaires locaux',
-                icon: Sparkles
+                title: 'Réservez en ligne',
+                description: 'Choisissez vos services (lavage, repassage, pressing) et planifiez un créneau de ramassage',
+                icon: Package,
+                color: 'from-purple-500 to-pink-500'
               },
               {
                 step: '3',
-                title: 'Livraison gratuite',
-                description: 'Détendez-vous pendant que nous livrons vos articles frais à votre porte',
-                icon: Clock
+                title: 'Collecte à domicile',
+                description: 'Un coursier passe récupérer votre linge à l\'heure convenue, directement chez vous',
+                icon: Truck,
+                color: 'from-orange-500 to-red-500'
+              },
+              {
+                step: '4',
+                title: 'Livraison express',
+                description: 'Recevez votre linge propre et soigné en 24h ou 48h selon l\'option choisie',
+                icon: CheckCircle,
+                color: 'from-green-500 to-emerald-500'
               }
             ].map((item, index) => (
               <motion.div
                 key={index}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.2 }}
+                transition={{ delay: index * 0.1 }}
                 viewport={{ once: true }}
-                className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition"
+                className="relative"
               >
-                <div className="w-16 h-16 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full flex items-center justify-center text-white text-2xl font-bold mb-6">
-                  {item.step}
+                <div className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition h-full border-2 border-gray-100 hover:border-purple-200">
+                  <div className={`w-14 h-14 bg-gradient-to-r ${item.color} rounded-2xl flex items-center justify-center text-white text-xl font-bold mb-4 shadow-lg`}>
+                    {item.step}
+                  </div>
+                  <item.icon className="w-10 h-10 text-gray-700 mb-4" />
+                  <h3 className="text-xl font-bold text-gray-900 mb-3">
+                    {item.title}
+                  </h3>
+                  <p className="text-gray-600 text-sm leading-relaxed">{item.description}</p>
                 </div>
-                <item.icon className="w-12 h-12 text-purple-600 mb-4" />
-                <h3 className="text-2xl font-bold text-gray-900 mb-3">
-                  {item.title}
-                </h3>
-                <p className="text-gray-600">{item.description}</p>
+                {index < 3 && (
+                  <div className="hidden lg:block absolute top-1/2 -right-3 transform -translate-y-1/2 z-10">
+                    <ChevronRight className="w-6 h-6 text-purple-400" />
+                  </div>
+                )}
               </motion.div>
             ))}
+          </div>
+
+          <div className="text-center mt-12">
+            <button
+              onClick={() => navigate('/partners-map')}
+              className="px-8 py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-full font-semibold text-lg hover:shadow-xl transition inline-flex items-center gap-2"
+            >
+              Commencer maintenant
+              <ChevronRight className="w-5 h-5" />
+            </button>
           </div>
         </div>
       </section>
 
       {/* Pricing CTA */}
-      <section id="pricing" className="py-20 px-4 bg-white">
+      <section className="py-20 px-4 bg-white">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
-            Une lessive impeccable à un prix que vous adorerez
+            Une lessive impeccable à un prix compétitif
           </h2>
           <p className="text-xl text-gray-600 mb-8">
-            Prix compétitifs, qualité garantie. Découvrez nos tarifs transparents.
+            Prix transparents définis par nos partenaires. Comparez et choisissez.
           </p>
           <button
             onClick={() => navigate('/partners-map')}
             className="px-8 py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-full font-semibold text-lg hover:shadow-xl transition inline-flex items-center gap-2"
           >
-            Voir les tarifs
+            Découvrir les pressings
             <ChevronRight className="w-5 h-5" />
           </button>
         </div>
@@ -227,7 +256,7 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-              200 000 articles nettoyés chaque semaine
+              Capacité de traitement : jusqu'à 200 000 articles/semaine
             </h2>
             <p className="text-xl text-gray-600">
               Ce que disent nos clients
@@ -300,17 +329,12 @@ export default function LandingPage() {
       {/* Trust badges */}
       <section className="py-20 px-4 bg-gradient-to-r from-purple-50 to-pink-50">
         <div className="max-w-7xl mx-auto">
-          <div className="grid md:grid-cols-3 gap-12">
+          <div className="grid md:grid-cols-2 gap-12">
             {[
               {
                 icon: Shield,
                 title: 'Manipulation sûre et sécurisée',
                 description: 'Vos objets sont manipulés avec soin selon les normes les plus strictes'
-              },
-              {
-                icon: TrendingUp,
-                title: 'Une décennie de confiance',
-                description: 'Des milliers de clients satisfaits et une réputation de fiabilité'
               },
               {
                 icon: Sparkles,
@@ -328,25 +352,6 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="py-20 px-4 bg-gradient-to-r from-purple-600 to-pink-600">
-        <div className="max-w-4xl mx-auto text-center text-white">
-          <Users className="w-16 h-16 mx-auto mb-6" />
-          <h2 className="text-4xl md:text-5xl font-bold mb-6">
-            Vous êtes pressing ?
-          </h2>
-          <p className="text-xl mb-8 text-purple-100">
-            Rejoignez notre réseau et développez votre activité
-          </p>
-          <button
-            onClick={() => navigate('/become-partner')}
-            className="px-8 py-4 bg-white text-purple-600 rounded-full font-semibold text-lg hover:shadow-xl transition"
-          >
-            Devenir partenaire gratuitement
-          </button>
-        </div>
-      </section>
-
       {/* Footer */}
       <footer className="bg-gray-900 text-white py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -356,7 +361,7 @@ export default function LandingPage() {
                 Kilolab
               </div>
               <p className="text-gray-400 text-sm">
-                Le pressing nouvelle génération
+                Votre pressing au kilo, livré chez vous
               </p>
             </div>
             <div>
@@ -372,7 +377,14 @@ export default function LandingPage() {
               <h4 className="font-semibold mb-4">Entreprise</h4>
               <ul className="space-y-2 text-sm text-gray-400">
                 <li><a href="#" className="hover:text-white transition">À propos</a></li>
-                <li><a href="#" className="hover:text-white transition">Devenir partenaire</a></li>
+                <li>
+                  <button 
+                    onClick={() => navigate('/become-partner')}
+                    className="hover:text-white transition text-left"
+                  >
+                    Devenir partenaire
+                  </button>
+                </li>
                 <li><a href="#" className="hover:text-white transition">Contact</a></li>
               </ul>
             </div>
