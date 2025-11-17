@@ -1,50 +1,34 @@
-import { Suspense } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { HelmetProvider } from 'react-helmet-async';
-
-// Import DIRECT (pas lazy) pour debug
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { Toaster } from 'react-hot-toast';
 import LandingPage from './pages/LandingPage';
-import PartnerLanding from './pages/PartnerLanding';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
+import PartnersMap from './pages/PartnersMap';
+import BecomePartner from './pages/BecomePartner';
 import ClientDashboard from './pages/ClientDashboard';
 import PartnerDashboard from './pages/PartnerDashboard';
-import NewOrder from './pages/NewOrder';
-import Checkout from './pages/Checkout';
-import PartnersMap from './pages/PartnersMap';
-import CGV from './pages/CGV';
-import MentionsLegales from './pages/MentionsLegales';
-import Privacy from './pages/Privacy';
-import PromoPopup from './components/PromoPopup';
-import CookieConsent from './components/CookieConsent';
+import CGU from './pages/legal/CGU';
+import MentionsLegales from './pages/legal/MentionsLegales';
+import Privacy from './pages/legal/Privacy';
 
-const Loader = () => (
-  <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center">
-    <div className="text-white text-xl">Chargement...</div>
-  </div>
-);
-
-export default function App() {
+function App() {
   return (
-    <HelmetProvider>
-      <Router>
-        <Suspense fallback={<Loader />}>
-          <Routes>
-            <Route path="/" element={<><LandingPage /><PromoPopup /><CookieConsent /></>} />
-            <Route path="/partners" element={<PartnerLanding />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/signup" element={<Signup />} />
-            <Route path="/client-dashboard" element={<ClientDashboard />} />
-            <Route path="/partner-dashboard" element={<PartnerDashboard />} />
-            <Route path="/new-order" element={<NewOrder />} />
-            <Route path="/checkout" element={<Checkout />} />
-            <Route path="/partners-map" element={<PartnersMap />} />
-            <Route path="/cgv" element={<CGV />} />
-            <Route path="/mentions-legales" element={<MentionsLegales />} />
-            <Route path="/privacy" element={<Privacy />} />
-          </Routes>
-        </Suspense>
-      </Router>
-    </HelmetProvider>
+    <BrowserRouter>
+      <Toaster position="top-right" />
+      <Routes>
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
+        <Route path="/partners-map" element={<PartnersMap />} />
+        <Route path="/become-partner" element={<BecomePartner />} />
+        <Route path="/client-dashboard" element={<ClientDashboard />} />
+        <Route path="/partner-dashboard" element={<PartnerDashboard />} />
+        <Route path="/legal/cgu" element={<CGU />} />
+        <Route path="/legal/mentions-legales" element={<MentionsLegales />} />
+        <Route path="/legal/privacy" element={<Privacy />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
+
+export default App;
