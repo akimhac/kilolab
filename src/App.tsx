@@ -11,6 +11,7 @@ import CGU from './pages/legal/CGU';
 import MentionsLegales from './pages/legal/MentionsLegales';
 import Privacy from './pages/legal/Privacy';
 import Pricing from './pages/Pricing';
+import NewOrder from './pages/NewOrder';
 
 function App() {
   return (
@@ -25,6 +26,7 @@ function App() {
         <Route path="/client-dashboard" element={<ClientDashboard />} />
         <Route path="/partner-dashboard" element={<PartnerDashboard />} />
         <Route path="/pricing" element={<Pricing />} />
+        <Route path="/new-order" element={<NewOrder />} />
         <Route path="/legal/cgu" element={<CGU />} />
         <Route path="/legal/mentions-legales" element={<MentionsLegales />} />
         <Route path="/legal/privacy" element={<Privacy />} />

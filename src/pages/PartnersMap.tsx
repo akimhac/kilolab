@@ -6,7 +6,6 @@ import { ArrowLeft, MapPin, Phone, Clock, Euro } from 'lucide-react';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 
-// Fix Leaflet default icon
 delete (L.Icon.Default.prototype as any)._getIconUrl;
 L.Icon.Default.mergeOptions({
   iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
@@ -47,7 +46,7 @@ export default function PartnersMap() {
           setUserLocation([position.coords.latitude, position.coords.longitude]);
         },
         () => {
-          console.log('Geolocation non disponible, utilisation de Paris par défaut');
+          console.log('Geolocation non disponible');
         }
       );
     }
@@ -63,42 +62,38 @@ export default function PartnersMap() {
       if (error) throw error;
       setPartners(data || []);
     } catch (error) {
-      console.error('Erreur chargement pressings:', error);
+      console.error('Erreur:', error);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleCreateOrder = (partner: Partner) => {
-    // Vérifier si l'utilisateur est connecté
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (!session) {
-        // Rediriger vers login avec retour vers création commande
-        navigate('/login', { 
-          state: { 
-            from: '/partners-map',
-            partnerId: partner.id,
-            message: 'Connectez-vous pour créer une commande'
-          } 
-        });
-      } else {
-        // Rediriger vers dashboard client avec le pressing sélectionné
-        navigate('/client-dashboard', { 
-          state: { 
-            selectedPartner: partner,
-            action: 'create-order'
-          } 
-        });
-      }
-    });
+  const handleCreateOrder = async (partner: Partner) => {
+    const { data: { session } } = await supabase.auth.getSession();
+    
+    if (!session) {
+      navigate('/login', { 
+        state: { 
+          from: '/partners-map',
+          partnerId: partner.id,
+          message: 'Connectez-vous pour créer une commande'
+        } 
+      });
+    } else {
+      navigate('/new-order', { 
+        state: { 
+          selectedPartner: partner,
+        } 
+      });
+    }
   };
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 to-pink-50">
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-purple-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-slate-600">Chargement de la carte...</p>
+          <p className="text-slate-600 font-semibold">Chargement de la carte...</p>
         </div>
       </div>
     );
@@ -106,23 +101,21 @@ export default function PartnersMap() {
 
   return (
     <div className="h-screen flex flex-col">
-      {/* Header */}
-      <div className="bg-white border-b px-4 py-4 flex items-center justify-between z-10">
+      <div className="bg-white border-b shadow-lg px-4 py-4 flex items-center justify-between z-10">
         <button
           onClick={() => navigate('/')}
-          className="flex items-center gap-2 text-purple-600 hover:text-purple-700 transition"
+          className="flex items-center gap-2 text-purple-600 hover:text-purple-700 transition font-semibold"
         >
           <ArrowLeft className="w-5 h-5" />
-          <span className="font-semibold">Retour</span>
+          Retour
         </button>
-        <div className="text-sm text-slate-600">
+        <div className="text-sm text-slate-600 font-semibold">
           <MapPin className="w-4 h-4 inline mr-1" />
           {partners.length} pressings disponibles
         </div>
       </div>
 
       <div className="flex-1 flex">
-        {/* Map */}
         <div className="flex-1 relative">
           <MapContainer
             center={userLocation}
@@ -131,7 +124,7 @@ export default function PartnersMap() {
           >
             <TileLayer
               url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+              attribution='&copy; OpenStreetMap'
             />
             {partners.map((partner) => (
               <Marker
@@ -147,7 +140,7 @@ export default function PartnersMap() {
                     <p className="text-sm text-slate-600 mb-2">{partner.address}</p>
                     <button
                       onClick={() => handleCreateOrder(partner)}
-                      className="w-full px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition text-sm font-semibold"
+                      className="w-full px-4 py-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg hover:shadow-lg transition text-sm font-semibold"
                     >
                       Choisir ce pressing
                     </button>
@@ -158,13 +151,12 @@ export default function PartnersMap() {
           </MapContainer>
         </div>
 
-        {/* Sidebar */}
-        <div className="w-96 bg-white border-l overflow-y-auto">
+        <div className="w-96 bg-white border-l shadow-xl overflow-y-auto">
           {selectedPartner ? (
             <div className="p-6">
               <button
                 onClick={() => setSelectedPartner(null)}
-                className="text-sm text-purple-600 hover:text-purple-700 mb-4"
+                className="text-sm text-purple-600 hover:text-purple-700 mb-4 font-semibold"
               >
                 ← Voir tous les pressings
               </button>
@@ -175,7 +167,7 @@ export default function PartnersMap() {
 
               <div className="space-y-4 mb-6">
                 <div className="flex items-start gap-3">
-                  <MapPin className="w-5 h-5 text-slate-400 flex-shrink-0 mt-1" />
+                  <MapPin className="w-5 h-5 text-purple-600 flex-shrink-0 mt-1" />
                   <div>
                     <p className="text-slate-700">{selectedPartner.address}</p>
                     <p className="text-slate-600">{selectedPartner.postal_code} {selectedPartner.city}</p>
@@ -184,41 +176,39 @@ export default function PartnersMap() {
 
                 {selectedPartner.phone && (
                   <div className="flex items-center gap-3">
-                    <Phone className="w-5 h-5 text-slate-400" />
-                    <a href={`tel:${selectedPartner.phone}`} className="text-purple-600 hover:underline">
+                    <Phone className="w-5 h-5 text-purple-600" />
+                    <a href={`tel:${selectedPartner.phone}`} className="text-purple-600 hover:underline font-semibold">
                       {selectedPartner.phone}
                     </a>
                   </div>
                 )}
 
                 <div className="flex items-center gap-3">
-                  <Euro className="w-5 h-5 text-slate-400" />
+                  <Euro className="w-5 h-5 text-purple-600" />
                   <p className="text-lg font-bold text-purple-600">
-                    {selectedPartner.price_per_kg}€/kg
+                    À partir de 5€/kg
                   </p>
                 </div>
 
-                {selectedPartner.opening_hours && (
-                  <div className="flex items-start gap-3">
-                    <Clock className="w-5 h-5 text-slate-400 mt-1" />
-                    <div className="text-sm text-slate-600">
-                      <p className="font-semibold mb-1">Horaires</p>
-                      <p>Lun-Ven: 8h-19h</p>
-                      <p>Sam: 9h-18h</p>
-                    </div>
+                <div className="flex items-start gap-3">
+                  <Clock className="w-5 h-5 text-purple-600 mt-1" />
+                  <div className="text-sm text-slate-600">
+                    <p className="font-semibold mb-1">Horaires</p>
+                    <p>Lun-Ven: 8h-19h</p>
+                    <p>Sam: 9h-18h</p>
                   </div>
-                )}
+                </div>
               </div>
 
               <button
                 onClick={() => handleCreateOrder(selectedPartner)}
-                className="w-full px-6 py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl font-bold text-lg hover:shadow-xl transition"
+                className="w-full py-4 rounded-2xl font-bold text-lg text-white bg-gradient-to-r from-purple-600 to-pink-600 hover:shadow-2xl transition-all transform hover:scale-105"
               >
                 Créer ma commande
               </button>
 
               <p className="text-xs text-slate-500 mt-4 text-center">
-                Vous serez redirigé vers votre espace client
+                Vous pourrez choisir votre formule à l'étape suivante
               </p>
             </div>
           ) : (
@@ -231,12 +221,12 @@ export default function PartnersMap() {
                   <div
                     key={partner.id}
                     onClick={() => setSelectedPartner(partner)}
-                    className="p-4 border border-slate-200 rounded-xl hover:border-purple-500 hover:shadow-md transition cursor-pointer"
+                    className="p-4 border-2 border-slate-200 rounded-xl hover:border-purple-500 hover:shadow-md transition cursor-pointer"
                   >
                     <h3 className="font-bold text-slate-900 mb-2">{partner.name}</h3>
                     <p className="text-sm text-slate-600 mb-2">{partner.city}</p>
                     <p className="text-lg font-bold text-purple-600">
-                      {partner.price_per_kg}€/kg
+                      À partir de 5€/kg
                     </p>
                   </div>
                 ))}
