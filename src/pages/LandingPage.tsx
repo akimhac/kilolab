@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Sparkles, MapPin, Clock, Shield, Package, Users, ChevronRight, Star, Search, Truck, CheckCircle, LogIn } from 'lucide-react';
 import { motion } from 'framer-motion';
+import Navbar from '../components/Navbar';
 
 export default function LandingPage() {
   const navigate = useNavigate();
@@ -51,48 +52,7 @@ export default function LandingPage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
       {/* Header/Nav */}
-      <nav className="fixed top-0 w-full bg-white/90 backdrop-blur-md z-50 border-b border-slate-200 shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex items-center justify-between">
-            <div 
-              onClick={() => navigate('/')}
-              className="text-3xl font-black cursor-pointer"
-              style={{
-                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                backgroundClip: 'text'
-              }}
-            >
-              Kilolab
-            </div>
-            <div className="flex items-center gap-6">
-              <a href="#how" className="hidden md:block text-slate-700 hover:text-purple-600 transition font-medium">
-                Comment ça marche
-              </a>
-              <a href="#reviews" className="hidden md:block text-slate-700 hover:text-purple-600 transition font-medium">
-                Avis
-              </a>
-              <button
-                onClick={() => navigate('/login')}
-                className="flex items-center gap-2 px-5 py-2.5 text-slate-700 hover:text-purple-600 transition font-medium"
-              >
-                <LogIn className="w-4 h-4" />
-                <span className="hidden sm:inline">Connexion</span>
-              </button>
-              <button
-                onClick={() => navigate('/partners-map')}
-                className="px-6 py-2.5 rounded-full font-semibold text-white shadow-lg hover:shadow-xl transition-all transform hover:scale-105"
-                style={{
-                  background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                }}
-              >
-                Trouver un pressing
-              </button>
-            </div>
-          </div>
-        </div>
-      </nav>
+      <Navbar />
 
       {/* Hero Section */}
       <section className="relative pt-32 pb-24 px-4 overflow-hidden">
@@ -151,7 +111,7 @@ export default function LandingPage() {
             >
               <div className="relative rounded-3xl overflow-hidden shadow-2xl">
                 <img
-                  src="https://images.pexels.com/photos/5591666/pexels-photo-5591666.jpeg?auto=compress&cs=tinysrgb&w=800"
+                  src="https://images.pexels.com/photos/6196916/pexels-photo-6196916.jpeg?auto=compress&cs=tinysrgb&w=800"
                   alt="Pressing moderne"
                   className="w-full h-[500px] object-cover"
                 />
