@@ -12,7 +12,7 @@ export default function ClientPricing() {
       features: [
         'Lavage professionnel',
         'Séchage délicat',
-        'Repassage soigné',
+        'Pliage soigné',
         'Livraison en 3-4 jours',
         'Idéal pour les grandes quantités',
       ],

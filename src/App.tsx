@@ -1,23 +1,14 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import LandingPage from './pages/LandingPage';
-import Pricing from './pages/Pricing';
 import Login from './pages/Login';
-import Pricing from './pages/Pricing';
 import Signup from './pages/Signup';
-import Pricing from './pages/Pricing';
 import PartnersMap from './pages/PartnersMap';
-import Pricing from './pages/Pricing';
 import BecomePartner from './pages/BecomePartner';
-import Pricing from './pages/Pricing';
 import ClientDashboard from './pages/ClientDashboard';
-import Pricing from './pages/Pricing';
 import PartnerDashboard from './pages/PartnerDashboard';
-import Pricing from './pages/Pricing';
 import CGU from './pages/legal/CGU';
-import Pricing from './pages/Pricing';
 import MentionsLegales from './pages/legal/MentionsLegales';
-import Pricing from './pages/Pricing';
 import Privacy from './pages/legal/Privacy';
 import Pricing from './pages/Pricing';
 
