@@ -1,346 +1,218 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { supabase } from '../lib/supabase';
-import { Store, MapPin, Phone, Mail, Check, ArrowLeft } from 'lucide-react';
-import toast from 'react-hot-toast';
+import { Store, Check, ArrowLeft } from 'lucide-react';
 
 export default function BecomePartner() {
   const navigate = useNavigate();
   const [step, setStep] = useState(1);
-  const [formData, setFormData] = useState({
-    name: '',
-    address: '',
-    postal_code: '',
-    city: '',
-    phone: '',
-    email: '',
-    siret: '',
-    description: '',
-    services: [] as string[],
-    opening_hours: '',
-  });
-  const [loading, setLoading] = useState(false);
 
-  const services = [
-    'Nettoyage à sec',
-    'Repassage',
-    'Retouches',
-    'Pressing express (24h)',
-    'Traitement cuir',
-    'Traitement daim',
-    'Lavage rideaux',
-    'Nettoyage couettes',
+  const plans = [
+    {
+      name: 'Découverte',
+      price: '0€',
+      period: '3 premiers mois',
+      commission: '0%',
+      features: [
+        'Inscription gratuite',
+        'Visibilité sur la carte',
+        '0% de commission pendant 3 mois',
+        'Gestion des commandes',
+        'Support email',
+      ],
+      badge: 'Idéal pour démarrer',
+    },
+    {
+      name: 'Standard',
+      price: '10%',
+      period: 'par transaction',
+      commission: '10%',
+      features: [
+        'Tout de Découverte',
+        '10% de commission uniquement',
+        'Dashboard avancé',
+        'Statistiques détaillées',
+        'Support prioritaire',
+        'Badge "Partenaire vérifié"',
+      ],
+      badge: 'Le plus populaire',
+      highlighted: true,
+    },
+    {
+      name: 'Premium',
+      price: '15%',
+      period: 'par transaction',
+      commission: '15%',
+      features: [
+        'Tout de Standard',
+        'Mise en avant sur la carte',
+        'Badge "Premium"',
+        'Photos professionnelles',
+        'Support téléphone 7j/7',
+        'Campagnes marketing dédiées',
+      ],
+      badge: 'Visibilité maximale',
+    },
   ];
 
-  const handleServiceToggle = (service: string) => {
-    setFormData(prev => ({
-      ...prev,
-      services: prev.services.includes(service)
-        ? prev.services.filter(s => s !== service)
-        : [...prev.services, service]
-    }));
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-
-    try {
-      // Insertion demande partenaire
-      const { error } = await supabase.from('partner_requests').insert({
-        name: formData.name,
-        address: formData.address,
-        postal_code: formData.postal_code,
-        city: formData.city,
-        phone: formData.phone,
-        email: formData.email,
-        siret: formData.siret,
-        description: formData.description,
-        services: formData.services,
-        opening_hours: formData.opening_hours,
-        status: 'pending',
-      });
-
-      if (error) throw error;
-
-      toast.success('Demande envoyée avec succès ! Nous vous contacterons sous 48h.');
-      navigate('/');
-    } catch (error: any) {
-      console.error('Erreur:', error);
-      toast.error('Erreur lors de l\'envoi');
-    } finally {
-      setLoading(false);
-    }
-  };
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 py-12 px-4">
-      <div className="max-w-3xl mx-auto">
-        <button
-          onClick={() => navigate('/')}
-          className="flex items-center gap-2 text-white/60 hover:text-white mb-8 transition"
-        >
-          <ArrowLeft className="w-5 h-5" />
-          Retour
-        </button>
+    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
+      {/* Header */}
+      <div className="bg-white border-b">
+        <div className="max-w-7xl mx-auto px-4 py-6">
+          <button
+            onClick={() => navigate('/')}
+            className="flex items-center gap-2 text-purple-600 hover:text-purple-700"
+          >
+            <ArrowLeft className="w-5 h-5" />
+            Retour
+          </button>
+        </div>
+      </div>
 
-        <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-8 border border-white/20">
-          <div className="text-center mb-8">
-            <Store className="w-16 h-16 text-purple-400 mx-auto mb-4" />
-            <h1 className="text-4xl font-bold text-white mb-2">
-              Devenez Partenaire Kilolab
-            </h1>
-            <p className="text-white/80 text-lg">
-              Rejoignez notre réseau de pressings de confiance
-            </p>
+      {/* Hero */}
+      <section className="py-20 px-4">
+        <div className="max-w-4xl mx-auto text-center">
+          <Store className="w-16 h-16 text-purple-600 mx-auto mb-6" />
+          <h1 className="text-5xl font-black text-slate-900 mb-6">
+            Développez votre pressing avec Kilolab
+          </h1>
+          <p className="text-xl text-slate-600 mb-8">
+            Rejoignez notre réseau de 2600+ pressings et accédez à de nouveaux clients
+          </p>
+          <div className="flex flex-wrap gap-8 justify-center text-left">
+            <div>
+              <div className="text-3xl font-bold text-purple-600">+30%</div>
+              <div className="text-slate-600">Chiffre d'affaires moyen</div>
+            </div>
+            <div>
+              <div className="text-3xl font-bold text-purple-600">2600+</div>
+              <div className="text-slate-600">Pressings partenaires</div>
+            </div>
+            <div>
+              <div className="text-3xl font-bold text-purple-600">0€</div>
+              <div className="text-slate-600">Frais d'inscription</div>
+            </div>
           </div>
+        </div>
+      </section>
 
-          {/* Progress Bar */}
-          <div className="flex items-center justify-center gap-2 mb-8">
-            {[1, 2, 3].map((s) => (
+      {/* Pricing */}
+      <section className="py-20 px-4 bg-white">
+        <div className="max-w-7xl mx-auto">
+          <h2 className="text-4xl font-bold text-center mb-4">
+            Choisissez votre formule
+          </h2>
+          <p className="text-xl text-slate-600 text-center mb-12">
+            Commencez gratuitement, payez uniquement quand vous gagnez
+          </p>
+
+          <div className="grid md:grid-cols-3 gap-8">
+            {plans.map((plan, idx) => (
               <div
-                key={s}
-                className={`h-2 w-20 rounded-full ${
-                  step >= s ? 'bg-purple-500' : 'bg-white/20'
+                key={idx}
+                className={`rounded-2xl p-8 ${
+                  plan.highlighted
+                    ? 'bg-gradient-to-br from-purple-600 to-pink-600 text-white shadow-2xl scale-105'
+                    : 'bg-white border-2 border-slate-200'
                 }`}
-              />
+              >
+                <div className="text-sm font-bold mb-4">
+                  {plan.badge}
+                </div>
+                <h3 className={`text-2xl font-bold mb-2 ${plan.highlighted ? '' : 'text-slate-900'}`}>
+                  {plan.name}
+                </h3>
+                <div className="flex items-baseline gap-2 mb-4">
+                  <span className={`text-5xl font-black ${plan.highlighted ? '' : 'text-slate-900'}`}>
+                    {plan.price}
+                  </span>
+                  <span className={plan.highlighted ? 'text-purple-100' : 'text-slate-500'}>
+                    {plan.period}
+                  </span>
+                </div>
+
+                <ul className="space-y-3 mb-8">
+                  {plan.features.map((f, i) => (
+                    <li key={i} className="flex items-start gap-2">
+                      <Check className={`w-5 h-5 flex-shrink-0 ${plan.highlighted ? 'text-yellow-300' : 'text-purple-600'}`} />
+                      <span className="text-sm">{f}</span>
+                    </li>
+                  ))}
+                </ul>
+
+                <button
+                  onClick={() => setStep(2)}
+                  className={`w-full py-3 rounded-lg font-bold ${
+                    plan.highlighted
+                      ? 'bg-white text-purple-600'
+                      : 'bg-gradient-to-r from-purple-600 to-pink-600 text-white'
+                  }`}
+                >
+                  Choisir {plan.name}
+                </button>
+              </div>
             ))}
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Step 1: Informations de base */}
-            {step === 1 && (
-              <div className="space-y-4">
-                <h2 className="text-2xl font-bold text-white mb-4">
-                  Informations de base
-                </h2>
-
-                <div>
-                  <label className="block text-white/80 mb-2">
-                    Nom du pressing *
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    value={formData.name}
-                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white"
-                    placeholder="Pressing Central Paris"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-white/80 mb-2">SIRET *</label>
-                  <input
-                    type="text"
-                    required
-                    value={formData.siret}
-                    onChange={(e) => setFormData({ ...formData, siret: e.target.value })}
-                    className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white"
-                    placeholder="123 456 789 00012"
-                  />
-                </div>
-
-                <div className="grid md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-white/80 mb-2">Email *</label>
-                    <input
-                      type="email"
-                      required
-                      value={formData.email}
-                      onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                      className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-white/80 mb-2">
-                      Téléphone *
-                    </label>
-                    <input
-                      type="tel"
-                      required
-                      value={formData.phone}
-                      onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                      className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white"
-                    />
-                  </div>
-                </div>
-
-                <button
-                  type="button"
-                  onClick={() => setStep(2)}
-                  className="w-full bg-purple-600 text-white py-3 rounded-lg font-semibold hover:bg-purple-700"
-                >
-                  Suivant
-                </button>
-              </div>
-            )}
-
-            {/* Step 2: Adresse */}
-            {step === 2 && (
-              <div className="space-y-4">
-                <h2 className="text-2xl font-bold text-white mb-4">Adresse</h2>
-
-                <div>
-                  <label className="block text-white/80 mb-2">Adresse *</label>
-                  <input
-                    type="text"
-                    required
-                    value={formData.address}
-                    onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                    className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white"
-                  />
-                </div>
-
-                <div className="grid md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-white/80 mb-2">
-                      Code postal *
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      value={formData.postal_code}
-                      onChange={(e) =>
-                        setFormData({ ...formData, postal_code: e.target.value })
-                      }
-                      className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-white/80 mb-2">Ville *</label>
-                    <input
-                      type="text"
-                      required
-                      value={formData.city}
-                      onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-                      className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white"
-                    />
-                  </div>
-                </div>
-
-                <div className="flex gap-4">
-                  <button
-                    type="button"
-                    onClick={() => setStep(1)}
-                    className="flex-1 bg-white/10 text-white py-3 rounded-lg font-semibold hover:bg-white/20"
-                  >
-                    Précédent
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setStep(3)}
-                    className="flex-1 bg-purple-600 text-white py-3 rounded-lg font-semibold hover:bg-purple-700"
-                  >
-                    Suivant
-                  </button>
-                </div>
-              </div>
-            )}
-
-            {/* Step 3: Services */}
-            {step === 3 && (
-              <div className="space-y-4">
-                <h2 className="text-2xl font-bold text-white mb-4">
-                  Vos services
-                </h2>
-
-                <div className="grid md:grid-cols-2 gap-3">
-                  {services.map((service) => (
-                    <button
-                      key={service}
-                      type="button"
-                      onClick={() => handleServiceToggle(service)}
-                      className={`p-4 rounded-lg border-2 transition flex items-center gap-3 ${
-                        formData.services.includes(service)
-                          ? 'border-purple-500 bg-purple-500/20'
-                          : 'border-white/20 bg-white/5 hover:border-white/40'
-                      }`}
-                    >
-                      {formData.services.includes(service) && (
-                        <Check className="w-5 h-5 text-purple-400" />
-                      )}
-                      <span className="text-white text-sm">{service}</span>
-                    </button>
-                  ))}
-                </div>
-
-                <div>
-                  <label className="block text-white/80 mb-2">
-                    Horaires d'ouverture
-                  </label>
-                  <textarea
-                    value={formData.opening_hours}
-                    onChange={(e) =>
-                      setFormData({ ...formData, opening_hours: e.target.value })
-                    }
-                    rows={3}
-                    className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white"
-                    placeholder="Lun-Ven: 9h-19h, Sam: 9h-12h"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-white/80 mb-2">
-                    Description (optionnel)
-                  </label>
-                  <textarea
-                    value={formData.description}
-                    onChange={(e) =>
-                      setFormData({ ...formData, description: e.target.value })
-                    }
-                    rows={4}
-                    className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white"
-                    placeholder="Présentez votre pressing..."
-                  />
-                </div>
-
-                <div className="flex gap-4">
-                  <button
-                    type="button"
-                    onClick={() => setStep(2)}
-                    className="flex-1 bg-white/10 text-white py-3 rounded-lg font-semibold hover:bg-white/20"
-                  >
-                    Précédent
-                  </button>
-                  <button
-                    type="submit"
-                    disabled={loading || formData.services.length === 0}
-                    className="flex-1 bg-gradient-to-r from-purple-600 to-pink-600 text-white py-3 rounded-lg font-semibold hover:from-purple-700 hover:to-pink-700 disabled:opacity-50"
-                  >
-                    {loading ? 'Envoi...' : 'Envoyer ma demande'}
-                  </button>
-                </div>
-              </div>
-            )}
-          </form>
+          <p className="text-center text-slate-500 mt-12">
+            💡 Sans engagement • Arrêt à tout moment • Support 7j/7
+          </p>
         </div>
+      </section>
 
-        {/* Avantages */}
-        <div className="mt-12 grid md:grid-cols-3 gap-6">
-          <div className="bg-white/5 backdrop-blur-sm rounded-xl p-6 text-center">
-            <div className="text-4xl mb-3">📈</div>
-            <h3 className="text-white font-bold mb-2">Visibilité accrue</h3>
-            <p className="text-white/60 text-sm">
-              Touchez de nouveaux clients dans votre zone
-            </p>
-          </div>
-          <div className="bg-white/5 backdrop-blur-sm rounded-xl p-6 text-center">
-            <div className="text-4xl mb-3">💰</div>
-            <h3 className="text-white font-bold mb-2">Sans commission</h3>
-            <p className="text-white/60 text-sm">
-              Gardez 100% de vos revenus
-            </p>
-          </div>
-          <div className="bg-white/5 backdrop-blur-sm rounded-xl p-6 text-center">
-            <div className="text-4xl mb-3">🚀</div>
-            <h3 className="text-white font-bold mb-2">Gestion simplifiée</h3>
-            <p className="text-white/60 text-sm">
-              Dashboard intuitif pour gérer vos commandes
-            </p>
+      {/* Bénéfices */}
+      <section className="py-20 px-4">
+        <div className="max-w-6xl mx-auto">
+          <h2 className="text-4xl font-bold text-center mb-12">
+            Pourquoi rejoindre Kilolab ?
+          </h2>
+          <div className="grid md:grid-cols-2 gap-8">
+            {[
+              {
+                title: 'Nouveaux clients automatiques',
+                text: 'Apparaissez dans les recherches de milliers d\'utilisateurs chaque mois',
+              },
+              {
+                title: 'Gestion simplifiée',
+                text: 'Dashboard intuitif pour suivre vos commandes et vos statistiques',
+              },
+              {
+                title: 'Paiements sécurisés',
+                text: 'Encaissement automatique via Stripe, viré sur votre compte sous 48h',
+              },
+              {
+                title: 'Marketing gratuit',
+                text: 'Bénéficiez de nos campagnes publicitaires sans frais supplémentaires',
+              },
+            ].map((item, idx) => (
+              <div key={idx} className="bg-white border border-slate-200 rounded-xl p-6">
+                <h3 className="text-xl font-bold text-slate-900 mb-2">
+                  {item.title}
+                </h3>
+                <p className="text-slate-600">{item.text}</p>
+              </div>
+            ))}
           </div>
         </div>
-      </div>
+      </section>
+
+      {/* CTA Final */}
+      <section className="py-20 px-4 bg-gradient-to-r from-purple-600 to-pink-600">
+        <div className="max-w-3xl mx-auto text-center text-white">
+          <h2 className="text-4xl font-bold mb-6">
+            Prêt à développer votre activité ?
+          </h2>
+          <p className="text-xl mb-8 text-purple-100">
+            Inscription en 5 minutes • Premier mois gratuit • Sans engagement
+          </p>
+          <button
+            onClick={() => setStep(2)}
+            className="px-8 py-4 bg-white text-purple-600 rounded-full font-bold text-lg hover:shadow-xl"
+          >
+            Devenir partenaire maintenant
+          </button>
+        </div>
+      </section>
     </div>
   );
 }
