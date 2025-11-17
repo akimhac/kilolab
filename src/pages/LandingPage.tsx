@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Sparkles, MapPin, Clock, Shield, Package, Users, ChevronRight, Star, Search, Truck, CheckCircle, LogIn } from 'lucide-react';
 import { motion } from 'framer-motion';
+import PricingSection from '../components/PricingSection';
 import Navbar from '../components/Navbar';
 
 export default function LandingPage() {
@@ -111,7 +112,7 @@ export default function LandingPage() {
             >
               <div className="relative rounded-3xl overflow-hidden shadow-2xl">
                 <img
-                  src="https://images.pexels.com/photos/6196916/pexels-photo-6196916.jpeg?auto=compress&cs=tinysrgb&w=800"
+                  src="https://images.pexels.com/photos/5591663/pexels-photo-5591663.jpeg?auto=compress&cs=tinysrgb&w=800"
                   alt="Pressing moderne"
                   className="w-full h-[500px] object-cover"
                 />
@@ -252,6 +253,10 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
+
+      
+      {/* Pricing */}
+      <PricingSection />
 
       {/* Reviews */}
       <section id="reviews" className="py-24 px-4 bg-slate-50">
