@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { MapPin, Clock, Shield, Zap, Star, Check, ChevronRight, Menu, X, LogIn, Sparkles, TrendingUp, Users, Award } from 'lucide-react';
 import { motion } from 'framer-motion';
+import ClientPricing from '../components/ClientPricing';
 import { useState } from 'react';
 
 export default function LandingPage() {
@@ -332,6 +333,9 @@ export default function LandingPage() {
       </section>
 
       {/* Avis clients */}
+      {/* Tarifs */}
+      <ClientPricing />
+
       <section id="reviews" className="py-24 px-4 bg-slate-50">
         <div className="max-w-7xl mx-auto">
           <motion.div 

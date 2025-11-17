@@ -1,0 +1,13 @@
+IMPORTANT : Dans BecomePartner.tsx, vérifiez que les prix sont clairs :
+
+COMMISSION KILOLAB (ce que les pressings paient) :
+- Découverte : 0% (3 premiers mois)
+- Standard : 10% de commission
+- Premium : 15% de commission
+
+PRIX CLIENT (ce que les clients paient au kg) :
+- Premium (72-96h) : 5€/kg
+- Express (24h) : 10€/kg  
+- Ultra Express (6h) : 15€/kg
+
+Les pressings fixent leurs prix, Kilolab prend sa commission sur le montant.
