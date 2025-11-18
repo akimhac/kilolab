@@ -35,10 +35,10 @@ export default function MentionsLegales() {
               </div>
               <div className="bg-slate-50 rounded-xl p-6">
                 <div className="space-y-2 text-slate-700">
-                  <p><strong>Raison sociale :</strong> [VOTRE SASU - À COMPLÉTER]</p>
+                  <p><strong>Raison sociale :</strong> la société éditrice du site</p>
                   <p><strong>Forme juridique :</strong> SASU (Société par Actions Simplifiée Unipersonnelle)</p>
                   <p><strong>Capital social :</strong> [MONTANT] euros</p>
-                  <p><strong>Siège social :</strong> [ADRESSE COMPLÈTE]</p>
+                  <p><strong>Siège social :</strong> siège social en France métropolitaine</p>
                   <p><strong>SIRET :</strong> [NUMÉRO SIRET - 14 chiffres]</p>
                   <p><strong>RCS :</strong> [VILLE D'IMMATRICULATION]</p>
                   <p><strong>Email :</strong> <a href="mailto:contact@kilolab.fr" className="text-blue-600 hover:underline">contact@kilolab.fr</a></p>

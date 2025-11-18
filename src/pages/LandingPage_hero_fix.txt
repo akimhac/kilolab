@@ -1,0 +1,34 @@
+Dans src/pages/LandingPage.tsx
+
+LIGNE ~145-175 (section Hero avec les icônes), REMPLACER par:
+
+            {/* Carrousel d'images professionnelles */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+              className="relative h-[600px]"
+            >
+              <ImageCarousel />
+
+              {/* Badge flottant Service 24h */}
+              <motion.div 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 1 }}
+                className="absolute -bottom-8 -left-8 bg-white rounded-2xl p-6 shadow-2xl"
+              >
+                <div className="flex items-center gap-4">
+                  <div className="w-14 h-14 rounded-xl flex items-center justify-center bg-gradient-to-r from-yellow-400 to-orange-500 shadow-lg">
+                    <Zap className="w-8 h-8 text-white" />
+                  </div>
+                  <div>
+                    <div className="text-2xl font-black text-slate-900">Service 24h</div>
+                    <div className="text-sm text-slate-600">Express disponible</div>
+                  </div>
+                </div>
+              </motion.div>
+            </motion.div>
+
+ET ajouter cet import en haut:
+import ImageCarousel from '../components/ImageCarousel';

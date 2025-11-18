@@ -1,8 +1,4 @@
 User-agent: *
 Allow: /
-Disallow: /client-dashboard
-Disallow: /partner-dashboard
-Disallow: /checkout
-Disallow: /new-order
 
 Sitemap: https://kilolab.fr/sitemap.xml

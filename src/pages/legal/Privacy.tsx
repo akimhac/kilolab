@@ -42,7 +42,7 @@ export default function Privacy() {
                 <p className="text-slate-700 leading-relaxed mb-2">
                   Le responsable du traitement des données est :
                 </p>
-                <p className="font-semibold text-slate-900">[VOTRE SASU - À COMPLÉTER]</p>
+                <p className="font-semibold text-slate-900">la société éditrice du site</p>
                 <p className="text-slate-700">Siège social : [ADRESSE COMPLÈTE]</p>
                 <p className="text-slate-700">Email : <a href="mailto:contact@kilolab.fr" className="text-blue-600 hover:underline">contact@kilolab.fr</a></p>
               </div>
