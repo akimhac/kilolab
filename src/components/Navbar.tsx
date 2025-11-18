@@ -38,8 +38,8 @@ export default function Navbar() {
               }}
               className={`font-medium transition ${
                 isActive('/') 
-                  ? 'text-purple-600' 
-                  : 'text-slate-700 hover:text-purple-600'
+                  ? 'text-blue-600' 
+                  : 'text-slate-700 hover:text-blue-600'
               }`}
             >
               Comment ça marche
@@ -53,15 +53,15 @@ export default function Navbar() {
               }}
               className={`font-medium transition ${
                 isActive('/') 
-                  ? 'text-purple-600' 
-                  : 'text-slate-700 hover:text-purple-600'
+                  ? 'text-blue-600' 
+                  : 'text-slate-700 hover:text-blue-600'
               }`}
             >
               Avis
             </button>
             <button
               onClick={() => navigate('/login')}
-              className="flex items-center gap-2 px-5 py-2.5 text-slate-700 hover:text-purple-600 transition font-medium"
+              className="flex items-center gap-2 px-5 py-2.5 text-slate-700 hover:text-blue-600 transition font-medium"
             >
               <LogIn className="w-4 h-4" />
               Connexion
@@ -97,7 +97,7 @@ export default function Navbar() {
                   document.getElementById('how')?.scrollIntoView({ behavior: 'smooth' });
                 }, 100);
               }}
-              className="block w-full text-left px-4 py-2 text-slate-700 hover:bg-purple-50 rounded-lg"
+              className="block w-full text-left px-4 py-2 text-slate-700 hover:bg-blue-50 rounded-lg"
             >
               Comment ça marche
             </button>
@@ -109,7 +109,7 @@ export default function Navbar() {
                   document.getElementById('reviews')?.scrollIntoView({ behavior: 'smooth' });
                 }, 100);
               }}
-              className="block w-full text-left px-4 py-2 text-slate-700 hover:bg-purple-50 rounded-lg"
+              className="block w-full text-left px-4 py-2 text-slate-700 hover:bg-blue-50 rounded-lg"
             >
               Avis
             </button>
@@ -118,7 +118,7 @@ export default function Navbar() {
                 navigate('/login');
                 setMobileMenuOpen(false);
               }}
-              className="block w-full text-left px-4 py-2 text-slate-700 hover:bg-purple-50 rounded-lg"
+              className="block w-full text-left px-4 py-2 text-slate-700 hover:bg-blue-50 rounded-lg"
             >
               <LogIn className="w-4 h-4 inline mr-2" />
               Connexion

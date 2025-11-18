@@ -218,7 +218,7 @@ export default function PartnerDashboard() {
       pending_weight: 'bg-yellow-500/20 text-yellow-300 border-yellow-500/50',
       awaiting_payment: 'bg-orange-500/20 text-orange-300 border-orange-500/50',
       paid: 'bg-blue-500/20 text-blue-300 border-blue-500/50',
-      in_progress: 'bg-purple-500/20 text-purple-300 border-purple-500/50',
+      in_progress: 'bg-blue-500/20 text-blue-300 border-blue-500/50',
       ready: 'bg-green-500/20 text-green-300 border-green-500/50',
       delivered: 'bg-gray-500/20 text-gray-300 border-gray-500/50',
       cancelled: 'bg-red-500/20 text-red-300 border-red-500/50'
@@ -279,7 +279,7 @@ export default function PartnerDashboard() {
                 <p className="text-3xl font-bold text-white">{stats.pending}</p>
               </div>
               <div className="bg-white/10 backdrop-blur-lg rounded-xl p-6 border border-white/20">
-                <TrendingUp className="w-10 h-10 text-purple-300 mb-2" />
+                <TrendingUp className="w-10 h-10 text-blue-300 mb-2" />
                 <p className="text-white/60 text-sm">En cours</p>
                 <p className="text-3xl font-bold text-white">{stats.inProgress}</p>
               </div>
@@ -298,7 +298,7 @@ export default function PartnerDashboard() {
                 <p className="text-green-300 text-sm">Depuis le début</p>
               </div>
 
-              <div className="bg-gradient-to-br from-blue-600/20 to-purple-600/20 backdrop-blur-lg rounded-2xl p-8 border border-blue-500/30">
+              <div className="bg-gradient-to-br from-blue-600/20 to-blue-600/20 backdrop-blur-lg rounded-2xl p-8 border border-blue-500/30">
                 <TrendingUp className="w-12 h-12 text-blue-300 mb-3" />
                 <p className="text-white/80 text-lg mb-2">CA ce mois-ci</p>
                 <p className="text-5xl font-bold text-white mb-2">
@@ -478,7 +478,7 @@ export default function PartnerDashboard() {
                     {order.status === 'ready' && (
                       <button
                         onClick={() => handleStatusUpdate(order.id, 'delivered')}
-                        className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-2 rounded-lg transition-all font-semibold"
+                        className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg transition-all font-semibold"
                       >
                         📦 Marquer comme récupéré
                       </button>

@@ -6,7 +6,7 @@ export default function PaymentCancelled() {
   const orderId = searchParams.get('order_id');
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 flex items-center justify-center p-4">
       <div className="max-w-md w-full bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-8 text-center">
         <XCircle className="w-16 h-16 text-red-400 mx-auto mb-4" />
         <h1 className="text-3xl font-bold text-white mb-4">Paiement annulé</h1>
@@ -23,7 +23,7 @@ export default function PaymentCancelled() {
           {orderId && (
             <Link
               to={`/new-order`}
-              className="flex-1 px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg hover:from-purple-700 hover:to-pink-700 transition"
+              className="flex-1 px-6 py-3 bg-gradient-to-r from-blue-600 to-cyan-600 text-white rounded-lg hover:from-blue-700 hover:to-cyan-700 transition"
             >
               Réessayer
             </Link>

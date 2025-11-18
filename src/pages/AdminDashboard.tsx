@@ -54,7 +54,7 @@ export default function AdminDashboard() {
           </div>
 
           <div className="bg-white/10 backdrop-blur-lg rounded-xl p-6 border border-white/20">
-            <Users className="w-10 h-10 text-purple-400 mb-2" />
+            <Users className="w-10 h-10 text-blue-400 mb-2" />
             <p className="text-white/60 text-sm">Partenaires</p>
             <p className="text-3xl font-bold text-white">{stats.totalPartners}</p>
           </div>

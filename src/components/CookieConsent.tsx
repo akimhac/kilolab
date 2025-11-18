@@ -39,7 +39,7 @@ export default function CookieConsent() {
             <div className="flex gap-3">
               <button
                 onClick={handleAccept}
-                className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white px-6 py-2 rounded-lg font-semibold transition-all"
+                className="bg-gradient-to-r from-blue-600 to-blue-600 hover:from-blue-700 hover:to-blue-700 text-white px-6 py-2 rounded-lg font-semibold transition-all"
               >
                 Accepter
               </button>

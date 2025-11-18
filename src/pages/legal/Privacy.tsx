@@ -9,14 +9,14 @@ export default function Privacy() {
       <div className="max-w-4xl mx-auto">
         <button
           onClick={() => navigate('/')}
-          className="flex items-center gap-2 text-purple-600 hover:text-purple-700 mb-8 transition font-semibold"
+          className="flex items-center gap-2 text-blue-600 hover:text-blue-700 mb-8 transition font-semibold"
         >
           <ArrowLeft className="w-5 h-5" />
           Retour à l'accueil
         </button>
 
         <div className="bg-white rounded-3xl shadow-xl p-8 md:p-12">
-          <h1 className="text-5xl font-black mb-8 bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+          <h1 className="text-5xl font-black mb-8 bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">
             Politique de Confidentialité
           </h1>
           
@@ -24,9 +24,9 @@ export default function Privacy() {
             Dernière mise à jour : {new Date().toLocaleDateString('fr-FR')}
           </p>
 
-          <div className="bg-purple-50 border-l-4 border-purple-600 p-6 rounded-r-lg mb-8">
-            <p className="font-bold text-purple-900 mb-2">Notre engagement</p>
-            <p className="text-purple-800">
+          <div className="bg-blue-50 border-l-4 border-blue-600 p-6 rounded-r-lg mb-8">
+            <p className="font-bold text-blue-900 mb-2">Notre engagement</p>
+            <p className="text-blue-800">
               Kilolab respecte votre vie privée et s'engage à protéger vos données personnelles 
               conformément au <strong>RGPD (Règlement Général sur la Protection des Données)</strong> 
               et à la loi Informatique et Libertés.
@@ -44,7 +44,7 @@ export default function Privacy() {
                 </p>
                 <p className="font-semibold text-slate-900">[VOTRE SASU - À COMPLÉTER]</p>
                 <p className="text-slate-700">Siège social : [ADRESSE COMPLÈTE]</p>
-                <p className="text-slate-700">Email : <a href="mailto:contact@kilolab.fr" className="text-purple-600 hover:underline">contact@kilolab.fr</a></p>
+                <p className="text-slate-700">Email : <a href="mailto:contact@kilolab.fr" className="text-blue-600 hover:underline">contact@kilolab.fr</a></p>
               </div>
             </section>
 
@@ -72,9 +72,9 @@ export default function Privacy() {
                     <li>• Adresses de livraison</li>
                   </ul>
                 </div>
-                <div className="bg-purple-50 rounded-xl p-4">
-                  <h4 className="font-bold text-purple-900 mb-2">Paiements</h4>
-                  <ul className="space-y-1 text-purple-800 text-sm">
+                <div className="bg-blue-50 rounded-xl p-4">
+                  <h4 className="font-bold text-blue-900 mb-2">Paiements</h4>
+                  <ul className="space-y-1 text-blue-800 text-sm">
                     <li>• Informations traitées par Stripe</li>
                     <li>• Carte bancaire (cryptée)</li>
                     <li>• Historique de paiement</li>
@@ -163,9 +163,9 @@ export default function Privacy() {
                   <h4 className="font-bold text-blue-900 mb-2">Pressings partenaires</h4>
                   <p className="text-blue-800 text-sm">Pour l'exécution de votre commande (nom, téléphone, adresse)</p>
                 </div>
-                <div className="bg-purple-50 rounded-xl p-5">
-                  <h4 className="font-bold text-purple-900 mb-2">Stripe (prestataire de paiement)</h4>
-                  <p className="text-purple-800 text-sm">Certifié PCI-DSS niveau 1, données bancaires cryptées</p>
+                <div className="bg-blue-50 rounded-xl p-5">
+                  <h4 className="font-bold text-blue-900 mb-2">Stripe (prestataire de paiement)</h4>
+                  <p className="text-blue-800 text-sm">Certifié PCI-DSS niveau 1, données bancaires cryptées</p>
                 </div>
                 <div className="bg-green-50 rounded-xl p-5">
                   <h4 className="font-bold text-green-900 mb-2">Supabase (hébergement base de données)</h4>
@@ -188,7 +188,7 @@ export default function Privacy() {
               <h2 className="text-3xl font-bold text-slate-900 mb-4">6. Durée de conservation</h2>
               <table className="w-full border-collapse bg-slate-50 rounded-xl overflow-hidden">
                 <thead>
-                  <tr className="bg-purple-600 text-white">
+                  <tr className="bg-blue-600 text-white">
                     <th className="p-4 text-left font-bold">Type de données</th>
                     <th className="p-4 text-left font-bold">Durée de conservation</th>
                   </tr>
@@ -233,15 +233,15 @@ export default function Privacy() {
                   { icon: Download, title: 'Droit à la portabilité', desc: 'Récupérer vos données dans un format structuré' },
                   { icon: Shield, title: 'Droit à la limitation', desc: 'Limiter le traitement de vos données' },
                 ].map((right, i) => (
-                  <div key={i} className="bg-white border-2 border-purple-200 rounded-xl p-6 hover:border-purple-500 transition">
-                    <right.icon className="w-10 h-10 text-purple-600 mb-3" />
+                  <div key={i} className="bg-white border-2 border-blue-200 rounded-xl p-6 hover:border-blue-500 transition">
+                    <right.icon className="w-10 h-10 text-blue-600 mb-3" />
                     <h4 className="font-bold text-slate-900 mb-2">{right.title}</h4>
                     <p className="text-slate-600 text-sm">{right.desc}</p>
                   </div>
                 ))}
               </div>
-              <div className="bg-purple-50 border-l-4 border-purple-600 p-6 rounded-r-lg mt-8">
-                <p className="text-purple-900 leading-relaxed">
+              <div className="bg-blue-50 border-l-4 border-blue-600 p-6 rounded-r-lg mt-8">
+                <p className="text-blue-900 leading-relaxed">
                   <strong>Pour exercer vos droits :</strong> Envoyez un email à{' '}
                   <a href="mailto:contact@kilolab.fr" className="font-bold hover:underline">contact@kilolab.fr</a>
                   {' '}avec l'objet "RGPD - [Votre demande]".<br />
@@ -314,7 +314,7 @@ export default function Privacy() {
                   <p className="text-slate-700">3 Place de Fontenoy - TSA 80715</p>
                   <p className="text-slate-700">75334 PARIS CEDEX 07</p>
                   <p className="text-slate-700">
-                    Site web : <a href="https://www.cnil.fr" target="_blank" rel="noopener noreferrer" className="text-purple-600 hover:underline font-semibold">cnil.fr</a>
+                    Site web : <a href="https://www.cnil.fr" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline font-semibold">cnil.fr</a>
                   </p>
                 </div>
               </div>
@@ -331,13 +331,13 @@ export default function Privacy() {
             </section>
 
             {/* Contact */}
-            <div className="mt-12 p-8 bg-gradient-to-r from-purple-50 to-pink-50 rounded-2xl">
+            <div className="mt-12 p-8 bg-gradient-to-r from-blue-50 to-cyan-50 rounded-2xl">
               <h3 className="font-bold text-2xl mb-4 text-slate-900">
                 Contact DPO (Délégué à la Protection des Données)
               </h3>
               <div className="space-y-2 text-slate-700">
                 <p>Pour toute question sur vos données personnelles :</p>
-                <p className="font-semibold">Email : <a href="mailto:contact@kilolab.fr" className="text-purple-600 hover:underline">contact@kilolab.fr</a></p>
+                <p className="font-semibold">Email : <a href="mailto:contact@kilolab.fr" className="text-blue-600 hover:underline">contact@kilolab.fr</a></p>
                 <p className="font-semibold">Objet : "RGPD - Demande de [votre demande]"</p>
               </div>
             </div>

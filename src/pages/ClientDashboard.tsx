@@ -109,7 +109,7 @@ export default function ClientDashboard() {
       pending_weight: 'bg-yellow-500/20 text-yellow-300 border-yellow-500/50',
       awaiting_payment: 'bg-orange-500/20 text-orange-300 border-orange-500/50',
       paid: 'bg-blue-500/20 text-blue-300 border-blue-500/50',
-      in_progress: 'bg-purple-500/20 text-purple-300 border-purple-500/50',
+      in_progress: 'bg-blue-500/20 text-blue-300 border-blue-500/50',
       ready: 'bg-green-500/20 text-green-300 border-green-500/50',
       delivered: 'bg-gray-500/20 text-gray-300 border-gray-500/50',
     };
@@ -125,14 +125,14 @@ export default function ClientDashboard() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 flex items-center justify-center">
         <div className="text-white text-xl">Chargement...</div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 p-6">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 p-6">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="flex justify-between items-center mb-8">
@@ -146,7 +146,7 @@ export default function ClientDashboard() {
           <div className="flex gap-3">
             <button
               onClick={() => navigate('/new-order')}
-              className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white px-6 py-3 rounded-lg transition-all font-semibold flex items-center gap-2"
+              className="bg-gradient-to-r from-blue-600 to-blue-600 hover:from-blue-700 hover:to-blue-700 text-white px-6 py-3 rounded-lg transition-all font-semibold flex items-center gap-2"
             >
               <Plus className="w-5 h-5" />
               Nouvelle commande
@@ -182,7 +182,7 @@ export default function ClientDashboard() {
           </div>
 
           <div className="bg-white/10 backdrop-blur-lg rounded-xl p-6 border border-white/20">
-            <Package className="w-10 h-10 text-purple-400 mb-2" />
+            <Package className="w-10 h-10 text-blue-400 mb-2" />
             <p className="text-white/60 text-sm">Total</p>
             <p className="text-3xl font-bold text-white">{stats.total}</p>
           </div>
@@ -198,7 +198,7 @@ export default function ClientDashboard() {
               <p className="text-white/60 text-lg mb-4">Aucune commande pour le moment</p>
               <button
                 onClick={() => navigate('/new-order')}
-                className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-lg transition-all font-semibold"
+                className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg transition-all font-semibold"
               >
                 Créer ma première commande
               </button>

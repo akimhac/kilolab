@@ -44,7 +44,7 @@ export default function TimeSlotPicker({ onSelect }: TimeSlotPickerProps) {
               onClick={() => setSelectedDate(day.value)}
               className={`p-3 rounded-lg text-center transition-all ${
                 selectedDate === day.value
-                  ? 'bg-purple-600 text-white'
+                  ? 'bg-blue-600 text-white'
                   : 'bg-white/10 text-white/70 hover:bg-white/20'
               }`}
             >
@@ -69,7 +69,7 @@ export default function TimeSlotPicker({ onSelect }: TimeSlotPickerProps) {
                 onClick={() => setSelectedTime(time)}
                 className={`p-3 rounded-lg text-center font-semibold transition-all ${
                   selectedTime === time
-                    ? 'bg-purple-600 text-white'
+                    ? 'bg-blue-600 text-white'
                     : 'bg-white/10 text-white/70 hover:bg-white/20'
                 }`}
               >

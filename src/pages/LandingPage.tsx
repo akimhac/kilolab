@@ -8,39 +8,39 @@ export default function LandingPage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-cyan-50 to-blue-50">
       {/* Navbar */}
-      <nav className="fixed top-0 w-full bg-white/95 backdrop-blur-xl z-50 border-b border-purple-200 shadow-lg">
+      <nav className="fixed top-0 w-full bg-white/95 backdrop-blur-xl z-50 border-b border-blue-200 shadow-lg">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
             <div 
               onClick={() => navigate('/')}
-              className="text-3xl font-black cursor-pointer bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 bg-clip-text text-transparent"
+              className="text-3xl font-black cursor-pointer bg-gradient-to-r from-blue-600 via-cyan-600 to-blue-600 bg-clip-text text-transparent"
             >
               Kilolab
             </div>
 
             {/* Desktop Menu */}
             <div className="hidden md:flex items-center gap-8">
-              <a href="#how" className="text-slate-700 hover:text-purple-600 transition font-semibold">
+              <a href="#how" className="text-slate-700 hover:text-blue-600 transition font-semibold">
                 Comment ça marche
               </a>
-              <a href="#reviews" className="text-slate-700 hover:text-purple-600 transition font-semibold">
+              <a href="#reviews" className="text-slate-700 hover:text-blue-600 transition font-semibold">
                 Avis
               </a>
-              <a href="#perfect-for" className="text-slate-700 hover:text-purple-600 transition font-semibold">
+              <a href="#perfect-for" className="text-slate-700 hover:text-blue-600 transition font-semibold">
                 Pour qui ?
               </a>
               <button
                 onClick={() => navigate('/login')}
-                className="flex items-center gap-2 px-5 py-2.5 text-slate-700 hover:text-purple-600 transition font-semibold"
+                className="flex items-center gap-2 px-5 py-2.5 text-slate-700 hover:text-blue-600 transition font-semibold"
               >
                 <LogIn className="w-4 h-4" />
                 Connexion
               </button>
               <button
                 onClick={() => navigate('/partners-map')}
-                className="px-6 py-3 rounded-full font-bold text-white shadow-xl hover:shadow-2xl transition-all transform hover:scale-105 bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600"
+                className="px-6 py-3 rounded-full font-bold text-white shadow-xl hover:shadow-2xl transition-all transform hover:scale-105 bg-gradient-to-r from-blue-600 via-cyan-600 to-blue-600"
               >
                 Trouver un pressing
               </button>
@@ -62,24 +62,24 @@ export default function LandingPage() {
               animate={{ opacity: 1, y: 0 }}
               className="md:hidden mt-4 pb-4 space-y-3"
             >
-              <a href="#how" className="block px-4 py-2 text-slate-700 hover:bg-purple-50 rounded-lg">
+              <a href="#how" className="block px-4 py-2 text-slate-700 hover:bg-blue-50 rounded-lg">
                 Comment ça marche
               </a>
-              <a href="#reviews" className="block px-4 py-2 text-slate-700 hover:bg-purple-50 rounded-lg">
+              <a href="#reviews" className="block px-4 py-2 text-slate-700 hover:bg-blue-50 rounded-lg">
                 Avis
               </a>
-              <a href="#perfect-for" className="block px-4 py-2 text-slate-700 hover:bg-purple-50 rounded-lg">
+              <a href="#perfect-for" className="block px-4 py-2 text-slate-700 hover:bg-blue-50 rounded-lg">
                 Pour qui ?
               </a>
               <button
                 onClick={() => navigate('/login')}
-                className="block w-full text-left px-4 py-2 text-slate-700 hover:bg-purple-50 rounded-lg"
+                className="block w-full text-left px-4 py-2 text-slate-700 hover:bg-blue-50 rounded-lg"
               >
                 Connexion
               </button>
               <button
                 onClick={() => navigate('/partners-map')}
-                className="block w-full px-6 py-3 rounded-full font-bold text-white text-center bg-gradient-to-r from-purple-600 to-pink-600"
+                className="block w-full px-6 py-3 rounded-full font-bold text-white text-center bg-gradient-to-r from-blue-600 to-cyan-600"
               >
                 Trouver un pressing
               </button>
@@ -97,12 +97,12 @@ export default function LandingPage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8 }}
             >
-              <div className="inline-block px-4 py-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-full text-sm font-bold mb-6 shadow-lg">
+              <div className="inline-block px-4 py-2 bg-gradient-to-r from-blue-600 to-cyan-600 text-white rounded-full text-sm font-bold mb-6 shadow-lg">
                 🚀 2600+ pressings partenaires
               </div>
               <h1 className="text-6xl md:text-7xl font-black text-slate-900 mb-6 leading-tight">
                 Votre pressing{' '}
-                <span className="bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 bg-clip-text text-transparent">
+                <span className="bg-gradient-to-r from-blue-600 via-cyan-600 to-blue-600 bg-clip-text text-transparent">
                   au kilo
                 </span>
                 <br />
@@ -117,14 +117,14 @@ export default function LandingPage() {
               <div className="flex flex-col sm:flex-row gap-4 mb-8">
                 <button
                   onClick={() => navigate('/partners-map')}
-                  className="group px-8 py-5 rounded-2xl font-bold text-xl text-white shadow-2xl hover:shadow-3xl transition-all transform hover:scale-105 flex items-center justify-center gap-3 bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600"
+                  className="group px-8 py-5 rounded-2xl font-bold text-xl text-white shadow-2xl hover:shadow-3xl transition-all transform hover:scale-105 flex items-center justify-center gap-3 bg-gradient-to-r from-blue-600 via-cyan-600 to-blue-600"
                 >
                   Trouver un pressing
                   <ChevronRight className="w-6 h-6 group-hover:translate-x-1 transition" />
                 </button>
                 <button
                   onClick={() => navigate('/signup')}
-                  className="px-8 py-5 bg-white border-3 border-purple-300 text-slate-900 rounded-2xl font-bold text-xl hover:border-purple-500 hover:bg-purple-50 transition-all shadow-xl"
+                  className="px-8 py-5 bg-white border-3 border-blue-300 text-slate-900 rounded-2xl font-bold text-xl hover:border-blue-500 hover:bg-blue-50 transition-all shadow-xl"
                 >
                   Créer un compte
                 </button>
@@ -133,7 +133,7 @@ export default function LandingPage() {
                 {[
                   { icon: Check, text: 'Pressings vérifiés', color: 'bg-green-500' },
                   { icon: Check, text: 'Prix transparents', color: 'bg-blue-500' },
-                  { icon: Check, text: 'Suivi en ligne', color: 'bg-purple-500' }
+                  { icon: Check, text: 'Suivi en ligne', color: 'bg-blue-500' }
                 ].map((item, i) => (
                   <div key={i} className="flex items-center gap-2">
                     <div className={`w-7 h-7 rounded-full ${item.color} flex items-center justify-center shadow-lg`}>
@@ -152,13 +152,13 @@ export default function LandingPage() {
               transition={{ duration: 0.8, delay: 0.2 }}
               className="relative"
             >
-              <div className="relative bg-gradient-to-br from-purple-400 via-pink-400 to-blue-400 rounded-3xl p-12 shadow-2xl">
+              <div className="relative bg-gradient-to-br from-blue-400 via-cyan-400 to-blue-400 rounded-3xl p-12 shadow-2xl">
                 <div className="grid grid-cols-2 gap-8">
                   {[
                     { icon: Shirt, label: 'Lavage', color: 'from-blue-500 to-cyan-500' },
                     { icon: Wind, label: 'Séchage', color: 'from-green-500 to-emerald-500' },
                     { icon: Package, label: 'Pliage', color: 'from-orange-500 to-red-500' },
-                    { icon: Sparkles, label: 'Propre', color: 'from-purple-500 to-pink-500' },
+                    { icon: Sparkles, label: 'Propre', color: 'from-blue-500 to-cyan-500' },
                   ].map((item, i) => (
                     <motion.div
                       key={i}
@@ -199,7 +199,7 @@ export default function LandingPage() {
       </section>
 
       {/* Stats Banner */}
-      <section className="py-16 bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 shadow-2xl">
+      <section className="py-16 bg-gradient-to-r from-blue-600 via-cyan-600 to-blue-600 shadow-2xl">
         <div className="max-w-7xl mx-auto px-4">
           <div className="grid md:grid-cols-2 gap-12 text-center text-white">
             <motion.div
@@ -232,7 +232,7 @@ export default function LandingPage() {
             viewport={{ once: true }}
             className="text-center mb-20"
           >
-            <h2 className="text-6xl font-black bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 bg-clip-text text-transparent mb-4">
+            <h2 className="text-6xl font-black bg-gradient-to-r from-blue-600 via-cyan-600 to-blue-600 bg-clip-text text-transparent mb-4">
               Comment ça marche
             </h2>
             <p className="text-2xl text-slate-600 font-semibold">
@@ -254,7 +254,7 @@ export default function LandingPage() {
                 title: 'Déposez votre linge',
                 description: 'Apportez votre linge dans un point relais partenaire. Nous pesons votre sac et validons votre commande.',
                 icon: Package,
-                gradient: 'from-purple-500 to-pink-500'
+                gradient: 'from-blue-500 to-cyan-500'
               },
               {
                 step: '3',
@@ -279,7 +279,7 @@ export default function LandingPage() {
                 viewport={{ once: true }}
                 className="relative group"
               >
-                <div className="bg-white rounded-3xl p-8 shadow-xl hover:shadow-2xl transition-all h-full border-4 border-transparent hover:border-purple-300">
+                <div className="bg-white rounded-3xl p-8 shadow-xl hover:shadow-2xl transition-all h-full border-4 border-transparent hover:border-blue-300">
                   <div className={`w-20 h-20 bg-gradient-to-r ${item.gradient} rounded-3xl flex items-center justify-center text-white text-3xl font-black mb-6 shadow-xl group-hover:scale-110 transition`}>
                     {item.step}
                   </div>
@@ -291,7 +291,7 @@ export default function LandingPage() {
                 </div>
                 {index < 3 && (
                   <div className="hidden lg:block absolute top-1/2 -right-4 transform -translate-y-1/2 z-10">
-                    <ChevronRight className="w-10 h-10 text-purple-400" />
+                    <ChevronRight className="w-10 h-10 text-blue-400" />
                   </div>
                 )}
               </motion.div>
@@ -301,7 +301,7 @@ export default function LandingPage() {
           <div className="text-center mt-16">
             <button
               onClick={() => navigate('/partners-map')}
-              className="px-12 py-6 rounded-2xl font-bold text-2xl text-white shadow-2xl hover:shadow-3xl transition-all transform hover:scale-105 bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600"
+              className="px-12 py-6 rounded-2xl font-bold text-2xl text-white shadow-2xl hover:shadow-3xl transition-all transform hover:scale-105 bg-gradient-to-r from-blue-600 via-cyan-600 to-blue-600"
             >
               Voir la carte des pressings
             </button>
@@ -310,7 +310,7 @@ export default function LandingPage() {
       </section>
 
       {/* Reviews */}
-      <section id="reviews" className="py-24 px-4 bg-gradient-to-br from-purple-50 to-pink-50">
+      <section id="reviews" className="py-24 px-4 bg-gradient-to-br from-blue-50 to-cyan-50">
         <div className="max-w-7xl mx-auto">
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
@@ -318,7 +318,7 @@ export default function LandingPage() {
             viewport={{ once: true }}
             className="text-center mb-20"
           >
-            <h2 className="text-6xl font-black bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 bg-clip-text text-transparent mb-4">
+            <h2 className="text-6xl font-black bg-gradient-to-r from-blue-600 via-cyan-600 to-blue-600 bg-clip-text text-transparent mb-4">
               Ils nous font confiance
             </h2>
             <p className="text-2xl text-slate-600 font-semibold">
@@ -334,7 +334,7 @@ export default function LandingPage() {
                 whileInView={{ opacity: 1, scale: 1 }}
                 transition={{ delay: index * 0.1 }}
                 viewport={{ once: true }}
-                className="bg-white rounded-3xl p-8 shadow-xl hover:shadow-2xl transition border-4 border-purple-200"
+                className="bg-white rounded-3xl p-8 shadow-xl hover:shadow-2xl transition border-4 border-blue-200"
               >
                 <div className="flex gap-1 mb-5">
                   {[...Array(5)].map((_, i) => (
@@ -345,7 +345,7 @@ export default function LandingPage() {
                   "Avis client réel à insérer ici."
                 </p>
                 <div className="flex items-center gap-3">
-                  <div className="w-14 h-14 rounded-full bg-gradient-to-r from-purple-500 to-pink-500" />
+                  <div className="w-14 h-14 rounded-full bg-gradient-to-r from-blue-500 to-cyan-500" />
                   <div>
                     <p className="font-bold text-slate-900">Nom du client</p>
                     <p className="text-sm text-slate-500">Ville</p>
@@ -366,7 +366,7 @@ export default function LandingPage() {
             viewport={{ once: true }}
             className="text-center mb-16"
           >
-            <h2 className="text-6xl font-black bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 bg-clip-text text-transparent mb-4">
+            <h2 className="text-6xl font-black bg-gradient-to-r from-blue-600 via-cyan-600 to-blue-600 bg-clip-text text-transparent mb-4">
               Parfait pour
             </h2>
           </motion.div>
@@ -374,7 +374,7 @@ export default function LandingPage() {
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             {[
               { emoji: '👨‍👩‍👧‍👦', title: 'Familles', text: 'Déposez votre linge au pressing le plus proche, à prix maîtrisé.', color: 'from-blue-500 to-cyan-500' },
-              { emoji: '💼', title: 'Professionnels', text: 'Gagnez du temps en déléguant vos lessives à nos points relais pratiques.', color: 'from-purple-500 to-pink-500' },
+              { emoji: '💼', title: 'Professionnels', text: 'Gagnez du temps en déléguant vos lessives à nos points relais pratiques.', color: 'from-blue-500 to-cyan-500' },
               { emoji: '🏢', title: 'Entreprises', text: 'Solution fiable pour vos équipes et vos besoins réguliers.', color: 'from-orange-500 to-red-500' },
               { emoji: '🎓', title: 'Étudiants', text: 'Tarifs accessibles et service rapide pour vous concentrer sur l\'essentiel.', color: 'from-green-500 to-emerald-500' }
             ].map((item, i) => (
@@ -398,7 +398,7 @@ export default function LandingPage() {
       </section>
 
       {/* Trust badges */}
-      <section className="py-24 px-4 bg-gradient-to-br from-purple-100 via-pink-100 to-blue-100">
+      <section className="py-24 px-4 bg-gradient-to-br from-blue-100 via-cyan-100 to-blue-100">
         <div className="max-w-5xl mx-auto">
           <div className="grid md:grid-cols-2 gap-16">
             {[
@@ -412,7 +412,7 @@ export default function LandingPage() {
                 icon: Sparkles,
                 title: 'Qualité professionnelle garantie',
                 desc: 'Nos partenaires respectent les standards les plus exigeants de l\'industrie.',
-                color: 'from-purple-500 to-pink-500'
+                color: 'from-blue-500 to-cyan-500'
               }
             ].map((item, i) => (
               <motion.div
@@ -439,7 +439,7 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto px-4">
           <div className="grid md:grid-cols-4 gap-12 mb-12">
             <div>
-              <div className="text-4xl font-black mb-4 bg-gradient-to-r from-purple-400 via-pink-400 to-blue-400 bg-clip-text text-transparent">
+              <div className="text-4xl font-black mb-4 bg-gradient-to-r from-blue-400 via-cyan-400 to-blue-400 bg-clip-text text-transparent">
                 Kilolab
               </div>
               <p className="text-slate-400">Votre pressing au kilo, en point relais</p>

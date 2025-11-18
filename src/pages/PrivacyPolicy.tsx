@@ -5,7 +5,7 @@ export default function PrivacyPolicy() {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 p-6">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 p-6">
       <div className="max-w-4xl mx-auto">
         <button
           onClick={() => navigate('/')}
@@ -204,7 +204,7 @@ export default function PrivacyPolicy() {
                 <p>3 Place de Fontenoy - TSA 80715</p>
                 <p>75334 Paris Cedex 07</p>
                 <p>Tél : 01 53 73 22 22</p>
-                <p><a href="https://www.cnil.fr" className="text-purple-300 hover:underline">www.cnil.fr</a></p>
+                <p><a href="https://www.cnil.fr" className="text-blue-300 hover:underline">www.cnil.fr</a></p>
               </div>
             </section>
           </div>

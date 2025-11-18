@@ -97,7 +97,7 @@ export default function AdvancedPhotoUpload({ onUpload, maxFiles = 5 }: Advanced
             {...getRootProps()}
             className={`aspect-square rounded-lg border-2 border-dashed flex flex-col items-center justify-center cursor-pointer transition-all ${
               isDragActive
-                ? 'border-purple-500 bg-purple-500/20'
+                ? 'border-blue-500 bg-blue-500/20'
                 : 'border-white/20 hover:border-white/40 bg-white/5'
             }`}
           >

@@ -48,12 +48,12 @@ export default function PromoCodeInput({ userId, onApply }: PromoCodeInputProps)
           onChange={(e) => setCode(e.target.value.toUpperCase())}
           placeholder="BIENVENUE30"
           disabled={success}
-          className="flex-1 px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500 disabled:opacity-50"
+          className="flex-1 px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
         />
         <button
           onClick={handleApply}
           disabled={loading || success || !code}
-          className="bg-purple-600 hover:bg-purple-700 text-white px-6 rounded-lg transition-all disabled:opacity-50 flex items-center gap-2"
+          className="bg-blue-600 hover:bg-blue-700 text-white px-6 rounded-lg transition-all disabled:opacity-50 flex items-center gap-2"
         >
           {loading ? (
             <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />

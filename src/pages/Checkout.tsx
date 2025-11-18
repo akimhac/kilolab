@@ -135,7 +135,7 @@ export default function Checkout() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 flex items-center justify-center">
         <Loader className="w-8 h-8 text-white animate-spin" />
       </div>
     );
@@ -144,7 +144,7 @@ export default function Checkout() {
   if (!order || !clientSecret) return null;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 p-6">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 p-6">
       <div className="max-w-2xl mx-auto">
         <button
           onClick={() => navigate('/client-dashboard')}
@@ -156,7 +156,7 @@ export default function Checkout() {
 
         <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-8 border border-white/20">
           <div className="text-center mb-8">
-            <CreditCard className="w-16 h-16 text-purple-400 mx-auto mb-4" />
+            <CreditCard className="w-16 h-16 text-blue-400 mx-auto mb-4" />
             <h1 className="text-3xl font-bold text-white mb-2">Paiement sécurisé</h1>
             <p className="text-white/60">Commande #{order.id.slice(0, 8)}</p>
           </div>

@@ -70,13 +70,13 @@ export default function ReviewForm({ orderId, partnerId, onSuccess }: ReviewForm
         onChange={(e) => setComment(e.target.value)}
         placeholder="Partagez votre expérience..."
         rows={4}
-        className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500"
+        className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-blue-500"
       />
 
       <button
         type="submit"
         disabled={loading || rating === 0}
-        className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white py-3 rounded-lg font-semibold disabled:opacity-50"
+        className="w-full bg-gradient-to-r from-blue-600 to-blue-600 hover:from-blue-700 hover:to-blue-700 text-white py-3 rounded-lg font-semibold disabled:opacity-50"
       >
         {loading ? 'Envoi...' : 'Envoyer mon avis'}
       </button>

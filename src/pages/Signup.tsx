@@ -61,7 +61,7 @@ export default function Signup() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center p-6">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 flex items-center justify-center p-6">
       <div className="max-w-md w-full">
         <button
           onClick={() => navigate('/')}
@@ -73,7 +73,7 @@ export default function Signup() {
 
         <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-8 border border-white/20">
           <div className="flex items-center gap-3 mb-6">
-            <UserPlus className="w-10 h-10 text-purple-400" />
+            <UserPlus className="w-10 h-10 text-blue-400" />
             <h1 className="text-3xl font-bold text-white">Inscription</h1>
           </div>
 
@@ -94,7 +94,7 @@ export default function Signup() {
                 required
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Jean Dupont"
               />
             </div>
@@ -109,7 +109,7 @@ export default function Signup() {
                 required
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="votre@email.com"
               />
             </div>
@@ -125,7 +125,7 @@ export default function Signup() {
                 minLength={6}
                 value={formData.password}
                 onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="••••••••"
               />
               <p className="text-white/40 text-sm mt-1">Minimum 6 caractères</p>
@@ -139,7 +139,7 @@ export default function Signup() {
                   onClick={() => setFormData({ ...formData, role: 'client' })}
                   className={`p-3 rounded-lg border-2 transition-all ${
                     formData.role === 'client'
-                      ? 'border-purple-500 bg-purple-500/20'
+                      ? 'border-blue-500 bg-blue-500/20'
                       : 'border-white/20 bg-white/5 hover:border-white/40'
                   }`}
                 >
@@ -150,7 +150,7 @@ export default function Signup() {
                   onClick={() => setFormData({ ...formData, role: 'partner' })}
                   className={`p-3 rounded-lg border-2 transition-all ${
                     formData.role === 'partner'
-                      ? 'border-purple-500 bg-purple-500/20'
+                      ? 'border-blue-500 bg-blue-500/20'
                       : 'border-white/20 bg-white/5 hover:border-white/40'
                   }`}
                 >
@@ -162,7 +162,7 @@ export default function Signup() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white py-3 rounded-lg font-semibold transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+              className="w-full bg-gradient-to-r from-blue-600 to-blue-600 hover:from-blue-700 hover:to-blue-700 text-white py-3 rounded-lg font-semibold transition-all disabled:opacity-50 flex items-center justify-center gap-2"
             >
               {loading ? (
                 <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -180,7 +180,7 @@ export default function Signup() {
               Déjà un compte ?{' '}
               <button
                 onClick={() => navigate('/login')}
-                className="text-purple-300 hover:text-purple-200 font-semibold"
+                className="text-blue-300 hover:text-blue-200 font-semibold"
               >
                 Se connecter
               </button>

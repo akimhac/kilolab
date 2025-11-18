@@ -9,14 +9,14 @@ export default function CGU() {
       <div className="max-w-4xl mx-auto">
         <button
           onClick={() => navigate('/')}
-          className="flex items-center gap-2 text-purple-600 hover:text-purple-700 mb-8 transition font-semibold"
+          className="flex items-center gap-2 text-blue-600 hover:text-blue-700 mb-8 transition font-semibold"
         >
           <ArrowLeft className="w-5 h-5" />
           Retour à l'accueil
         </button>
 
         <div className="bg-white rounded-3xl shadow-xl p-8 md:p-12">
-          <h1 className="text-5xl font-black mb-8 bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+          <h1 className="text-5xl font-black mb-8 bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">
             Conditions Générales d'Utilisation
           </h1>
           
@@ -33,9 +33,9 @@ export default function CGU() {
                 <strong>Kilolab</strong> est une plateforme de mise en relation permettant aux utilisateurs 
                 de trouver et de confier leur linge à un pressing partenaire situé à proximité, au kilo.
               </p>
-              <div className="bg-purple-50 border-l-4 border-purple-600 p-6 rounded-r-lg my-6">
-                <p className="font-bold text-purple-900 mb-2">⚠️ Important</p>
-                <p className="text-purple-800">
+              <div className="bg-blue-50 border-l-4 border-blue-600 p-6 rounded-r-lg my-6">
+                <p className="font-bold text-blue-900 mb-2">⚠️ Important</p>
+                <p className="text-blue-800">
                   Kilolab <strong>n'est pas un pressing</strong> et <strong>n'intervient pas dans la prestation 
                   de nettoyage elle-même</strong>. Nous agissons uniquement en tant qu'intermédiaire technologique 
                   entre les utilisateurs et les pressings partenaires.
@@ -68,25 +68,25 @@ export default function CGU() {
                 <h3 className="font-bold text-lg mb-3 text-slate-900">Processus en 4 étapes :</h3>
                 <ol className="space-y-3">
                   <li className="flex gap-3">
-                    <span className="flex-shrink-0 w-8 h-8 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-full flex items-center justify-center font-bold">1</span>
+                    <span className="flex-shrink-0 w-8 h-8 bg-gradient-to-r from-blue-600 to-cyan-600 text-white rounded-full flex items-center justify-center font-bold">1</span>
                     <div>
                       <strong>Recherche :</strong> L'utilisateur sélectionne un pressing partenaire via la plateforme Kilolab.
                     </div>
                   </li>
                   <li className="flex gap-3">
-                    <span className="flex-shrink-0 w-8 h-8 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-full flex items-center justify-center font-bold">2</span>
+                    <span className="flex-shrink-0 w-8 h-8 bg-gradient-to-r from-blue-600 to-cyan-600 text-white rounded-full flex items-center justify-center font-bold">2</span>
                     <div>
                       <strong>Dépôt :</strong> Le linge est déposé et pesé directement par le pressing ou le point relais.
                     </div>
                   </li>
                   <li className="flex gap-3">
-                    <span className="flex-shrink-0 w-8 h-8 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-full flex items-center justify-center font-bold">3</span>
+                    <span className="flex-shrink-0 w-8 h-8 bg-gradient-to-r from-blue-600 to-cyan-600 text-white rounded-full flex items-center justify-center font-bold">3</span>
                     <div>
                       <strong>Nettoyage :</strong> Le pressing partenaire réalise la prestation de nettoyage.
                     </div>
                   </li>
                   <li className="flex gap-3">
-                    <span className="flex-shrink-0 w-8 h-8 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-full flex items-center justify-center font-bold">4</span>
+                    <span className="flex-shrink-0 w-8 h-8 bg-gradient-to-r from-blue-600 to-cyan-600 text-white rounded-full flex items-center justify-center font-bold">4</span>
                     <div>
                       <strong>Retrait :</strong> L'utilisateur récupère son linge au même point relais.
                     </div>
@@ -202,13 +202,13 @@ export default function CGU() {
               <p className="text-slate-700 leading-relaxed">
                 Conformément au <strong>RGPD</strong> et à la loi Informatique et Libertés, l'utilisateur peut 
                 demander l'accès, la rectification ou la suppression de ses données en contactant : 
-                <a href="mailto:contact@kilolab.fr" className="text-purple-600 hover:underline font-semibold"> contact@kilolab.fr</a>
+                <a href="mailto:contact@kilolab.fr" className="text-blue-600 hover:underline font-semibold"> contact@kilolab.fr</a>
               </p>
               <p className="text-slate-700 leading-relaxed">
                 Pour plus d'informations, consultez notre{' '}
                 <button 
                   onClick={() => navigate('/legal/privacy')} 
-                  className="text-purple-600 hover:underline font-semibold"
+                  className="text-blue-600 hover:underline font-semibold"
                 >
                   Politique de confidentialité
                 </button>.
@@ -230,7 +230,7 @@ export default function CGU() {
               <h2 className="text-3xl font-bold text-slate-900 mb-4">Article 10 - Réclamations</h2>
               <p className="text-slate-700 leading-relaxed mb-4">
                 Pour toute réclamation concernant la plateforme Kilolab, contactez-nous à : 
-                <a href="mailto:contact@kilolab.fr" className="text-purple-600 hover:underline font-semibold"> contact@kilolab.fr</a>
+                <a href="mailto:contact@kilolab.fr" className="text-blue-600 hover:underline font-semibold"> contact@kilolab.fr</a>
               </p>
               <p className="text-slate-700 leading-relaxed">
                 <strong>En cas de litige avec un pressing partenaire</strong>, l'utilisateur doit d'abord tenter 
@@ -269,12 +269,12 @@ export default function CGU() {
             </section>
 
             {/* Contact */}
-            <div className="mt-12 p-8 bg-gradient-to-r from-purple-50 to-pink-50 rounded-2xl">
+            <div className="mt-12 p-8 bg-gradient-to-r from-blue-50 to-cyan-50 rounded-2xl">
               <h3 className="font-bold text-2xl mb-4 text-slate-900">Nous contacter</h3>
               <div className="space-y-2 text-slate-700">
                 <p><strong>Kilolab</strong></p>
-                <p>Email : <a href="mailto:contact@kilolab.fr" className="text-purple-600 hover:underline font-semibold">contact@kilolab.fr</a></p>
-                <p>Site web : <a href="https://kilolab.fr" className="text-purple-600 hover:underline font-semibold">kilolab.fr</a></p>
+                <p>Email : <a href="mailto:contact@kilolab.fr" className="text-blue-600 hover:underline font-semibold">contact@kilolab.fr</a></p>
+                <p>Site web : <a href="https://kilolab.fr" className="text-blue-600 hover:underline font-semibold">kilolab.fr</a></p>
               </div>
             </div>
           </div>

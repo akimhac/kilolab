@@ -12,7 +12,7 @@ export default function Pricing() {
         <div className="max-w-7xl mx-auto px-4 py-6">
           <button
             onClick={() => navigate('/')}
-            className="flex items-center gap-2 text-purple-600 hover:text-purple-700 transition font-semibold"
+            className="flex items-center gap-2 text-blue-600 hover:text-blue-700 transition font-semibold"
           >
             <ArrowLeft className="w-5 h-5" />
             Retour à l'accueil
@@ -21,7 +21,7 @@ export default function Pricing() {
       </div>
 
       {/* Hero */}
-      <section className="py-20 px-4 bg-gradient-to-b from-purple-50 to-white">
+      <section className="py-20 px-4 bg-gradient-to-b from-blue-50 to-white">
         <div className="max-w-4xl mx-auto text-center">
           <h1 className="text-6xl font-black text-slate-900 mb-6">
             Nos tarifs
@@ -86,17 +86,17 @@ export default function Pricing() {
       </section>
 
       {/* CTA */}
-      <section className="py-20 px-4 bg-gradient-to-r from-purple-600 to-pink-600">
+      <section className="py-20 px-4 bg-gradient-to-r from-blue-600 to-cyan-600">
         <div className="max-w-3xl mx-auto text-center text-white">
           <h2 className="text-4xl font-bold mb-6">
             Prêt à essayer ?
           </h2>
-          <p className="text-xl mb-8 text-purple-100">
+          <p className="text-xl mb-8 text-blue-100">
             Trouvez un pressing près de chez vous et commencez en 5 minutes
           </p>
           <button
             onClick={() => navigate('/partners-map')}
-            className="px-10 py-5 bg-white text-purple-600 rounded-full font-bold text-xl hover:shadow-2xl transition-all transform hover:scale-105"
+            className="px-10 py-5 bg-white text-blue-600 rounded-full font-bold text-xl hover:shadow-2xl transition-all transform hover:scale-105"
           >
             Trouver un pressing
           </button>

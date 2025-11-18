@@ -23,7 +23,7 @@ export default function ClientPricing() {
       duration: '24h',
       price: '10',
       icon: Clock,
-      color: 'from-purple-500 to-pink-500',
+      color: 'from-blue-500 to-cyan-500',
       features: [
         'Tout de Premium',
         'Service en 24 heures',
@@ -81,7 +81,7 @@ export default function ClientPricing() {
               {plan.badge && (
                 <div className="absolute -top-5 left-1/2 -translate-x-1/2 z-10">
                   <div className={`px-4 py-2 rounded-full text-sm font-bold text-white shadow-lg ${
-                    plan.highlighted ? 'bg-gradient-to-r from-purple-600 to-pink-600' : 'bg-slate-800'
+                    plan.highlighted ? 'bg-gradient-to-r from-blue-600 to-cyan-600' : 'bg-slate-800'
                   }`}>
                     {plan.badge}
                   </div>
@@ -90,8 +90,8 @@ export default function ClientPricing() {
 
               <div className={`rounded-3xl p-8 h-full ${
                 plan.highlighted
-                  ? 'bg-gradient-to-br from-purple-600 to-pink-600 text-white shadow-2xl scale-105'
-                  : 'bg-white border-2 border-slate-200 hover:border-purple-300'
+                  ? 'bg-gradient-to-br from-blue-600 to-cyan-600 text-white shadow-2xl scale-105'
+                  : 'bg-white border-2 border-slate-200 hover:border-blue-300'
               } transition-all`}>
                 <div className={`w-16 h-16 rounded-2xl flex items-center justify-center mb-6 ${
                   plan.highlighted ? 'bg-white/20' : `bg-gradient-to-r ${plan.color}`
@@ -107,12 +107,12 @@ export default function ClientPricing() {
                   <span className={`text-5xl font-black ${plan.highlighted ? 'text-white' : 'text-slate-900'}`}>
                     {plan.price}€
                   </span>
-                  <span className={plan.highlighted ? 'text-purple-100' : 'text-slate-600'}>
+                  <span className={plan.highlighted ? 'text-blue-100' : 'text-slate-600'}>
                     / kg
                   </span>
                 </div>
 
-                <p className={`text-lg font-semibold mb-8 ${plan.highlighted ? 'text-purple-100' : 'text-slate-600'}`}>
+                <p className={`text-lg font-semibold mb-8 ${plan.highlighted ? 'text-blue-100' : 'text-slate-600'}`}>
                   Délai : {plan.duration}
                 </p>
 
@@ -132,8 +132,8 @@ export default function ClientPricing() {
                 <button
                   className={`w-full py-4 rounded-xl font-bold text-lg transition-all transform hover:scale-105 ${
                     plan.highlighted
-                      ? 'bg-white text-purple-600 hover:shadow-xl'
-                      : 'bg-gradient-to-r from-purple-600 to-pink-600 text-white hover:shadow-lg'
+                      ? 'bg-white text-blue-600 hover:shadow-xl'
+                      : 'bg-gradient-to-r from-blue-600 to-cyan-600 text-white hover:shadow-lg'
                   }`}
                 >
                   Choisir {plan.name}

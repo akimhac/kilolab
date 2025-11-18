@@ -61,7 +61,7 @@ export default function BecomePartner() {
         <div className="max-w-7xl mx-auto px-4 py-6">
           <button
             onClick={() => navigate('/')}
-            className="flex items-center gap-2 text-purple-600 hover:text-purple-700"
+            className="flex items-center gap-2 text-blue-600 hover:text-blue-700"
           >
             <ArrowLeft className="w-5 h-5" />
             Retour
@@ -72,7 +72,7 @@ export default function BecomePartner() {
       {/* Hero */}
       <section className="py-20 px-4">
         <div className="max-w-4xl mx-auto text-center">
-          <Store className="w-16 h-16 text-purple-600 mx-auto mb-6" />
+          <Store className="w-16 h-16 text-blue-600 mx-auto mb-6" />
           <h1 className="text-5xl font-black text-slate-900 mb-6">
             Développez votre pressing avec Kilolab
           </h1>
@@ -81,15 +81,15 @@ export default function BecomePartner() {
           </p>
           <div className="flex flex-wrap gap-8 justify-center text-left">
             <div>
-              <div className="text-3xl font-bold text-purple-600">+30%</div>
+              <div className="text-3xl font-bold text-blue-600">+30%</div>
               <div className="text-slate-600">Chiffre d'affaires moyen</div>
             </div>
             <div>
-              <div className="text-3xl font-bold text-purple-600">2600+</div>
+              <div className="text-3xl font-bold text-blue-600">2600+</div>
               <div className="text-slate-600">Pressings partenaires</div>
             </div>
             <div>
-              <div className="text-3xl font-bold text-purple-600">0€</div>
+              <div className="text-3xl font-bold text-blue-600">0€</div>
               <div className="text-slate-600">Frais d'inscription</div>
             </div>
           </div>
@@ -112,7 +112,7 @@ export default function BecomePartner() {
                 key={idx}
                 className={`rounded-2xl p-8 ${
                   plan.highlighted
-                    ? 'bg-gradient-to-br from-purple-600 to-pink-600 text-white shadow-2xl scale-105'
+                    ? 'bg-gradient-to-br from-blue-600 to-cyan-600 text-white shadow-2xl scale-105'
                     : 'bg-white border-2 border-slate-200'
                 }`}
               >
@@ -126,7 +126,7 @@ export default function BecomePartner() {
                   <span className={`text-5xl font-black ${plan.highlighted ? '' : 'text-slate-900'}`}>
                     {plan.price}
                   </span>
-                  <span className={plan.highlighted ? 'text-purple-100' : 'text-slate-500'}>
+                  <span className={plan.highlighted ? 'text-blue-100' : 'text-slate-500'}>
                     {plan.period}
                   </span>
                 </div>
@@ -134,7 +134,7 @@ export default function BecomePartner() {
                 <ul className="space-y-3 mb-8">
                   {plan.features.map((f, i) => (
                     <li key={i} className="flex items-start gap-2">
-                      <Check className={`w-5 h-5 flex-shrink-0 ${plan.highlighted ? 'text-yellow-300' : 'text-purple-600'}`} />
+                      <Check className={`w-5 h-5 flex-shrink-0 ${plan.highlighted ? 'text-yellow-300' : 'text-blue-600'}`} />
                       <span className="text-sm">{f}</span>
                     </li>
                   ))}
@@ -144,8 +144,8 @@ export default function BecomePartner() {
                   onClick={() => setStep(2)}
                   className={`w-full py-3 rounded-lg font-bold ${
                     plan.highlighted
-                      ? 'bg-white text-purple-600'
-                      : 'bg-gradient-to-r from-purple-600 to-pink-600 text-white'
+                      ? 'bg-white text-blue-600'
+                      : 'bg-gradient-to-r from-blue-600 to-cyan-600 text-white'
                   }`}
                 >
                   Choisir {plan.name}
@@ -197,17 +197,17 @@ export default function BecomePartner() {
       </section>
 
       {/* CTA Final */}
-      <section className="py-20 px-4 bg-gradient-to-r from-purple-600 to-pink-600">
+      <section className="py-20 px-4 bg-gradient-to-r from-blue-600 to-cyan-600">
         <div className="max-w-3xl mx-auto text-center text-white">
           <h2 className="text-4xl font-bold mb-6">
             Prêt à développer votre activité ?
           </h2>
-          <p className="text-xl mb-8 text-purple-100">
+          <p className="text-xl mb-8 text-blue-100">
             Inscription en 5 minutes • Premier mois gratuit • Sans engagement
           </p>
           <button
             onClick={() => setStep(2)}
-            className="px-8 py-4 bg-white text-purple-600 rounded-full font-bold text-lg hover:shadow-xl"
+            className="px-8 py-4 bg-white text-blue-600 rounded-full font-bold text-lg hover:shadow-xl"
           >
             Devenir partenaire maintenant
           </button>

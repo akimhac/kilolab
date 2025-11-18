@@ -5,7 +5,7 @@ export default function CGV() {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 p-6">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 p-6">
       <div className="max-w-4xl mx-auto">
         <button
           onClick={() => navigate('/')}
@@ -17,7 +17,7 @@ export default function CGV() {
 
         <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-8 border border-white/20">
           <div className="flex items-center gap-4 mb-8">
-            <FileText className="w-12 h-12 text-purple-400" />
+            <FileText className="w-12 h-12 text-blue-400" />
             <div>
               <h1 className="text-4xl font-bold text-white">Conditions Generales de Vente</h1>
               <p className="text-white/60">Derniere mise a jour : 07 novembre 2025</p>
