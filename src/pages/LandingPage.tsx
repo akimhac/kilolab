@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowRight, Zap, Shield, Clock, Euro, Star, Users, TrendingUp, Award, MapPin, Sparkles, CheckCircle } from 'lucide-react';
+import { ArrowRight, Zap, Shield, Clock, Euro, Star, Users, TrendingUp, Award, MapPin, Sparkles } from 'lucide-react';
 import HowItWorksCarousel from '../components/HowItWorksCarousel';
 
 export default function LandingPage() {
@@ -60,33 +60,6 @@ export default function LandingPage() {
     }
   ];
 
-  const steps = [
-    {
-      number: '01',
-      title: 'Trouvez votre pressing',
-      description: 'Utilisez notre carte interactive pour localiser un pressing partenaire près de chez vous',
-      color: 'from-blue-500 to-cyan-500'
-    },
-    {
-      number: '02',
-      title: 'Déposez votre linge',
-      description: 'Apportez votre linge au pressing. Il est pesé sur place pour un tarif transparent',
-      color: 'from-cyan-500 to-teal-500'
-    },
-    {
-      number: '03',
-      title: 'Linge traité',
-      description: 'Votre linge est lavé, séché et plié professionnellement selon la formule choisie',
-      color: 'from-orange-500 to-red-500'
-    },
-    {
-      number: '04',
-      title: 'Récupérez propre',
-      description: 'Récupérez votre linge impeccable en 24h (Express) ou 48-72h (Standard)',
-      color: 'from-green-500 to-emerald-500'
-    }
-  ];
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-cyan-50">
       {/* Navigation */}
@@ -101,8 +74,8 @@ export default function LandingPage() {
                 <button onClick={() => navigate('/partners-map')} className="text-slate-600 hover:text-blue-600 font-semibold transition">
                   Comment ça marche
                 </button>
-                <button onClick={() => navigate('/pricing')} className="text-slate-600 hover:text-blue-600 font-semibold transition">
-                  Avis
+                <button onClick={() => navigate('/about')} className="text-slate-600 hover:text-blue-600 font-semibold transition">
+                  À propos
                 </button>
                 <button onClick={() => navigate('/pricing')} className="text-slate-600 hover:text-blue-600 font-semibold transition">
                   Pour qui ?
@@ -129,7 +102,6 @@ export default function LandingPage() {
       <section className="pt-32 pb-20 px-4">
         <div className="max-w-7xl mx-auto">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
-            {/* Texte à gauche */}
             <motion.div
               initial={{ opacity: 0, x: -50 }}
               animate={{ opacity: 1, x: 0 }}
@@ -190,7 +162,6 @@ export default function LandingPage() {
               </div>
             </motion.div>
 
-            {/* Carrousel à droite */}
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
@@ -271,46 +242,8 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Comment ça marche - Version détaillée */}
-      <section className="py-20 px-4 bg-gradient-to-br from-slate-50 to-blue-50">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-black text-slate-900 mb-4">
-              Comment ça marche ?
-            </h2>
-            <p className="text-xl text-slate-600">
-              4 étapes simples pour un linge impeccable
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {steps.map((step, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-                viewport={{ once: true }}
-                className="relative"
-              >
-                <div className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all h-full">
-                  <div className={`text-6xl font-black bg-gradient-to-br ${step.color} bg-clip-text text-transparent mb-4`}>
-                    {step.number}
-                  </div>
-                  <h3 className="text-xl font-bold text-slate-900 mb-3">{step.title}</h3>
-                  <p className="text-slate-600 leading-relaxed">{step.description}</p>
-                </div>
-                {index < steps.length - 1 && (
-                  <div className="hidden lg:block absolute top-1/2 -right-4 w-8 h-0.5 bg-gradient-to-r from-blue-300 to-cyan-300"></div>
-                )}
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* Testimonials */}
-      <section className="py-20 px-4 bg-white">
+      <section className="py-20 px-4 bg-gradient-to-br from-slate-50 to-blue-50">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-black text-slate-900 mb-4">
@@ -329,7 +262,7 @@ export default function LandingPage() {
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
                 viewport={{ once: true }}
-                className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-2xl p-8 shadow-lg"
+                className="bg-white rounded-2xl p-8 shadow-lg"
               >
                 <div className="flex gap-1 mb-4">
                   {[...Array(testimonial.rating)].map((_, i) => (
@@ -398,7 +331,7 @@ export default function LandingPage() {
             <div>
               <h3 className="font-bold mb-4">Entreprise</h3>
               <ul className="space-y-2 text-slate-400">
-                <li><button className="hover:text-white transition">À propos</button></li>
+                <li><button onClick={() => navigate('/about')} className="hover:text-white transition">À propos</button></li>
                 <li><button className="hover:text-white transition">Contact</button></li>
               </ul>
             </div>
