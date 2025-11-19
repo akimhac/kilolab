@@ -1,107 +1,129 @@
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Info } from 'lucide-react';
-import ClientPricing from '../components/ClientPricing';
+import { ArrowLeft, Check, Zap } from 'lucide-react';
 
 export default function Pricing() {
   const navigate = useNavigate();
 
-  return (
-    <div className="min-h-screen bg-white">
-      {/* Header */}
-      <div className="bg-white border-b sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 py-6">
-          <button
-            onClick={() => navigate('/')}
-            className="flex items-center gap-2 text-blue-600 hover:text-blue-700 transition font-semibold"
-          >
-            <ArrowLeft className="w-5 h-5" />
-            Retour à l'accueil
-          </button>
-        </div>
-      </div>
+  const plans = [
+    {
+      name: 'Standard',
+      price: '3,50',
+      duration: '48-72h',
+      features: [
+        'Lavage professionnel',
+        'Séchage soigné',
+        'Pliage impeccable',
+        'Délai standard',
+        'Prix économique'
+      ],
+      color: 'from-blue-500 to-cyan-500',
+      popular: false
+    },
+    {
+      name: 'Express',
+      price: '5',
+      duration: '24h',
+      features: [
+        'Lavage professionnel',
+        'Séchage soigné',
+        'Pliage impeccable',
+        'Livraison en 24h',
+        'Service prioritaire'
+      ],
+      color: 'from-orange-500 to-red-500',
+      popular: true
+    }
+  ];
 
-      {/* Hero */}
-      <section className="py-20 px-4 bg-gradient-to-b from-blue-50 to-white">
-        <div className="max-w-4xl mx-auto text-center">
-          <h1 className="text-6xl font-black text-slate-900 mb-6">
-            Nos tarifs
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white py-12 px-4">
+      <div className="max-w-6xl mx-auto">
+        <button
+          onClick={() => navigate('/')}
+          className="flex items-center gap-2 text-blue-600 hover:text-blue-700 mb-8 transition font-semibold"
+        >
+          <ArrowLeft className="w-5 h-5" />
+          Retour
+        </button>
+
+        <div className="text-center mb-12">
+          <h1 className="text-5xl font-black bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent mb-4">
+            Tarifs simples et transparents
           </h1>
-          <p className="text-2xl text-slate-600 mb-8">
-            Des prix transparents, sans mauvaise surprise
+          <p className="text-xl text-slate-600">
+            Prix au kilo, sans surprise
           </p>
-          <div className="bg-blue-50 border-l-4 border-blue-600 p-6 rounded-r-xl inline-block">
-            <div className="flex items-start gap-3 text-left">
-              <Info className="w-6 h-6 text-blue-600 flex-shrink-0 mt-1" />
-              <div>
-                <p className="text-blue-900 font-semibold mb-2">Prix au kilogramme</p>
-                <p className="text-blue-800">
-                  Vous payez uniquement le poids de votre linge. Pesée précise au gramme près 
-                  par nos pressings partenaires certifiés.
-                </p>
+        </div>
+
+        <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+          {plans.map((plan) => (
+            <div
+              key={plan.name}
+              className={`relative bg-white rounded-3xl shadow-xl p-8 ${
+                plan.popular ? 'ring-4 ring-orange-500' : ''
+              }`}
+            >
+              {plan.popular && (
+                <div className="absolute -top-4 left-1/2 -translate-x-1/2">
+                  <div className="bg-gradient-to-r from-orange-500 to-red-500 text-white px-6 py-2 rounded-full font-bold text-sm flex items-center gap-2 shadow-lg">
+                    <Zap className="w-4 h-4" />
+                    Le plus populaire
+                  </div>
+                </div>
+              )}
+
+              <div className="text-center mb-8">
+                <h3 className="text-2xl font-bold text-slate-900 mb-2">
+                  {plan.name}
+                </h3>
+                <div className="flex items-baseline justify-center gap-2 mb-2">
+                  <span className={`text-6xl font-black bg-gradient-to-r ${plan.color} bg-clip-text text-transparent`}>
+                    {plan.price}€
+                  </span>
+                  <span className="text-slate-600">/kg</span>
+                </div>
+                <p className="text-slate-500 font-semibold">{plan.duration}</p>
               </div>
+
+              <ul className="space-y-4 mb-8">
+                {plan.features.map((feature, i) => (
+                  <li key={i} className="flex items-center gap-3">
+                    <Check className="w-5 h-5 text-green-500 flex-shrink-0" />
+                    <span className="text-slate-700">{feature}</span>
+                  </li>
+                ))}
+              </ul>
+
+              <button
+                onClick={() => navigate('/partners-map')}
+                className={`w-full py-4 rounded-xl font-bold text-lg text-white bg-gradient-to-r ${plan.color} hover:shadow-2xl transition-all transform hover:scale-105`}
+              >
+                Choisir {plan.name}
+              </button>
+            </div>
+          ))}
+        </div>
+
+        <div className="mt-16 bg-white rounded-3xl shadow-xl p-8 max-w-3xl mx-auto">
+          <h2 className="text-2xl font-bold text-center text-slate-900 mb-6">
+            Questions fréquentes
+          </h2>
+          <div className="space-y-4">
+            <div>
+              <h3 className="font-bold text-slate-900 mb-2">Y a-t-il un poids minimum ?</h3>
+              <p className="text-slate-600">Non, mais nous recommandons 2-3kg minimum pour optimiser le service.</p>
+            </div>
+            <div>
+              <h3 className="font-bold text-slate-900 mb-2">Comment est calculé le prix ?</h3>
+              <p className="text-slate-600">Votre linge est pesé par le pressing. Prix = poids × tarif/kg.</p>
+            </div>
+            <div>
+              <h3 className="font-bold text-slate-900 mb-2">Quels vêtements acceptez-vous ?</h3>
+              <p className="text-slate-600">Tous types de textiles lavables en machine (vêtements, linge de maison, etc.).</p>
             </div>
           </div>
         </div>
-      </section>
-
-      {/* Pricing component */}
-      <ClientPricing />
-
-      {/* FAQ Prix */}
-      <section className="py-20 px-4 bg-slate-50">
-        <div className="max-w-4xl mx-auto">
-          <h2 className="text-4xl font-bold text-slate-900 mb-12 text-center">
-            Questions fréquentes sur les tarifs
-          </h2>
-          <div className="space-y-6">
-            {[
-              {
-                q: 'Comment est pesé mon linge ?',
-                a: 'Votre linge est pesé par le pressing partenaire sur une balance certifiée. Le poids est validé et vous recevez une notification avec le montant exact avant le début du traitement.'
-              },
-              {
-                q: 'Y a-t-il un poids minimum ?',
-                a: 'Non, il n\'y a pas de poids minimum. Cependant, la plupart des pressings recommandent un minimum de 2-3kg pour optimiser le traitement.'
-              },
-              {
-                q: 'Que comprend le prix ?',
-                a: 'Le prix au kilo comprend le lavage, le séchage, le repassage et le pliage de votre linge. Tout est inclus, aucun frais caché.'
-              },
-              {
-                q: 'Puis-je changer de formule ?',
-                a: 'Oui, vous choisissez la formule à chaque commande selon vos besoins. Pas d\'abonnement, pas d\'engagement.'
-              },
-              {
-                q: 'Les prix varient-ils selon le pressing ?',
-                a: 'Non, les prix affichés sont fixes sur toute la plateforme Kilolab. Tous nos pressings partenaires appliquent les mêmes tarifs.'
-              }
-            ].map((faq, i) => (
-              <div key={i} className="bg-white rounded-2xl p-6 shadow-md">
-                <h3 className="text-xl font-bold text-slate-900 mb-3">{faq.q}</h3>
-                <p className="text-slate-600 leading-relaxed">{faq.a}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* CTA */}
-      <section className="py-20 px-4 bg-gradient-to-r from-blue-600 to-cyan-600">
-        <div className="max-w-3xl mx-auto text-center text-white">
-          <h2 className="text-4xl font-bold mb-6">
-            Prêt à essayer ?
-          </h2>
-          <p className="text-xl mb-8 text-blue-100">
-            Trouvez un pressing près de chez vous et commencez en 5 minutes
-          </p>
-          <button
-            onClick={() => navigate('/partners-map')}
-            className="px-10 py-5 bg-white text-blue-600 rounded-full font-bold text-xl hover:shadow-2xl transition-all transform hover:scale-105"
-          >
-            Trouver un pressing
-          </button>
-        </div>
-      </section>
+      </div>
     </div>
   );
 }

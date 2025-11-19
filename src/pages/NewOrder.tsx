@@ -10,6 +10,7 @@ interface Partner {
   address: string;
   city: string;
   price_per_kg: number;
+  stripe_account_id?: string;
 }
 
 export default function NewOrder() {
@@ -19,68 +20,43 @@ export default function NewOrder() {
   const [user, setUser] = useState<any>(null);
   const [partner, setPartner] = useState<Partner | null>(null);
   const [weight, setWeight] = useState<number>(5);
-  const [serviceType, setServiceType] = useState<'premium' | 'express' | 'ultra_express'>('express');
+  const [serviceType, setServiceType] = useState<'standard' | 'express'>('express');
 
   const servicePrices = {
-    premium: 5,
-    express: 10,
-    ultra_express: 15,
+    standard: 3.5,
+    express: 5,
   };
 
   const serviceLabels = {
-    premium: 'Premium (72-96h)',
+    standard: 'Standard (48-72h)',
     express: 'Express (24h)',
-    ultra_express: 'Ultra Express (6h)',
   };
 
   useEffect(() => {
-    console.log('🔍 NewOrder mounted');
-    console.log('Location state:', location.state);
     checkAuth();
     loadPartner();
   }, []);
 
   const checkAuth = async () => {
-    console.log('🔐 Checking auth...');
     const { data: { session } } = await supabase.auth.getSession();
-    console.log('Session:', session);
     if (!session) {
-      console.log('❌ No session, redirecting to login');
       navigate('/login', { state: { from: '/new-order' } });
       return;
     }
-    console.log('✅ User authenticated:', session.user.email);
     setUser(session.user);
   };
 
   const loadPartner = async () => {
-    console.log('🏢 Loading partner...');
     const state = location.state as any;
-    console.log('State received:', state);
-    
     if (state?.selectedPartner) {
-      console.log('✅ Partner from state:', state.selectedPartner);
       setPartner(state.selectedPartner);
     } else if (state?.partnerId) {
-      console.log('🔍 Fetching partner by ID:', state.partnerId);
-      const { data, error } = await supabase
+      const { data } = await supabase
         .from('partners')
         .select('*')
         .eq('id', state.partnerId)
         .single();
-      
-      if (error) {
-        console.error('❌ Error fetching partner:', error);
-        toast.error('Erreur lors du chargement du pressing');
-        setTimeout(() => navigate('/partners-map'), 2000);
-      } else {
-        console.log('✅ Partner loaded:', data);
-        setPartner(data);
-      }
-    } else {
-      console.log('⚠️ No partner info, redirecting');
-      toast.error('Aucun pressing sélectionné');
-      setTimeout(() => navigate('/partners-map'), 2000);
+      if (data) setPartner(data);
     }
   };
 
@@ -89,46 +65,32 @@ export default function NewOrder() {
   };
 
   const handleCreateOrder = async () => {
-    if (!user || !partner) {
-      console.log('❌ Missing user or partner');
-      toast.error('Informations manquantes');
-      return;
-    }
+    if (!user || !partner) return;
 
-    console.log('📝 Creating order...');
     setLoading(true);
-    
     try {
-      const orderData = {
-        user_id: user.id,
-        partner_id: partner.id,
-        weight_kg: weight,
-        service_type: serviceType,
-        price_per_kg: servicePrices[serviceType],
-        total_amount: calculateTotal(),
-        status: 'pending',
-        pickup_date: new Date().toISOString(),
-      };
-
-      console.log('Order data:', orderData);
-
       const { data, error } = await supabase
         .from('orders')
-        .insert(orderData)
+        .insert({
+          user_id: user.id,
+          partner_id: partner.id,
+          weight_kg: weight,
+          service_type: serviceType,
+          price_per_kg: servicePrices[serviceType],
+          total_amount: calculateTotal(),
+          status: 'pending',
+          pickup_date: new Date().toISOString(),
+        })
         .select()
         .single();
 
-      if (error) {
-        console.error('❌ Supabase error:', error);
-        throw error;
-      }
+      if (error) throw error;
 
-      console.log('✅ Order created:', data);
-      toast.success('Commande créée avec succès !');
-      setTimeout(() => navigate('/client-dashboard'), 1000);
+      toast.success('Commande créée !');
+      navigate('/client-dashboard');
     } catch (error: any) {
-      console.error('❌ Error creating order:', error);
-      toast.error(error.message || 'Erreur lors de la création de la commande');
+      console.error('Erreur:', error);
+      toast.error('Erreur lors de la création');
     } finally {
       setLoading(false);
     }
@@ -137,10 +99,7 @@ export default function NewOrder() {
   if (!partner) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-white">
-        <div className="text-center">
-          <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-slate-600">Chargement...</p>
-        </div>
+        <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
@@ -161,13 +120,11 @@ export default function NewOrder() {
             Nouvelle commande
           </h1>
 
-          {/* Pressing sélectionné */}
           <div className="bg-blue-50 rounded-2xl p-6 mb-8 border-2 border-blue-200">
             <h2 className="font-bold text-xl text-slate-900 mb-2">{partner.name}</h2>
             <p className="text-slate-600">{partner.address}, {partner.city}</p>
           </div>
 
-          {/* Poids */}
           <div className="mb-8">
             <label className="block text-lg font-bold text-slate-900 mb-4">
               <Package className="w-5 h-5 inline mr-2" />
@@ -181,18 +138,14 @@ export default function NewOrder() {
               onChange={(e) => setWeight(Number(e.target.value))}
               className="w-full px-6 py-4 text-2xl font-bold text-center border-3 border-blue-300 rounded-2xl focus:border-blue-600 focus:outline-none"
             />
-            <p className="text-sm text-slate-500 mt-2">
-              Le poids exact sera confirmé par le pressing lors du dépôt
-            </p>
           </div>
 
-          {/* Type de service */}
           <div className="mb-8">
             <label className="block text-lg font-bold text-slate-900 mb-4">
               <Clock className="w-5 h-5 inline mr-2" />
               Formule
             </label>
-            <div className="grid md:grid-cols-3 gap-4">
+            <div className="grid md:grid-cols-2 gap-4">
               {(Object.keys(servicePrices) as Array<keyof typeof servicePrices>).map((type) => (
                 <button
                   key={type}
@@ -206,7 +159,7 @@ export default function NewOrder() {
                   <div className="text-3xl font-black text-blue-600 mb-2">
                     {servicePrices[type]}€/kg
                   </div>
-                  <div className="font-bold text-slate-900 mb-1">
+                  <div className="font-bold text-slate-900">
                     {serviceLabels[type]}
                   </div>
                 </button>
@@ -214,7 +167,6 @@ export default function NewOrder() {
             </div>
           </div>
 
-          {/* Récapitulatif */}
           <div className="bg-gradient-to-r from-blue-100 to-cyan-100 rounded-2xl p-6 mb-8">
             <h3 className="font-bold text-xl text-slate-900 mb-4">
               <Euro className="w-5 h-5 inline mr-2" />
@@ -229,27 +181,22 @@ export default function NewOrder() {
                 <span>Prix au kg :</span>
                 <span className="font-bold">{servicePrices[serviceType]}€</span>
               </div>
-              <div className="flex justify-between">
-                <span>Formule :</span>
-                <span className="font-bold">{serviceLabels[serviceType]}</span>
-              </div>
               <div className="border-t-2 border-blue-300 pt-3 flex justify-between text-2xl font-black text-blue-900">
                 <span>Total :</span>
-                <span>{calculateTotal()}€</span>
+                <span>{calculateTotal().toFixed(2)}€</span>
               </div>
             </div>
           </div>
 
-          {/* Bouton validation */}
           <button
             onClick={handleCreateOrder}
             disabled={loading}
-            className="w-full py-5 rounded-2xl font-bold text-xl text-white bg-gradient-to-r from-blue-600 to-cyan-600 hover:shadow-2xl transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3"
+            className="w-full py-5 rounded-2xl font-bold text-xl text-white bg-gradient-to-r from-blue-600 to-cyan-600 hover:shadow-2xl transition-all transform hover:scale-105 disabled:opacity-50 flex items-center justify-center gap-3"
           >
             {loading ? (
               <>
                 <div className="w-6 h-6 border-3 border-white border-t-transparent rounded-full animate-spin"></div>
-                Création en cours...
+                Création...
               </>
             ) : (
               <>
@@ -258,10 +205,6 @@ export default function NewOrder() {
               </>
             )}
           </button>
-
-          <p className="text-sm text-slate-500 text-center mt-4">
-            Le paiement sera effectué lors du dépôt au pressing
-          </p>
         </div>
       </div>
     </div>

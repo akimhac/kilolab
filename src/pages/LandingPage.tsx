@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { MapPin, Clock, Shield, Package, Users, ChevronRight, Star, Search, Sparkles, Check, Menu, X, LogIn, Zap, Wind, Shirt } from 'lucide-react';
 import { motion } from 'framer-motion';
-import ImageCarousel from '../components/ImageCarousel';
+import HowItWorksCarousel from '../components/HowItWorksCarousel';
 
 export default function LandingPage() {
   const navigate = useNavigate();
