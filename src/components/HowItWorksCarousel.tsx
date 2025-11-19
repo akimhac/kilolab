@@ -1,111 +1,131 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, Package, Sparkles, CheckCircle, ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 const steps = [
   {
     number: 1,
-    icon: Search,
     title: 'Trouvez votre pressing',
-    description: 'Recherchez un pressing partenaire près de chez vous',
-    color: 'from-blue-500 to-cyan-500',
-    bgColor: 'bg-blue-100'
+    description: 'Recherchez un pressing partenaire près de chez vous sur notre carte interactive',
+    image: 'https://images.unsplash.com/photo-1524661135-423995f22d0b?w=800&q=80',
+    gradient: 'from-blue-500 to-cyan-500'
   },
   {
     number: 2,
-    icon: Package,
     title: 'Déposez votre linge',
-    description: 'Apportez votre linge dans un point relais',
-    color: 'from-blue-500 to-cyan-500',
-    bgColor: 'bg-blue-100'
+    description: 'Apportez votre linge au pressing. Pesée sur place, tarif transparent',
+    image: 'https://images.unsplash.com/photo-1582735689369-4fe89db7114c?w=800&q=80',
+    gradient: 'from-blue-500 to-cyan-500'
   },
   {
     number: 3,
-    icon: Sparkles,
     title: 'Nettoyage professionnel',
-    description: 'Votre linge est lavé, séché et plié avec soin',
-    color: 'from-orange-500 to-red-500',
-    bgColor: 'bg-orange-100'
+    description: 'Votre linge est lavé, séché et plié par des experts avec du matériel pro',
+    image: 'https://images.unsplash.com/photo-1517677208171-0bc6725a3e60?w=800&q=80',
+    gradient: 'from-orange-500 to-red-500'
   },
   {
     number: 4,
-    icon: CheckCircle,
     title: 'Récupérez-le propre',
-    description: 'Votre linge vous attend, impeccable',
-    color: 'from-green-500 to-emerald-500',
-    bgColor: 'bg-green-100'
+    description: 'Récupérez votre linge impeccable en 24h à 72h selon la formule choisie',
+    image: 'https://images.unsplash.com/photo-1489274495757-95c7c837b101?w=800&q=80',
+    gradient: 'from-green-500 to-emerald-500'
   }
 ];
 
 export default function HowItWorksCarousel() {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [direction, setDirection] = useState(0);
 
   useEffect(() => {
     const timer = setInterval(() => {
+      setDirection(1);
       setCurrentIndex((prev) => (prev + 1) % steps.length);
-    }, 4000);
+    }, 5000);
     return () => clearInterval(timer);
   }, []);
 
   const goToPrevious = () => {
+    setDirection(-1);
     setCurrentIndex((prev) => (prev - 1 + steps.length) % steps.length);
   };
 
   const goToNext = () => {
+    setDirection(1);
     setCurrentIndex((prev) => (prev + 1) % steps.length);
   };
 
   const currentStep = steps[currentIndex];
-  const Icon = currentStep.icon;
+
+  const variants = {
+    enter: (direction: number) => ({
+      x: direction > 0 ? 1000 : -1000,
+      opacity: 0
+    }),
+    center: {
+      x: 0,
+      opacity: 1
+    },
+    exit: (direction: number) => ({
+      x: direction < 0 ? 1000 : -1000,
+      opacity: 0
+    })
+  };
 
   return (
-    <div className="relative w-full h-full">
-      <AnimatePresence mode="wait">
+    <div className="relative w-full h-full bg-gradient-to-br from-slate-50 to-blue-50 rounded-3xl overflow-hidden shadow-2xl">
+      <AnimatePresence initial={false} custom={direction} mode="wait">
         <motion.div
           key={currentIndex}
-          initial={{ opacity: 0, x: 100 }}
-          animate={{ opacity: 1, x: 0 }}
-          exit={{ opacity: 0, x: -100 }}
-          transition={{ duration: 0.5 }}
-          className="w-full h-full flex items-center justify-center"
+          custom={direction}
+          variants={variants}
+          initial="enter"
+          animate="center"
+          exit="exit"
+          transition={{
+            x: { type: "spring", stiffness: 300, damping: 30 },
+            opacity: { duration: 0.2 }
+          }}
+          className="absolute inset-0"
         >
-          <div className="text-center px-8">
-            {/* Numéro */}
+          {/* Image de fond */}
+          <div className="absolute inset-0">
+            <img
+              src={currentStep.image}
+              alt={currentStep.title}
+              className="w-full h-full object-cover"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/50 to-transparent" />
+          </div>
+
+          {/* Contenu */}
+          <div className="relative h-full flex flex-col justify-end p-8 md:p-12">
+            {/* Numéro de l'étape */}
             <motion.div
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              transition={{ delay: 0.2, type: "spring" }}
-              className={`w-24 h-24 rounded-3xl bg-gradient-to-br ${currentStep.color} text-white text-4xl font-black flex items-center justify-center mx-auto mb-6 shadow-2xl`}
+              initial={{ scale: 0, rotate: -180 }}
+              animate={{ scale: 1, rotate: 0 }}
+              transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
+              className={`inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br ${currentStep.gradient} text-white text-3xl font-black shadow-2xl mb-4`}
             >
               {currentStep.number}
             </motion.div>
 
-            {/* Icône */}
-            <motion.div
-              initial={{ scale: 0, rotate: -180 }}
-              animate={{ scale: 1, rotate: 0 }}
-              transition={{ delay: 0.3, type: "spring" }}
-              className={`w-20 h-20 rounded-2xl ${currentStep.bgColor} flex items-center justify-center mx-auto mb-6`}
-            >
-              <Icon className="w-10 h-10 text-slate-700" />
-            </motion.div>
-
             {/* Titre */}
             <motion.h3
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4 }}
-              className="text-3xl font-black text-slate-900 mb-4"
+              transition={{ delay: 0.3 }}
+              className="text-4xl md:text-5xl font-black text-white mb-4 drop-shadow-lg"
             >
               {currentStep.title}
             </motion.h3>
 
             {/* Description */}
             <motion.p
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.5 }}
-              className="text-lg text-slate-600 max-w-md mx-auto"
+              transition={{ delay: 0.4 }}
+              className="text-xl text-white/90 max-w-2xl drop-shadow-lg leading-relaxed"
             >
               {currentStep.description}
             </motion.p>
@@ -113,36 +133,49 @@ export default function HowItWorksCarousel() {
         </motion.div>
       </AnimatePresence>
 
-      {/* Navigation */}
+      {/* Boutons de navigation */}
       <button
         onClick={goToPrevious}
-        className="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white shadow-xl hover:shadow-2xl transition-all flex items-center justify-center z-10"
+        className="absolute left-4 md:left-8 top-1/2 -translate-y-1/2 w-14 h-14 rounded-full bg-white/95 backdrop-blur-sm shadow-2xl hover:bg-white hover:scale-110 transition-all flex items-center justify-center z-20 group"
         aria-label="Étape précédente"
       >
-        <ChevronLeft className="w-6 h-6 text-slate-900" />
+        <ChevronLeft className="w-7 h-7 text-slate-900 group-hover:text-blue-600 transition" />
       </button>
+      
       <button
         onClick={goToNext}
-        className="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white shadow-xl hover:shadow-2xl transition-all flex items-center justify-center z-10"
+        className="absolute right-4 md:right-8 top-1/2 -translate-y-1/2 w-14 h-14 rounded-full bg-white/95 backdrop-blur-sm shadow-2xl hover:bg-white hover:scale-110 transition-all flex items-center justify-center z-20 group"
         aria-label="Étape suivante"
       >
-        <ChevronRight className="w-6 h-6 text-slate-900" />
+        <ChevronRight className="w-7 h-7 text-slate-900 group-hover:text-blue-600 transition" />
       </button>
 
-      {/* Indicateurs */}
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex gap-3 z-10">
+      {/* Indicateurs de progression */}
+      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-3 z-20">
         {steps.map((_, index) => (
           <button
             key={index}
-            onClick={() => setCurrentIndex(index)}
+            onClick={() => {
+              setDirection(index > currentIndex ? 1 : -1);
+              setCurrentIndex(index);
+            }}
             className={`transition-all rounded-full ${
               index === currentIndex
-                ? 'w-12 h-3 bg-blue-600'
-                : 'w-3 h-3 bg-slate-300 hover:bg-slate-400'
+                ? 'w-12 h-3 bg-white'
+                : 'w-3 h-3 bg-white/50 hover:bg-white/75'
             }`}
-            aria-label={`Aller à l étape ${index + 1}`}
+            aria-label={`Aller à l'étape ${index + 1}`}
           />
         ))}
+      </div>
+
+      {/* Badge "Comment ça marche" */}
+      <div className="absolute top-6 left-6 md:top-8 md:left-8 z-20">
+        <div className="bg-white/95 backdrop-blur-sm rounded-2xl px-6 py-3 shadow-xl">
+          <p className="text-sm font-bold text-slate-600 uppercase tracking-wider">
+            Comment ça marche
+          </p>
+        </div>
       </div>
     </div>
   );
