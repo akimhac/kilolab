@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
+import ScrollToTop from './components/ScrollToTop';
 import CookieBanner from './components/CookieBanner';
 import LandingPage from './pages/LandingPage';
 import Login from './pages/Login';
@@ -13,6 +14,9 @@ import MentionsLegales from './pages/legal/MentionsLegales';
 import Privacy from './pages/legal/Privacy';
 import Pricing from './pages/Pricing';
 import About from './pages/About';
+import Contact from './pages/Contact';
+import ForWho from './pages/ForWho';
+import Blog from './pages/Blog';
 import NotFound from './pages/NotFound';
 import NewOrder from './pages/NewOrder';
 
@@ -21,6 +25,7 @@ function App() {
     <BrowserRouter>
       <Toaster position="top-right" />
       <CookieBanner />
+      <ScrollToTop />
       <Routes>
         <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<Login />} />
@@ -31,6 +36,9 @@ function App() {
         <Route path="/partner-dashboard" element={<PartnerDashboard />} />
         <Route path="/pricing" element={<Pricing />} />
         <Route path="/about" element={<About />} />
+        <Route path="/contact" element={<Contact />} />
+        <Route path="/for-who" element={<ForWho />} />
+        <Route path="/blog" element={<Blog />} />
         <Route path="/new-order" element={<NewOrder />} />
         <Route path="/legal/cgu" element={<CGU />} />
         <Route path="/legal/mentions-legales" element={<MentionsLegales />} />

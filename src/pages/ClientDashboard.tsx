@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { Package, Clock, CheckCircle, XCircle, ArrowLeft } from 'lucide-react';
 import toast from 'react-hot-toast';
+import EmptyState from '../components/EmptyState';
+import ConfirmDialog from '../components/ConfirmDialog';
 
 interface Order {
   id: string;
@@ -24,6 +26,10 @@ export default function ClientDashboard() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState<any>(null);
+  const [confirmDialog, setConfirmDialog] = useState<{isOpen: boolean; orderId: string | null}>({
+    isOpen: false,
+    orderId: null
+  });
 
   useEffect(() => {
     checkAuth();
@@ -54,7 +60,7 @@ export default function ClientDashboard() {
       setOrders(data || []);
     } catch (error: any) {
       console.error('Error:', error);
-      toast.error('Erreur lors du chargement');
+      toast.error('Impossible de charger vos commandes. Réessayez dans quelques instants.');
     } finally {
       setLoading(false);
     }
@@ -86,16 +92,13 @@ export default function ClientDashboard() {
 
   const getServiceLabel = (type: string) => {
     const labels: Record<string, string> = {
-      premium: 'Premium (72-96h)',
-      express: 'Express (24h)',
-      ultra_express: 'Ultra Express (6h)'
+      standard: 'Standard (48-72h)',
+      express: 'Express (24h)'
     };
     return labels[type] || type;
   };
 
   const handleCancelOrder = async (orderId: string) => {
-    if (!confirm('Annuler cette commande ?')) return;
-
     try {
       const { error } = await supabase
         .from('orders')
@@ -105,17 +108,22 @@ export default function ClientDashboard() {
 
       if (error) throw error;
       
-      toast.success('Commande annulée');
+      toast.success('Commande annulée avec succès');
       if (user) loadOrders(user.id);
     } catch (error: any) {
-      toast.error('Impossible d\'annuler');
+      toast.error('Impossible d\'annuler cette commande. Elle a peut-être déjà été traitée.');
+    } finally {
+      setConfirmDialog({ isOpen: false, orderId: null });
     }
   };
 
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-white">
-        <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+          <p className="text-slate-600 font-semibold">Chargement de vos commandes...</p>
+        </div>
       </div>
     );
   }
@@ -133,7 +141,7 @@ export default function ClientDashboard() {
           </button>
           <button
             onClick={() => supabase.auth.signOut().then(() => navigate('/'))}
-            className="text-slate-600 hover:text-slate-900 transition"
+            className="text-slate-600 hover:text-slate-900 transition font-semibold"
           >
             Déconnexion
           </button>
@@ -149,20 +157,14 @@ export default function ClientDashboard() {
         </div>
 
         {orders.length === 0 ? (
-          <div className="bg-white rounded-3xl shadow-xl p-12 text-center">
-            <Package className="w-20 h-20 text-slate-300 mx-auto mb-4" />
-            <h2 className="text-2xl font-bold text-slate-900 mb-2">
-              Aucune commande
-            </h2>
-            <p className="text-slate-600 mb-6">
-              Commencez dès maintenant
-            </p>
-            <button
-              onClick={() => navigate('/partners-map')}
-              className="px-8 py-4 bg-gradient-to-r from-blue-600 to-cyan-600 text-white rounded-xl font-bold hover:shadow-xl transition"
-            >
-              Trouver un pressing
-            </button>
+          <div className="bg-white rounded-3xl shadow-xl p-12">
+            <EmptyState
+              icon={Package}
+              title="Aucune commande"
+              description="Vous n'avez pas encore passé de commande. Trouvez un pressing près de chez vous pour commencer."
+              actionLabel="Trouver un pressing"
+              onAction={() => navigate('/partners-map')}
+            />
           </div>
         ) : (
           <div className="space-y-4">
@@ -188,18 +190,22 @@ export default function ClientDashboard() {
                     <p className="text-sm text-slate-500">Détails</p>
                     <p className="font-semibold text-slate-900">{order.weight_kg} kg</p>
                     <p className="text-sm text-slate-600">
-                      {new Date(order.created_at).toLocaleDateString('fr-FR')}
+                      {new Date(order.created_at).toLocaleDateString('fr-FR', {
+                        day: 'numeric',
+                        month: 'long',
+                        year: 'numeric'
+                      })}
                     </p>
                   </div>
                 </div>
 
                 <div className="flex items-center justify-between pt-4 border-t">
                   <div className="text-2xl font-black text-blue-600">
-                    {order.total_amount}€
+                    {order.total_amount.toFixed(2)}€
                   </div>
                   {order.status === 'pending' && (
                     <button
-                      onClick={() => handleCancelOrder(order.id)}
+                      onClick={() => setConfirmDialog({ isOpen: true, orderId: order.id })}
                       className="px-4 py-2 bg-red-100 text-red-700 rounded-lg font-semibold hover:bg-red-200 transition"
                     >
                       Annuler
@@ -211,6 +217,17 @@ export default function ClientDashboard() {
           </div>
         )}
       </div>
+
+      <ConfirmDialog
+        isOpen={confirmDialog.isOpen}
+        title="Annuler la commande"
+        message="Êtes-vous sûr de vouloir annuler cette commande ? Cette action est irréversible."
+        confirmLabel="Oui, annuler"
+        cancelLabel="Non, garder"
+        danger
+        onConfirm={() => confirmDialog.orderId && handleCancelOrder(confirmDialog.orderId)}
+        onCancel={() => setConfirmDialog({ isOpen: false, orderId: null })}
+      />
     </div>
   );
 }
