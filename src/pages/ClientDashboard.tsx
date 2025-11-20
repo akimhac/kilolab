@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
-import { Package, Clock, CheckCircle, XCircle, ArrowLeft } from 'lucide-react';
+import { Package, Clock, CheckCircle, XCircle, ArrowLeft, Gift, Star } from 'lucide-react';
 import toast from 'react-hot-toast';
 import EmptyState from '../components/EmptyState';
 import ConfirmDialog from '../components/ConfirmDialog';
@@ -117,6 +117,36 @@ export default function ClientDashboard() {
     }
   };
 
+  const checkIfReviewed = async (orderId: string) => {
+    const { data } = await supabase
+      .from('reviews')
+      .select('id')
+      .eq('order_id', orderId)
+      .single();
+
+    return !!data;
+  };
+
+  const [reviewedOrders, setReviewedOrders] = useState<Set<string>>(new Set());
+
+  useEffect(() => {
+    if (orders.length > 0) {
+      Promise.all(
+        orders
+          .filter(o => o.status === 'completed')
+          .map(async (order) => {
+            const reviewed = await checkIfReviewed(order.id);
+            return { orderId: order.id, reviewed };
+          })
+      ).then((results) => {
+        const reviewed = new Set(
+          results.filter(r => r.reviewed).map(r => r.orderId)
+        );
+        setReviewedOrders(reviewed);
+      });
+    }
+  }, [orders]);
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-white">
@@ -139,12 +169,21 @@ export default function ClientDashboard() {
             <ArrowLeft className="w-5 h-5" />
             Retour
           </button>
-          <button
-            onClick={() => supabase.auth.signOut().then(() => navigate('/'))}
-            className="text-slate-600 hover:text-slate-900 transition font-semibold"
-          >
-            Déconnexion
-          </button>
+          <div className="flex items-center gap-4">
+            <button
+              onClick={() => navigate('/referral')}
+              className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-xl font-bold hover:shadow-xl transition"
+            >
+              <Gift className="w-5 h-5" />
+              Parrainage
+            </button>
+            <button
+              onClick={() => supabase.auth.signOut().then(() => navigate('/'))}
+              className="text-slate-600 hover:text-slate-900 transition font-semibold"
+            >
+              Déconnexion
+            </button>
+          </div>
         </div>
 
         <div className="bg-white rounded-3xl shadow-2xl p-8 mb-8">
@@ -203,14 +242,25 @@ export default function ClientDashboard() {
                   <div className="text-2xl font-black text-blue-600">
                     {order.total_amount.toFixed(2)}€
                   </div>
-                  {order.status === 'pending' && (
-                    <button
-                      onClick={() => setConfirmDialog({ isOpen: true, orderId: order.id })}
-                      className="px-4 py-2 bg-red-100 text-red-700 rounded-lg font-semibold hover:bg-red-200 transition"
-                    >
-                      Annuler
-                    </button>
-                  )}
+                  <div className="flex gap-3">
+                    {order.status === 'completed' && !reviewedOrders.has(order.id) && (
+                      <button
+                        onClick={() => navigate(`/review/${order.id}`)}
+                        className="px-4 py-2 bg-yellow-100 text-yellow-700 rounded-lg font-semibold hover:bg-yellow-200 transition flex items-center gap-2"
+                      >
+                        <Star className="w-4 h-4" />
+                        Laisser un avis
+                      </button>
+                    )}
+                    {order.status === 'pending' && (
+                      <button
+                        onClick={() => setConfirmDialog({ isOpen: true, orderId: order.id })}
+                        className="px-4 py-2 bg-red-100 text-red-700 rounded-lg font-semibold hover:bg-red-200 transition"
+                      >
+                        Annuler
+                      </button>
+                    )}
+                  </div>
                 </div>
               </div>
             ))}
