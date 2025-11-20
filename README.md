@@ -1,21 +1,22 @@
 # 🧺 KiloLab - Plateforme de Pressing Nouvelle Génération
 
-**KiloLab** est une plateforme moderne de pressing en ligne connectant clients et blanchisseries partenaires. Dépôt, suivi en temps réel, paiement sécurisé Stripe, et récupération simplifiée.
+KiloLab est une plateforme moderne de pressing en ligne connectant clients et blanchisseries partenaires. Dépôt, suivi en temps réel, emails automatiques, système d'avis, et programme de parrainage.
 
----
+![KiloLab Banner](https://images.unsplash.com/photo-1517677208171-0bc6725a3e60?w=1200&h=400&fit=crop)
 
 ## 📋 Table des matières
 
-1. [Concept](#concept)
-2. [Stack technique](#stack-technique)
-3. [Installation](#installation)
-4. [Configuration](#configuration)
-5. [Développement local](#développement-local)
-6. [Déploiement](#déploiement)
-7. [Base de données](#base-de-données)
-8. [Stripe Checkout](#stripe-checkout)
-9. [Sécurité RLS](#sécurité-rls)
-10. [Troubleshooting](#troubleshooting)
+1. [Concept](#-concept)
+2. [Nouveautés](#-nouveautés)
+3. [Stack technique](#-stack-technique)
+4. [Installation](#-installation)
+5. [Configuration](#-configuration)
+6. [Développement local](#-développement-local)
+7. [Base de données](#-base-de-données)
+8. [Fonctionnalités](#-fonctionnalités)
+9. [Sécurité](#-sécurité)
+10. [Déploiement](#-déploiement)
+11. [Troubleshooting](#-troubleshooting)
 
 ---
 
@@ -23,72 +24,88 @@
 
 ### Pour les clients
 
-3 formules de service :
+**2 formules simples et transparentes :**
+- **Standard (48-72h)** : 3,50€/kg - Service professionnel complet
+- **Express (24h)** : 5€/kg - Besoin urgent ? Votre linge prêt en 24h
 
-- **Standard** (72-96h) : 5€/kg - Recommandé
-- **Express** (24h) : 10€/kg - Rapide
-- **Ultra Express** (6h) : 15€/kg - Urgent
+**Workflow :**
+1. 🗺️ Trouver un pressing partenaire sur la carte (2600+ en France & Belgique)
+2. 📦 Déposer le linge - Pesée au poids réel
+3. 📧 Recevoir une confirmation par email
+4. 📱 Suivre l'avancement en temps réel
+5. 🎉 Récupérer le linge propre, séché et plié
+6. ⭐ Laisser un avis
+7. 🎁 Parrainer des amis (10€ par filleul)
 
-Workflow :
-1. Déposer le linge chez un partenaire proche
-2. Payer en ligne (Stripe)
-3. Suivre l'avancement en temps réel
-4. Récupérer le linge propre et repassé
+### Pour les partenaires pressings
 
-### Pour les partenaires
+- ✅ Inscription gratuite au réseau
+- 📊 Dashboard professionnel de gestion
+- 📧 Notifications automatiques par email
+- 🗺️ Visibilité sur la carte interactive
+- 💰 Commission transparente
+- ⭐ Système d'avis clients
 
-- Inscription gratuite au réseau
-- Interface simple de gestion des commandes
-- Géolocalisation automatique des clients
-- Paiement garanti
+---
+
+## 🆕 Nouveautés
+
+### ✨ Dernières mises à jour
+
+- **Tarification simplifiée** : 2 forfaits au lieu de 3 (Standard 3,50€ & Express 5€)
+- **Emails automatiques** : Confirmation commande, notification "prête", contact
+- **Système d'avis** : Notes et commentaires sur chaque pressing
+- **Programme parrainage** : 10€ offerts pour le parrain et le filleul
+- **Dashboard amélioré** : Filtrage par statut, stats en temps réel
+- **RLS Supabase** : Sécurité renforcée avec Row Level Security
+- **Navigation complète** : Pages À propos, Contact, Blog, Pour qui
 
 ---
 
 ## 🛠️ Stack technique
 
 ### Frontend
-- **React 19** + **TypeScript**
-- **Vite** (build tool)
-- **TailwindCSS** (styling)
-- **Framer Motion** (animations)
-- **React Router** (routing)
-- **Leaflet** (cartes OSM)
-- **Lucide React** (icônes)
+- **React 18** + **TypeScript** - UI moderne et type-safe
+- **Vite** - Build ultra-rapide
+- **TailwindCSS** - Styling utility-first
+- **Framer Motion** - Animations fluides
+- **React Router v6** - Routing déclaratif
+- **Leaflet + OSM** - Cartes interactives
+- **Lucide React** - Icônes modernes
 
-### Backend
-- **Supabase** (Auth + Database PostgreSQL + Storage)
-- **Stripe** (paiement en ligne)
-- **Netlify Functions** (serverless API)
+### Backend & Services
+- **Supabase** - Auth, Database PostgreSQL, Storage
+- **Resend** - Emails transactionnels (contact@kilolab.fr)
+- **Stripe Connect** - Paiements sécurisés (à venir)
+- **Netlify Functions** - API serverless
 
 ### Déploiement
-- **Netlify** (hébergement + CI/CD)
-- **OVH** (domaine custom)
+- **Netlify** - Hébergement + CI/CD automatique
+- **GitHub** - Versioning + Collaboration
+- **Custom Domain** - kilolab.fr (OVH)
 
 ---
 
 ## 📦 Installation
 
 ### Prérequis
-
 - Node.js 18+ et npm
 - Compte Supabase (gratuit)
-- Compte Stripe (mode test gratuit)
+- Compte Resend (gratuit jusqu'à 3000 emails/mois)
 - (Optionnel) Compte Netlify
 
 ### Cloner le projet
-
 ```bash
-git clone https://github.com/votre-username/kilolab.git
+git clone https://github.com/akimhac/kilolab.git
 cd kilolab
 ```
 
 ### Installer les dépendances
-
 ```bash
 # Dépendances frontend
 npm install
 
-# Dépendances Netlify Functions
+# Dépendances Netlify Functions (si nécessaire)
 cd netlify/functions
 npm install
 cd ../..
@@ -98,462 +115,351 @@ cd ../..
 
 ## ⚙️ Configuration
 
-### 1. Variables d'environnement
+### Variables d'environnement
 
 Créez un fichier `.env` à la racine :
-
-```bash
-# Supabase
-VITE_SUPABASE_URL=https://dhecegehcjelbxydeolg.supabase.co
-VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-
-# Stripe (mode test)
-VITE_STRIPE_PUBLISHABLE_KEY=pk_test_51RF...
+```env
+VITE_SUPABASE_URL=https://votre-projet.supabase.co
+VITE_SUPABASE_ANON_KEY=votre-cle-anon-publique
 ```
 
-### 2. Variables Netlify (backend)
+### Configuration Supabase
 
-Ajoutez ces variables dans **Netlify Dashboard > Site Settings > Environment Variables** :
+1. **Créer un projet** sur [supabase.com](https://supabase.com)
+2. **Exécuter le SQL** disponible dans la section [Base de données](#-base-de-données)
+3. **Récupérer les clés** : Settings > API > Project URL & anon public key
 
-```bash
-# Supabase (backend)
-VITE_SUPABASE_URL=https://dhecegehcjelbxydeolg.supabase.co
-SUPABASE_SERVICE_ROLE_KEY=<votre_service_role_key>  # Pour webhook Stripe
+### Configuration Resend
 
-# Stripe (backend)
-STRIPE_SECRET_KEY=sk_test_51RF...
-STRIPE_WEBHOOK_SECRET=whsec_...  # Après configuration webhook
-```
-
-### 3. Configuration Supabase
-
-#### a) Créer les tables
-
-Allez dans **Supabase Dashboard > SQL Editor** et exécutez :
-
-```bash
-supabase/migrations/001_normalize_user_profiles.sql
-```
-
-#### b) Réinitialiser les mots de passe de test
-
-Suivez les instructions dans :
-
-```bash
-supabase/RESET_PASSWORDS.md
-```
-
-Comptes de test :
-- **Client** : `akim.hachili@gmail.com` / `Password123!`
-- **Partenaire** : `partenaire@test.com` / `Password123!`
-
-#### c) Activer RLS (Production uniquement)
-
-⚠️ **Laissez RLS désactivé en dev**
-
-Avant le déploiement, activez les policies :
-
-```bash
-supabase/SECURITY_RLS.md
-```
+1. **Créer un compte** sur [resend.com](https://resend.com)
+2. **Vérifier le domaine** contact@kilolab.fr
+3. **Générer une API key** (déjà configurée dans `src/services/emailService.ts`)
 
 ---
 
 ## 💻 Développement local
 
-### Lancer le dev server
-
+### Lancer le serveur de dev
 ```bash
-npm run dev -- --host 0.0.0.0
+npm run dev
 ```
 
-Application disponible sur : http://localhost:5173
+Ouvrir [http://localhost:5173](http://localhost:5173)
 
-### Tester avec Netlify Dev (fonctions serverless)
-
+### Build de production
 ```bash
-# Installer Netlify CLI
-npm install -g netlify-cli
-
-# Lancer le dev server avec functions
-netlify dev
-```
-
-### Structure des routes
-
-- `/` - Landing page publique
-- `/login` - Connexion
-- `/signup` - Inscription
-- `/partners` - Carte des partenaires
-- `/dashboard` - Dashboard (client ou partenaire selon rôle)
-- `/new-order` - Nouvelle commande (client)
-- `/order/:id` - Détail commande (client)
-- `/payment-success` - Confirmation paiement
-- `/payment-cancelled` - Paiement annulé
-
----
-
-## 🚀 Déploiement
-
-### Option 1 : Netlify (Recommandé)
-
-#### Via Git (auto-deploy)
-
-1. **Pusher sur GitHub**
-
-```bash
-git add .
-git commit -m "Production ready"
-git push origin main
-```
-
-2. **Connecter à Netlify**
-
-- Allez sur https://app.netlify.com
-- `Add new site` > `Import an existing project`
-- Sélectionnez votre repo GitHub
-- Build settings :
-  - **Build command** : `npm run build`
-  - **Publish directory** : `dist`
-  - **Functions directory** : `netlify/functions`
-
-3. **Ajouter les variables d'environnement**
-
-Dans `Site settings > Environment variables`, ajoutez :
-
-```
-VITE_SUPABASE_URL
-VITE_SUPABASE_ANON_KEY
-VITE_STRIPE_PUBLISHABLE_KEY
-STRIPE_SECRET_KEY
-SUPABASE_SERVICE_ROLE_KEY
-STRIPE_WEBHOOK_SECRET (après config webhook)
-```
-
-4. **Déployer**
-
-- Cliquez sur `Deploy site`
-- Netlify va build et déployer automatiquement
-- URL de prod : `https://votre-site.netlify.app`
-
-#### Via CLI
-
-```bash
-# Build
 npm run build
-
-# Déployer
-netlify deploy --prod
 ```
 
-### Option 2 : Vercel
+Les fichiers optimisés seront dans `/dist`
 
+### Preview du build
 ```bash
-# Installer Vercel CLI
-npm install -g vercel
-
-# Déployer
-vercel --prod
+npm run preview
 ```
-
-### Domaine custom (OVH)
-
-1. **Acheter un domaine sur OVH** (ex: kilolab.fr)
-
-2. **Configurer DNS dans OVH**
-
-- Type `A` : `@` → IP Netlify (ex: 75.2.60.5)
-- Type `CNAME` : `www` → `votre-site.netlify.app`
-
-3. **Configurer dans Netlify**
-
-- `Domain management` > `Add custom domain`
-- Entrez `kilolab.fr`
-- Netlify provisionne automatiquement SSL (Let's Encrypt)
 
 ---
 
 ## 🗄️ Base de données
 
-### Tables principales
+### Schema Supabase
 
-#### `user_profiles`
+#### Tables principales
 
-Profils utilisateurs (clients et partenaires)
-
+**`partners`** - Pressings partenaires
 ```sql
-id          uuid PRIMARY KEY
-user_id     uuid REFERENCES auth.users (UNIQUE)
-email       text NOT NULL
-role        text CHECK (role IN ('client', 'partner'))
-created_at  timestamp
+- id (uuid, primary key)
+- name (text)
+- address (text)
+- city (text)
+- postal_code (text)
+- latitude (numeric)
+- longitude (numeric)
+- phone (text)
+- email (text)
+- opening_hours (text)
+- created_at (timestamp)
 ```
 
-#### `partners`
-
-Établissements partenaires (blanchisseries)
-
+**`orders`** - Commandes clients
 ```sql
-id           uuid PRIMARY KEY
-owner_id     uuid REFERENCES user_profiles
-name         text NOT NULL
-address      text
-city         text
-postal_code  text
-latitude     float
-longitude    float
-is_active    boolean DEFAULT true
-created_at   timestamp
+- id (uuid, primary key)
+- user_id (uuid, foreign key → auth.users)
+- partner_id (uuid, foreign key → partners)
+- weight_kg (numeric)
+- service_type (text) - 'standard' ou 'express'
+- price_per_kg (numeric) - 3.5 ou 5
+- total_amount (numeric)
+- status (text) - 'pending', 'confirmed', 'in_progress', 'ready', 'completed', 'cancelled'
+- pickup_date (timestamp)
+- delivery_date (timestamp)
+- notes (text)
+- created_at (timestamp)
+- updated_at (timestamp)
 ```
 
-#### `orders`
-
-Commandes de pressing
-
+**`reviews`** - Avis clients
 ```sql
-id                 uuid PRIMARY KEY
-client_id          uuid REFERENCES user_profiles
-partner_id         uuid REFERENCES partners
-service_type       text ('standard' | 'express' | 'ultra')
-weight             float
-total_price        float
-status             text ('pending' | 'paid' | 'processing' | 'ready' | 'completed' | 'cancelled')
-stripe_session_id  text
-notes              text
-created_at         timestamp
-updated_at         timestamp
+- id (uuid, primary key)
+- order_id (uuid, foreign key → orders)
+- user_id (uuid, foreign key → auth.users)
+- partner_id (uuid, foreign key → partners)
+- rating (integer 1-5)
+- comment (text)
+- response (text) - Réponse du pressing
+- created_at (timestamp)
 ```
 
-### Migrations
-
-Toutes les migrations SQL sont dans :
-
-```
-supabase/migrations/
-```
-
-Pour appliquer :
-
-1. Allez dans **Supabase > SQL Editor**
-2. Collez le contenu du fichier
-3. Exécutez
-
----
-
-## 💳 Stripe Checkout
-
-### Configuration
-
-#### 1. Obtenir les clés API
-
-- Allez sur https://dashboard.stripe.com/test/apikeys
-- Copiez :
-  - **Publishable key** (pk_test_...) → `VITE_STRIPE_PUBLISHABLE_KEY`
-  - **Secret key** (sk_test_...) → `STRIPE_SECRET_KEY`
-
-#### 2. Configurer le webhook
-
-Pour que Stripe notifie KiloLab après un paiement :
-
-1. Allez dans **Stripe Dashboard > Developers > Webhooks**
-2. Cliquez sur `Add endpoint`
-3. **Endpoint URL** : `https://votre-site.netlify.app/api/stripe-webhook`
-4. **Events to send** :
-   - `checkout.session.completed`
-   - `checkout.session.expired`
-   - `payment_intent.payment_failed`
-5. Copiez le **Signing secret** (whsec_...) → `STRIPE_WEBHOOK_SECRET`
-
-#### 3. Tester le paiement
-
-Cartes de test Stripe :
-
-- **Succès** : `4242 4242 4242 4242`
-- **Échec** : `4000 0000 0000 0002`
-- **3D Secure** : `4000 0025 0000 3155`
-
-Date d'expiration : Toute date future (ex: 12/25)
-CVC : 3 chiffres au hasard (ex: 123)
-
-### Workflow de paiement
-
-1. Client crée une commande (`/new-order`)
-2. Frontend appelle `/api/create-checkout-session`
-3. Netlify Function crée une session Stripe
-4. Client est redirigé vers Stripe Checkout
-5. Après paiement :
-   - **Succès** → Stripe appelle `/api/stripe-webhook`
-   - Webhook met à jour `orders.status = 'paid'`
-   - Client redirigé vers `/payment-success`
-6. Si annulation → `/payment-cancelled`
-
----
-
-## 🔒 Sécurité RLS
-
-### État actuel
-
-⚠️ **RLS désactivé** pour faciliter les tests en développement.
-
-### Activation (production)
-
-Avant de déployer en production, activez les Row Level Security policies :
-
-```bash
-# Lire la doc
-cat supabase/SECURITY_RLS.md
-
-# Exécuter le script SQL
-# Supabase > SQL Editor > Coller le script d'activation
-```
-
-### Résumé des policies
-
-- **user_profiles** : Chacun voit/modifie son propre profil
-- **orders** :
-  - Clients voient leurs commandes
-  - Partenaires voient les commandes de leur établissement
-- **partners** : Lecture publique (pour carte), modification par propriétaire
-
----
-
-## 🧪 Troubleshooting
-
-### Erreur : "Invalid login credentials"
-
-**Cause** : Mot de passe non configuré dans Supabase Auth
-
-**Solution** :
-
-```bash
-# Lire les instructions
-cat supabase/RESET_PASSWORDS.md
-
-# Réinitialiser via Supabase Dashboard > Auth > Users
-```
-
-### Erreur : "Missing Supabase environment variables"
-
-**Cause** : Fichier `.env` manquant ou mal configuré
-
-**Solution** :
-
-```bash
-# Vérifier .env
-cat .env
-
-# Copier depuis .env.example si nécessaire
-cp .env.example .env
-```
-
-### Stripe : "No such checkout session"
-
-**Cause** : Webhook non configuré ou mauvaise clé
-
-**Solution** :
-
-1. Vérifier `STRIPE_WEBHOOK_SECRET` dans Netlify
-2. Tester le webhook avec Stripe CLI :
-
-```bash
-stripe listen --forward-to http://localhost:8888/api/stripe-webhook
-```
-
-### Commandes bloquées après paiement
-
-**Cause** : Webhook Stripe n'a pas pu mettre à jour la DB
-
-**Solution** :
-
-1. Vérifier `SUPABASE_SERVICE_ROLE_KEY` dans Netlify
-2. Consulter les logs :
-   - Netlify : `Site > Functions > stripe-webhook > Logs`
-   - Stripe : `Dashboard > Developers > Webhooks > Logs`
-
-### RLS bloque les requêtes
-
-**Cause** : Policies trop restrictives ou mal configurées
-
-**Solution** :
-
+**`referrals`** - Programme de parrainage
 ```sql
--- Désactiver temporairement RLS pour debug
-ALTER TABLE orders DISABLE ROW LEVEL SECURITY;
+- id (uuid, primary key)
+- referrer_id (uuid, foreign key → auth.users)
+- referred_id (uuid, foreign key → auth.users)
+- referral_code (text, unique)
+- reward_amount (numeric, default 10.00)
+- status (text) - 'pending', 'validated', 'paid'
+- created_at (timestamp)
+```
 
--- Vérifier les policies actives
-SELECT * FROM pg_policies WHERE tablename = 'orders';
+### Script SQL complet
+
+Exécutez ce SQL dans Supabase SQL Editor :
+```sql
+-- Voir le fichier SQL fourni précédemment
+-- Ou exécutez directement depuis l'interface Supabase
 ```
 
 ---
 
-## 📚 Documentation supplémentaire
+## ✨ Fonctionnalités
 
-- **Migrations SQL** : `supabase/migrations/`
-- **Reset mots de passe** : `supabase/RESET_PASSWORDS.md`
-- **Policies RLS** : `supabase/SECURITY_RLS.md`
-- **Configuration Netlify** : `netlify.toml`
+### 🔐 Authentification
+- Inscription / Connexion avec email
+- Confirmation par email
+- Reset password
+- Sessions sécurisées JWT
+
+### 📍 Carte interactive
+- 2600+ pressings géolocalisés
+- Filtrage par ville, code postal
+- Affichage des notes moyennes
+- Derniers avis visibles
+- Calcul d'itinéraire
+
+### 📦 Gestion des commandes
+
+**Client :**
+- Création commande avec 2 forfaits
+- Suivi en temps réel (6 statuts)
+- Annulation si statut "pending"
+- Historique complet
+- Notifications email automatiques
+
+**Pressing partenaire :**
+- Dashboard avec stats (CA, commandes, avis)
+- Filtrage par statut
+- Changement de statut en 1 clic
+- Email automatique au client (statut "ready")
+
+### ⭐ Système d'avis
+- Notation de 1 à 5 étoiles
+- Commentaire optionnel
+- Affichage sur carte pressings
+- Moyenne calculée en temps réel
+- Possibilité de réponse pour le pressing
+
+### 🎁 Programme de parrainage
+- Code unique généré à l'inscription
+- 10€ pour le parrain + 10€ pour le filleul
+- Suivi des filleuls et gains
+- Partage via lien ou code
+
+### 📧 Emails automatiques (Resend)
+- **Confirmation commande** : Envoyé au client + au pressing
+- **Linge prêt** : Notification quand statut = "ready"
+- **Contact** : Formulaire → contact@kilolab.fr
+
+### 📄 Pages additionnelles
+- Landing page complète avec carousel
+- Pricing avec 2 forfaits + exemples
+- À propos (storytelling Asie)
+- Contact (formulaire fonctionnel)
+- Pour qui (4 personas)
+- Blog (3 articles exemple)
+- CGU / Privacy / Mentions légales
+
+---
+
+## 🔒 Sécurité
+
+### Row Level Security (RLS)
+
+**Policies actives :**
+```sql
+-- Users voient uniquement leurs commandes
+CREATE POLICY "users_view_own_orders" ON orders
+  FOR SELECT USING (auth.uid() = user_id);
+
+-- Pressings voient uniquement leurs commandes
+CREATE POLICY "partners_view_their_orders" ON orders
+  FOR SELECT USING (
+    partner_id IN (
+      SELECT id FROM partners 
+      WHERE email = (SELECT email FROM auth.users WHERE id = auth.uid())
+    )
+  );
+
+-- Les avis sont publics
+CREATE POLICY "reviews_public_read" ON reviews
+  FOR SELECT USING (true);
+```
+
+### Bonnes pratiques
+- ✅ Validation côté client ET serveur
+- ✅ Sanitization des inputs
+- ✅ HTTPS obligatoire
+- ✅ API keys en variables d'environnement
+- ✅ Rate limiting sur emails
+- ✅ CORS configuré
+
+---
+
+## 🚀 Déploiement
+
+### Netlify (automatique via GitHub)
+
+1. **Connecter le repo** sur [netlify.com](https://app.netlify.com)
+2. **Build settings** :
+   - Build command : `npm run build`
+   - Publish directory : `dist`
+3. **Environment variables** : Ajouter `VITE_SUPABASE_URL` et `VITE_SUPABASE_ANON_KEY`
+4. **Custom domain** : kilolab.fr (DNS configuré sur OVH)
+
+### Déploiement manuel
+```bash
+# Build
+npm run build
+
+# Deploy sur Netlify CLI
+npm install -g netlify-cli
+netlify deploy --prod --dir=dist
+```
+
+---
+
+## 🐛 Troubleshooting
+
+### Problème : Map ne s'affiche pas
+```bash
+# Vérifier que Leaflet CSS est importé
+import 'leaflet/dist/leaflet.css';
+```
+
+### Problème : Emails non reçus
+- Vérifier que le domaine est vérifié sur Resend
+- Checker les logs Resend dashboard
+- Regarder les spams
+
+### Problème : SQL errors
+- S'assurer que les tables existent (exécuter le SQL complet)
+- Vérifier les foreign keys
+- Activer RLS sur toutes les tables
+
+### Problème : Auth redirect loop
+```typescript
+// Vérifier la logique de redirection
+const { data: { session } } = await supabase.auth.getSession();
+if (!session) navigate('/login');
+```
+
+### Problème : Build Netlify échoue
+- Vérifier les variables d'env
+- S'assurer que `npm run build` fonctionne localement
+- Regarder les logs Netlify
+
+---
+
+## 📊 Métriques & KPIs
+
+### Objectifs à 3 mois
+- 100 commandes
+- 50 clients réguliers (>2 commandes)
+- 30 pressings actifs
+- Note moyenne > 4.5/5
+
+### Analytics
+- Google Analytics 4 configuré
+- Événements trackés : signup, order_created, review_submitted
+- Funnel de conversion analysé
 
 ---
 
 ## 🤝 Contribution
 
+Ce projet est en développement actif. Pour contribuer :
+
 1. Fork le projet
-2. Créer une branche feature (`git checkout -b feature/nouvelle-fonctionnalite`)
-3. Commit (`git commit -m 'Ajout nouvelle fonctionnalité'`)
-4. Push (`git push origin feature/nouvelle-fonctionnalite`)
+2. Créer une branche (`git checkout -b feature/AmazingFeature`)
+3. Commit vos changements (`git commit -m 'Add AmazingFeature'`)
+4. Push vers la branche (`git push origin feature/AmazingFeature`)
 5. Ouvrir une Pull Request
+
+---
+
+## 📝 Roadmap
+
+### ✅ Phase 1 (Terminé)
+- Landing page
+- Auth complète
+- Carte pressings
+- Création commande
+- Dashboards (client + pressing)
+- Emails automatiques
+- Système d'avis
+- Programme parrainage
+
+### 🔄 Phase 2 (En cours)
+- Intégration Stripe Connect
+- App mobile (React Native)
+- Notifications push
+- Chat en direct
+- API publique
+
+### 📅 Phase 3 (Futur)
+- IA : estimation poids par photo
+- Programme fidélité
+- Abonnements
+- Expansion internationale
 
 ---
 
 ## 📄 Licence
 
-MIT License - Voir [LICENSE](LICENSE)
+Propriétaire - © 2025 KiloLab. Tous droits réservés.
 
 ---
 
-## 👨‍💻 Auteur
+## 👨‍💻 Auteur & Contact
 
-**Akim Hachili**
-📧 akim.hachili@gmail.com
-
----
-
-## ✅ Checklist déploiement
-
-Avant de mettre en production :
-
-- [ ] Variables d'environnement configurées (Netlify)
-- [ ] Migration SQL exécutée (user_profiles normalisé)
-- [ ] Mots de passe admin réinitialisés
-- [ ] Stripe webhook configuré
-- [ ] RLS activé (policies appliquées)
-- [ ] Domaine custom configuré (DNS OVH)
-- [ ] SSL activé (Let's Encrypt via Netlify)
-- [ ] Tests de paiement réussis
-- [ ] Test client : créer commande → payer → vérifier statut
-- [ ] Test partenaire : voir commandes assignées
-- [ ] Meta tags SEO configurés (title, description, OG)
-- [ ] Favicon et PWA manifest
-- [ ] Google Analytics / Plausible (optionnel)
+**KiloLab Team**
+- 🌐 Site : [kilolab.fr](https://kilolab.fr)
+- 📧 Email : [contact@kilolab.fr](mailto:contact@kilolab.fr)
+- 💼 LinkedIn : [KiloLab](https://linkedin.com/company/kilolab)
+- 🐦 Twitter : [@kilolab_fr](https://twitter.com/kilolab_fr)
 
 ---
 
-## 🚀 Roadmap
+## 🙏 Remerciements
 
-- [x] Landing page design
-- [x] Authentification Supabase
-- [x] Dashboard client
-- [x] Dashboard partenaire
-- [x] Création de commandes
-- [x] Paiement Stripe
-- [x] RLS policies
-- [ ] Notifications SMS (Twilio)
-- [ ] Upload photos du linge
-- [ ] Système de codes promo
-- [ ] Programme de fidélité
-- [ ] API mobile (React Native)
-- [ ] Backoffice admin
+- [Supabase](https://supabase.com) - Backend as a Service
+- [Resend](https://resend.com) - Email delivery
+- [Leaflet](https://leafletjs.com) - Open-source maps
+- [Stripe](https://stripe.com) - Payment processing
+- [Netlify](https://netlify.com) - Hosting & deployment
 
 ---
 
-**Merci d'utiliser KiloLab ! 🧺✨**
+**⭐ Si ce projet vous plaît, n'hésitez pas à mettre une étoile sur GitHub !**
+```
+Made with ❤️ in Paris, France
+```
