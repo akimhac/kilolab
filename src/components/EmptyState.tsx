@@ -8,7 +8,13 @@ interface EmptyStateProps {
   onAction?: () => void;
 }
 
-export default function EmptyState({ icon: Icon, title, description, actionLabel, onAction }: EmptyStateProps) {
+export default function EmptyState({ 
+  icon: Icon, 
+  title, 
+  description, 
+  actionLabel, 
+  onAction 
+}: EmptyStateProps) {
   return (
     <div className="text-center py-16">
       <div className="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-6">
