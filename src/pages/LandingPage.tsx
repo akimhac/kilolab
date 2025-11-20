@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowRight, Zap, Shield, Clock, Euro, Star, Users, MapPin, Sparkles } from 'lucide-react';
+import { ArrowRight, Zap, Shield, Clock, Euro, Star, Users, MapPin, Sparkles, Award, TrendingUp, Leaf } from 'lucide-react';
 import HowItWorksCarousel from '../components/HowItWorksCarousel';
 
 export default function LandingPage() {
@@ -36,6 +36,34 @@ export default function LandingPage() {
       icon: Users,
       title: 'Support réactif',
       description: 'Une question ? Notre équipe est là pour vous aider rapidement'
+    }
+  ];
+
+  const whyKilolab = [
+    {
+      icon: Euro,
+      title: 'Prix au kilo',
+      description: 'Nous offrons un tarif simple et transparent'
+    },
+    {
+      icon: Award,
+      title: 'Partenaires de qualité',
+      description: 'Nous sélectionnons les meilleurs pressings pour vous offrir une qualité premium'
+    },
+    {
+      icon: Zap,
+      title: 'Simplicité d\'utilisation',
+      description: 'Déposez, nous nous chargeons du reste'
+    },
+    {
+      icon: Clock,
+      title: 'Service ultra-rapide',
+      description: 'Recevez votre linge impeccable en 24h'
+    },
+    {
+      icon: Leaf,
+      title: 'Respect de l\'environnement',
+      description: 'Des process optimisés et des partenaires responsables'
     }
   ];
 
@@ -124,27 +152,60 @@ export default function LandingPage() {
               </div>
 
               <h1 className="text-5xl md:text-6xl lg:text-7xl font-black text-slate-900 leading-tight mb-6">
-                Votre pressing
+                Le pressing
                 <span className="block bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">
-                  au kilo
+                  nouvelle génération.
                 </span>
-                <span className="block">en point relais</span>
+                <span className="block">Au kilo. Sans effort.</span>
+                <span className="block">Tout près de chez vous.</span>
               </h1>
 
               <p className="text-xl md:text-2xl text-slate-600 mb-6 leading-relaxed">
-                Déposez votre linge près de chez vous, récupérez-le impeccable 24h plus tard.
+                Déposez votre linge en point relais, récupérez-le impeccable en 24h. 
+                <strong className="text-slate-900"> Vous gagnez du temps, on s'occupe du reste.</strong>
               </p>
 
-              <p className="text-lg text-slate-500 mb-8 leading-relaxed">
-                Kilolab sélectionne pour vous les meilleurs pressings partenaires, au prix le plus juste. Simple, rapide, transparent.
-              </p>
+              <div className="bg-blue-50 rounded-2xl p-6 mb-8 border-2 border-blue-200">
+                <p className="text-lg text-slate-700 mb-4 font-semibold">
+                  Kilolab simplifie totalement le pressing :
+                </p>
+                <ul className="space-y-3">
+                  <li className="flex items-start gap-3">
+                    <div className="w-6 h-6 bg-blue-600 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <Euro className="w-4 h-4 text-white" />
+                    </div>
+                    <span className="text-slate-700">Prix au kilo, transparents et sans surprise</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <div className="w-6 h-6 bg-blue-600 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <MapPin className="w-4 h-4 text-white" />
+                    </div>
+                    <span className="text-slate-700">Dépôt près de chez vous, en point relais</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <div className="w-6 h-6 bg-blue-600 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <Award className="w-4 h-4 text-white" />
+                    </div>
+                    <span className="text-slate-700">Qualité premium garantie par nos pressings partenaires</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <div className="w-6 h-6 bg-blue-600 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <Zap className="w-4 h-4 text-white" />
+                    </div>
+                    <span className="text-slate-700">Service rapide, simple, intelligent</span>
+                  </li>
+                </ul>
+                <p className="text-slate-800 font-semibold mt-4">
+                  Votre linge revient propre, soigné, repassé. Vous, vous ne faites rien.
+                </p>
+              </div>
 
               <div className="flex flex-col sm:flex-row gap-4 mb-8">
                 <button
                   onClick={() => navigate('/partners-map')}
                   className="px-8 py-4 bg-gradient-to-r from-blue-600 to-cyan-600 text-white rounded-xl font-bold text-lg hover:shadow-2xl transition-all transform hover:scale-105 flex items-center justify-center gap-2"
                 >
-                  Trouver un pressing
+                  Essayez Kilolab maintenant
                   <ArrowRight className="w-5 h-5" />
                 </button>
                 <button
@@ -218,83 +279,51 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Pricing Quick View */}
+      {/* NOUVELLE SECTION : Pourquoi Kilolab ? */}
       <section className="py-20 px-4 bg-white">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-12">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-black text-slate-900 mb-4">
-              Deux formules simples
+              Pourquoi Kilolab ?
             </h2>
-            <p className="text-xl text-slate-600">
-              Choisissez selon vos besoins
+            <p className="text-2xl text-slate-600 mb-6">
+              Le pressing repensé. Simplifié. Accessible.
+            </p>
+            <p className="text-lg text-slate-600 max-w-4xl mx-auto leading-relaxed">
+              Kilolab révolutionne votre expérience de pressing en la rendant simple, rapide et sans effort. 
+              Fini les longues attentes et déplacements inutiles : vous déposez votre linge dans un point relais 
+              proche de chez vous et le récupérez propre en 24h.
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-            <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-3xl p-8 border-2 border-blue-200">
-              <Clock className="w-12 h-12 text-blue-600 mb-4" />
-              <h3 className="text-3xl font-black text-slate-900 mb-2">Standard</h3>
-              <div className="text-5xl font-black text-blue-600 mb-2">3,50€<span className="text-2xl">/kg</span></div>
-              <p className="text-slate-600 mb-4">48-72h de délai</p>
-              <ul className="space-y-2 text-slate-700">
-                <li className="flex items-center gap-2">
-                  <div className="w-5 h-5 bg-blue-600 rounded-full flex items-center justify-center">
-                    <Sparkles className="w-3 h-3 text-white" />
-                  </div>
-                  Lavage professionnel
-                </li>
-                <li className="flex items-center gap-2">
-                  <div className="w-5 h-5 bg-blue-600 rounded-full flex items-center justify-center">
-                    <Sparkles className="w-3 h-3 text-white" />
-                  </div>
-                  Séchage et pliage
-                </li>
-                <li className="flex items-center gap-2">
-                  <div className="w-5 h-5 bg-blue-600 rounded-full flex items-center justify-center">
-                    <Sparkles className="w-3 h-3 text-white" />
-                  </div>
-                  Qualité garantie
-                </li>
-              </ul>
-            </div>
-
-            <div className="bg-gradient-to-br from-orange-50 to-red-50 rounded-3xl p-8 border-2 border-orange-500 relative">
-              <div className="absolute -top-3 -right-3 bg-orange-500 text-white px-4 py-1 rounded-full text-sm font-bold">
-                URGENT
-              </div>
-              <Zap className="w-12 h-12 text-orange-600 mb-4" />
-              <h3 className="text-3xl font-black text-slate-900 mb-2">Express</h3>
-              <div className="text-5xl font-black text-orange-600 mb-2">5€<span className="text-2xl">/kg</span></div>
-              <p className="text-slate-600 mb-4">Besoin urgent ? Votre linge prêt en 24h</p>
-              <ul className="space-y-2 text-slate-700">
-                <li className="flex items-center gap-2">
-                  <div className="w-5 h-5 bg-orange-600 rounded-full flex items-center justify-center">
-                    <Sparkles className="w-3 h-3 text-white" />
-                  </div>
-                  Tout du Standard
-                </li>
-                <li className="flex items-center gap-2">
-                  <div className="w-5 h-5 bg-orange-600 rounded-full flex items-center justify-center">
-                    <Sparkles className="w-3 h-3 text-white" />
-                  </div>
-                  Traitement prioritaire
-                </li>
-                <li className="flex items-center gap-2">
-                  <div className="w-5 h-5 bg-orange-600 rounded-full flex items-center justify-center">
-                    <Sparkles className="w-3 h-3 text-white" />
-                  </div>
-                  Prêt en 24h
-                </li>
-              </ul>
-            </div>
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+            {whyKilolab.map((item, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+                viewport={{ once: true }}
+                className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-2xl p-8 hover:shadow-xl transition-all"
+              >
+                <div className="w-14 h-14 bg-gradient-to-br from-blue-600 to-cyan-600 rounded-xl flex items-center justify-center mb-4">
+                  <item.icon className="w-7 h-7 text-white" />
+                </div>
+                <h3 className="text-xl font-bold text-slate-900 mb-3">{item.title}</h3>
+                <p className="text-slate-600 leading-relaxed">{item.description}</p>
+              </motion.div>
+            ))}
           </div>
 
-          <div className="text-center mt-8">
+          <div className="text-center">
+            <p className="text-xl font-bold text-slate-900 mb-6">
+              Voici pourquoi Kilolab est le choix idéal pour vous
+            </p>
             <button
-              onClick={() => navigate('/pricing')}
-              className="px-8 py-4 bg-gradient-to-r from-blue-600 to-cyan-600 text-white rounded-xl font-bold text-lg hover:shadow-xl transition"
+              onClick={() => navigate('/partners-map')}
+              className="px-12 py-5 bg-gradient-to-r from-blue-600 to-cyan-600 text-white rounded-xl font-bold text-xl hover:shadow-2xl transition-all transform hover:scale-105"
             >
-              Voir tous les tarifs
+              Simplifiez-vous la vie maintenant !
             </button>
           </div>
         </div>
@@ -305,14 +334,14 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-black text-slate-900 mb-4">
-              Pourquoi choisir Kilolab ?
+              Comment ça marche ?
             </h2>
             <p className="text-xl text-slate-600 max-w-2xl mx-auto">
-              Une solution complète pour simplifier votre quotidien
+              4 étapes simples pour un linge impeccable
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
             {features.map((feature, index) => (
               <motion.div
                 key={index}
@@ -408,7 +437,7 @@ export default function LandingPage() {
                 Kilolab
               </p>
               <p className="text-slate-400">
-                Votre pressing au kilo, simple et transparent
+                Le pressing nouvelle génération
               </p>
             </div>
             <div>
