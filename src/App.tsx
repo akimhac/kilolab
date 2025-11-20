@@ -19,6 +19,8 @@ import ForWho from './pages/ForWho';
 import Blog from './pages/Blog';
 import NotFound from './pages/NotFound';
 import NewOrder from './pages/NewOrder';
+import ReviewOrder from './pages/ReviewOrder';
+import Referral from './pages/Referral';
 
 function App() {
   return (
@@ -40,6 +42,8 @@ function App() {
         <Route path="/for-who" element={<ForWho />} />
         <Route path="/blog" element={<Blog />} />
         <Route path="/new-order" element={<NewOrder />} />
+        <Route path="/review/:orderId" element={<ReviewOrder />} />
+        <Route path="/referral" element={<Referral />} />
         <Route path="/legal/cgu" element={<CGU />} />
         <Route path="/legal/mentions-legales" element={<MentionsLegales />} />
         <Route path="/legal/privacy" element={<Privacy />} />
