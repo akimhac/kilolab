@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { sendOrderConfirmation, sendPartnerNotification } from '../services/emailService';
-import { ArrowLeft, Package, Clock, Euro, CreditCard } from 'lucide-react';
+import { ArrowLeft, Package, Clock, Euro, CreditCard, Zap } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 interface Partner {
@@ -21,7 +21,7 @@ export default function NewOrder() {
   const [user, setUser] = useState<any>(null);
   const [partner, setPartner] = useState<Partner | null>(null);
   const [weight, setWeight] = useState<number>(5);
-  const [serviceType, setServiceType] = useState<'standard' | 'express'>('express');
+  const [serviceType, setServiceType] = useState<'standard' | 'express'>('standard');
 
   const servicePrices = {
     standard: 3.5,
@@ -29,8 +29,13 @@ export default function NewOrder() {
   };
 
   const serviceLabels = {
-    standard: 'Standard (48-72h)',
-    express: 'Express (24h)',
+    standard: 'Standard',
+    express: 'Express',
+  };
+
+  const serviceDescriptions = {
+    standard: '48-72h de délai',
+    express: 'Besoin urgent ? Votre linge prêt en 24h',
   };
 
   useEffect(() => {
@@ -95,7 +100,7 @@ export default function NewOrder() {
 
       if (error) throw error;
 
-      // Envoyer emails (ne pas bloquer si ça échoue)
+      // Envoyer emails
       try {
         await Promise.all([
           sendOrderConfirmation({
@@ -187,27 +192,53 @@ export default function NewOrder() {
           <div className="mb-8">
             <label className="block text-lg font-bold text-slate-900 mb-4">
               <Clock className="w-5 h-5 inline mr-2" />
-              Formule
+              Choisissez votre formule
             </label>
             <div className="grid md:grid-cols-2 gap-4">
-              {(Object.keys(servicePrices) as Array<keyof typeof servicePrices>).map((type) => (
-                <button
-                  key={type}
-                  onClick={() => setServiceType(type)}
-                  className={`p-6 rounded-2xl border-3 transition-all ${
-                    serviceType === type
-                      ? 'border-blue-600 bg-blue-50 shadow-lg'
-                      : 'border-slate-200 hover:border-blue-300'
-                  }`}
-                >
-                  <div className="text-3xl font-black text-blue-600 mb-2">
-                    {servicePrices[type]}€/kg
-                  </div>
-                  <div className="font-bold text-slate-900">
-                    {serviceLabels[type]}
-                  </div>
-                </button>
-              ))}
+              {/* Standard */}
+              <button
+                onClick={() => setServiceType('standard')}
+                className={`p-6 rounded-2xl border-3 transition-all ${
+                  serviceType === 'standard'
+                    ? 'border-blue-600 bg-blue-50 shadow-lg'
+                    : 'border-slate-200 hover:border-blue-300'
+                }`}
+              >
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-lg font-black text-slate-900">Standard</span>
+                  <Clock className="w-6 h-6 text-blue-600" />
+                </div>
+                <div className="text-4xl font-black text-blue-600 mb-2">
+                  3,50€<span className="text-lg">/kg</span>
+                </div>
+                <div className="text-slate-600">
+                  48-72h de délai
+                </div>
+              </button>
+
+              {/* Express */}
+              <button
+                onClick={() => setServiceType('express')}
+                className={`p-6 rounded-2xl border-3 transition-all relative ${
+                  serviceType === 'express'
+                    ? 'border-orange-600 bg-orange-50 shadow-lg'
+                    : 'border-slate-200 hover:border-orange-300'
+                }`}
+              >
+                <div className="absolute -top-3 -right-3 bg-orange-500 text-white px-3 py-1 rounded-full text-xs font-bold">
+                  URGENT
+                </div>
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-lg font-black text-slate-900">Express</span>
+                  <Zap className="w-6 h-6 text-orange-600" />
+                </div>
+                <div className="text-4xl font-black text-orange-600 mb-2">
+                  5€<span className="text-lg">/kg</span>
+                </div>
+                <div className="text-slate-600">
+                  Besoin urgent ? Votre linge prêt en 24h
+                </div>
+              </button>
             </div>
           </div>
 
@@ -222,12 +253,12 @@ export default function NewOrder() {
                 <span className="font-bold">{weight} kg</span>
               </div>
               <div className="flex justify-between">
-                <span>Prix au kg :</span>
-                <span className="font-bold">{servicePrices[serviceType]}€</span>
+                <span>Formule :</span>
+                <span className="font-bold">{serviceLabels[serviceType]} ({serviceDescriptions[serviceType]})</span>
               </div>
               <div className="flex justify-between">
-                <span>Formule :</span>
-                <span className="font-bold">{serviceLabels[serviceType]}</span>
+                <span>Prix au kg :</span>
+                <span className="font-bold">{servicePrices[serviceType].toFixed(2)}€</span>
               </div>
               <div className="border-t-2 border-blue-300 pt-3 flex justify-between text-2xl font-black text-blue-900">
                 <span>Total :</span>
