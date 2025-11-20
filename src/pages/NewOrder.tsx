@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
+import { sendOrderConfirmation, sendPartnerNotification } from '../services/emailService';
 import { ArrowLeft, Package, Clock, Euro, CreditCard } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -9,8 +10,8 @@ interface Partner {
   name: string;
   address: string;
   city: string;
+  email: string;
   price_per_kg: number;
-  stripe_account_id?: string;
 }
 
 export default function NewOrder() {
@@ -57,6 +58,9 @@ export default function NewOrder() {
         .eq('id', state.partnerId)
         .single();
       if (data) setPartner(data);
+    } else {
+      toast.error('Aucun pressing sélectionné');
+      setTimeout(() => navigate('/partners-map'), 2000);
     }
   };
 
@@ -65,32 +69,66 @@ export default function NewOrder() {
   };
 
   const handleCreateOrder = async () => {
-    if (!user || !partner) return;
+    if (!user || !partner) {
+      toast.error('Informations manquantes');
+      return;
+    }
 
     setLoading(true);
     try {
-      const { data, error } = await supabase
+      const orderData = {
+        user_id: user.id,
+        partner_id: partner.id,
+        weight_kg: weight,
+        service_type: serviceType,
+        price_per_kg: servicePrices[serviceType],
+        total_amount: calculateTotal(),
+        status: 'pending',
+        pickup_date: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+      };
+
+      const { data: order, error } = await supabase
         .from('orders')
-        .insert({
-          user_id: user.id,
-          partner_id: partner.id,
-          weight_kg: weight,
-          service_type: serviceType,
-          price_per_kg: servicePrices[serviceType],
-          total_amount: calculateTotal(),
-          status: 'pending',
-          pickup_date: new Date().toISOString(),
-        })
+        .insert(orderData)
         .select()
         .single();
 
       if (error) throw error;
 
-      toast.success('Commande créée !');
-      navigate('/client-dashboard');
+      // Envoyer emails (ne pas bloquer si ça échoue)
+      try {
+        await Promise.all([
+          sendOrderConfirmation({
+            customerEmail: user.email,
+            customerName: user.email.split('@')[0],
+            orderNumber: order.id.substring(0, 8).toUpperCase(),
+            partnerName: partner.name,
+            partnerAddress: `${partner.address}, ${partner.city}`,
+            weight,
+            serviceType,
+            total: calculateTotal(),
+            pickupDate: new Date(Date.now() + 24 * 60 * 60 * 1000).toLocaleDateString('fr-FR')
+          }),
+          sendPartnerNotification({
+            partnerEmail: partner.email || 'contact@kilolab.fr',
+            partnerName: partner.name,
+            orderNumber: order.id.substring(0, 8).toUpperCase(),
+            customerEmail: user.email,
+            weight,
+            serviceType,
+            total: calculateTotal()
+          })
+        ]);
+        toast.success('Commande créée ! Email de confirmation envoyé.');
+      } catch (emailError) {
+        console.error('Email error:', emailError);
+        toast.success('Commande créée avec succès !');
+      }
+
+      setTimeout(() => navigate('/client-dashboard'), 2000);
     } catch (error: any) {
       console.error('Erreur:', error);
-      toast.error('Erreur lors de la création');
+      toast.error('Erreur lors de la création de la commande');
     } finally {
       setLoading(false);
     }
@@ -99,7 +137,10 @@ export default function NewOrder() {
   if (!partner) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-white">
-        <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+          <p className="text-slate-600">Chargement...</p>
+        </div>
       </div>
     );
   }
@@ -138,6 +179,9 @@ export default function NewOrder() {
               onChange={(e) => setWeight(Number(e.target.value))}
               className="w-full px-6 py-4 text-2xl font-bold text-center border-3 border-blue-300 rounded-2xl focus:border-blue-600 focus:outline-none"
             />
+            <p className="text-sm text-slate-500 mt-2">
+              Le poids exact sera confirmé par le pressing lors du dépôt
+            </p>
           </div>
 
           <div className="mb-8">
@@ -181,6 +225,10 @@ export default function NewOrder() {
                 <span>Prix au kg :</span>
                 <span className="font-bold">{servicePrices[serviceType]}€</span>
               </div>
+              <div className="flex justify-between">
+                <span>Formule :</span>
+                <span className="font-bold">{serviceLabels[serviceType]}</span>
+              </div>
               <div className="border-t-2 border-blue-300 pt-3 flex justify-between text-2xl font-black text-blue-900">
                 <span>Total :</span>
                 <span>{calculateTotal().toFixed(2)}€</span>
@@ -191,12 +239,12 @@ export default function NewOrder() {
           <button
             onClick={handleCreateOrder}
             disabled={loading}
-            className="w-full py-5 rounded-2xl font-bold text-xl text-white bg-gradient-to-r from-blue-600 to-cyan-600 hover:shadow-2xl transition-all transform hover:scale-105 disabled:opacity-50 flex items-center justify-center gap-3"
+            className="w-full py-5 rounded-2xl font-bold text-xl text-white bg-gradient-to-r from-blue-600 to-cyan-600 hover:shadow-2xl transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3"
           >
             {loading ? (
               <>
                 <div className="w-6 h-6 border-3 border-white border-t-transparent rounded-full animate-spin"></div>
-                Création...
+                Création en cours...
               </>
             ) : (
               <>
@@ -205,6 +253,10 @@ export default function NewOrder() {
               </>
             )}
           </button>
+
+          <p className="text-sm text-slate-500 text-center mt-4">
+            Le paiement sera effectué lors du dépôt au pressing
+          </p>
         </div>
       </div>
     </div>
