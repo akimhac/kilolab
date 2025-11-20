@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowRight, Zap, Shield, Clock, Euro, Star, Users, TrendingUp, Award, MapPin, Sparkles } from 'lucide-react';
+import { ArrowRight, Zap, Shield, Clock, Euro, Star, Users, MapPin, Sparkles } from 'lucide-react';
 import HowItWorksCarousel from '../components/HowItWorksCarousel';
 
 export default function LandingPage() {
@@ -15,7 +15,7 @@ export default function LandingPage() {
     {
       icon: Euro,
       title: 'Prix transparents',
-      description: 'Tarification au poids réel, sans frais cachés. Ce que vous voyez, c\'est ce que vous payez'
+      description: 'Standard 3,50€/kg ou Express 5€/kg. Ce que vous voyez, c\'est ce que vous payez'
     },
     {
       icon: Clock,
@@ -74,11 +74,20 @@ export default function LandingPage() {
                 <button onClick={() => navigate('/partners-map')} className="text-slate-600 hover:text-blue-600 font-semibold transition">
                   Comment ça marche
                 </button>
+                <button onClick={() => navigate('/pricing')} className="text-slate-600 hover:text-blue-600 font-semibold transition">
+                  Tarifs
+                </button>
                 <button onClick={() => navigate('/about')} className="text-slate-600 hover:text-blue-600 font-semibold transition">
                   À propos
                 </button>
-                <button onClick={() => navigate('/pricing')} className="text-slate-600 hover:text-blue-600 font-semibold transition">
+                <button onClick={() => navigate('/for-who')} className="text-slate-600 hover:text-blue-600 font-semibold transition">
                   Pour qui ?
+                </button>
+                <button onClick={() => navigate('/blog')} className="text-slate-600 hover:text-blue-600 font-semibold transition">
+                  Blog
+                </button>
+                <button onClick={() => navigate('/contact')} className="text-slate-600 hover:text-blue-600 font-semibold transition">
+                  Contact
                 </button>
               </div>
             </div>
@@ -139,10 +148,10 @@ export default function LandingPage() {
                   <ArrowRight className="w-5 h-5" />
                 </button>
                 <button
-                  onClick={() => navigate('/signup')}
+                  onClick={() => navigate('/pricing')}
                   className="px-8 py-4 bg-white border-2 border-slate-300 text-slate-900 rounded-xl font-bold text-lg hover:border-blue-600 hover:text-blue-600 transition-all"
                 >
-                  Créer un compte
+                  Voir les tarifs
                 </button>
               </div>
 
@@ -194,7 +203,7 @@ export default function LandingPage() {
               viewport={{ once: true }}
             >
               <div className="text-5xl font-black mb-2">24h</div>
-              <p className="text-xl text-blue-100">Service express selon disponibilité</p>
+              <p className="text-xl text-blue-100">Service express disponible</p>
             </motion.div>
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -209,8 +218,90 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Features Section */}
+      {/* Pricing Quick View */}
       <section className="py-20 px-4 bg-white">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-12">
+            <h2 className="text-4xl md:text-5xl font-black text-slate-900 mb-4">
+              Deux formules simples
+            </h2>
+            <p className="text-xl text-slate-600">
+              Choisissez selon vos besoins
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+            <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-3xl p-8 border-2 border-blue-200">
+              <Clock className="w-12 h-12 text-blue-600 mb-4" />
+              <h3 className="text-3xl font-black text-slate-900 mb-2">Standard</h3>
+              <div className="text-5xl font-black text-blue-600 mb-2">3,50€<span className="text-2xl">/kg</span></div>
+              <p className="text-slate-600 mb-4">48-72h de délai</p>
+              <ul className="space-y-2 text-slate-700">
+                <li className="flex items-center gap-2">
+                  <div className="w-5 h-5 bg-blue-600 rounded-full flex items-center justify-center">
+                    <Sparkles className="w-3 h-3 text-white" />
+                  </div>
+                  Lavage professionnel
+                </li>
+                <li className="flex items-center gap-2">
+                  <div className="w-5 h-5 bg-blue-600 rounded-full flex items-center justify-center">
+                    <Sparkles className="w-3 h-3 text-white" />
+                  </div>
+                  Séchage et pliage
+                </li>
+                <li className="flex items-center gap-2">
+                  <div className="w-5 h-5 bg-blue-600 rounded-full flex items-center justify-center">
+                    <Sparkles className="w-3 h-3 text-white" />
+                  </div>
+                  Qualité garantie
+                </li>
+              </ul>
+            </div>
+
+            <div className="bg-gradient-to-br from-orange-50 to-red-50 rounded-3xl p-8 border-2 border-orange-500 relative">
+              <div className="absolute -top-3 -right-3 bg-orange-500 text-white px-4 py-1 rounded-full text-sm font-bold">
+                URGENT
+              </div>
+              <Zap className="w-12 h-12 text-orange-600 mb-4" />
+              <h3 className="text-3xl font-black text-slate-900 mb-2">Express</h3>
+              <div className="text-5xl font-black text-orange-600 mb-2">5€<span className="text-2xl">/kg</span></div>
+              <p className="text-slate-600 mb-4">Besoin urgent ? Votre linge prêt en 24h</p>
+              <ul className="space-y-2 text-slate-700">
+                <li className="flex items-center gap-2">
+                  <div className="w-5 h-5 bg-orange-600 rounded-full flex items-center justify-center">
+                    <Sparkles className="w-3 h-3 text-white" />
+                  </div>
+                  Tout du Standard
+                </li>
+                <li className="flex items-center gap-2">
+                  <div className="w-5 h-5 bg-orange-600 rounded-full flex items-center justify-center">
+                    <Sparkles className="w-3 h-3 text-white" />
+                  </div>
+                  Traitement prioritaire
+                </li>
+                <li className="flex items-center gap-2">
+                  <div className="w-5 h-5 bg-orange-600 rounded-full flex items-center justify-center">
+                    <Sparkles className="w-3 h-3 text-white" />
+                  </div>
+                  Prêt en 24h
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <div className="text-center mt-8">
+            <button
+              onClick={() => navigate('/pricing')}
+              className="px-8 py-4 bg-gradient-to-r from-blue-600 to-cyan-600 text-white rounded-xl font-bold text-lg hover:shadow-xl transition"
+            >
+              Voir tous les tarifs
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {/* Features Section */}
+      <section className="py-20 px-4 bg-gradient-to-br from-slate-50 to-blue-50">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-black text-slate-900 mb-4">
@@ -229,7 +320,7 @@ export default function LandingPage() {
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
                 viewport={{ once: true }}
-                className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-2xl p-8 hover:shadow-xl transition-all"
+                className="bg-white rounded-2xl p-8 hover:shadow-xl transition-all"
               >
                 <div className="w-14 h-14 bg-gradient-to-br from-blue-600 to-cyan-600 rounded-xl flex items-center justify-center mb-4">
                   <feature.icon className="w-7 h-7 text-white" />
@@ -243,7 +334,7 @@ export default function LandingPage() {
       </section>
 
       {/* Testimonials */}
-      <section className="py-20 px-4 bg-gradient-to-br from-slate-50 to-blue-50">
+      <section className="py-20 px-4 bg-white">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-black text-slate-900 mb-4">
@@ -262,7 +353,7 @@ export default function LandingPage() {
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
                 viewport={{ once: true }}
-                className="bg-white rounded-2xl p-8 shadow-lg"
+                className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-2xl p-8 shadow-lg"
               >
                 <div className="flex gap-1 mb-4">
                   {[...Array(testimonial.rating)].map((_, i) => (
@@ -332,7 +423,8 @@ export default function LandingPage() {
               <h3 className="font-bold mb-4">Entreprise</h3>
               <ul className="space-y-2 text-slate-400">
                 <li><button onClick={() => navigate('/about')} className="hover:text-white transition">À propos</button></li>
-                <li><button className="hover:text-white transition">Contact</button></li>
+                <li><button onClick={() => navigate('/blog')} className="hover:text-white transition">Blog</button></li>
+                <li><button onClick={() => navigate('/contact')} className="hover:text-white transition">Contact</button></li>
               </ul>
             </div>
             <div>
