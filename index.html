@@ -5,28 +5,59 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     
-    <!-- SEO Meta Tags -->
-    <title>Kilolab - Votre pressing au kilo en point relais</title>
-    <meta name="description" content="Trouvez un pressing près de chez vous. Service au kilo, tarifs transparents, 2600+ pressings partenaires en France et Belgique. À partir de 5€/kg." />
-    <meta name="keywords" content="pressing, laverie, nettoyage vêtements, pressing au kilo, pressing pas cher, pressing express" />
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="theme-color" content="#2563eb" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Kilolab" />
+    <link rel="apple-touch-icon" href="/icon-192.png" />
     
-    <!-- Open Graph -->
-    <meta property="og:title" content="Kilolab - Votre pressing au kilo" />
-    <meta property="og:description" content="Service de pressing au kilo. Simple, rapide, transparent. À partir de 5€/kg." />
+    <!-- SEO Meta Tags -->
+    <title>Kilolab - Le pressing nouvelle génération au kilo | 2600+ points relais</title>
+    <meta name="description" content="Kilolab simplifie le pressing : tarif au kilo (3,50€ Standard, 5€ Express), 2600+ pressings partenaires en France et Belgique. Déposez le matin, récupérez le soir. Simple, rapide, transparent." />
+    <meta name="keywords" content="pressing au kilo, pressing pas cher, pressing express, laverie automatique, nettoyage vêtements, pressing 24h, pressing prix transparent, kilolab, pressing point relais" />
+    
+    <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://kilolab.fr" />
+    <meta property="og:title" content="Kilolab - Le pressing nouvelle génération au kilo" />
+    <meta property="og:description" content="Déposez votre linge en point relais, récupérez-le impeccable en 24h. 3,50€/kg en Standard, 5€/kg en Express. Plus de 2600 pressings partenaires." />
+    <meta property="og:image" content="https://kilolab.fr/og-image.png" />
+    <meta property="og:locale" content="fr_FR" />
+    <meta property="og:site_name" content="Kilolab" />
     
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Kilolab - Votre pressing au kilo" />
-    <meta name="twitter:description" content="Service de pressing au kilo. À partir de 5€/kg." />
+    <meta name="twitter:url" content="https://kilolab.fr" />
+    <meta name="twitter:title" content="Kilolab - Pressing au kilo près de chez vous" />
+    <meta name="twitter:description" content="3,50€/kg en Standard, 5€/kg en Express. 2600+ pressings en France et Belgique." />
+    <meta name="twitter:image" content="https://kilolab.fr/twitter-image.png" />
     
-    <!-- Robots -->
-    <meta name="robots" content="index, follow" />
+    <!-- Geo Tags -->
+    <meta name="geo.region" content="FR" />
+    <meta name="geo.placename" content="France" />
+    
+    <!-- Robots & Canonical -->
+    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
     <link rel="canonical" href="https://kilolab.fr" />
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
-</html>
+    
+    <!-- Author -->
+    <meta name="author" content="Kilolab" />
+    <meta name="copyright" content="Kilolab 2025" />
+    
+    <!-- Preconnect for performance -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    
+    <!-- Structured Data (JSON-LD) pour SEO -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "LocalBusiness",
+      "name": "Kilolab",
+      "description": "Service de pressing au kilo avec 2600+ points relais en France et Belgique",
+      "url": "https://kilolab.fr",
+      "logo": "https://kilolab.fr/logo.png",
+      "image": "https://kilolab.fr/og-image.png",
+      "priceRange": "3.50€-5€
