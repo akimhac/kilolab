@@ -41,95 +41,115 @@ export interface LoyaltyRedemption {
   redeemed_at: string;
   expires_at: string;
   used: boolean;
+  loyalty_rewards?: LoyaltyReward; // Join avec la table rewards
 }
 
 export const loyaltyService = {
   // Récupérer les points de l'utilisateur
   async getUserPoints(userId: string): Promise<LoyaltyPoints | null> {
-    const { data, error } = await supabase
-      .from('loyalty_points')
-      .select('*')
-      .eq('user_id', userId)
-      .single();
+    try {
+      const { data, error } = await supabase
+        .from('loyalty_points')
+        .select('*')
+        .eq('user_id', userId)
+        .single();
 
-    if (error) {
-      console.error('Erreur getUserPoints:', error);
+      if (error) {
+        console.error('Erreur getUserPoints:', error);
+        return null;
+      }
+
+      return data;
+    } catch (error) {
+      console.error('Exception getUserPoints:', error);
       return null;
     }
-
-    return data;
   },
 
   // Récupérer l'historique des transactions
   async getUserTransactions(userId: string): Promise<LoyaltyTransaction[]> {
-    const { data, error } = await supabase
-      .from('loyalty_transactions')
-      .select('*')
-      .eq('user_id', userId)
-      .order('created_at', { ascending: false })
-      .limit(50);
+    try {
+      const { data, error } = await supabase
+        .from('loyalty_transactions')
+        .select('*')
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false })
+        .limit(50);
 
-    if (error) {
-      console.error('Erreur getUserTransactions:', error);
+      if (error) {
+        console.error('Erreur getUserTransactions:', error);
+        return [];
+      }
+
+      return data || [];
+    } catch (error) {
+      console.error('Exception getUserTransactions:', error);
       return [];
     }
-
-    return data;
   },
 
   // Récupérer les récompenses disponibles
-  async getAvailableRewards(userTier?: string): Promise<LoyaltyReward[]> {
-    let query = supabase
-      .from('loyalty_rewards')
-      .select('*')
-      .eq('is_active', true);
+  async getAvailableRewards(): Promise<LoyaltyReward[]> {
+    try {
+      const { data, error } = await supabase
+        .from('loyalty_rewards')
+        .select('*')
+        .eq('is_active', true)
+        .order('points_cost');
 
-    if (userTier) {
-      // Filtrer selon le tier (simplification)
-      query = query.lte('min_tier', userTier);
-    }
+      if (error) {
+        console.error('Erreur getAvailableRewards:', error);
+        return [];
+      }
 
-    const { data, error } = await query.order('points_cost');
-
-    if (error) {
-      console.error('Erreur getAvailableRewards:', error);
+      return data || [];
+    } catch (error) {
+      console.error('Exception getAvailableRewards:', error);
       return [];
     }
-
-    return data;
   },
 
   // Utiliser une récompense
   async redeemReward(userId: string, rewardId: string): Promise<{ success: boolean; error?: string; redemption?: any }> {
-    const { data, error } = await supabase.rpc('redeem_loyalty_reward', {
-      p_user_id: userId,
-      p_reward_id: rewardId
-    });
+    try {
+      const { data, error } = await supabase.rpc('redeem_loyalty_reward', {
+        p_user_id: userId,
+        p_reward_id: rewardId
+      });
 
-    if (error) {
-      console.error('Erreur redeemReward:', error);
+      if (error) {
+        console.error('Erreur redeemReward:', error);
+        return { success: false, error: error.message };
+      }
+
+      return data || { success: false, error: 'Erreur inconnue' };
+    } catch (error: any) {
+      console.error('Exception redeemReward:', error);
       return { success: false, error: error.message };
     }
-
-    return data;
   },
 
   // Récupérer les coupons actifs de l'utilisateur
   async getUserActiveCoupons(userId: string): Promise<LoyaltyRedemption[]> {
-    const { data, error } = await supabase
-      .from('loyalty_redemptions')
-      .select('*, loyalty_rewards(*)')
-      .eq('user_id', userId)
-      .eq('used', false)
-      .gt('expires_at', new Date().toISOString())
-      .order('expires_at');
+    try {
+      const { data, error } = await supabase
+        .from('loyalty_redemptions')
+        .select('*, loyalty_rewards(*)')
+        .eq('user_id', userId)
+        .eq('used', false)
+        .gt('expires_at', new Date().toISOString())
+        .order('expires_at');
 
-    if (error) {
-      console.error('Erreur getUserActiveCoupons:', error);
+      if (error) {
+        console.error('Erreur getUserActiveCoupons:', error);
+        return [];
+      }
+
+      return data || [];
+    } catch (error) {
+      console.error('Exception getUserActiveCoupons:', error);
       return [];
     }
-
-    return data;
   },
 
   // Calculer le prochain palier
