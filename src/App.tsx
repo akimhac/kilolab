@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import ScrollToTop from './components/ScrollToTop';
 import CookieBanner from './components/CookieBanner';
+import InstallPrompt from './components/InstallPrompt';
 import LandingPage from './pages/LandingPage';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
@@ -9,6 +10,7 @@ import PartnersMap from './pages/PartnersMap';
 import BecomePartner from './pages/BecomePartner';
 import ClientDashboard from './pages/ClientDashboard';
 import PartnerDashboard from './pages/PartnerDashboard';
+import LoyaltyDashboard from './pages/LoyaltyDashboard';
 import CGU from './pages/legal/CGU';
 import MentionsLegales from './pages/legal/MentionsLegales';
 import Privacy from './pages/legal/Privacy';
@@ -17,6 +19,9 @@ import About from './pages/About';
 import Contact from './pages/Contact';
 import ForWho from './pages/ForWho';
 import Blog from './pages/Blog';
+import EconomiserPressing from './pages/blog/EconomiserPressing';
+import LaverVsPressing from './pages/blog/LaverVsPressing';
+import VetementsDelicats from './pages/blog/VetementsDelicats';
 import NotFound from './pages/NotFound';
 import NewOrder from './pages/NewOrder';
 import ReviewOrder from './pages/ReviewOrder';
@@ -27,26 +32,44 @@ function App() {
     <BrowserRouter>
       <Toaster position="top-right" />
       <CookieBanner />
+      <InstallPrompt />
       <ScrollToTop />
       <Routes>
+        {/* Pages principales */}
         <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/partners-map" element={<PartnersMap />} />
         <Route path="/become-partner" element={<BecomePartner />} />
+        
+        {/* Dashboards */}
         <Route path="/client-dashboard" element={<ClientDashboard />} />
         <Route path="/partner-dashboard" element={<PartnerDashboard />} />
+        <Route path="/loyalty" element={<LoyaltyDashboard />} />
+        
+        {/* Pages informatives */}
         <Route path="/pricing" element={<Pricing />} />
         <Route path="/about" element={<About />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/for-who" element={<ForWho />} />
+        
+        {/* Blog */}
         <Route path="/blog" element={<Blog />} />
+        <Route path="/blog/economiser-pressing" element={<EconomiserPressing />} />
+        <Route path="/blog/laver-vs-pressing" element={<LaverVsPressing />} />
+        <Route path="/blog/vetements-delicats" element={<VetementsDelicats />} />
+        
+        {/* Actions */}
         <Route path="/new-order" element={<NewOrder />} />
         <Route path="/review/:orderId" element={<ReviewOrder />} />
         <Route path="/referral" element={<Referral />} />
+        
+        {/* Légal */}
         <Route path="/legal/cgu" element={<CGU />} />
         <Route path="/legal/mentions-legales" element={<MentionsLegales />} />
         <Route path="/legal/privacy" element={<Privacy />} />
+        
+        {/* 404 */}
         <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>
