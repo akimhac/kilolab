@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
-import { Package, Clock, CheckCircle, XCircle, ArrowLeft, Gift, Star } from 'lucide-react';
+import { Package, Clock, CheckCircle, XCircle, ArrowLeft, Gift, Star, TrendingUp, Award } from 'lucide-react';
 import toast from 'react-hot-toast';
 import EmptyState from '../components/EmptyState';
 import ConfirmDialog from '../components/ConfirmDialog';
+import { loyaltyService, LoyaltyPoints } from '../services/loyaltyService';
 
 interface Order {
   id: string;
@@ -26,10 +27,12 @@ export default function ClientDashboard() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState<any>(null);
+  const [loyaltyData, setLoyaltyData] = useState<LoyaltyPoints | null>(null);
   const [confirmDialog, setConfirmDialog] = useState<{isOpen: boolean; orderId: string | null}>({
     isOpen: false,
     orderId: null
   });
+  const [reviewedOrders, setReviewedOrders] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     checkAuth();
@@ -43,6 +46,7 @@ export default function ClientDashboard() {
     }
     setUser(session.user);
     loadOrders(session.user.id);
+    loadLoyaltyData(session.user.id);
   };
 
   const loadOrders = async (userId: string) => {
@@ -58,12 +62,32 @@ export default function ClientDashboard() {
 
       if (error) throw error;
       setOrders(data || []);
+
+      // Charger les avis pour chaque commande terminée
+      if (data && data.length > 0) {
+        const completedOrders = data.filter(o => o.status === 'completed');
+        const reviewChecks = await Promise.all(
+          completedOrders.map(async (order) => {
+            const reviewed = await checkIfReviewed(order.id);
+            return { orderId: order.id, reviewed };
+          })
+        );
+        const reviewed = new Set(
+          reviewChecks.filter(r => r.reviewed).map(r => r.orderId)
+        );
+        setReviewedOrders(reviewed);
+      }
     } catch (error: any) {
       console.error('Error:', error);
       toast.error('Impossible de charger vos commandes. Réessayez dans quelques instants.');
     } finally {
       setLoading(false);
     }
+  };
+
+  const loadLoyaltyData = async (userId: string) => {
+    const points = await loyaltyService.getUserPoints(userId);
+    setLoyaltyData(points);
   };
 
   const getStatusIcon = (status: string) => {
@@ -127,26 +151,6 @@ export default function ClientDashboard() {
     return !!data;
   };
 
-  const [reviewedOrders, setReviewedOrders] = useState<Set<string>>(new Set());
-
-  useEffect(() => {
-    if (orders.length > 0) {
-      Promise.all(
-        orders
-          .filter(o => o.status === 'completed')
-          .map(async (order) => {
-            const reviewed = await checkIfReviewed(order.id);
-            return { orderId: order.id, reviewed };
-          })
-      ).then((results) => {
-        const reviewed = new Set(
-          results.filter(r => r.reviewed).map(r => r.orderId)
-        );
-        setReviewedOrders(reviewed);
-      });
-    }
-  }, [orders]);
-
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-white">
@@ -158,9 +162,17 @@ export default function ClientDashboard() {
     );
   }
 
+  // Calculer les stats
+  const completedOrders = orders.filter(o => o.status === 'completed');
+  const totalSpent = completedOrders.reduce((sum, o) => sum + o.total_amount, 0);
+  const nextTierInfo = loyaltyData ? loyaltyService.getNextTierInfo(loyaltyData.tier, loyaltyData.lifetime_points) : null;
+  const tierIcon = loyaltyData ? loyaltyService.getTierIcon(loyaltyData.tier) : '🥉';
+  const tierColor = loyaltyData ? loyaltyService.getTierColor(loyaltyData.tier) : 'from-slate-400 to-slate-600';
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white py-12 px-4">
-      <div className="max-w-6xl mx-auto">
+      <div className="max-w-7xl mx-auto">
+        {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <button
             onClick={() => navigate('/')}
@@ -186,17 +198,116 @@ export default function ClientDashboard() {
           </div>
         </div>
 
+        {/* Welcome Card */}
         <div className="bg-white rounded-3xl shadow-2xl p-8 mb-8">
           <h1 className="text-4xl font-black bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent mb-2">
-            Mes commandes
+            Mon espace
           </h1>
           <p className="text-slate-600">
             Bienvenue {user?.email}
           </p>
         </div>
 
-        {orders.length === 0 ? (
-          <div className="bg-white rounded-3xl shadow-xl p-12">
+        {/* Stats Cards */}
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+          {/* Total commandes */}
+          <div className="bg-white rounded-2xl p-6 shadow-lg">
+            <div className="flex items-center gap-4 mb-4">
+              <div className="w-12 h-12 bg-gradient-to-br from-blue-600 to-cyan-600 rounded-xl flex items-center justify-center">
+                <Package className="w-6 h-6 text-white" />
+              </div>
+              <div>
+                <p className="text-sm text-slate-600">Commandes</p>
+                <p className="text-3xl font-black text-slate-900">{orders.length}</p>
+              </div>
+            </div>
+            <p className="text-sm text-slate-500">
+              Dont {completedOrders.length} terminées
+            </p>
+          </div>
+
+          {/* Total dépensé */}
+          <div className="bg-white rounded-2xl p-6 shadow-lg">
+            <div className="flex items-center gap-4 mb-4">
+              <div className="w-12 h-12 bg-gradient-to-br from-green-600 to-emerald-600 rounded-xl flex items-center justify-center">
+                <TrendingUp className="w-6 h-6 text-white" />
+              </div>
+              <div>
+                <p className="text-sm text-slate-600">Total dépensé</p>
+                <p className="text-3xl font-black text-slate-900">{totalSpent.toFixed(0)}€</p>
+              </div>
+            </div>
+            <p className="text-sm text-slate-500">
+              Depuis le début
+            </p>
+          </div>
+
+          {/* Programme fidélité */}
+          {loyaltyData && (
+            <div className={`bg-gradient-to-br ${tierColor} rounded-2xl p-6 shadow-lg text-white lg:col-span-1 md:col-span-2`}>
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-4">
+                  <div className="text-4xl">{tierIcon}</div>
+                  <div>
+                    <p className="text-white/80 text-sm">Programme Fidélité</p>
+                    <p className="text-2xl font-black">{loyaltyData.points} points</p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => navigate('/loyalty')}
+                  className="px-4 py-2 bg-white/20 backdrop-blur-sm hover:bg-white/30 rounded-xl font-bold transition text-sm"
+                >
+                  Voir mes récompenses
+                </button>
+              </div>
+              
+              {!nextTierInfo?.isMaxTier && (
+                <div>
+                  <div className="flex items-center justify-between text-sm mb-2">
+                    <span className="text-white/80">Progression vers {nextTierInfo?.name?.toUpperCase()}</span>
+                    <span className="text-white/80">{nextTierInfo?.pointsNeeded} points restants</span>
+                  </div>
+                  <div className="flex-1 bg-white/20 rounded-full h-2">
+                    <div 
+                      className="bg-white rounded-full h-2 transition-all duration-500"
+                      style={{
+                        width: `${Math.min(100, ((loyaltyData.lifetime_points / (loyaltyData.lifetime_points + (nextTierInfo?.pointsNeeded || 1))) * 100))}%`
+                      }}
+                    ></div>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* Quick Actions */}
+        <div className="grid md:grid-cols-3 gap-4 mb-8">
+          <button
+            onClick={() => navigate('/partners-map')}
+            className="bg-gradient-to-r from-blue-600 to-cyan-600 text-white rounded-2xl p-6 font-bold text-lg hover:shadow-2xl transition-all transform hover:scale-105"
+          >
+            Nouvelle commande
+          </button>
+          <button
+            onClick={() => navigate('/loyalty')}
+            className="bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-2xl p-6 font-bold text-lg hover:shadow-2xl transition-all transform hover:scale-105"
+          >
+            Mes récompenses
+          </button>
+          <button
+            onClick={() => navigate('/referral')}
+            className="bg-gradient-to-r from-orange-600 to-red-600 text-white rounded-2xl p-6 font-bold text-lg hover:shadow-2xl transition-all transform hover:scale-105"
+          >
+            Parrainer un ami
+          </button>
+        </div>
+
+        {/* Orders List */}
+        <div className="bg-white rounded-3xl shadow-2xl p-8">
+          <h2 className="text-2xl font-black text-slate-900 mb-6">Mes commandes</h2>
+          
+          {orders.length === 0 ? (
             <EmptyState
               icon={Package}
               title="Aucune commande"
@@ -204,68 +315,68 @@ export default function ClientDashboard() {
               actionLabel="Trouver un pressing"
               onAction={() => navigate('/partners-map')}
             />
-          </div>
-        ) : (
-          <div className="space-y-4">
-            {orders.map((order) => (
-              <div key={order.id} className="bg-white rounded-2xl shadow-lg p-6 hover:shadow-xl transition">
-                <div className="flex items-center gap-3 mb-4">
-                  {getStatusIcon(order.status)}
-                  <span className="font-bold text-lg text-slate-900">
-                    {getStatusLabel(order.status)}
-                  </span>
-                  <span className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-semibold">
-                    {getServiceLabel(order.service_type)}
-                  </span>
-                </div>
+          ) : (
+            <div className="space-y-4">
+              {orders.map((order) => (
+                <div key={order.id} className="bg-slate-50 rounded-2xl p-6 hover:shadow-lg transition">
+                  <div className="flex items-center gap-3 mb-4">
+                    {getStatusIcon(order.status)}
+                    <span className="font-bold text-lg text-slate-900">
+                      {getStatusLabel(order.status)}
+                    </span>
+                    <span className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-semibold">
+                      {getServiceLabel(order.service_type)}
+                    </span>
+                  </div>
 
-                <div className="grid md:grid-cols-2 gap-4 mb-4">
-                  <div>
-                    <p className="text-sm text-slate-500">Pressing</p>
-                    <p className="font-semibold text-slate-900">{order.partners.name}</p>
-                    <p className="text-sm text-slate-600">{order.partners.city}</p>
+                  <div className="grid md:grid-cols-2 gap-4 mb-4">
+                    <div>
+                      <p className="text-sm text-slate-500">Pressing</p>
+                      <p className="font-semibold text-slate-900">{order.partners.name}</p>
+                      <p className="text-sm text-slate-600">{order.partners.city}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-slate-500">Détails</p>
+                      <p className="font-semibold text-slate-900">{order.weight_kg} kg</p>
+                      <p className="text-sm text-slate-600">
+                        {new Date(order.created_at).toLocaleDateString('fr-FR', {
+                          day: 'numeric',
+                          month: 'long',
+                          year: 'numeric'
+                        })}
+                      </p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="text-sm text-slate-500">Détails</p>
-                    <p className="font-semibold text-slate-900">{order.weight_kg} kg</p>
-                    <p className="text-sm text-slate-600">
-                      {new Date(order.created_at).toLocaleDateString('fr-FR', {
-                        day: 'numeric',
-                        month: 'long',
-                        year: 'numeric'
-                      })}
-                    </p>
-                  </div>
-                </div>
 
-                <div className="flex items-center justify-between pt-4 border-t">
-                  <div className="text-2xl font-black text-blue-600">
-                    {order.total_amount.toFixed(2)}€
-                  </div>
-                  <div className="flex gap-3">
-                    {order.status === 'completed' && !reviewedOrders.has(order.id) && (
-                      <button
-                        onClick={() => navigate(`/review/${order.id}`)}
-                        className="px-4 py-2 bg-yellow-100 text-yellow-700 rounded-lg font-semibold hover:bg-yellow-200 transition flex items-center gap-2"
-                      >
-                        <Star className="w-4 h-4" />
-                        Laisser un avis
-                      </button>
-                    )}
-                    {order.status === 'pending' && (
-                      <button
-                        onClick={() => setConfirmDialog({ isOpen: true, orderId: order.id })}
-                        className="px-4 py-2 bg-red-100 text-red-700 rounded-lg font-semibold hover:bg-red-200 transition"
-                      >
-                        Annuler
-                      </button>
-                    )}
+                  <div className="flex items-center justify-between pt-4 border-t border-slate-200">
+                    <div className="text-2xl font-black text-blue-600">
+                      {order.total_amount.toFixed(2)}€
+                    </div>
+                    <div className="flex gap-3">
+                      {order.status === 'completed' && !reviewedOrders.has(order.id) && (
+                        <button
+                          onClick={() => navigate(`/review/${order.id}`)}
+                          className="px-4 py-2 bg-yellow-100 text-yellow-700 rounded-lg font-semibold hover:bg-yellow-200 transition flex items-center gap-2"
+                        >
+                          <Star className="w-4 h-4" />
+                          Laisser un avis
+                        </button>
+                      )}
+                      {order.status === 'pending' && (
+                        <button
+                          onClick={() => setConfirmDialog({ isOpen: true, orderId: order.id })}
+                          className="px-4 py-2 bg-red-100 text-red-700 rounded-lg font-semibold hover:bg-red-200 transition"
+                        >
+                          Annuler
+                        </button>
+                      )}
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
-        )}
+              ))}
+            </div>
+          )}
+        </div>
       </div>
 
       <ConfirmDialog
