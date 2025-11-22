@@ -1,62 +1,55 @@
-import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { CheckCircle, Loader } from 'lucide-react';
-import { supabase } from '../lib/supabase';
+import { CheckCircle, ArrowRight } from 'lucide-react';
+import { useEffect } from 'react';
 
 export default function PaymentSuccess() {
-  const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const [updating, setUpdating] = useState(true);
-  
+  const [searchParams] = useSearchParams();
   const orderId = searchParams.get('order_id');
-  const sessionId = searchParams.get('session_id');
 
   useEffect(() => {
-    updateOrderStatus();
-  }, [orderId]);
+    // Auto-redirect après 5 secondes
+    const timer = setTimeout(() => {
+      navigate('/client-dashboard');
+    }, 5000);
 
-  const updateOrderStatus = async () => {
-    if (!orderId) return;
-
-    try {
-      // Marquer la commande comme payée
-      await supabase
-        .from('orders')
-        .update({ status: 'pending' })
-        .eq('id', orderId);
-      
-      setUpdating(false);
-      
-      // Redirection automatique après 3 secondes
-      setTimeout(() => {
-        navigate('/dashboard');
-      }, 3000);
-    } catch (error) {
-      console.error('Error updating order:', error);
-      setUpdating(false);
-    }
-  };
+    return () => clearTimeout(timer);
+  }, [navigate]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 flex items-center justify-center p-4">
-      <div className="max-w-md w-full bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-8 text-center">
-        {updating ? (
-          <>
-            <Loader className="w-16 h-16 text-blue-400 mx-auto mb-4 animate-spin" />
-            <h1 className="text-2xl font-bold text-white mb-2">Confirmation du paiement...</h1>
-          </>
-        ) : (
-          <>
-            <CheckCircle className="w-16 h-16 text-green-400 mx-auto mb-4" />
-            <h1 className="text-3xl font-bold text-white mb-4">Paiement réussi !</h1>
-            <p className="text-gray-300 mb-6">
-              Votre commande a été confirmée. Vous allez recevoir un email de confirmation.
+    <div className="min-h-screen bg-gradient-to-br from-green-50 to-white flex items-center justify-center p-4">
+      <div className="max-w-md w-full">
+        <div className="bg-white rounded-3xl shadow-2xl p-8 text-center">
+          <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+            <CheckCircle className="w-12 h-12 text-green-600" />
+          </div>
+
+          <h1 className="text-3xl font-black text-slate-900 mb-4">
+            Paiement réussi !
+          </h1>
+
+          <p className="text-lg text-slate-600 mb-6">
+            Votre commande a été confirmée. Le pressing va prendre en charge votre linge.
+          </p>
+
+          <div className="bg-green-50 rounded-xl p-4 mb-6">
+            <p className="text-sm text-green-800">
+              📧 Un email de confirmation vous a été envoyé
             </p>
-            <p className="text-sm text-gray-400">
-              Redirection automatique vers le dashboard...
-            </p>
-          </>
-        )}
+          </div>
+
+          <button
+            onClick={() => navigate('/client-dashboard')}
+            className="w-full px-8 py-4 bg-gradient-to-r from-blue-600 to-cyan-600 text-white rounded-xl font-bold hover:shadow-xl transition flex items-center justify-center gap-2"
+          >
+            Voir mes commandes
+            <ArrowRight className="w-5 h-5" />
+          </button>
+
+          <p className="text-sm text-slate-500 mt-4">
+            Redirection automatique dans 5 secondes...
+          </p>
+        </div>
       </div>
     </div>
   );
