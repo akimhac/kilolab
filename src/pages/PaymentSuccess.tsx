@@ -8,11 +8,9 @@ export default function PaymentSuccess() {
   const orderId = searchParams.get('order_id');
 
   useEffect(() => {
-    // Auto-redirect après 5 secondes
     const timer = setTimeout(() => {
       navigate('/client-dashboard');
     }, 5000);
-
     return () => clearTimeout(timer);
   }, [navigate]);
 
@@ -25,7 +23,7 @@ export default function PaymentSuccess() {
           </div>
 
           <h1 className="text-3xl font-black text-slate-900 mb-4">
-            Paiement réussi !
+            Paiement réussi ! 🎉
           </h1>
 
           <p className="text-lg text-slate-600 mb-6">
@@ -33,7 +31,7 @@ export default function PaymentSuccess() {
           </p>
 
           <div className="bg-green-50 rounded-xl p-4 mb-6">
-            <p className="text-sm text-green-800">
+            <p className="text-sm text-green-800 font-semibold">
               📧 Un email de confirmation vous a été envoyé
             </p>
           </div>
