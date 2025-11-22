@@ -1,11 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
-import { sendOrderReady } from '../services/emailService';
-import { Package, Clock, CheckCircle, Euro, ArrowLeft, TrendingUp, Users } from 'lucide-react';
+import { Package, TrendingUp, Clock, CheckCircle, AlertCircle, ArrowLeft, Gift, Euro } from 'lucide-react';
 import toast from 'react-hot-toast';
 import EmptyState from '../components/EmptyState';
-import ConfirmDialog from '../components/ConfirmDialog';
+import { promoService } from '../services/promoService';
 
 interface Order {
   id: string;
@@ -15,42 +14,26 @@ interface Order {
   total_amount: number;
   status: string;
   created_at: string;
-  users?: {
-    email: string;
-  };
 }
 
-interface Stats {
-  total_orders: number;
-  pending_orders: number;
-  total_revenue: number;
-  completed_orders: number;
+interface Partner {
+  id: string;
+  name: string;
+  email: string;
+  is_active: boolean;
 }
 
 export default function PartnerDashboard() {
   const navigate = useNavigate();
   const [orders, setOrders] = useState<Order[]>([]);
-  const [stats, setStats] = useState<Stats>({ total_orders: 0, pending_orders: 0, total_revenue: 0, completed_orders: 0 });
+  const [partner, setPartner] = useState<Partner | null>(null);
   const [loading, setLoading] = useState(true);
-  const [user, setUser] = useState<any>(null);
-  const [partnerId, setPartnerId] = useState<string | null>(null);
-  const [statusFilter, setStatusFilter] = useState<string>('all');
-  const [confirmDialog, setConfirmDialog] = useState<{isOpen: boolean; orderId: string | null; action: string | null}>({
-    isOpen: false,
-    orderId: null,
-    action: null
-  });
+  const [hasPromo, setHasPromo] = useState(false);
+  const [promoData, setPromoData] = useState<any>(null);
 
   useEffect(() => {
     checkAuth();
   }, []);
-
-  useEffect(() => {
-    if (partnerId) {
-      loadOrders();
-      loadStats();
-    }
-  }, [partnerId, statusFilter]);
 
   const checkAuth = async () => {
     const { data: { session } } = await supabase.auth.getSession();
@@ -58,81 +41,42 @@ export default function PartnerDashboard() {
       navigate('/login');
       return;
     }
-    setUser(session.user);
-    await getPartnerId(session.user.email);
+    loadPartnerData(session.user.id);
   };
 
-  const getPartnerId = async (email: string) => {
+  const loadPartnerData = async (userId: string) => {
     try {
-      const { data, error } = await supabase
+      // Récupérer infos pressing
+      const { data: partnerData, error: partnerError } = await supabase
         .from('partners')
-        .select('id')
-        .eq('email', email)
+        .select('*')
+        .eq('user_id', userId)
         .single();
 
-      if (error || !data) {
-        toast.error('Aucun pressing associé à ce compte');
-        setTimeout(() => navigate('/'), 2000);
-        return;
-      }
+      if (partnerError) throw partnerError;
+      setPartner(partnerData);
 
-      setPartnerId(data.id);
-    } catch (error) {
-      console.error('Error:', error);
-      toast.error('Erreur lors de la vérification du compte');
-    }
-  };
-
-  const loadOrders = async () => {
-    if (!partnerId) return;
-
-    try {
-      let query = supabase
+      // Récupérer commandes
+      const { data: ordersData, error: ordersError } = await supabase
         .from('orders')
-        .select(`
-          *,
-          users:user_id (email)
-        `)
-        .eq('partner_id', partnerId)
+        .select('*')
+        .eq('partner_id', partnerData.id)
         .order('created_at', { ascending: false });
 
-      if (statusFilter !== 'all') {
-        query = query.eq('status', statusFilter);
+      if (ordersError) throw ordersError;
+      setOrders(ordersData || []);
+
+      // Vérifier promo active
+      const promo = await promoService.getPartnerPromo(partnerData.id);
+      if (promo) {
+        setHasPromo(true);
+        setPromoData(promo);
       }
-
-      const { data, error } = await query;
-
-      if (error) throw error;
-      setOrders(data || []);
     } catch (error: any) {
-      console.error('Error:', error);
-      toast.error('Impossible de charger les commandes');
+      console.error('Erreur:', error);
+      toast.error('Erreur de chargement');
     } finally {
       setLoading(false);
-    }
-  };
-
-  const loadStats = async () => {
-    if (!partnerId) return;
-
-    try {
-      const { data: allOrders, error } = await supabase
-        .from('orders')
-        .select('status, total_amount')
-        .eq('partner_id', partnerId);
-
-      if (error) throw error;
-
-      const stats = {
-        total_orders: allOrders?.length || 0,
-        pending_orders: allOrders?.filter(o => o.status === 'pending').length || 0,
-        completed_orders: allOrders?.filter(o => o.status === 'completed').length || 0,
-        total_revenue: allOrders?.reduce((sum, o) => sum + (o.total_amount || 0), 0) || 0
-      };
-
-      setStats(stats);
-    } catch (error) {
-      console.error('Stats error:', error);
     }
   };
 
@@ -141,84 +85,15 @@ export default function PartnerDashboard() {
       const { error } = await supabase
         .from('orders')
         .update({ status: newStatus })
-        .eq('id', orderId)
-        .eq('partner_id', partnerId);
+        .eq('id', orderId);
 
       if (error) throw error;
 
-      // Si commande prête, envoyer email au client
-      if (newStatus === 'ready') {
-        const order = orders.find(o => o.id === orderId);
-        if (order && order.users?.email) {
-          try {
-            const { data: partner } = await supabase
-              .from('partners')
-              .select('name, address, city')
-              .eq('id', partnerId)
-              .single();
-
-            if (partner) {
-              await sendOrderReady({
-                customerEmail: order.users.email,
-                customerName: order.users.email.split('@')[0],
-                orderNumber: orderId.substring(0, 8).toUpperCase(),
-                partnerName: partner.name,
-                partnerAddress: `${partner.address}, ${partner.city}`
-              });
-            }
-          } catch (emailError) {
-            console.error('Email error:', emailError);
-          }
-        }
-      }
-
-      toast.success('Statut mis à jour avec succès');
-      loadOrders();
-      loadStats();
+      toast.success('Statut mis à jour');
+      if (partner) loadPartnerData(partner.user_id || '');
     } catch (error: any) {
-      console.error('Error:', error);
-      toast.error('Erreur lors de la mise à jour du statut');
-    } finally {
-      setConfirmDialog({ isOpen: false, orderId: null, action: null });
+      toast.error('Erreur de mise à jour');
     }
-  };
-
-  const getStatusColor = (status: string) => {
-    const colors: Record<string, string> = {
-      pending: 'bg-orange-100 text-orange-700',
-      confirmed: 'bg-blue-100 text-blue-700',
-      in_progress: 'bg-purple-100 text-purple-700',
-      ready: 'bg-green-100 text-green-700',
-      completed: 'bg-slate-100 text-slate-700'
-    };
-    return colors[status] || 'bg-gray-100 text-gray-700';
-  };
-
-  const getStatusLabel = (status: string) => {
-    const labels: Record<string, string> = {
-      pending: 'En attente',
-      confirmed: 'Confirmée',
-      in_progress: 'En cours',
-      ready: 'Prête',
-      completed: 'Terminée',
-      cancelled: 'Annulée'
-    };
-    return labels[status] || status;
-  };
-
-  const getNextStatus = (currentStatus: string) => {
-    const flow: Record<string, string> = {
-      pending: 'confirmed',
-      confirmed: 'in_progress',
-      in_progress: 'ready',
-      ready: 'completed'
-    };
-    return flow[currentStatus];
-  };
-
-  const getNextStatusLabel = (currentStatus: string) => {
-    const nextStatus = getNextStatus(currentStatus);
-    return nextStatus ? getStatusLabel(nextStatus) : null;
   };
 
   if (loading) {
@@ -226,15 +101,74 @@ export default function PartnerDashboard() {
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-white">
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-          <p className="text-slate-600 font-semibold">Chargement du dashboard...</p>
+          <p className="text-slate-600 font-semibold">Chargement...</p>
         </div>
       </div>
     );
   }
 
+  // Si pressing pas encore activé
+  if (partner && !partner.is_active) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white flex items-center justify-center p-4">
+        <div className="max-w-2xl w-full">
+          <div className="bg-white rounded-3xl shadow-2xl p-8 text-center">
+            <div className="w-20 h-20 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-6">
+              <Clock className="w-10 h-10 text-orange-600" />
+            </div>
+            <h1 className="text-3xl font-black text-slate-900 mb-4">
+              Compte en cours de validation
+            </h1>
+            <p className="text-lg text-slate-600 mb-6 leading-relaxed">
+              Merci pour votre inscription ! Notre équipe vérifie actuellement vos informations. 
+              Vous recevrez un email de confirmation dès que votre compte sera activé.
+            </p>
+            <div className="bg-blue-50 rounded-xl p-6 mb-6">
+              <h3 className="font-bold text-slate-900 mb-3">Pendant ce temps :</h3>
+              <ul className="text-left space-y-2 text-slate-700">
+                <li className="flex items-start gap-2">
+                  <CheckCircle className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" />
+                  <span>Votre compte bénéficiera du <strong>1er mois gratuit</strong></span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <CheckCircle className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" />
+                  <span>Vous apparaîtrez sur notre carte dès activation</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <CheckCircle className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" />
+                  <span>Validation sous <strong>24-48h ouvrées</strong></span>
+                </li>
+              </ul>
+            </div>
+            <p className="text-sm text-slate-500 mb-6">
+              Questions ? Contactez-nous à{' '}
+              <a href="mailto:contact@kilolab.fr" className="text-blue-600 hover:underline font-semibold">
+                contact@kilolab.fr
+              </a>
+            </p>
+            <button
+              onClick={() => navigate('/')}
+              className="px-8 py-3 bg-gradient-to-r from-blue-600 to-cyan-600 text-white rounded-xl font-bold hover:shadow-xl transition"
+            >
+              Retour à l'accueil
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  const stats = {
+    total: orders.length,
+    pending: orders.filter(o => o.status === 'pending').length,
+    completed: orders.filter(o => o.status === 'completed').length,
+    revenue: orders.filter(o => o.status === 'completed').reduce((sum, o) => sum + o.total_amount, 0)
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white py-12 px-4">
       <div className="max-w-7xl mx-auto">
+        {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <button
             onClick={() => navigate('/')}
@@ -253,143 +187,168 @@ export default function PartnerDashboard() {
 
         <div className="bg-white rounded-3xl shadow-2xl p-8 mb-8">
           <h1 className="text-4xl font-black bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent mb-2">
-            Dashboard Pressing
+            Dashboard Partenaire
           </h1>
           <p className="text-slate-600">
-            Gérez vos commandes Kilolab
+            Bienvenue {partner?.name}
           </p>
         </div>
 
-        {/* Stats */}
-        <div className="grid md:grid-cols-4 gap-6 mb-8">
-          <div className="bg-gradient-to-br from-blue-500 to-cyan-500 rounded-2xl p-6 text-white shadow-xl">
-            <Package className="w-10 h-10 mb-3 opacity-80" />
-            <div className="text-3xl font-black mb-1">{stats.total_orders}</div>
-            <div className="text-blue-100">Commandes totales</div>
-          </div>
-
-          <div className="bg-gradient-to-br from-orange-500 to-red-500 rounded-2xl p-6 text-white shadow-xl">
-            <Clock className="w-10 h-10 mb-3 opacity-80" />
-            <div className="text-3xl font-black mb-1">{stats.pending_orders}</div>
-            <div className="text-orange-100">En attente</div>
-          </div>
-
-          <div className="bg-gradient-to-br from-green-500 to-emerald-500 rounded-2xl p-6 text-white shadow-xl">
-            <CheckCircle className="w-10 h-10 mb-3 opacity-80" />
-            <div className="text-3xl font-black mb-1">{stats.completed_orders}</div>
-            <div className="text-green-100">Terminées</div>
-          </div>
-
-          <div className="bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl p-6 text-white shadow-xl">
-            <Euro className="w-10 h-10 mb-3 opacity-80" />
-            <div className="text-3xl font-black mb-1">{stats.total_revenue.toFixed(2)}€</div>
-            <div className="text-purple-100">Chiffre d'affaires</div>
-          </div>
-        </div>
-
-        {/* Filtres */}
-        <div className="bg-white rounded-2xl shadow-lg p-6 mb-6">
-          <div className="flex items-center gap-3 flex-wrap">
-            <span className="font-bold text-slate-900">Filtrer par statut :</span>
-            {['all', 'pending', 'confirmed', 'in_progress', 'ready', 'completed'].map((status) => (
-              <button
-                key={status}
-                onClick={() => setStatusFilter(status)}
-                className={`px-4 py-2 rounded-xl font-semibold transition ${
-                  statusFilter === status
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                }`}
-              >
-                {status === 'all' ? 'Toutes' : getStatusLabel(status)}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Liste commandes */}
-        {orders.length === 0 ? (
-          <div className="bg-white rounded-3xl shadow-xl p-12">
-            <EmptyState
-              icon={Package}
-              title={statusFilter === 'all' ? 'Aucune commande' : `Aucune commande "${getStatusLabel(statusFilter)}"`}
-              description={statusFilter === 'all' ? "Vous n'avez pas encore reçu de commande via Kilolab." : "Changez de filtre pour voir d'autres commandes."}
-              actionLabel={statusFilter !== 'all' ? 'Voir toutes les commandes' : undefined}
-              onAction={statusFilter !== 'all' ? () => setStatusFilter('all') : undefined}
-            />
-          </div>
-        ) : (
-          <div className="space-y-4">
-            {orders.map((order) => (
-              <div key={order.id} className="bg-white rounded-2xl shadow-lg p-6 hover:shadow-xl transition">
-                <div className="flex items-start justify-between mb-4">
-                  <div>
-                    <div className="flex items-center gap-3 mb-2">
-                      <span className={`px-3 py-1 rounded-full text-sm font-bold ${getStatusColor(order.status)}`}>
-                        {getStatusLabel(order.status)}
-                      </span>
-                      <span className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-semibold">
-                        {order.service_type === 'express' ? 'Express (24h)' : 'Standard (48-72h)'}
-                      </span>
-                    </div>
-                    <p className="text-sm text-slate-500">
-                      Commande #{order.id.substring(0, 8).toUpperCase()}
-                    </p>
-                  </div>
-                  <div className="text-right">
-                    <div className="text-2xl font-black text-blue-600">{order.total_amount.toFixed(2)}€</div>
-                    <div className="text-sm text-slate-500">{order.weight_kg} kg</div>
-                  </div>
-                </div>
-
-                <div className="grid md:grid-cols-2 gap-4 mb-4 text-sm">
-                  <div>
-                    <p className="text-slate-500">Client</p>
-                    <p className="font-semibold text-slate-900">{order.users?.email || 'N/A'}</p>
-                  </div>
-                  <div>
-                    <p className="text-slate-500">Date</p>
-                    <p className="font-semibold text-slate-900">
-                      {new Date(order.created_at).toLocaleDateString('fr-FR', {
-                        day: 'numeric',
-                        month: 'long',
-                        year: 'numeric',
-                        hour: '2-digit',
-                        minute: '2-digit'
-                      })}
-                    </p>
-                  </div>
-                </div>
-
-                {order.status !== 'completed' && order.status !== 'cancelled' && getNextStatus(order.status) && (
-                  <div className="flex gap-3">
-                    <button
-                      onClick={() => setConfirmDialog({ 
-                        isOpen: true, 
-                        orderId: order.id, 
-                        action: getNextStatus(order.status) 
-                      })}
-                      className="flex-1 px-4 py-3 bg-gradient-to-r from-blue-600 to-cyan-600 text-white rounded-xl font-bold hover:shadow-xl transition"
-                    >
-                      Passer à : {getNextStatusLabel(order.status)}
-                    </button>
-                  </div>
-                )}
+        {/* Badge Promo */}
+        {hasPromo && promoData && (
+          <div className="bg-gradient-to-r from-green-600 to-emerald-600 rounded-2xl p-6 mb-6 text-white shadow-2xl">
+            <div className="flex flex-col md:flex-row items-center gap-4">
+              <div className="w-14 h-14 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center flex-shrink-0">
+                <Gift className="w-7 h-7" />
               </div>
-            ))}
+              <div className="flex-1 text-center md:text-left">
+                <p className="text-xl md:text-2xl font-black mb-1">
+                  🎉 Offre de lancement active !
+                </p>
+                <p className="text-green-100">
+                  <strong className="text-white">0€ de commission</strong> pendant encore{' '}
+                  <strong className="text-white text-lg">
+                    {promoService.getDaysRemaining(promoData.end_date)} jours
+                  </strong>
+                </p>
+              </div>
+              <div className="text-center bg-white/10 backdrop-blur-sm rounded-xl px-4 py-3">
+                <div className="flex items-center gap-2 text-sm text-green-100 mb-1">
+                  <Clock className="w-4 h-4" />
+                  <span>Expire le</span>
+                </div>
+                <p className="text-lg font-bold">
+                  {new Date(promoData.end_date).toLocaleDateString('fr-FR')}
+                </p>
+              </div>
+            </div>
           </div>
         )}
-      </div>
 
-      <ConfirmDialog
-        isOpen={confirmDialog.isOpen}
-        title="Confirmer le changement de statut"
-        message={`Êtes-vous sûr de vouloir changer le statut de cette commande vers "${confirmDialog.action ? getStatusLabel(confirmDialog.action) : ''}" ?`}
-        confirmLabel="Oui, confirmer"
-        cancelLabel="Annuler"
-        onConfirm={() => confirmDialog.orderId && confirmDialog.action && handleStatusChange(confirmDialog.orderId, confirmDialog.action)}
-        onCancel={() => setConfirmDialog({ isOpen: false, orderId: null, action: null })}
-      />
+        {/* Stats */}
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <div className="bg-white rounded-2xl p-6 shadow-lg">
+            <div className="flex items-center gap-4 mb-4">
+              <div className="w-12 h-12 bg-gradient-to-br from-blue-600 to-cyan-600 rounded-xl flex items-center justify-center">
+                <Package className="w-6 h-6 text-white" />
+              </div>
+              <div>
+                <p className="text-sm text-slate-600">Commandes totales</p>
+                <p className="text-3xl font-black text-slate-900">{stats.total}</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-2xl p-6 shadow-lg">
+            <div className="flex items-center gap-4 mb-4">
+              <div className="w-12 h-12 bg-gradient-to-br from-orange-600 to-red-600 rounded-xl flex items-center justify-center">
+                <Clock className="w-6 h-6 text-white" />
+              </div>
+              <div>
+                <p className="text-sm text-slate-600">En attente</p>
+                <p className="text-3xl font-black text-slate-900">{stats.pending}</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-2xl p-6 shadow-lg">
+            <div className="flex items-center gap-4 mb-4">
+              <div className="w-12 h-12 bg-gradient-to-br from-green-600 to-emerald-600 rounded-xl flex items-center justify-center">
+                <CheckCircle className="w-6 h-6 text-white" />
+              </div>
+              <div>
+                <p className="text-sm text-slate-600">Terminées</p>
+                <p className="text-3xl font-black text-slate-900">{stats.completed}</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-2xl p-6 shadow-lg">
+            <div className="flex items-center gap-4 mb-4">
+              <div className="w-12 h-12 bg-gradient-to-br from-purple-600 to-pink-600 rounded-xl flex items-center justify-center">
+                <TrendingUp className="w-6 h-6 text-white" />
+              </div>
+              <div>
+                <p className="text-sm text-slate-600">Chiffre d'affaires</p>
+                <p className="text-3xl font-black text-slate-900">{stats.revenue.toFixed(0)}€</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Commandes */}
+        <div className="bg-white rounded-3xl shadow-2xl p-8">
+          <h2 className="text-2xl font-black text-slate-900 mb-6">Commandes</h2>
+
+          {orders.length === 0 ? (
+            <EmptyState
+              icon={Package}
+              title="Aucune commande"
+              description="Vous n'avez pas encore reçu de commande. Elles apparaîtront ici."
+            />
+          ) : (
+            <div className="space-y-4">
+              {orders.map((order) => (
+                <div key={order.id} className="bg-slate-50 rounded-2xl p-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <div>
+                      <p className="font-bold text-lg text-slate-900">
+                        {order.weight_kg} kg • {order.service_type === 'express' ? 'Express 24h' : 'Standard 48-72h'}
+                      </p>
+                      <p className="text-sm text-slate-600">
+                        {new Date(order.created_at).toLocaleDateString('fr-FR')}
+                      </p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-2xl font-black text-blue-600">
+                        {order.total_amount.toFixed(2)}€
+                      </p>
+                      {hasPromo && order.status !== 'completed' && (
+                        <p className="text-xs text-green-600 font-semibold">
+                          0€ commission (promo active)
+                        </p>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="flex gap-2">
+                    {order.status === 'pending' && (
+                      <button
+                        onClick={() => handleStatusChange(order.id, 'in_progress')}
+                        className="px-4 py-2 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition"
+                      >
+                        Accepter
+                      </button>
+                    )}
+                    {order.status === 'in_progress' && (
+                      <button
+                        onClick={() => handleStatusChange(order.id, 'ready')}
+                        className="px-4 py-2 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 transition"
+                      >
+                        Marquer comme prêt
+                      </button>
+                    )}
+                    {order.status === 'ready' && (
+                      <button
+                        onClick={() => handleStatusChange(order.id, 'completed')}
+                        className="px-4 py-2 bg-purple-600 text-white rounded-lg font-semibold hover:bg-purple-700 transition"
+                      >
+                        Terminer
+                      </button>
+                    )}
+                    {order.status === 'completed' && (
+                      <div className="flex items-center gap-2 text-green-600 font-semibold">
+                        <CheckCircle className="w-5 h-5" />
+                        Terminé
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   );
 }
