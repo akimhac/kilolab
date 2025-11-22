@@ -1,128 +1,110 @@
 import Stripe from 'stripe';
-import { Handler } from '@netlify/functions';
 
-// Initialiser Stripe avec la clé secrète
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2024-12-18.acacia',
+  apiVersion: '2024-11-20.acacia'
 });
 
 interface CheckoutBody {
-  serviceType: 'standard' | 'express' | 'ultra';
-  weight: number;
   orderId: string;
+  amount: number;
+  partnerStripeAccountId?: string;
+  serviceType: string;
+  weightKg: number;
 }
 
-export const handler: Handler = async (event) => {
-  // CORS headers
+export async function handler(event: any) {
   const headers = {
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Headers': 'Content-Type',
-    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+    'Access-Control-Allow-Methods': 'POST, OPTIONS'
   };
 
-  // Handle OPTIONS preflight
   if (event.httpMethod === 'OPTIONS') {
-    return {
-      statusCode: 200,
-      headers,
-      body: '',
-    };
+    return { statusCode: 200, headers, body: '' };
   }
 
-  // Only allow POST
   if (event.httpMethod !== 'POST') {
     return {
       statusCode: 405,
       headers,
-      body: JSON.stringify({ error: 'Method not allowed' }),
+      body: JSON.stringify({ error: 'Method not allowed' })
     };
   }
 
   try {
-    // Parse request body
-    if (!event.body) {
-      throw new Error('Missing request body');
-    }
+    const body: CheckoutBody = JSON.parse(event.body);
+    const { orderId, amount, partnerStripeAccountId, serviceType, weightKg } = body;
 
-    const { serviceType, weight, orderId } = JSON.parse(event.body) as CheckoutBody;
-
-    // Validation
-    if (!serviceType || !weight || !orderId) {
+    if (!orderId || !amount) {
       return {
         statusCode: 400,
         headers,
-        body: JSON.stringify({ error: 'Missing required fields' }),
+        body: JSON.stringify({ error: 'Missing required fields' })
       };
     }
 
-    // Prix par kg selon la formule
-    const pricePerKg = {
-      standard: 5.00,
-      express: 10.00,
-      ultra: 15.00,
-    };
+    // Déterminer le prix unitaire selon le service
+    const pricePerKg = serviceType === 'express' ? 5.00 : 3.50;
+    const serviceLabel = serviceType === 'express' ? 'Express (24h)' : 'Standard (48-72h)';
 
-    const unitAmount = Math.round(pricePerKg[serviceType] * weight * 100); // en centimes
-
-    // Labels des formules
-    const serviceLabels = {
-      standard: 'Standard (72-96h)',
-      express: 'Express (24h)',
-      ultra: 'Ultra Express (6h)',
-    };
-
-    // Créer la session Stripe Checkout
+    // Créer session Stripe Checkout
     const session = await stripe.checkout.sessions.create({
-      mode: 'payment',
       payment_method_types: ['card'],
       line_items: [
         {
           price_data: {
             currency: 'eur',
             product_data: {
-              name: `Kilolab - ${serviceLabels[serviceType]}`,
-              description: `${weight} kg de linge`,
-              images: ['https://i.imgur.com/EHyR2nP.png'], // Logo KiloLab (optionnel)
+              name: `Pressing Kilolab - ${serviceLabel}`,
+              description: `${weightKg} kg de linge - Lavage, séchage et pliage professionnel`,
+              images: ['https://kilolab.fr/logo.png'],
             },
-            unit_amount: unitAmount,
+            unit_amount: Math.round(amount * 100), // Convertir en centimes
           },
           quantity: 1,
         },
       ],
-      // URLs de redirection
-      success_url: `${process.env.URL || 'http://localhost:5173'}/payment-success?session_id={CHECKOUT_SESSION_ID}&order_id=${orderId}`,
-      cancel_url: `${process.env.URL || 'http://localhost:5173'}/payment-cancelled?order_id=${orderId}`,
-      // Metadata pour traçabilité
+      mode: 'payment',
+      success_url: `${process.env.URL}/payment-success?session_id={CHECKOUT_SESSION_ID}&order_id=${orderId}`,
+      cancel_url: `${process.env.URL}/payment-cancel?order_id=${orderId}`,
+      customer_email: undefined, // Sera rempli par l'user
+      locale: 'fr',
       metadata: {
         orderId,
+        partnerStripeAccountId: partnerStripeAccountId || '',
         serviceType,
-        weight: weight.toString(),
+        weightKg: weightKg.toString(),
+        pricePerKg: pricePerKg.toString()
       },
-      // Collecter l'adresse email (optionnel si déjà connecté)
-      customer_email: undefined, // On pourrait passer l'email du user ici
-      // Mode de facturation
-      billing_address_collection: 'auto',
+      // Si le pressing a un compte Stripe Connect, split payment
+      ...(partnerStripeAccountId && {
+        payment_intent_data: {
+          application_fee_amount: Math.round(amount * 10), // 10% commission Kilolab
+          transfer_data: {
+            destination: partnerStripeAccountId,
+          },
+        },
+      }),
     });
 
-    // Retourner l'URL de checkout
+    console.log('✅ Session Stripe créée:', session.id);
+
     return {
       statusCode: 200,
       headers,
-      body: JSON.stringify({
-        url: session.url,
-        sessionId: session.id,
-      }),
+      body: JSON.stringify({ 
+        url: session.url, 
+        sessionId: session.id 
+      })
     };
   } catch (error: any) {
-    console.error('Stripe Checkout error:', error);
-
+    console.error('❌ Stripe error:', error);
     return {
       statusCode: 500,
       headers,
-      body: JSON.stringify({
-        error: 'Failed to create checkout session',
-        message: error.message,
-      }),
+      body: JSON.stringify({ 
+        error: error.message || 'Erreur lors de la création de la session'
+      })
     };
   }
-};
+}
