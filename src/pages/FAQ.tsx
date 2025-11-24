@@ -1,10 +1,20 @@
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Plus, Minus } from 'lucide-react';
 import { useState } from 'react';
+import SchemaOrg from '../components/SchemaOrg';
 
 export default function FAQ() {
   const navigate = useNavigate();
   const [openIndex, setOpenIndex] = useState<number | null>(0);
+  
+  const faqSchemaData = {
+  questions: faqs.flatMap(category => 
+    category.questions.map(q => ({
+      question: q.q,
+      answer: q.a
+    }))
+  )
+};
 
   const faqs = [
     {
@@ -106,7 +116,13 @@ export default function FAQ() {
           </button>
         </div>
       </nav>
-
+      
+    <SchemaOrg type="FAQPage" data={faqSchemaData} />
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white">
+      {/* ... reste du code ... */}
+    </div>
+  </>
+);
       {/* Hero */}
       <section className="py-20 px-4">
         <div className="max-w-4xl mx-auto text-center">
