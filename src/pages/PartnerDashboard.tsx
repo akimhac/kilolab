@@ -81,20 +81,27 @@ export default function PartnerDashboard() {
   };
 
   const handleStatusChange = async (orderId: string, newStatus: string) => {
-    try {
-      const { error } = await supabase
-        .from('orders')
-        .update({ status: newStatus })
-        .eq('id', orderId);
+  try {
+    const { error } = await supabase
+      .from('orders')
+      .update({ status: newStatus })
+      .eq('id', orderId);
 
-      if (error) throw error;
+    if (error) throw error;
 
-      toast.success('Statut mis à jour');
-      if (partner) loadPartnerData(partner.user_id || '');
-    } catch (error: any) {
-      toast.error('Erreur de mise à jour');
-    }
-  };
+    toast.success('Statut mis à jour');
+    
+    // Recharger les commandes
+    setOrders(prev => 
+      prev.map(order => 
+        order.id === orderId ? { ...order, status: newStatus } : order
+      )
+    );
+  } catch (error: any) {
+    console.error('Erreur:', error);
+    toast.error('Erreur de mise à jour');
+  }
+};
 
   if (loading) {
     return (
