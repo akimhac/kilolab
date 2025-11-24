@@ -18,6 +18,7 @@ import Pricing from './pages/Pricing';
 import Blog from './pages/Blog';
 import PaymentSuccess from './pages/PaymentSuccess';
 import PaymentCancel from './pages/PaymentCancel';
+import FAQ from './pages/FAQ';
 
 // Pages blog
 import VetementsDelicats from './pages/blog/VetementsDelicats';
@@ -54,6 +55,7 @@ export default function App() {
           
           {/* Blog */}
           <Route path="/blog/vetements-delicats" element={<VetementsDelicats />} />
+          <Route path="/faq" element={<FAQ />} />
           
           {/* Pages légales */}
           <Route path="/legal/cgu" element={<CGU />} />
