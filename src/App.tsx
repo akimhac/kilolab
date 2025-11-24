@@ -16,12 +16,10 @@ import About from './pages/About';
 import Contact from './pages/Contact';
 import Pricing from './pages/Pricing';
 import Blog from './pages/Blog';
+import VetementsDelicats from './pages/VetementsDelicats';
 import PaymentSuccess from './pages/PaymentSuccess';
 import PaymentCancel from './pages/PaymentCancel';
 import FAQ from './pages/FAQ';
-
-// Pages blog
-import VetementsDelicats from './pages/blog/VetementsDelicats';
 
 // Pages légales
 import CGU from './pages/legal/CGU';
@@ -47,15 +45,13 @@ export default function App() {
           <Route path="/about" element={<About />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/pricing" element={<Pricing />} />
+          <Route path="/faq" element={<FAQ />} />
           <Route path="/blog" element={<Blog />} />
+          <Route path="/blog/vetements-delicats" element={<VetementsDelicats />} />
           
           {/* Paiement */}
           <Route path="/payment-success" element={<PaymentSuccess />} />
           <Route path="/payment-cancel" element={<PaymentCancel />} />
-          
-          {/* Blog */}
-          <Route path="/blog/vetements-delicats" element={<VetementsDelicats />} />
-          <Route path="/faq" element={<FAQ />} />
           
           {/* Pages légales */}
           <Route path="/legal/cgu" element={<CGU />} />
