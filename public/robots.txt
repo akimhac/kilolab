@@ -1,4 +1,11 @@
 User-agent: *
 Allow: /
 
+# Bloquer pages privées
+Disallow: /client-dashboard
+Disallow: /partner-dashboard
+Disallow: /login
+Disallow: /signup
+
+# Sitemap
 Sitemap: https://kilolab.fr/sitemap.xml
