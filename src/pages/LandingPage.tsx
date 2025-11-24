@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowRight, Zap, Shield, Clock, Euro, Star, Users, MapPin, Sparkles, Award, TrendingUp, Leaf, Gift, CheckCircle } from 'lucide-react';
 import HowItWorksCarousel from '../components/HowItWorksCarousel';
+import PriceComparator from '../components/PriceComparator';
 import { useEffect, useState } from 'react';
 import { promoService } from '../services/promoService';
 
@@ -11,7 +12,7 @@ export default function LandingPage() {
 
   useEffect(() => {
     loadPromoStats();
-    const interval = setInterval(loadPromoStats, 60000); // Refresh chaque minute
+    const interval = setInterval(loadPromoStats, 60000);
     return () => clearInterval(interval);
   }, []);
 
@@ -119,6 +120,9 @@ export default function LandingPage() {
                 <button onClick={() => navigate('/pricing')} className="text-slate-600 hover:text-blue-600 font-semibold transition text-sm">
                   Tarifs
                 </button>
+                <button onClick={() => navigate('/faq')} className="text-slate-600 hover:text-blue-600 font-semibold transition text-sm">
+                  FAQ
+                </button>
                 <button onClick={() => navigate('/about')} className="text-slate-600 hover:text-blue-600 font-semibold transition text-sm">
                   À propos
                 </button>
@@ -145,7 +149,7 @@ export default function LandingPage() {
         </div>
       </nav>
 
-      {/* Hero Section - COMPACTE */}
+      {/* Hero Section */}
       <section className="pt-24 pb-12 px-4">
         <div className="max-w-7xl mx-auto">
           <div className="grid lg:grid-cols-2 gap-8 items-center">
@@ -229,7 +233,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Stats Section - COMPACTE */}
+      {/* Stats Section */}
       <section className="py-12 bg-gradient-to-r from-blue-600 to-cyan-600">
         <div className="max-w-7xl mx-auto px-4">
           <div className="grid md:grid-cols-3 gap-6 text-center text-white">
@@ -249,8 +253,15 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Section Pourquoi Kilolab - COMPACTE */}
+      {/* Comparateur Prix - NOUVEAU */}
       <section className="py-12 px-4 bg-white">
+        <div className="max-w-5xl mx-auto">
+          <PriceComparator />
+        </div>
+      </section>
+
+      {/* Section Pourquoi Kilolab */}
+      <section className="py-12 px-4 bg-gradient-to-br from-slate-50 to-blue-50">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-10">
             <h2 className="text-3xl md:text-4xl font-black text-slate-900 mb-3">
@@ -269,7 +280,7 @@ export default function LandingPage() {
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.4, delay: index * 0.05 }}
                 viewport={{ once: true }}
-                className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-xl p-4 hover:shadow-lg transition"
+                className="bg-white rounded-xl p-4 hover:shadow-lg transition"
               >
                 <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-cyan-600 rounded-lg flex items-center justify-center mb-3">
                   <item.icon className="w-5 h-5 text-white" />
@@ -359,7 +370,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Features - COMPACTE */}
+      {/* Features */}
       <section className="py-12 px-4 bg-gradient-to-br from-slate-50 to-blue-50">
         <div className="max-w-7xl mx-auto">
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -383,7 +394,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Testimonials - COMPACTE */}
+      {/* Testimonials */}
       <section className="py-12 px-4 bg-white">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-8">
@@ -420,7 +431,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* CTA Final - COMPACTE */}
+      {/* CTA Final */}
       <section className="py-12 px-4 bg-gradient-to-r from-blue-600 to-cyan-600">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-3xl md:text-4xl font-black text-white mb-4">
@@ -439,7 +450,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Footer - COMPACTE */}
+      {/* Footer */}
       <footer className="bg-slate-900 text-white py-10">
         <div className="max-w-7xl mx-auto px-4">
           <div className="grid md:grid-cols-4 gap-8 mb-8">
@@ -456,6 +467,7 @@ export default function LandingPage() {
               <ul className="space-y-2 text-sm text-slate-400">
                 <li><button onClick={() => navigate('/partners-map')} className="hover:text-white transition">Trouver un pressing</button></li>
                 <li><button onClick={() => navigate('/pricing')} className="hover:text-white transition">Tarifs</button></li>
+                <li><button onClick={() => navigate('/faq')} className="hover:text-white transition">FAQ</button></li>
                 <li><button onClick={() => navigate('/become-partner')} className="hover:text-white transition">Devenir partenaire</button></li>
               </ul>
             </div>
