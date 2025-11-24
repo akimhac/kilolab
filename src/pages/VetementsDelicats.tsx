@@ -1,8 +1,14 @@
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Sparkles, AlertCircle, CheckCircle, XCircle } from 'lucide-react';
+import { analytics } from '../../utils/analytics';
 
 export default function VetementsDelicats() {
   const navigate = useNavigate();
+
+  useEffect(() => {
+    analytics.pageView('/blog/vetements-delicats');
+  }, []);
 
   return (
     <div className="min-h-screen bg-white">
@@ -31,11 +37,11 @@ export default function VetementsDelicats() {
           <span>•</span>
           <span>15 min de lecture</span>
           <span>•</span>
-          <span>Mars 2025</span>
+          <span>Novembre 2024</span>
         </div>
 
         <img 
-          src="https://images.unsplash.com/photo-1489274495757-95c7c837b101?w=1200&q=80" 
+          src="https://images.unsplash.com/photo-1489274495757-95c7c837b101?w=800&q=75&auto=format" 
           alt="Vêtements délicats"
           className="w-full h-96 object-cover rounded-2xl mb-8"
         />
@@ -194,8 +200,8 @@ export default function VetementsDelicats() {
             <div className="bg-white rounded-lg p-4 border-2 border-blue-300">
               <p className="font-bold text-slate-900 mb-2">💡 Astuce Pro :</p>
               <p className="text-slate-700">
-                Lavez votre cachemire <strong>maximum 2 fois/hiver</strong>. Entre deux, aérez-le 24h et brossez-le. 
-                Pour les pièces exceptionnelles (>300€), pressing spécialisé recommandé.
+                Lavez votre cachemire <strong>maximum 2 fois par hiver</strong>. Entre deux, aérez-le 24h et brossez-le. 
+                Pour les pièces exceptionnelles (plus de 300€), pressing spécialisé recommandé.
               </p>
             </div>
           </div>
@@ -232,7 +238,7 @@ export default function VetementsDelicats() {
                 </h4>
                 <ul className="space-y-2 text-slate-700">
                   <li>✗ Programme coton (trop agressif)</li>
-                  <li>✗ Température >30°C</li>
+                  <li>✗ Température supérieure à 30°C</li>
                   <li>✗ Sèche-linge</li>
                   <li>✗ Eau de javel</li>
                 </ul>
@@ -353,37 +359,6 @@ export default function VetementsDelicats() {
             </div>
           </div>
 
-          <h2 className="text-3xl font-bold text-slate-900 mt-12 mb-6">
-            📋 Checklist : Votre routine d'entretien parfaite
-          </h2>
-
-          <div className="bg-slate-50 rounded-xl p-6 mb-8">
-            <h3 className="font-bold text-slate-900 mb-4">Après chaque port :</h3>
-            <ul className="space-y-2 text-slate-700">
-              <li>☐ Inspecter les taches (traiter immédiatement)</li>
-              <li>☐ Aérer 24h près d'une fenêtre</li>
-              <li>☐ Brosser (laine, cachemire)</li>
-              <li>☐ Ranger correctement (plié ou cintre adapté)</li>
-            </ul>
-
-            <h3 className="font-bold text-slate-900 mt-6 mb-4">Avant lavage :</h3>
-            <ul className="space-y-2 text-slate-700">
-              <li>☐ Lire l'étiquette d'entretien</li>
-              <li>☐ Trier par couleur ET par matière</li>
-              <li>☐ Fermer zips et boutons</li>
-              <li>☐ Retourner les vêtements fragiles</li>
-              <li>☐ Utiliser filets de lavage</li>
-            </ul>
-
-            <h3 className="font-bold text-slate-900 mt-6 mb-4">Après lavage :</h3>
-            <ul className="space-y-2 text-slate-700">
-              <li>☐ Sortir IMMÉDIATEMENT de la machine</li>
-              <li>☐ Remettre en forme pendant le séchage</li>
-              <li>☐ Sécher à plat (délicat) ou cintre (normal)</li>
-              <li>☐ Ranger uniquement quand TOTALEMENT sec</li>
-            </ul>
-          </div>
-
           <div className="bg-gradient-to-r from-orange-50 to-red-50 rounded-2xl p-8 text-center border-2 border-orange-300">
             <h3 className="text-2xl font-bold text-slate-900 mb-4">
               Vos vêtements de luxe méritent le meilleur
@@ -393,7 +368,13 @@ export default function VetementsDelicats() {
               Kilolab sélectionne les meilleurs pressings pour un entretien expert.
             </p>
             <button
-              onClick={() => navigate('/partners-map')}
+              onClick={() => {
+                analytics.trackEvent('cta_clicked', {
+                  location: 'blog_vetements_delicats',
+                  cta_text: 'Trouver un pressing'
+                });
+                navigate('/partners-map');
+              }}
               className="px-8 py-4 bg-gradient-to-r from-blue-600 to-cyan-600 text-white rounded-xl font-bold text-lg hover:shadow-xl transition"
             >
               Trouver un pressing près de chez moi
