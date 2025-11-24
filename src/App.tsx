@@ -3,7 +3,7 @@ import { Toaster } from 'react-hot-toast';
 import { HelmetProvider } from 'react-helmet-async';
 import GoogleTagManager from './components/GoogleTagManager';
 
-// Pages
+// Pages principales
 import LandingPage from './pages/LandingPage';
 import PartnersMap from './pages/PartnersMap';
 import NewOrder from './pages/NewOrder';
@@ -16,9 +16,11 @@ import About from './pages/About';
 import Contact from './pages/Contact';
 import Pricing from './pages/Pricing';
 import Blog from './pages/Blog';
-import VetementsDelicats from './pages/blog/VetementsDelicats';
 import PaymentSuccess from './pages/PaymentSuccess';
 import PaymentCancel from './pages/PaymentCancel';
+
+// Pages blog
+import VetementsDelicats from './pages/blog/VetementsDelicats';
 
 // Pages légales
 import CGU from './pages/legal/CGU';
@@ -45,11 +47,13 @@ export default function App() {
           <Route path="/contact" element={<Contact />} />
           <Route path="/pricing" element={<Pricing />} />
           <Route path="/blog" element={<Blog />} />
-          <Route path="/blog/vetements-delicats" element={<VetementsDelicats />} />
           
           {/* Paiement */}
           <Route path="/payment-success" element={<PaymentSuccess />} />
           <Route path="/payment-cancel" element={<PaymentCancel />} />
+          
+          {/* Blog */}
+          <Route path="/blog/vetements-delicats" element={<VetementsDelicats />} />
           
           {/* Pages légales */}
           <Route path="/legal/cgu" element={<CGU />} />
