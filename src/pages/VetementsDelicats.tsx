@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Sparkles, AlertCircle, CheckCircle, XCircle } from 'lucide-react';
-import { analytics } from '../../analytics';
+import { analytics } from '../analytics';
 
 export default function VetementsDelicats() {
   const navigate = useNavigate();
