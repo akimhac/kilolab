@@ -5,6 +5,7 @@ import HowItWorksCarousel from '../components/HowItWorksCarousel';
 import PriceComparator from '../components/PriceComparator';
 import { useEffect, useState } from 'react';
 import { promoService } from '../services/promoService';
+import SchemaOrg from '../components/SchemaOrg';
 
 export default function LandingPage() {
   const navigate = useNavigate();
@@ -104,6 +105,12 @@ export default function LandingPage() {
   ];
 
   return (
+        <SchemaOrg type="Organization" />
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-cyan-50">
+      {/* ... reste du code ... */}
+    </div>
+  </>
+);
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-cyan-50">
       {/* Navigation */}
       <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-lg border-b border-slate-200">
