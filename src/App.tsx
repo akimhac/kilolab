@@ -20,6 +20,8 @@ import VetementsDelicats from './pages/VetementsDelicats';
 import PaymentSuccess from './pages/PaymentSuccess';
 import PaymentCancel from './pages/PaymentCancel';
 import FAQ from './pages/FAQ';
+import UserProfile from './pages/UserProfile';
+import OrderTracking from './pages/OrderTracking';
 
 // Pages légales
 import CGU from './pages/legal/CGU';
@@ -48,6 +50,8 @@ export default function App() {
           <Route path="/faq" element={<FAQ />} />
           <Route path="/blog" element={<Blog />} />
           <Route path="/blog/vetements-delicats" element={<VetementsDelicats />} />
+          <Route path="/profile" element={<UserProfile />} />
+          <Route path="/order/:orderId" element={<OrderTracking />} />
           
           {/* Paiement */}
           <Route path="/payment-success" element={<PaymentSuccess />} />
