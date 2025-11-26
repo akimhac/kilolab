@@ -42,7 +42,7 @@ export default function LandingPage() {
     },
     {
       icon: MapPin,
-      title: '2600+ points relais',
+      title: '1854 points relais',
       description: 'Trouvez un pressing près de chez vous'
     },
     {
@@ -121,7 +121,7 @@ export default function LandingPage() {
                   Kilolab
                 </button>
                 <div className="hidden md:flex items-center gap-6">
-                  <button onClick={() => navigate('/partners-map')} className="text-slate-600 hover:text-blue-600 font-semibold transition text-sm">
+                  <button onClick={() => navigate('/about')} className="text-slate-600 hover:text-blue-600 font-semibold transition text-sm">
                     Comment ça marche
                   </button>
                   <button onClick={() => navigate('/pricing')} className="text-slate-600 hover:text-blue-600 font-semibold transition text-sm">
@@ -167,18 +167,21 @@ export default function LandingPage() {
               >
                 <div className="inline-flex items-center gap-2 bg-blue-100 text-blue-700 px-3 py-1 rounded-full font-semibold text-xs mb-4">
                   <Zap className="w-3 h-3" />
-                  2600+ pressings partenaires
+                  1854 pressings partenaires
                 </div>
 
                 <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-slate-900 leading-tight mb-4">
-                  Le pressing
-                  <span className="block bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">
-                    nouvelle génération.
+                  <span className="block text-center lg:text-left">Le pressing</span>
+                  <span className="block text-center lg:text-left bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">
+                    nouvelle
                   </span>
-                  <span className="block text-3xl md:text-4xl">Au kilo. Sans effort.</span>
+                  <span className="block text-center lg:text-left bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">
+                    génération.
+                  </span>
+                  <span className="block text-center lg:text-left text-3xl md:text-4xl mt-2">Au kilo. Sans effort.</span>
                 </h1>
 
-                <p className="text-lg md:text-xl text-slate-600 mb-4 leading-relaxed">
+                <p className="text-lg md:text-xl text-slate-600 mb-4 leading-relaxed text-center lg:text-left">
                   Déposez votre linge en point relais, récupérez-le impeccable en 24h. 
                   <strong className="text-slate-900"> Vous gagnez du temps</strong>.
                 </p>
@@ -216,7 +219,7 @@ export default function LandingPage() {
                   </button>
                 </div>
 
-                <div className="flex flex-wrap gap-4 text-xs">
+                <div className="flex flex-wrap gap-4 text-xs justify-center lg:justify-start">
                   <div className="flex items-center gap-1 text-slate-600">
                     <div className="w-1.5 h-1.5 bg-green-500 rounded-full"></div>
                     <span className="font-semibold">Pressings vérifiés</span>
@@ -245,7 +248,7 @@ export default function LandingPage() {
           <div className="max-w-7xl mx-auto px-4">
             <div className="grid md:grid-cols-3 gap-6 text-center text-white">
               <div>
-                <div className="text-4xl font-black mb-1">2600+</div>
+                <div className="text-4xl font-black mb-1">1854</div>
                 <p className="text-blue-100 text-sm">Pressings en France & Belgique</p>
               </div>
               <div>
@@ -322,26 +325,21 @@ export default function LandingPage() {
             </h2>
             
             <p className="text-xl text-green-100 mb-6">
-              Rejoignez les {100 - promoStats.remainingSlots} premiers pressings inscrits
+              Offre limitée aux 100 premiers pressings
             </p>
 
             <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 mb-6">
-              <div className="flex items-center justify-center gap-8 mb-4">
+              <div className="flex items-center justify-center mb-4">
                 <div>
-                  <p className="text-4xl font-black mb-1">{promoStats.freeMonthCount}</p>
-                  <p className="text-green-100 text-sm">Inscrits</p>
-                </div>
-                <div className="w-px h-16 bg-white/20"></div>
-                <div>
-                  <p className="text-4xl font-black mb-1 text-yellow-300">{promoStats.remainingSlots}</p>
-                  <p className="text-green-100 text-sm">Places restantes</p>
+                  <p className="text-5xl font-black mb-1 text-yellow-300">{promoStats.remainingSlots}</p>
+                  <p className="text-green-100 text-lg">Places restantes</p>
                 </div>
               </div>
               
               <div className="w-full bg-white/20 rounded-full h-3 mb-3">
                 <div 
                   className="bg-white rounded-full h-3 transition-all duration-500"
-                  style={{ width: `${promoStats.freeMonthCount}%` }}
+                  style={{ width: `${100 - promoStats.remainingSlots}%` }}
                 ></div>
               </div>
               
