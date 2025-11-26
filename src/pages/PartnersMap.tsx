@@ -65,7 +65,25 @@ export default function PartnersMap() {
         .order('name');
 
       if (error) throw error;
-      setPartners(data || []);
+      
+      // ⚠️ FILTRER LES PARTNERS SANS COORDONNÉES VALIDES
+      const validPartners = (data || []).filter(partner => 
+        partner.latitude != null && 
+        partner.longitude != null &&
+        !isNaN(partner.latitude) &&
+        !isNaN(partner.longitude) &&
+        partner.latitude !== 0 &&
+        partner.longitude !== 0
+      );
+      
+      // Log pour debug
+      console.log(`📍 ${validPartners.length} pressings valides sur ${data?.length || 0}`);
+      
+      if (validPartners.length < (data?.length || 0)) {
+        console.warn(`⚠️ ${(data?.length || 0) - validPartners.length} pressings sans coordonnées ignorés`);
+      }
+      
+      setPartners(validPartners);
     } catch (error: any) {
       console.error('Erreur chargement pressings:', error);
       toast.error('Erreur de chargement des pressings');
