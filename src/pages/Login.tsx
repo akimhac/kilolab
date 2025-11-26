@@ -148,7 +148,7 @@ export default function Login() {
 
           <div className="mt-4 text-center">
             <button
-              onClick={() => toast.info('Fonctionnalité bientôt disponible')}
+              onClick={() => toast('Fonctionnalité bientôt disponible', { icon: 'ℹ️' })}
               className="text-sm text-slate-500 hover:text-slate-700"
             >
               Mot de passe oublié ?
