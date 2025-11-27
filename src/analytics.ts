@@ -1,239 +1,338 @@
-// Google Tag Manager & Analytics tracking
-
 declare global {
   interface Window {
+    gtag: (...args: any[]) => void;
     dataLayer: any[];
   }
 }
 
-export const analytics = {
-  // Page view
-  pageView: (path: string) => {
-    if (typeof window !== 'undefined' && window.dataLayer) {
-      window.dataLayer.push({
-        event: 'page_view',
-        page_path: path,
-        page_title: document.title
-      });
-    }
-  },
+// ID Google Analytics - À remplacer par ton ID
+const GA_MEASUREMENT_ID = 'G-XXXXXXXXXX';
 
-  // Commande créée
-  orderCreated: (orderId: string, amount: number, serviceType: string) => {
-    if (typeof window !== 'undefined' && window.dataLayer) {
-      window.dataLayer.push({
-        event: 'order_created',
-        order_id: orderId,
-        value: amount,
-        service_type: serviceType
-      });
-    }
-  },
+// ============================================
+// INITIALISATION
+// ============================================
 
-  // Paiement réussi
-  paymentSuccess: (orderId: string, amount: number) => {
-    if (typeof window !== 'undefined' && window.dataLayer) {
-      window.dataLayer.push({
-        event: 'purchase',
-        transaction_id: orderId,
-        value: amount,
-        currency: 'EUR'
-      });
-    }
-  },
+export function initializeGA(): void {
+  // Ajouter le script GA
+  const script = document.createElement('script');
+  script.async = true;
+  script.src = `https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`;
+  document.head.appendChild(script);
 
-  // Pressing consulté
-  partnerViewed: (partnerId: string, partnerName: string) => {
-    if (typeof window !== 'undefined' && window.dataLayer) {
-      window.dataLayer.push({
-        event: 'partner_viewed',
-        partner_id: partnerId,
-        partner_name: partnerName
-      });
-    }
-  },
+  // Initialiser dataLayer
+  window.dataLayer = window.dataLayer || [];
+  window.gtag = function gtag() {
+    window.dataLayer.push(arguments);
+  };
 
-  // Inscription pressing
-  partnerSignup: (partnerEmail: string) => {
-    if (typeof window !== 'undefined' && window.dataLayer) {
-      window.dataLayer.push({
-        event: 'partner_signup',
-        partner_email: partnerEmail
-      });
-    }
-  },
+  window.gtag('js', new Date());
+  window.gtag('config', GA_MEASUREMENT_ID, {
+    page_path: window.location.pathname,
+    cookie_flags: 'SameSite=None;Secure',
+    anonymize_ip: true // RGPD
+  });
 
-  // CTA cliqué
-  ctaClicked: (location: string, ctaText: string) => {
-    if (typeof window !== 'undefined' && window.dataLayer) {
-      window.dataLayer.push({
-        event: 'cta_clicked',
-        cta_location: location,
-        cta_text: ctaText
-      });
-    }
-  },
+  console.log('✅ Google Analytics initialisé');
+}
 
-  // Contact form soumis
-  contactFormSubmitted: (name: string, email: string) => {
-    if (typeof window !== 'undefined' && window.dataLayer) {
-      window.dataLayer.push({
-        event: 'contact_form_submitted',
-        contact_name: name,
-        contact_email: email
-      });
-    }
-  },
+// ============================================
+// TRACKING DE PAGES
+// ============================================
 
-  // Newsletter inscription
-  newsletterSubscribed: (email: string) => {
-    if (typeof window !== 'undefined' && window.dataLayer) {
-      window.dataLayer.push({
-        event: 'newsletter_subscribed',
-        newsletter_email: email
-      });
-    }
-  },
+export function trackPageView(path: string, title?: string): void {
+  if (!window.gtag) return;
 
-  // Recherche effectuée
-  searchPerformed: (query: string, resultsCount: number) => {
-    if (typeof window !== 'undefined' && window.dataLayer) {
-      window.dataLayer.push({
-        event: 'search',
-        search_term: query,
-        results_count: resultsCount
-      });
-    }
-  },
+  window.gtag('config', GA_MEASUREMENT_ID, {
+    page_path: path,
+    page_title: title || document.title
+  });
+}
 
-  // Event générique - AJOUT DE LA MÉTHODE MANQUANTE
-  trackEvent: (eventName: string, eventParams?: Record<string, any>) => {
-    if (typeof window !== 'undefined' && window.dataLayer) {
-      window.dataLayer.push({
-        event: eventName,
-        ...eventParams
-      });
-    }
-  },
+// ============================================
+// ÉVÉNEMENTS E-COMMERCE
+// ============================================
 
-  // Login
-  userLogin: (userId: string, method: string) => {
-    if (typeof window !== 'undefined' && window.dataLayer) {
-      window.dataLayer.push({
-        event: 'login',
-        user_id: userId,
-        method: method
-      });
-    }
-  },
+// Voir un pressing
+export function trackViewPartner(partner: {
+  id: string;
+  name: string;
+  city: string;
+  price?: number;
+}): void {
+  if (!window.gtag) return;
 
-  // Signup
-  userSignup: (userId: string, method: string) => {
-    if (typeof window !== 'undefined' && window.dataLayer) {
-      window.dataLayer.push({
-        event: 'sign_up',
-        user_id: userId,
-        method: method
-      });
-    }
-  },
+  window.gtag('event', 'view_item', {
+    currency: 'EUR',
+    value: partner.price || 0,
+    items: [{
+      item_id: partner.id,
+      item_name: partner.name,
+      item_category: 'pressing',
+      item_category2: partner.city,
+      price: partner.price || 0
+    }]
+  });
+}
 
-  // FAQ question ouverte
-  faqQuestionOpened: (question: string, category: string) => {
-    if (typeof window !== 'undefined' && window.dataLayer) {
-      window.dataLayer.push({
-        event: 'faq_question_opened',
-        question_text: question,
-        question_category: category
-      });
-    }
-  },
+// Commencer une commande
+export function trackBeginCheckout(order: {
+  id: string;
+  partnerId: string;
+  partnerName: string;
+  weight: number;
+  serviceType: string;
+  total: number;
+}): void {
+  if (!window.gtag) return;
 
-  // Blog article lu
-  blogArticleRead: (articleTitle: string, articleId: string) => {
-    if (typeof window !== 'undefined' && window.dataLayer) {
-      window.dataLayer.push({
-        event: 'blog_article_read',
-        article_title: articleTitle,
-        article_id: articleId
-      });
-    }
-  },
+  window.gtag('event', 'begin_checkout', {
+    currency: 'EUR',
+    value: order.total,
+    items: [{
+      item_id: order.partnerId,
+      item_name: order.partnerName,
+      item_category: 'pressing',
+      item_variant: order.serviceType,
+      quantity: order.weight,
+      price: order.total / order.weight
+    }]
+  });
+}
 
-  // Erreur rencontrée
-  errorOccurred: (errorMessage: string, errorLocation: string) => {
-    if (typeof window !== 'undefined' && window.dataLayer) {
-      window.dataLayer.push({
-        event: 'error',
-        error_message: errorMessage,
-        error_location: errorLocation
-      });
-    }
-  },
+// Commande confirmée
+export function trackPurchase(order: {
+  id: string;
+  partnerId: string;
+  partnerName: string;
+  weight: number;
+  serviceType: string;
+  total: number;
+}): void {
+  if (!window.gtag) return;
 
-  // Filter appliqué (carte des pressings)
-  filterApplied: (filterType: string, filterValue: string) => {
-    if (typeof window !== 'undefined' && window.dataLayer) {
-      window.dataLayer.push({
-        event: 'filter_applied',
-        filter_type: filterType,
-        filter_value: filterValue
-      });
-    }
-  },
+  window.gtag('event', 'purchase', {
+    transaction_id: order.id,
+    currency: 'EUR',
+    value: order.total,
+    items: [{
+      item_id: order.partnerId,
+      item_name: order.partnerName,
+      item_category: 'pressing',
+      item_variant: order.serviceType,
+      quantity: order.weight,
+      price: order.total / order.weight
+    }]
+  });
+}
 
-  // Avis laissé
-  reviewSubmitted: (rating: number, orderId: string) => {
-    if (typeof window !== 'undefined' && window.dataLayer) {
-      window.dataLayer.push({
-        event: 'review_submitted',
-        rating: rating,
-        order_id: orderId
-      });
-    }
-  },
+// ============================================
+// ÉVÉNEMENTS UTILISATEUR
+// ============================================
 
-  // Partage social
-  socialShare: (platform: string, content: string) => {
-    if (typeof window !== 'undefined' && window.dataLayer) {
-      window.dataLayer.push({
-        event: 'social_share',
-        platform: platform,
-        content: content
-      });
-    }
-  },
+// Inscription
+export function trackSignUp(method: string = 'email'): void {
+  if (!window.gtag) return;
 
-  // Téléchargement
-  fileDownloaded: (fileName: string, fileType: string) => {
-    if (typeof window !== 'undefined' && window.dataLayer) {
-      window.dataLayer.push({
-        event: 'file_download',
-        file_name: fileName,
-        file_type: fileType
-      });
-    }
-  },
+  window.gtag('event', 'sign_up', {
+    method
+  });
+}
 
-  // Vidéo lue
-  videoPlayed: (videoTitle: string, videoId: string) => {
-    if (typeof window !== 'undefined' && window.dataLayer) {
-      window.dataLayer.push({
-        event: 'video_play',
-        video_title: videoTitle,
-        video_id: videoId
-      });
-    }
-  },
+// Connexion
+export function trackLogin(method: string = 'email'): void {
+  if (!window.gtag) return;
 
-  // Temps passé sur page
-  timeOnPage: (pagePath: string, timeSeconds: number) => {
-    if (typeof window !== 'undefined' && window.dataLayer) {
-      window.dataLayer.push({
-        event: 'time_on_page',
-        page_path: pagePath,
-        time_seconds: timeSeconds
-      });
-    }
-  }
+  window.gtag('event', 'login', {
+    method
+  });
+}
+
+// Inscription partenaire
+export function trackPartnerSignup(partner: {
+  city: string;
+  postalCode: string;
+}): void {
+  if (!window.gtag) return;
+
+  window.gtag('event', 'generate_lead', {
+    currency: 'EUR',
+    value: 0,
+    event_category: 'partner',
+    event_label: partner.city
+  });
+}
+
+// ============================================
+// ÉVÉNEMENTS ENGAGEMENT
+// ============================================
+
+// Recherche
+export function trackSearch(searchTerm: string, resultsCount: number): void {
+  if (!window.gtag) return;
+
+  window.gtag('event', 'search', {
+    search_term: searchTerm,
+    results_count: resultsCount
+  });
+}
+
+// Filtre utilisé
+export function trackFilter(filterType: string, filterValue: string): void {
+  if (!window.gtag) return;
+
+  window.gtag('event', 'filter', {
+    filter_type: filterType,
+    filter_value: filterValue
+  });
+}
+
+// Géolocalisation
+export function trackGeolocation(success: boolean): void {
+  if (!window.gtag) return;
+
+  window.gtag('event', 'geolocation', {
+    success,
+    event_category: 'engagement'
+  });
+}
+
+// Contact
+export function trackContact(type: 'form' | 'phone' | 'email'): void {
+  if (!window.gtag) return;
+
+  window.gtag('event', 'contact', {
+    contact_type: type,
+    event_category: 'engagement'
+  });
+}
+
+// Partage
+export function trackShare(method: string, contentType: string, itemId: string): void {
+  if (!window.gtag) return;
+
+  window.gtag('event', 'share', {
+    method,
+    content_type: contentType,
+    item_id: itemId
+  });
+}
+
+// Avis laissé
+export function trackReview(rating: number, partnerId: string): void {
+  if (!window.gtag) return;
+
+  window.gtag('event', 'review', {
+    rating,
+    partner_id: partnerId,
+    event_category: 'engagement'
+  });
+}
+
+// QR Code scanné/téléchargé
+export function trackQRCode(action: 'view' | 'download' | 'scan', orderId: string): void {
+  if (!window.gtag) return;
+
+  window.gtag('event', 'qr_code', {
+    action,
+    order_id: orderId,
+    event_category: 'engagement'
+  });
+}
+
+// Parrainage
+export function trackReferral(action: 'share' | 'apply', code: string): void {
+  if (!window.gtag) return;
+
+  window.gtag('event', 'referral', {
+    action,
+    referral_code: code,
+    event_category: 'acquisition'
+  });
+}
+
+// ============================================
+// ÉVÉNEMENTS PERSONNALISÉS
+// ============================================
+
+export function trackCustomEvent(
+  eventName: string, 
+  params?: Record<string, any>
+): void {
+  if (!window.gtag) return;
+
+  window.gtag('event', eventName, params);
+}
+
+// ============================================
+// DÉFINIR L'UTILISATEUR
+// ============================================
+
+export function setUserId(userId: string): void {
+  if (!window.gtag) return;
+
+  window.gtag('config', GA_MEASUREMENT_ID, {
+    user_id: userId
+  });
+}
+
+export function setUserProperties(properties: {
+  user_type?: 'client' | 'partner' | 'admin';
+  city?: string;
+  orders_count?: number;
+}): void {
+  if (!window.gtag) return;
+
+  window.gtag('set', 'user_properties', properties);
+}
+
+// ============================================
+// CONSENTEMENT RGPD
+// ============================================
+
+export function updateConsent(granted: boolean): void {
+  if (!window.gtag) return;
+
+  window.gtag('consent', 'update', {
+    analytics_storage: granted ? 'granted' : 'denied',
+    ad_storage: granted ? 'granted' : 'denied'
+  });
+}
+
+// Initialisation par défaut (consentement refusé)
+export function initConsentMode(): void {
+  if (!window.gtag) return;
+
+  window.gtag('consent', 'default', {
+    analytics_storage: 'denied',
+    ad_storage: 'denied',
+    wait_for_update: 500
+  });
+}
+
+// ============================================
+// EXPORT PAR DÉFAUT
+// ============================================
+
+export default {
+  initializeGA,
+  trackPageView,
+  trackViewPartner,
+  trackBeginCheckout,
+  trackPurchase,
+  trackSignUp,
+  trackLogin,
+  trackPartnerSignup,
+  trackSearch,
+  trackFilter,
+  trackGeolocation,
+  trackContact,
+  trackShare,
+  trackReview,
+  trackQRCode,
+  trackReferral,
+  trackCustomEvent,
+  setUserId,
+  setUserProperties,
+  updateConsent,
+  initConsentMode
 };
