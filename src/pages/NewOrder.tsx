@@ -1,316 +1,381 @@
+// src/pages/NewOrder.tsx
+// Page de création de commande - CORRIGÉE
+
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
-import { ArrowLeft, Package, Clock, Euro, CreditCard, Zap, Shield, CheckCircle } from 'lucide-react';
+import { 
+  ArrowLeft, Package, Zap, MapPin, Phone, Euro, 
+  Minus, Plus, Calendar, Clock, CheckCircle, Loader2,
+  AlertCircle, Search
+} from 'lucide-react';
 import toast from 'react-hot-toast';
-import LoadingButton from '../components/LoadingButton';
 
 interface Partner {
   id: string;
   name: string;
   address: string;
   city: string;
-  email: string;
-  is_active: boolean;
-  stripe_account_id?: string;
+  postal_code: string;
+  phone?: string;
+  price_per_kg?: number;
 }
 
 export default function NewOrder() {
   const navigate = useNavigate();
   const location = useLocation();
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
   const [user, setUser] = useState<any>(null);
   const [partner, setPartner] = useState<Partner | null>(null);
-  const [weightKg, setWeightKg] = useState<number>(5);
+  const [noPartnerSelected, setNoPartnerSelected] = useState(false);
+  
+  // Données de commande
   const [serviceType, setServiceType] = useState<'standard' | 'express'>('standard');
+  const [weightKg, setWeightKg] = useState(5);
+  const [notes, setNotes] = useState('');
 
-  const servicePrices = {
-    standard: 3.50,
-    express: 5.00
-  };
+  const pricePerKg = serviceType === 'express' ? 5 : 3.5;
+  const totalAmount = weightKg * pricePerKg;
 
   useEffect(() => {
-    checkAuth();
-    loadPartner();
+    checkAuthAndLoadData();
   }, []);
 
-  const checkAuth = async () => {
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session) {
-      navigate('/login', { state: { from: '/new-order' } });
-      return;
-    }
-    setUser(session.user);
-  };
-
-  const loadPartner = () => {
-    const state = location.state as any;
-    if (state?.partner) {
-      setPartner(state.partner);
-    } else {
-      toast.error('Aucun pressing sélectionné');
-      setTimeout(() => navigate('/partners-map'), 2000);
-    }
-  };
-
-  const calculateTotal = () => {
-    return weightKg * servicePrices[serviceType];
-  };
-
-  const handleCreateOrder = async () => {
-    if (!user || !partner) {
-      toast.error('Informations manquantes');
-      return;
-    }
-
-    if (weightKg < 1 || weightKg > 50) {
-      toast.error('Le poids doit être entre 1 et 50 kg');
-      return;
-    }
-
-    setLoading(true);
-
+  const checkAuthAndLoadData = async () => {
     try {
-      const totalAmount = calculateTotal();
+      // Vérifier l'authentification
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session) {
+        toast.error('Veuillez vous connecter');
+        navigate('/login', { state: { from: '/new-order' } });
+        return;
+      }
+      
+      setUser(session.user);
 
-      // 1. Créer la commande dans Supabase
-      const { data: orderData, error: orderError } = await supabase
-        .from('orders')
-        .insert([{
-          user_id: user.id,
-          partner_id: partner.id,
-          weight_kg: weightKg,
-          service_type: serviceType,
-          total_amount: totalAmount,
-          status: 'pending',
-          payment_status: 'pending'
-        }])
-        .select()
-        .single();
-
-      if (orderError) throw orderError;
-
-      console.log('✅ Commande créée:', orderData.id);
-
-      // 2. Créer session Stripe Checkout
-      const response = await fetch('/.netlify/functions/create-checkout', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          orderId: orderData.id,
-          amount: totalAmount,
-          serviceType: serviceType,
-          weightKg: weightKg,
-          partnerStripeAccountId: partner.stripe_account_id || null
-        })
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Erreur création session Stripe');
+      // Récupérer le partenaire depuis le state
+      const selectedPartner = location.state?.selectedPartner;
+      
+      if (selectedPartner) {
+        setPartner(selectedPartner);
+        setNoPartnerSelected(false);
+      } else {
+        // Aucun pressing sélectionné
+        setNoPartnerSelected(true);
       }
 
-      const { url, error } = await response.json();
-
-      if (error) throw new Error(error);
-
-      // 3. Rediriger vers Stripe Checkout
-      console.log('✅ Redirection vers Stripe Checkout');
-      window.location.href = url;
-
-    } catch (error: any) {
-      console.error('❌ Erreur:', error);
-      toast.error(error.message || 'Erreur lors de la création de la commande');
+    } catch (error) {
+      console.error('Erreur:', error);
+      toast.error('Erreur de chargement');
+    } finally {
       setLoading(false);
     }
   };
 
-  if (!partner) {
+  const handleSubmit = async () => {
+    if (!partner || !user) {
+      toast.error('Données manquantes');
+      return;
+    }
+
+    if (weightKg < 1) {
+      toast.error('Minimum 1 kg');
+      return;
+    }
+
+    setSubmitting(true);
+
+    try {
+      const orderData = {
+        user_id: user.id,
+        partner_id: partner.id,
+        weight_kg: weightKg,
+        service_type: serviceType,
+        price_per_kg: pricePerKg,
+        total_amount: totalAmount,
+        status: 'pending',
+        notes: notes.trim() || null,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      };
+
+      const { data, error } = await supabase
+        .from('orders')
+        .insert([orderData])
+        .select()
+        .single();
+
+      if (error) {
+        console.error('Erreur création:', error);
+        throw error;
+      }
+
+      toast.success('Commande créée avec succès !');
+      
+      // Rediriger vers le tracking
+      navigate(`/tracking/${data.id}`, { replace: true });
+
+    } catch (error: any) {
+      console.error('Erreur:', error);
+      toast.error(error.message || 'Erreur lors de la création');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  // Loading
+  if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-white">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 to-pink-50">
         <div className="text-center">
-          <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-          <p className="text-slate-600 font-semibold">Chargement...</p>
+          <Loader2 className="w-12 h-12 text-purple-600 animate-spin mx-auto mb-4" />
+          <p className="text-slate-600">Chargement...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Aucun pressing sélectionné → Rediriger vers la liste
+  if (noPartnerSelected) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-50 flex items-center justify-center p-4">
+        <div className="bg-white rounded-3xl shadow-xl p-8 max-w-md w-full text-center">
+          <div className="w-20 h-20 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-6">
+            <AlertCircle className="w-10 h-10 text-orange-500" />
+          </div>
+          
+          <h1 className="text-2xl font-bold text-slate-900 mb-4">
+            Aucun pressing sélectionné
+          </h1>
+          
+          <p className="text-slate-600 mb-8">
+            Veuillez d'abord choisir un pressing partenaire pour créer votre commande.
+          </p>
+
+          <div className="space-y-3">
+            <button
+              onClick={() => navigate('/partners-map')}
+              className="w-full py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl font-bold text-lg hover:shadow-xl transition flex items-center justify-center gap-2"
+            >
+              <Search className="w-5 h-5" />
+              Trouver un pressing
+            </button>
+            
+            <button
+              onClick={() => navigate('/')}
+              className="w-full py-3 bg-slate-100 text-slate-700 rounded-xl font-semibold hover:bg-slate-200 transition"
+            >
+              Retour à l'accueil
+            </button>
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white py-12 px-4">
-      <div className="max-w-4xl mx-auto">
-        <button
-          onClick={() => navigate(-1)}
-          className="flex items-center gap-2 text-blue-600 hover:text-blue-700 mb-8 transition font-semibold"
-        >
-          <ArrowLeft className="w-5 h-5" />
-          Retour
-        </button>
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-50">
+      {/* Header */}
+      <div className="bg-white border-b shadow-sm sticky top-0 z-50">
+        <div className="max-w-2xl mx-auto px-4 py-4">
+          <div className="flex items-center justify-between">
+            <button
+              onClick={() => navigate(-1)}
+              className="flex items-center gap-2 text-purple-600 hover:text-purple-700 font-semibold"
+            >
+              <ArrowLeft className="w-5 h-5" />
+              Retour
+            </button>
+            <h1 className="text-lg font-bold text-slate-900">Nouvelle commande</h1>
+            <div className="w-20"></div>
+          </div>
+        </div>
+      </div>
 
-        <div className="bg-white rounded-3xl shadow-2xl p-8 md:p-12">
-          <h1 className="text-4xl font-black bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent mb-8">
-            Nouvelle commande
-          </h1>
-
-          {/* Info Pressing */}
-          <div className="bg-blue-50 rounded-2xl p-6 mb-8 border-2 border-blue-200">
-            <div className="flex items-center justify-between">
-              <div>
-                <h2 className="font-bold text-xl text-slate-900 mb-1">{partner.name}</h2>
-                <p className="text-slate-600">{partner.address}, {partner.city}</p>
-              </div>
-              <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center">
-                <CheckCircle className="w-6 h-6 text-white" />
-              </div>
+      <div className="max-w-2xl mx-auto px-4 py-6 space-y-6">
+        {/* Pressing sélectionné */}
+        <div className="bg-white rounded-2xl p-5 shadow-lg">
+          <h2 className="text-sm font-medium text-slate-500 mb-3">Pressing sélectionné</h2>
+          <div className="flex items-start gap-4">
+            <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center flex-shrink-0">
+              <MapPin className="w-6 h-6 text-purple-600" />
+            </div>
+            <div className="flex-1">
+              <h3 className="font-bold text-slate-900">{partner?.name}</h3>
+              <p className="text-sm text-slate-600">{partner?.address}</p>
+              <p className="text-sm text-slate-600">{partner?.postal_code} {partner?.city}</p>
+              {partner?.phone && (
+                <a href={`tel:${partner.phone}`} className="text-sm text-purple-600 flex items-center gap-1 mt-1">
+                  <Phone className="w-3 h-3" />
+                  {partner.phone}
+                </a>
+              )}
             </div>
           </div>
-
-          {/* Poids */}
-          <div className="mb-8">
-            <label className="block text-lg font-bold text-slate-900 mb-4">
-              <Package className="w-5 h-5 inline mr-2" />
-              Poids estimé (kg)
-            </label>
-            <input
-              type="number"
-              min="1"
-              max="50"
-              step="0.5"
-              value={weightKg}
-              onChange={(e) => setWeightKg(Number(e.target.value))}
-              className="w-full px-6 py-4 text-3xl font-black text-center border-4 border-blue-300 rounded-2xl focus:border-blue-600 focus:outline-none transition"
-            />
-            <p className="text-sm text-slate-500 mt-2 text-center">
-              Le poids exact sera confirmé par le pressing lors du dépôt
-            </p>
-          </div>
-
-          {/* Formules */}
-          <div className="mb-8">
-            <label className="block text-lg font-bold text-slate-900 mb-4">
-              <Clock className="w-5 h-5 inline mr-2" />
-              Choisissez votre formule
-            </label>
-            <div className="grid md:grid-cols-2 gap-6">
-              {/* Standard */}
-              <button
-                type="button"
-                onClick={() => setServiceType('standard')}
-                className={`p-6 rounded-2xl border-4 transition-all ${
-                  serviceType === 'standard'
-                    ? 'border-blue-600 bg-blue-50 shadow-xl scale-105'
-                    : 'border-slate-200 hover:border-blue-300 hover:shadow-lg'
-                }`}
-              >
-                <div className="flex items-center justify-between mb-4">
-                  <span className="text-xl font-black text-slate-900">Standard</span>
-                  <Clock className="w-7 h-7 text-blue-600" />
-                </div>
-                <div className="text-5xl font-black text-blue-600 mb-3">
-                  3,50€<span className="text-2xl">/kg</span>
-                </div>
-                <div className="text-slate-600 font-semibold">
-                  48-72h de délai
-                </div>
-                <div className="mt-4 text-sm text-slate-500">
-                  ✓ Lavage professionnel<br/>
-                  ✓ Séchage<br/>
-                  ✓ Pliage soigné
-                </div>
-              </button>
-
-              {/* Express */}
-              <button
-                type="button"
-                onClick={() => setServiceType('express')}
-                className={`p-6 rounded-2xl border-4 transition-all relative ${
-                  serviceType === 'express'
-                    ? 'border-orange-600 bg-orange-50 shadow-xl scale-105'
-                    : 'border-slate-200 hover:border-orange-300 hover:shadow-lg'
-                }`}
-              >
-                <div className="absolute -top-3 -right-3 bg-gradient-to-r from-orange-500 to-red-500 text-white px-4 py-1 rounded-full text-xs font-black shadow-lg">
-                  ⚡ URGENT
-                </div>
-                <div className="flex items-center justify-between mb-4">
-                  <span className="text-xl font-black text-slate-900">Express</span>
-                  <Zap className="w-7 h-7 text-orange-600" />
-                </div>
-                <div className="text-5xl font-black text-orange-600 mb-3">
-                  5,00€<span className="text-2xl">/kg</span>
-                </div>
-                <div className="text-slate-600 font-semibold">
-                  Prêt en 24h
-                </div>
-                <div className="mt-4 text-sm text-slate-500">
-                  ✓ Tout inclus<br/>
-                  ✓ Service prioritaire<br/>
-                  ✓ Garantie 24h
-                </div>
-              </button>
-            </div>
-          </div>
-
-          {/* Récapitulatif */}
-          <div className="bg-gradient-to-r from-blue-100 to-cyan-100 rounded-2xl p-6 mb-8 border-2 border-blue-300">
-            <h3 className="font-bold text-xl text-slate-900 mb-4 flex items-center gap-2">
-              <Euro className="w-6 h-6" />
-              Récapitulatif
-            </h3>
-            <div className="space-y-3 text-slate-700">
-              <div className="flex justify-between text-lg">
-                <span>Poids :</span>
-                <span className="font-bold">{weightKg} kg</span>
-              </div>
-              <div className="flex justify-between text-lg">
-                <span>Formule :</span>
-                <span className="font-bold">
-                  {serviceType === 'express' ? 'Express (24h)' : 'Standard (48-72h)'}
-                </span>
-              </div>
-              <div className="flex justify-between text-lg">
-                <span>Prix au kg :</span>
-                <span className="font-bold">{servicePrices[serviceType].toFixed(2)}€</span>
-              </div>
-              <div className="border-t-4 border-blue-400 pt-4 flex justify-between items-center">
-                <span className="text-2xl font-black text-slate-900">Total :</span>
-                <span className="text-5xl font-black text-blue-600">
-                  {calculateTotal().toFixed(2)}€
-                </span>
-              </div>
-            </div>
-          </div>
-
-          {/* Sécurité */}
-          <div className="bg-green-50 rounded-xl p-4 mb-6 border-2 border-green-200">
-            <div className="flex items-center gap-3 text-green-800">
-              <Shield className="w-6 h-6 flex-shrink-0" />
-              <p className="text-sm font-semibold">
-                Paiement 100% sécurisé par Stripe • Vos données bancaires sont protégées
-              </p>
-            </div>
-          </div>
-
-          {/* Bouton paiement */}
-          <LoadingButton
-            loading={loading}
-            onClick={handleCreateOrder}
-            className="w-full py-5 rounded-2xl font-bold text-xl text-white bg-gradient-to-r from-blue-600 to-cyan-600 hover:shadow-2xl transition-all transform hover:scale-105 flex items-center justify-center gap-3"
+          <button
+            onClick={() => navigate('/partners-map')}
+            className="mt-4 text-sm text-purple-600 font-medium hover:underline"
           >
-            {loading ? (
-              <>Redirection vers le paiement sécurisé...</>
-            ) : (
-              <>
-                <CreditCard className="w-6 h-6" />
-                Procéder au paiement sécurisé
-              </>
-            )}
-          </LoadingButton>
+            Changer de pressing
+          </button>
+        </div>
 
-          <p className="text-xs text-slate-500 text-center mt-4">
-            En cliquant, vous serez redirigé vers notre plateforme de paiement sécurisée Stripe
+        {/* Type de service */}
+        <div className="bg-white rounded-2xl p-5 shadow-lg">
+          <h2 className="text-sm font-medium text-slate-500 mb-4">Type de service</h2>
+          <div className="grid grid-cols-2 gap-4">
+            {/* Standard */}
+            <button
+              onClick={() => setServiceType('standard')}
+              className={`p-4 rounded-2xl border-2 transition text-left ${
+                serviceType === 'standard'
+                  ? 'border-purple-500 bg-purple-50'
+                  : 'border-slate-200 hover:border-purple-300'
+              }`}
+            >
+              <Package className={`w-8 h-8 mb-2 ${
+                serviceType === 'standard' ? 'text-purple-600' : 'text-slate-400'
+              }`} />
+              <p className={`font-bold ${
+                serviceType === 'standard' ? 'text-purple-600' : 'text-slate-700'
+              }`}>Standard</p>
+              <p className="text-2xl font-bold text-purple-600 mt-1">3,50€<span className="text-sm font-normal">/kg</span></p>
+              <p className="text-xs text-slate-500 mt-1">Retrait sous 24-48h</p>
+            </button>
+
+            {/* Express */}
+            <button
+              onClick={() => setServiceType('express')}
+              className={`p-4 rounded-2xl border-2 transition text-left relative ${
+                serviceType === 'express'
+                  ? 'border-orange-500 bg-orange-50'
+                  : 'border-slate-200 hover:border-orange-300'
+              }`}
+            >
+              <div className="absolute -top-2 -right-2 bg-orange-500 text-white text-xs px-2 py-1 rounded-full font-bold">
+                RAPIDE
+              </div>
+              <Zap className={`w-8 h-8 mb-2 ${
+                serviceType === 'express' ? 'text-orange-600' : 'text-slate-400'
+              }`} />
+              <p className={`font-bold ${
+                serviceType === 'express' ? 'text-orange-600' : 'text-slate-700'
+              }`}>Express</p>
+              <p className="text-2xl font-bold text-orange-600 mt-1">5€<span className="text-sm font-normal">/kg</span></p>
+              <p className="text-xs text-slate-500 mt-1">Retrait sous 4h</p>
+            </button>
+          </div>
+        </div>
+
+        {/* Poids */}
+        <div className="bg-white rounded-2xl p-5 shadow-lg">
+          <h2 className="text-sm font-medium text-slate-500 mb-4">Poids estimé (kg)</h2>
+          <div className="flex items-center justify-center gap-6">
+            <button
+              onClick={() => setWeightKg(Math.max(1, weightKg - 1))}
+              className="w-14 h-14 bg-slate-100 rounded-full flex items-center justify-center hover:bg-slate-200 transition"
+            >
+              <Minus className="w-6 h-6 text-slate-600" />
+            </button>
+            
+            <div className="text-center">
+              <span className="text-5xl font-bold text-purple-600">{weightKg}</span>
+              <span className="text-2xl text-slate-400 ml-1">kg</span>
+            </div>
+            
+            <button
+              onClick={() => setWeightKg(Math.min(50, weightKg + 1))}
+              className="w-14 h-14 bg-purple-100 rounded-full flex items-center justify-center hover:bg-purple-200 transition"
+            >
+              <Plus className="w-6 h-6 text-purple-600" />
+            </button>
+          </div>
+          
+          {/* Raccourcis */}
+          <div className="flex justify-center gap-2 mt-4">
+            {[3, 5, 8, 10, 15].map(w => (
+              <button
+                key={w}
+                onClick={() => setWeightKg(w)}
+                className={`px-4 py-2 rounded-full text-sm font-medium transition ${
+                  weightKg === w
+                    ? 'bg-purple-600 text-white'
+                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                }`}
+              >
+                {w} kg
+              </button>
+            ))}
+          </div>
+
+          <p className="text-center text-sm text-slate-500 mt-4">
+            💡 Le poids exact sera mesuré au pressing
           </p>
         </div>
+
+        {/* Notes */}
+        <div className="bg-white rounded-2xl p-5 shadow-lg">
+          <h2 className="text-sm font-medium text-slate-500 mb-3">Instructions (optionnel)</h2>
+          <textarea
+            value={notes}
+            onChange={(e) => setNotes(e.target.value)}
+            placeholder="Ex: Attention aux vêtements délicats, ne pas sécher le pull rouge..."
+            rows={3}
+            className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-purple-500 focus:outline-none resize-none"
+          />
+        </div>
+
+        {/* Récapitulatif */}
+        <div className="bg-gradient-to-r from-purple-600 to-pink-600 rounded-2xl p-6 text-white shadow-xl">
+          <h2 className="text-lg font-bold mb-4">Récapitulatif</h2>
+          
+          <div className="space-y-2 mb-4">
+            <div className="flex justify-between">
+              <span className="text-white/80">Service</span>
+              <span className="font-medium">
+                {serviceType === 'express' ? '⚡ Express' : '📦 Standard'}
+              </span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-white/80">Poids estimé</span>
+              <span className="font-medium">{weightKg} kg</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-white/80">Prix au kg</span>
+              <span className="font-medium">{pricePerKg}€</span>
+            </div>
+          </div>
+          
+          <div className="border-t border-white/20 pt-4 flex justify-between items-center">
+            <span className="text-lg">Total estimé</span>
+            <span className="text-3xl font-bold">{totalAmount.toFixed(2)}€</span>
+          </div>
+        </div>
+
+        {/* Bouton commander */}
+        <button
+          onClick={handleSubmit}
+          disabled={submitting}
+          className="w-full py-5 bg-white text-purple-600 border-2 border-purple-600 rounded-2xl font-bold text-lg hover:bg-purple-50 transition disabled:opacity-50 flex items-center justify-center gap-2 shadow-lg"
+        >
+          {submitting ? (
+            <>
+              <Loader2 className="w-5 h-5 animate-spin" />
+              Création en cours...
+            </>
+          ) : (
+            <>
+              <CheckCircle className="w-5 h-5" />
+              Confirmer la commande
+            </>
+          )}
+        </button>
+
+        <p className="text-center text-sm text-slate-500">
+          Le paiement s'effectue directement au pressing lors du retrait
+        </p>
       </div>
     </div>
   );
