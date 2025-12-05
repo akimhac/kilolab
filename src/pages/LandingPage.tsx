@@ -1,507 +1,388 @@
-import { useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { ArrowRight, Zap, Shield, Clock, Euro, Star, Users, MapPin, Sparkles, Award, Leaf, Gift, CheckCircle } from 'lucide-react';
-import HowItWorksCarousel from '../components/HowItWorksCarousel';
-import PriceComparator from '../components/PriceComparator';
-import NewsletterFooter from '../components/NewsletterFooter';
-import SchemaOrg from '../components/SchemaOrg';
-import PageHead from '../components/PageHead';
-import { useEffect, useState } from 'react';
-import { promoService } from '../services/promoService';
+// src/pages/LandingPage.tsx
+// Landing Page principale - Prix corrigés : 3€/kg Standard, 5€/kg Express
+
+import { useState, useEffect } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
+import { 
+  MapPin, Clock, Euro, Star, ChevronRight, ChevronLeft,
+  Shirt, CheckCircle, Users, Shield, Zap, Calculator,
+  ArrowRight, Phone, Mail, Menu, X
+} from 'lucide-react';
 
 export default function LandingPage() {
   const navigate = useNavigate();
-  const [promoStats, setPromoStats] = useState({ freeMonthCount: 0, remainingSlots: 100 });
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  useEffect(() => {
-    loadPromoStats();
-    const interval = setInterval(loadPromoStats, 60000);
-    return () => clearInterval(interval);
-  }, []);
-
-  const loadPromoStats = async () => {
-    const stats = await promoService.getPromoStats();
-    setPromoStats(stats);
-  };
-
-  const features = [
+  // Carousel slides
+  const slides = [
     {
-      icon: Shield,
-      title: 'Pressings certifiés',
-      description: 'Tous nos partenaires sont vérifiés'
+      title: "Le pressing au kilo",
+      subtitle: "Simple, rapide et économique",
+      description: "Déposez votre linge, on s'occupe de tout. À partir de 3€/kg seulement.",
+      cta: "Trouver un pressing",
+      ctaLink: "/partners-map",
+      bg: "from-purple-600 to-pink-600"
     },
     {
+      title: "Jusqu'à 90% d'économie",
+      subtitle: "Comparé au pressing traditionnel",
+      description: "Une chemise à 0.45€ au lieu de 8€. Faites le calcul !",
+      cta: "Voir les tarifs",
+      ctaLink: "/pricing",
+      bg: "from-green-500 to-teal-500"
+    },
+    {
+      title: "Service Express 24h",
+      subtitle: "Pour les urgences",
+      description: "Besoin de votre linge rapidement ? Option express disponible.",
+      cta: "Commander maintenant",
+      ctaLink: "/partners-map",
+      bg: "from-orange-500 to-red-500"
+    },
+    {
+      title: "Vous êtes pressing ?",
+      subtitle: "Rejoignez le réseau Kilolab",
+      description: "Zéro abonnement, zéro engagement. Rentable dès le 1er client.",
+      cta: "Devenir partenaire",
+      ctaLink: "/become-partner",
+      bg: "from-blue-600 to-purple-600"
+    }
+  ];
+
+  // Auto-advance carousel
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % slides.length);
+    }, 5000);
+    return () => clearInterval(timer);
+  }, []);
+
+  // Stats
+  const stats = [
+    { value: "1854", label: "Pressings en France & Belgique" },
+    { value: "24h", label: "Service express" },
+    { value: "3€", label: "À partir de /kg" }
+  ];
+
+  // Comparateur de prix - 90% d'économie
+  const priceComparison = [
+    { item: "Chemise", weight: 0.15, traditional: 8, saving: 90 },
+    { item: "Pantalon", weight: 0.4, traditional: 10, saving: 88 },
+    { item: "Pull", weight: 0.5, traditional: 12, saving: 88 },
+    { item: "Veste", weight: 0.8, traditional: 18, saving: 87 },
+    { item: "Manteau", weight: 1.5, traditional: 25, saving: 82 },
+    { item: "Robe", weight: 0.3, traditional: 15, saving: 94 },
+  ];
+
+  const pricePerKg = 3; // Prix standard
+
+  // Avantages
+  const benefits = [
+    {
       icon: Euro,
-      title: 'Prix transparents',
-      description: '3,50€/kg Standard ou 5€/kg Express'
+      title: "Jusqu'à 90% d'économie",
+      description: "Payez au poids, pas à la pièce. Une chemise revient à 0.45€ au lieu de 8€."
     },
     {
       icon: Clock,
-      title: 'Service rapide',
-      description: 'Express 24h ou Standard 48-72h'
+      title: "Rapide et pratique",
+      description: "Déposez, on s'occupe de tout. Prêt en 24-48h, ou 4h en express."
     },
     {
       icon: MapPin,
-      title: '1854 points relais',
-      description: 'Trouvez un pressing près de chez vous'
+      title: "Près de chez vous",
+      description: "Plus de 1850 pressings partenaires dans toute la France et Belgique."
     },
     {
-      icon: Sparkles,
-      title: 'Qualité pro',
-      description: 'Lavage, séchage et pliage professionnel'
-    },
-    {
-      icon: Users,
-      title: 'Support réactif',
-      description: 'Notre équipe vous aide rapidement'
+      icon: Shield,
+      title: "Qualité garantie",
+      description: "Pressings professionnels sélectionnés. Avis clients transparents."
     }
   ];
 
-  const whyKilolab = [
-    {
-      icon: Euro,
-      title: 'Prix au kilo',
-      description: 'Tarif simple et transparent'
-    },
-    {
-      icon: Award,
-      title: 'Partenaires qualité',
-      description: 'Meilleurs pressings sélectionnés'
-    },
-    {
-      icon: Zap,
-      title: 'Ultra simple',
-      description: 'Déposez, on s\'occupe du reste'
-    },
-    {
-      icon: Clock,
-      title: 'Ultra rapide',
-      description: 'Linge impeccable en 24h'
-    },
-    {
-      icon: Leaf,
-      title: 'Éco-responsable',
-      description: 'Process optimisés'
-    }
-  ];
-
-  const testimonials = [
-    {
-      name: 'Sophie L.',
-      role: 'Cliente régulière',
-      content: 'Service impeccable ! Je dépose le matin, je récupère le soir.',
-      rating: 5
-    },
-    {
-      name: 'Marc D.',
-      role: 'Utilisateur Express',
-      content: 'Pratique et rapide. Prix clairs dès le départ.',
-      rating: 5
-    },
-    {
-      name: 'Julie M.',
-      role: 'Maman de 3 enfants',
-      content: 'Kilolab a changé ma vie ! Plus de montagne de linge.',
-      rating: 5
-    }
+  // Comment ça marche
+  const steps = [
+    { step: 1, title: "Trouvez", description: "Sélectionnez un pressing près de chez vous" },
+    { step: 2, title: "Déposez", description: "Apportez votre linge, on le pèse" },
+    { step: 3, title: "Récupérez", description: "Notification quand c'est prêt, payez sur place" }
   ];
 
   return (
-    <>
-      <PageHead />
-      <SchemaOrg type="Organization" />
-      
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-cyan-50">
-        {/* Navigation */}
-        <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-lg border-b border-slate-200">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6">
-            <div className="flex items-center justify-between h-16">
-              <div className="flex items-center gap-8">
-                <button onClick={() => navigate('/')} className="text-2xl font-black bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">
-                  Kilolab
-                </button>
-                <div className="hidden md:flex items-center gap-6">
-                  <button onClick={() => navigate('/about')} className="text-slate-600 hover:text-blue-600 font-semibold transition text-sm">
-                    Comment ça marche
-                  </button>
-                  <button onClick={() => navigate('/pricing')} className="text-slate-600 hover:text-blue-600 font-semibold transition text-sm">
-                    Tarifs
-                  </button>
-                  <button onClick={() => navigate('/faq')} className="text-slate-600 hover:text-blue-600 font-semibold transition text-sm">
-                    FAQ
-                  </button>
-                  <button onClick={() => navigate('/about')} className="text-slate-600 hover:text-blue-600 font-semibold transition text-sm">
-                    À propos
-                  </button>
-                  <button onClick={() => navigate('/blog')} className="text-slate-600 hover:text-blue-600 font-semibold transition text-sm">
-                    Blog
-                  </button>
-                  <button onClick={() => navigate('/contact')} className="text-slate-600 hover:text-blue-600 font-semibold transition text-sm">
-                    Contact
-                  </button>
-                </div>
-              </div>
-              <div className="flex items-center gap-3">
-                <button onClick={() => navigate('/login')} className="text-slate-600 hover:text-blue-600 font-semibold transition text-sm">
-                  Connexion
-                </button>
-                <button
-                  onClick={() => navigate('/partners-map')}
-                  className="px-5 py-2 bg-gradient-to-r from-blue-600 to-cyan-600 text-white rounded-xl font-bold hover:shadow-xl transition text-sm"
-                >
-                  Trouver un pressing
-                </button>
-              </div>
-            </div>
-          </div>
-        </nav>
+    <div className="min-h-screen bg-white">
+      {/* Navigation */}
+      <nav className="bg-white border-b sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-4 py-3">
+          <div className="flex items-center justify-between">
+            {/* Logo */}
+            <Link to="/" className="text-2xl font-bold text-green-600">
+              Kilolab
+            </Link>
 
-        {/* Hero Section */}
-        <section className="pt-24 pb-12 px-4">
-          <div className="max-w-7xl mx-auto">
-            <div className="grid lg:grid-cols-2 gap-8 items-center">
-              <motion.div
-                initial={{ opacity: 0, x: -50 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.6 }}
+            {/* Desktop Nav */}
+            <div className="hidden md:flex items-center gap-6">
+              <Link to="/login" className="text-slate-600 hover:text-slate-900 font-medium">
+                Connexion
+              </Link>
+              <Link 
+                to="/partners-map"
+                className="px-6 py-2.5 bg-green-500 text-white rounded-full font-semibold hover:bg-green-600 transition"
               >
-                <div className="inline-flex items-center gap-2 bg-blue-100 text-blue-700 px-3 py-1 rounded-full font-semibold text-xs mb-4">
-                  <Zap className="w-3 h-3" />
-                  1854 pressings partenaires
-                </div>
-
-                <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-slate-900 leading-tight mb-4">
-                  <span className="block text-center lg:text-left">Le pressing</span>
-                  <span className="block text-center lg:text-left bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">
-                    nouvelle
-                  </span>
-                  <span className="block text-center lg:text-left bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">
-                    génération.
-                  </span>
-                  <span className="block text-center lg:text-left text-3xl md:text-4xl mt-2">Au kilo. Sans effort.</span>
-                </h1>
-
-                <p className="text-lg md:text-xl text-slate-600 mb-4 leading-relaxed text-center lg:text-left">
-                  Déposez votre linge en point relais, récupérez-le impeccable en 24h. 
-                  <strong className="text-slate-900"> Vous gagnez du temps</strong>.
-                </p>
-
-                <div className="bg-blue-50 rounded-xl p-4 mb-6 border-2 border-blue-200">
-                  <ul className="space-y-2">
-                    <li className="flex items-start gap-2 text-sm">
-                      <Euro className="w-4 h-4 text-blue-600 mt-0.5 flex-shrink-0" />
-                      <span className="text-slate-700">Prix au kilo transparents</span>
-                    </li>
-                    <li className="flex items-start gap-2 text-sm">
-                      <MapPin className="w-4 h-4 text-blue-600 mt-0.5 flex-shrink-0" />
-                      <span className="text-slate-700">Dépôt près de chez vous</span>
-                    </li>
-                    <li className="flex items-start gap-2 text-sm">
-                      <Award className="w-4 h-4 text-blue-600 mt-0.5 flex-shrink-0" />
-                      <span className="text-slate-700">Qualité premium garantie</span>
-                    </li>
-                  </ul>
-                </div>
-
-                <div className="flex flex-col sm:flex-row gap-3 mb-4">
-                  <button
-                    onClick={() => navigate('/partners-map')}
-                    className="px-6 py-3 bg-gradient-to-r from-blue-600 to-cyan-600 text-white rounded-xl font-bold hover:shadow-xl transition flex items-center justify-center gap-2"
-                  >
-                    Essayez maintenant
-                    <ArrowRight className="w-4 h-4" />
-                  </button>
-                  <button
-                    onClick={() => navigate('/pricing')}
-                    className="px-6 py-3 bg-white border-2 border-slate-300 text-slate-900 rounded-xl font-bold hover:border-blue-600 transition"
-                  >
-                    Voir les tarifs
-                  </button>
-                </div>
-
-                <div className="flex flex-wrap gap-4 text-xs justify-center lg:justify-start">
-                  <div className="flex items-center gap-1 text-slate-600">
-                    <div className="w-1.5 h-1.5 bg-green-500 rounded-full"></div>
-                    <span className="font-semibold">Pressings vérifiés</span>
-                  </div>
-                  <div className="flex items-center gap-1 text-slate-600">
-                    <div className="w-1.5 h-1.5 bg-blue-500 rounded-full"></div>
-                    <span className="font-semibold">Prix transparents</span>
-                  </div>
-                </div>
-              </motion.div>
-
-              <motion.div
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.6 }}
-                className="relative h-[400px]"
-              >
-                <HowItWorksCarousel />
-              </motion.div>
-            </div>
-          </div>
-        </section>
-
-        {/* Stats Section */}
-        <section className="py-12 bg-gradient-to-r from-blue-600 to-cyan-600">
-          <div className="max-w-7xl mx-auto px-4">
-            <div className="grid md:grid-cols-3 gap-6 text-center text-white">
-              <div>
-                <div className="text-4xl font-black mb-1">1854</div>
-                <p className="text-blue-100 text-sm">Pressings en France & Belgique</p>
-              </div>
-              <div>
-                <div className="text-4xl font-black mb-1">24h</div>
-                <p className="text-blue-100 text-sm">Service express</p>
-              </div>
-              <div>
-                <div className="text-4xl font-black mb-1">3,50€</div>
-                <p className="text-blue-100 text-sm">À partir de /kg</p>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Comparateur Prix */}
-        <section className="py-12 px-4 bg-white">
-          <div className="max-w-5xl mx-auto">
-            <PriceComparator />
-          </div>
-        </section>
-
-        {/* Section Pourquoi Kilolab */}
-        <section className="py-12 px-4 bg-gradient-to-br from-slate-50 to-blue-50">
-          <div className="max-w-7xl mx-auto">
-            <div className="text-center mb-10">
-              <h2 className="text-3xl md:text-4xl font-black text-slate-900 mb-3">
-                Pourquoi Kilolab ?
-              </h2>
-              <p className="text-lg text-slate-600">
-                Le pressing repensé. Simplifié. Accessible.
-              </p>
+                Trouver un pressing
+              </Link>
             </div>
 
-            <div className="grid md:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
-              {whyKilolab.map((item, index) => (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.4, delay: index * 0.05 }}
-                  viewport={{ once: true }}
-                  className="bg-white rounded-xl p-4 hover:shadow-lg transition"
-                >
-                  <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-cyan-600 rounded-lg flex items-center justify-center mb-3">
-                    <item.icon className="w-5 h-5 text-white" />
-                  </div>
-                  <h3 className="text-base font-bold text-slate-900 mb-2">{item.title}</h3>
-                  <p className="text-sm text-slate-600">{item.description}</p>
-                </motion.div>
-              ))}
-            </div>
-
-            <div className="text-center">
-              <button
-                onClick={() => navigate('/partners-map')}
-                className="px-8 py-3 bg-gradient-to-r from-blue-600 to-cyan-600 text-white rounded-xl font-bold hover:shadow-xl transition"
-              >
-                Simplifiez-vous la vie !
-              </button>
-            </div>
-          </div>
-        </section>
-
-        {/* SECTION PROMO PRESSINGS PARTENAIRES */}
-        <section className="py-12 px-4 bg-gradient-to-r from-green-600 to-emerald-600">
-          <div className="max-w-5xl mx-auto text-center text-white">
-            <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full mb-4">
-              <Gift className="w-5 h-5" />
-              <span className="font-bold text-sm">OFFRE DE LANCEMENT</span>
-            </div>
-            
-            <h2 className="text-3xl md:text-4xl font-black mb-4">
-              Pressings : 1er mois GRATUIT !
-            </h2>
-            
-            <p className="text-xl text-green-100 mb-6">
-              Offre limitée aux 100 premiers pressings
-            </p>
-
-            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 mb-6">
-              <div className="flex items-center justify-center mb-4">
-                <div>
-                  <p className="text-5xl font-black mb-1 text-yellow-300">{promoStats.remainingSlots}</p>
-                  <p className="text-green-100 text-lg">Places restantes</p>
-                </div>
-              </div>
-              
-              <div className="w-full bg-white/20 rounded-full h-3 mb-3">
-                <div 
-                  className="bg-white rounded-full h-3 transition-all duration-500"
-                  style={{ width: `${100 - promoStats.remainingSlots}%` }}
-                ></div>
-              </div>
-              
-              <p className="text-sm text-green-100">
-                ⚡ {promoStats.remainingSlots < 20 ? 'Dernières places !' : 'Offre limitée'}
-              </p>
-            </div>
-
-            <div className="grid md:grid-cols-3 gap-4 mb-6">
-              <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4">
-                <CheckCircle className="w-8 h-8 mx-auto mb-2" />
-                <h3 className="font-bold mb-1">0€ / 30 jours</h3>
-                <p className="text-green-100 text-sm">Aucune commission</p>
-              </div>
-              <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4">
-                <Star className="w-8 h-8 mx-auto mb-2" />
-                <h3 className="font-bold mb-1">Puis 10% seulement</h3>
-                <p className="text-green-100 text-sm">Commission la plus basse</p>
-              </div>
-              <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4">
-                <Users className="w-8 h-8 mx-auto mb-2" />
-                <h3 className="font-bold mb-1">Nouveaux clients</h3>
-                <p className="text-green-100 text-sm">Notre base de clients</p>
-              </div>
-            </div>
-
-            <button
-              onClick={() => navigate('/become-partner')}
-              className="px-10 py-4 bg-white text-green-600 rounded-xl font-black text-lg hover:shadow-2xl transition transform hover:scale-105"
+            {/* Mobile menu button */}
+            <button 
+              className="md:hidden p-2"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             >
-              Je deviens partenaire GRATUITEMENT
+              {mobileMenuOpen ? <X /> : <Menu />}
             </button>
           </div>
-        </section>
 
-        {/* Features */}
-        <section className="py-12 px-4 bg-gradient-to-br from-slate-50 to-blue-50">
-          <div className="max-w-7xl mx-auto">
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {features.map((feature, index) => (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.4, delay: index * 0.05 }}
-                  viewport={{ once: true }}
-                  className="bg-white rounded-xl p-5 hover:shadow-lg transition"
-                >
-                  <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-cyan-600 rounded-lg flex items-center justify-center mb-3">
-                    <feature.icon className="w-5 h-5 text-white" />
-                  </div>
-                  <h3 className="text-base font-bold text-slate-900 mb-2">{feature.title}</h3>
-                  <p className="text-sm text-slate-600">{feature.description}</p>
-                </motion.div>
-              ))}
+          {/* Mobile Nav */}
+          {mobileMenuOpen && (
+            <div className="md:hidden py-4 border-t mt-3">
+              <div className="flex flex-col gap-3">
+                <Link to="/login" className="py-2 text-slate-600">Connexion</Link>
+                <Link to="/partners-map" className="py-2 px-4 bg-green-500 text-white rounded-lg text-center font-semibold">
+                  Trouver un pressing
+                </Link>
+              </div>
             </div>
-          </div>
-        </section>
+          )}
+        </div>
+      </nav>
 
-        {/* Testimonials */}
-        <section className="py-12 px-4 bg-white">
-          <div className="max-w-7xl mx-auto">
-            <div className="text-center mb-8">
-              <h2 className="text-3xl md:text-4xl font-black text-slate-900 mb-2">
-                Ils nous font confiance
-              </h2>
-            </div>
-
-            <div className="grid md:grid-cols-3 gap-6">
-              {testimonials.map((testimonial, index) => (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.4, delay: index * 0.1 }}
-                  viewport={{ once: true }}
-                  className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-xl p-5"
-                >
-                  <div className="flex gap-1 mb-3">
-                    {[...Array(testimonial.rating)].map((_, i) => (
-                      <Star key={i} className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                    ))}
-                  </div>
-                  <p className="text-sm text-slate-700 mb-4 italic">
-                    "{testimonial.content}"
-                  </p>
-                  <div>
-                    <p className="font-bold text-slate-900 text-sm">{testimonial.name}</p>
-                    <p className="text-xs text-slate-600">{testimonial.role}</p>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* CTA Final */}
-        <section className="py-12 px-4 bg-gradient-to-r from-blue-600 to-cyan-600">
-          <div className="max-w-4xl mx-auto text-center">
-            <h2 className="text-3xl md:text-4xl font-black text-white mb-4">
-              Prêt à simplifier votre quotidien ?
-            </h2>
-            <p className="text-lg text-blue-100 mb-6">
-              Trouvez un pressing près de chez vous
+      {/* Hero Carousel */}
+      <section className="relative overflow-hidden">
+        <div 
+          className={`bg-gradient-to-r ${slides[currentSlide].bg} text-white py-16 md:py-24 transition-all duration-500`}
+        >
+          <div className="max-w-7xl mx-auto px-4 text-center">
+            <p className="text-white/80 text-lg mb-2">{slides[currentSlide].subtitle}</p>
+            <h1 className="text-4xl md:text-6xl font-bold mb-4">{slides[currentSlide].title}</h1>
+            <p className="text-xl text-white/90 mb-8 max-w-2xl mx-auto">
+              {slides[currentSlide].description}
             </p>
             <button
-              onClick={() => navigate('/partners-map')}
-              className="px-10 py-4 bg-white text-blue-600 rounded-xl font-bold text-lg hover:shadow-2xl transition transform hover:scale-105 inline-flex items-center gap-2"
+              onClick={() => navigate(slides[currentSlide].ctaLink)}
+              className="px-8 py-4 bg-white text-slate-900 rounded-full font-bold text-lg hover:shadow-xl transition inline-flex items-center gap-2"
             >
-              Trouver un pressing
+              {slides[currentSlide].cta}
               <ArrowRight className="w-5 h-5" />
             </button>
           </div>
-        </section>
+        </div>
 
-        {/* Newsletter */}
-        <NewsletterFooter />
+        {/* Carousel dots */}
+        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
+          {slides.map((_, i) => (
+            <button
+              key={i}
+              onClick={() => setCurrentSlide(i)}
+              className={`w-3 h-3 rounded-full transition ${
+                i === currentSlide ? 'bg-white' : 'bg-white/40'
+              }`}
+            />
+          ))}
+        </div>
 
-        {/* Footer */}
-        <footer className="bg-slate-900 text-white py-10">
-          <div className="max-w-7xl mx-auto px-4">
-            <div className="grid md:grid-cols-4 gap-8 mb-8">
-              <div>
-                <p className="text-2xl font-black mb-3 bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
-                  Kilolab
-                </p>
-                <p className="text-slate-400 text-sm">
-                  Le pressing nouvelle génération
-                </p>
+        {/* Carousel arrows */}
+        <button
+          onClick={() => setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length)}
+          className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/20 rounded-full flex items-center justify-center text-white hover:bg-white/30 transition"
+        >
+          <ChevronLeft className="w-6 h-6" />
+        </button>
+        <button
+          onClick={() => setCurrentSlide((prev) => (prev + 1) % slides.length)}
+          className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/20 rounded-full flex items-center justify-center text-white hover:bg-white/30 transition"
+        >
+          <ChevronRight className="w-6 h-6" />
+        </button>
+      </section>
+
+      {/* Stats */}
+      <section className="bg-gradient-to-r from-green-500 to-teal-500 py-12">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="grid grid-cols-3 gap-4 text-center text-white">
+            {stats.map((stat, i) => (
+              <div key={i}>
+                <div className="text-3xl md:text-5xl font-bold">{stat.value}</div>
+                <div className="text-sm md:text-base text-white/80">{stat.label}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Comparateur de prix */}
+      <section className="py-16 bg-green-50">
+        <div className="max-w-4xl mx-auto px-4">
+          <div className="bg-white rounded-3xl shadow-xl p-6 md:p-8 border-2 border-green-100">
+            <div className="flex items-center gap-4 mb-6">
+              <div className="w-14 h-14 bg-green-100 rounded-2xl flex items-center justify-center">
+                <Calculator className="w-7 h-7 text-green-600" />
               </div>
               <div>
-                <h3 className="font-bold mb-3 text-sm">Services</h3>
-                <ul className="space-y-2 text-sm text-slate-400">
-                  <li><button onClick={() => navigate('/partners-map')} className="hover:text-white transition">Trouver un pressing</button></li>
-                  <li><button onClick={() => navigate('/pricing')} className="hover:text-white transition">Tarifs</button></li>
-                  <li><button onClick={() => navigate('/faq')} className="hover:text-white transition">FAQ</button></li>
-                  <li><button onClick={() => navigate('/become-partner')} className="hover:text-white transition">Devenir partenaire</button></li>
-                </ul>
-              </div>
-              <div>
-                <h3 className="font-bold mb-3 text-sm">Entreprise</h3>
-                <ul className="space-y-2 text-sm text-slate-400">
-                  <li><button onClick={() => navigate('/about')} className="hover:text-white transition">À propos</button></li>
-                  <li><button onClick={() => navigate('/blog')} className="hover:text-white transition">Blog</button></li>
-                  <li><button onClick={() => navigate('/contact')} className="hover:text-white transition">Contact</button></li>
-                </ul>
-              </div>
-              <div>
-                <h3 className="font-bold mb-3 text-sm">Légal</h3>
-                <ul className="space-y-2 text-sm text-slate-400">
-                  <li><button onClick={() => navigate('/legal/cgu')} className="hover:text-white transition">CGU</button></li>
-                  <li><button onClick={() => navigate('/legal/privacy')} className="hover:text-white transition">Confidentialité</button></li>
-                  <li><button onClick={() => navigate('/legal/mentions-legales')} className="hover:text-white transition">Mentions légales</button></li>
-                </ul>
+                <h2 className="text-2xl md:text-3xl font-bold text-slate-900">Comparateur de prix</h2>
+                <p className="text-slate-600">Pressing traditionnel vs Kilolab (au kilo)</p>
               </div>
             </div>
-            <div className="border-t border-slate-800 pt-6 text-center text-slate-500 text-xs">
-              <p>© 2025 Kilolab. Tous droits réservés.</p>
+
+            <div className="space-y-4">
+              {priceComparison.map((item, i) => {
+                const kilolabPrice = (item.weight * pricePerKg).toFixed(2);
+                return (
+                  <div key={i} className="bg-slate-50 rounded-2xl p-4">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="font-bold text-slate-900">{item.item}</span>
+                      <span className="text-sm text-slate-500">~{item.weight}kg</span>
+                    </div>
+                    <div className="grid grid-cols-3 gap-4 text-center">
+                      <div>
+                        <p className="text-xs text-slate-500">Traditionnel</p>
+                        <p className="font-bold text-slate-400 line-through">{item.traditional.toFixed(2)}€</p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-slate-500">Kilolab</p>
+                        <p className="font-bold text-green-600">{kilolabPrice}€</p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-slate-500">Économie</p>
+                        <p className="font-bold text-green-600 flex items-center justify-center gap-1">
+                          <span className="text-lg">↘</span> {item.saving}%
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            <div className="mt-6 p-4 bg-green-100 rounded-2xl text-center">
+              <p className="text-green-800 font-medium">
+                💡 Avec Kilolab, économisez en moyenne <strong>90%</strong> sur votre pressing !
+              </p>
+            </div>
+
+            <button
+              onClick={() => navigate('/partners-map')}
+              className="w-full mt-6 py-4 bg-green-500 text-white rounded-2xl font-bold text-lg hover:bg-green-600 transition"
+            >
+              Trouver un pressing près de chez moi
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {/* Comment ça marche */}
+      <section className="py-16">
+        <div className="max-w-7xl mx-auto px-4">
+          <h2 className="text-3xl md:text-4xl font-bold text-center text-slate-900 mb-4">
+            Comment ça marche ?
+          </h2>
+          <p className="text-center text-slate-600 mb-12 max-w-2xl mx-auto">
+            En 3 étapes simples, votre linge est prêt
+          </p>
+
+          <div className="grid md:grid-cols-3 gap-8">
+            {steps.map((step, i) => (
+              <div key={i} className="text-center">
+                <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-teal-500 rounded-full flex items-center justify-center mx-auto mb-4 text-white text-2xl font-bold">
+                  {step.step}
+                </div>
+                <h3 className="text-xl font-bold text-slate-900 mb-2">{step.title}</h3>
+                <p className="text-slate-600">{step.description}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Avantages */}
+      <section className="py-16 bg-slate-50">
+        <div className="max-w-7xl mx-auto px-4">
+          <h2 className="text-3xl md:text-4xl font-bold text-center text-slate-900 mb-12">
+            Pourquoi choisir Kilolab ?
+          </h2>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {benefits.map((benefit, i) => (
+              <div key={i} className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition">
+                <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center mb-4">
+                  <benefit.icon className="w-6 h-6 text-green-600" />
+                </div>
+                <h3 className="text-lg font-bold text-slate-900 mb-2">{benefit.title}</h3>
+                <p className="text-slate-600 text-sm">{benefit.description}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Partenaires */}
+      <section className="py-16 bg-gradient-to-r from-purple-600 to-pink-600">
+        <div className="max-w-4xl mx-auto px-4 text-center text-white">
+          <h2 className="text-3xl md:text-4xl font-bold mb-4">
+            Vous êtes un pressing ?
+          </h2>
+          <p className="text-xl text-white/90 mb-8">
+            Rejoignez le réseau Kilolab et recevez de nouveaux clients.
+            <br />
+            <strong>Zéro abonnement. Zéro engagement. Rentable dès le 1er client.</strong>
+          </p>
+          <button
+            onClick={() => navigate('/become-partner')}
+            className="px-8 py-4 bg-white text-purple-600 rounded-full font-bold text-lg hover:shadow-xl transition"
+          >
+            Devenir partenaire gratuitement
+          </button>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="bg-slate-900 text-white py-12">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="grid md:grid-cols-4 gap-8 mb-8">
+            <div>
+              <h3 className="text-xl font-bold mb-4">Kilolab</h3>
+              <p className="text-slate-400 text-sm">
+                Le pressing au kilo, simple et économique.
+              </p>
+            </div>
+            <div>
+              <h4 className="font-semibold mb-4">Navigation</h4>
+              <ul className="space-y-2 text-slate-400 text-sm">
+                <li><Link to="/partners-map" className="hover:text-white">Trouver un pressing</Link></li>
+                <li><Link to="/pricing" className="hover:text-white">Tarifs</Link></li>
+                <li><Link to="/become-partner" className="hover:text-white">Devenir partenaire</Link></li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="font-semibold mb-4">Informations</h4>
+              <ul className="space-y-2 text-slate-400 text-sm">
+                <li><Link to="/about" className="hover:text-white">À propos</Link></li>
+                <li><Link to="/contact" className="hover:text-white">Contact</Link></li>
+                <li><Link to="/blog" className="hover:text-white">Blog</Link></li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="font-semibold mb-4">Légal</h4>
+              <ul className="space-y-2 text-slate-400 text-sm">
+                <li><Link to="/legal/cgu" className="hover:text-white">CGU</Link></li>
+                <li><Link to="/legal/privacy" className="hover:text-white">Confidentialité</Link></li>
+                <li><Link to="/legal/mentions-legales" className="hover:text-white">Mentions légales</Link></li>
+              </ul>
             </div>
           </div>
-        </footer>
-      </div>
-    </>
+          <div className="border-t border-slate-800 pt-8 text-center text-slate-400 text-sm">
+            © 2025 Kilolab. Tous droits réservés.
+          </div>
+        </div>
+      </footer>
+    </div>
   );
 }
