@@ -1,3 +1,6 @@
+// src/pages/PickupQR.tsx
+// Page de retrait avec QR Code et scanner pour le pressing
+
 import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
