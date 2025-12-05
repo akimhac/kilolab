@@ -1,60 +1,65 @@
+// src/pages/PartnerDashboard.tsx
+// Dashboard complet pour les pressings partenaires
+
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { 
-  ArrowLeft, Building2, CheckCircle, XCircle, Clock, Eye, 
-  Users, Package, Euro, TrendingUp, AlertCircle, Search,
-  Mail, Phone, MapPin, Calendar, Filter
+  Package, Clock, CheckCircle, Truck, Euro, Star, 
+  Users, TrendingUp, ArrowLeft, LogOut, RefreshCw,
+  ChevronRight, Phone, Mail, MapPin, QrCode, Search,
+  AlertCircle, Loader2, Eye, MessageSquare, BarChart3,
+  Calendar, Filter, X, Check, Play, Pause
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
-interface Partner {
+interface Order {
   id: string;
-  user_id?: string;
-  name: string;
-  email: string;
-  phone?: string;
-  address: string;
-  city: string;
-  postal_code: string;
-  siret?: string;
-  description?: string;
-  is_active: boolean;
+  user_id: string;
+  weight_kg: number;
+  service_type: 'standard' | 'express';
+  price_per_kg: number;
+  total_amount: number;
+  status: 'pending' | 'confirmed' | 'in_progress' | 'ready' | 'completed' | 'cancelled';
+  notes?: string;
   created_at: string;
-  price_per_kg?: number;
+  updated_at: string;
+  user_email?: string;
+  user_name?: string;
 }
 
 interface Stats {
-  totalPartners: number;
-  activePartners: number;
-  pendingPartners: number;
   totalOrders: number;
+  pendingOrders: number;
+  completedOrders: number;
   totalRevenue: number;
-  totalUsers: number;
+  averageRating: number;
+  totalReviews: number;
 }
 
-export default function AdminDashboard() {
+export default function PartnerDashboard() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
-  const [partners, setPartners] = useState<Partner[]>([]);
+  const [partner, setPartner] = useState<any>(null);
+  const [orders, setOrders] = useState<Order[]>([]);
   const [stats, setStats] = useState<Stats>({
-    totalPartners: 0,
-    activePartners: 0,
-    pendingPartners: 0,
     totalOrders: 0,
+    pendingOrders: 0,
+    completedOrders: 0,
     totalRevenue: 0,
-    totalUsers: 0
+    averageRating: 0,
+    totalReviews: 0
   });
-  const [selectedPartner, setSelectedPartner] = useState<Partner | null>(null);
-  const [filter, setFilter] = useState<'all' | 'pending' | 'active' | 'inactive'>('pending');
+  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+  const [filterStatus, setFilterStatus] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState('');
-  const [isAdmin, setIsAdmin] = useState(false);
+  const [updatingStatus, setUpdatingStatus] = useState<string | null>(null);
 
   useEffect(() => {
-    checkAdminAndLoad();
+    checkAuthAndLoadData();
   }, []);
 
-  const checkAdminAndLoad = async () => {
+  const checkAuthAndLoadData = async () => {
     try {
       const { data: { session } } = await supabase.auth.getSession();
       
@@ -63,17 +68,29 @@ export default function AdminDashboard() {
         return;
       }
 
-      // Vérifier si l'utilisateur est admin (email spécifique ou table admins)
-      const adminEmails = ['admin@kilolab.fr', 'contact@kilolab.fr']; // À personnaliser
-      
-      if (!adminEmails.includes(session.user.email || '')) {
-        toast.error('Accès non autorisé');
+      // Trouver le partenaire associé à cet email
+      const { data: partnerData, error: partnerError } = await supabase
+        .from('partners')
+        .select('*')
+        .eq('email', session.user.email)
+        .single();
+
+      if (partnerError || !partnerData) {
+        toast.error('Compte partenaire non trouvé');
         navigate('/');
         return;
       }
 
-      setIsAdmin(true);
-      await loadData();
+      if (!partnerData.is_active) {
+        toast.error('Votre compte est en attente de validation');
+        navigate('/');
+        return;
+      }
+
+      setPartner(partnerData);
+      await loadOrders(partnerData.id);
+      await loadStats(partnerData.id);
+
     } catch (error) {
       console.error('Erreur:', error);
       toast.error('Erreur de chargement');
@@ -82,431 +99,496 @@ export default function AdminDashboard() {
     }
   };
 
-  const loadData = async () => {
+  const loadOrders = async (partnerId: string) => {
     try {
-      // Charger tous les partenaires
-      const { data: partnersData, error: partnersError } = await supabase
-        .from('partners')
+      const { data, error } = await supabase
+        .from('orders')
         .select('*')
+        .eq('partner_id', partnerId)
         .order('created_at', { ascending: false });
-
-      if (partnersError) throw partnersError;
-      setPartners(partnersData || []);
-
-      // Calculer les stats
-      const active = partnersData?.filter(p => p.is_active === true).length || 0;
-      const pending = partnersData?.filter(p => p.is_active === false || p.is_active === null).length || 0;
-
-      // Charger les commandes
-      const { data: ordersData } = await supabase
-        .from('orders')
-        .select('total_amount');
-
-      const totalRevenue = ordersData?.reduce((sum, o) => sum + (o.total_amount || 0), 0) || 0;
-
-      // Compter les utilisateurs (approximatif)
-      const { count: usersCount } = await supabase
-        .from('orders')
-        .select('user_id', { count: 'exact', head: true });
-
-      setStats({
-        totalPartners: partnersData?.length || 0,
-        activePartners: active,
-        pendingPartners: pending,
-        totalOrders: ordersData?.length || 0,
-        totalRevenue,
-        totalUsers: usersCount || 0
-      });
-
-    } catch (error) {
-      console.error('Erreur:', error);
-    }
-  };
-
-  const handleValidatePartner = async (partnerId: string, approve: boolean) => {
-    try {
-      const { error } = await supabase
-        .from('partners')
-        .update({ 
-          is_active: approve,
-          validated_at: approve ? new Date().toISOString() : null
-        })
-        .eq('id', partnerId);
 
       if (error) throw error;
 
-      toast.success(approve ? 'Partenaire validé !' : 'Partenaire refusé');
-      
-      // Recharger les données
-      await loadData();
-      setSelectedPartner(null);
+      // Charger les infos utilisateurs
+      const ordersWithUsers = await Promise.all(
+        (data || []).map(async (order) => {
+          const { data: userData } = await supabase.auth.admin.getUserById(order.user_id).catch(() => ({ data: null }));
+          return {
+            ...order,
+            user_email: userData?.user?.email || 'Client',
+            user_name: userData?.user?.user_metadata?.name || 'Client'
+          };
+        })
+      );
 
-      // TODO: Envoyer un email au partenaire
-
+      setOrders(ordersWithUsers);
     } catch (error) {
-      console.error('Erreur:', error);
-      toast.error('Erreur lors de la validation');
+      console.error('Erreur chargement commandes:', error);
     }
   };
 
-  const filteredPartners = partners.filter(p => {
-    // Filtre par statut
-    if (filter === 'active' && !p.is_active) return false;
-    if (filter === 'inactive' && p.is_active !== false) return false;
-    if (filter === 'pending' && p.is_active !== false && p.is_active !== null) return false;
+  const loadStats = async (partnerId: string) => {
+    try {
+      // Commandes
+      const { data: ordersData } = await supabase
+        .from('orders')
+        .select('*')
+        .eq('partner_id', partnerId);
 
-    // Filtre par recherche
+      const orders = ordersData || [];
+      const completed = orders.filter(o => o.status === 'completed');
+      const pending = orders.filter(o => ['pending', 'confirmed', 'in_progress', 'ready'].includes(o.status));
+
+      // Avis
+      const { data: reviewsData } = await supabase
+        .from('reviews')
+        .select('rating')
+        .eq('partner_id', partnerId);
+
+      const reviews = reviewsData || [];
+      const avgRating = reviews.length > 0
+        ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length
+        : 0;
+
+      setStats({
+        totalOrders: orders.length,
+        pendingOrders: pending.length,
+        completedOrders: completed.length,
+        totalRevenue: completed.reduce((sum, o) => sum + (o.total_amount || 0), 0),
+        averageRating: Math.round(avgRating * 10) / 10,
+        totalReviews: reviews.length
+      });
+    } catch (error) {
+      console.error('Erreur stats:', error);
+    }
+  };
+
+  const updateOrderStatus = async (orderId: string, newStatus: string) => {
+    setUpdatingStatus(orderId);
+    try {
+      const { error } = await supabase
+        .from('orders')
+        .update({ 
+          status: newStatus,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', orderId);
+
+      if (error) throw error;
+
+      // Mettre à jour localement
+      setOrders(prev => prev.map(o => 
+        o.id === orderId ? { ...o, status: newStatus as any } : o
+      ));
+
+      toast.success(`Statut mis à jour : ${getStatusLabel(newStatus)}`);
+
+      // Recharger les stats
+      if (partner) {
+        await loadStats(partner.id);
+      }
+
+    } catch (error) {
+      console.error('Erreur:', error);
+      toast.error('Erreur lors de la mise à jour');
+    } finally {
+      setUpdatingStatus(null);
+    }
+  };
+
+  const getStatusLabel = (status: string): string => {
+    const labels: Record<string, string> = {
+      pending: 'En attente',
+      confirmed: 'Confirmée',
+      in_progress: 'En cours',
+      ready: 'Prêt',
+      completed: 'Terminée',
+      cancelled: 'Annulée'
+    };
+    return labels[status] || status;
+  };
+
+  const getStatusColor = (status: string): string => {
+    const colors: Record<string, string> = {
+      pending: 'bg-yellow-100 text-yellow-700',
+      confirmed: 'bg-blue-100 text-blue-700',
+      in_progress: 'bg-purple-100 text-purple-700',
+      ready: 'bg-green-100 text-green-700',
+      completed: 'bg-slate-100 text-slate-700',
+      cancelled: 'bg-red-100 text-red-700'
+    };
+    return colors[status] || 'bg-slate-100 text-slate-700';
+  };
+
+  const getNextStatus = (currentStatus: string): string | null => {
+    const flow: Record<string, string> = {
+      pending: 'confirmed',
+      confirmed: 'in_progress',
+      in_progress: 'ready',
+      ready: 'completed'
+    };
+    return flow[currentStatus] || null;
+  };
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    navigate('/');
+  };
+
+  // Filtrer les commandes
+  const filteredOrders = orders.filter(order => {
+    if (filterStatus !== 'all' && order.status !== filterStatus) return false;
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
       return (
-        p.name?.toLowerCase().includes(query) ||
-        p.email?.toLowerCase().includes(query) ||
-        p.city?.toLowerCase().includes(query) ||
-        p.postal_code?.includes(query)
+        order.id.toLowerCase().includes(query) ||
+        order.user_email?.toLowerCase().includes(query) ||
+        order.user_name?.toLowerCase().includes(query)
       );
     }
-
     return true;
   });
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 to-purple-900">
-        <div className="w-16 h-16 border-4 border-purple-500 border-t-transparent rounded-full animate-spin"></div>
+      <div className="min-h-screen flex items-center justify-center bg-slate-50">
+        <div className="text-center">
+          <Loader2 className="w-12 h-12 text-green-600 animate-spin mx-auto mb-4" />
+          <p className="text-slate-600">Chargement...</p>
+        </div>
       </div>
     );
   }
 
-  if (!isAdmin) {
-    return null;
-  }
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+    <div className="min-h-screen bg-slate-50">
       {/* Header */}
-      <div className="bg-black/20 backdrop-blur-lg border-b border-white/10 sticky top-0 z-50">
+      <div className="bg-white border-b shadow-sm sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
-            <button
-              onClick={() => navigate('/')}
-              className="flex items-center gap-2 text-white/80 hover:text-white transition"
-            >
-              <ArrowLeft className="w-5 h-5" />
-              Retour
-            </button>
-            <h1 className="text-xl font-bold text-white flex items-center gap-2">
-              <Building2 className="w-6 h-6 text-purple-400" />
-              Administration Kilolab
-            </h1>
-            <div className="w-20"></div>
+            <div>
+              <h1 className="text-xl font-bold text-slate-900">{partner?.name}</h1>
+              <p className="text-sm text-slate-500">{partner?.city}</p>
+            </div>
+            <div className="flex items-center gap-3">
+              <Link
+                to="/scanner"
+                className="flex items-center gap-2 px-4 py-2 bg-green-500 text-white rounded-lg font-medium hover:bg-green-600 transition"
+              >
+                <QrCode className="w-5 h-5" />
+                Scanner QR
+              </Link>
+              <button
+                onClick={handleLogout}
+                className="p-2 text-slate-400 hover:text-slate-600 transition"
+              >
+                <LogOut className="w-5 h-5" />
+              </button>
+            </div>
           </div>
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 py-8">
+      <div className="max-w-7xl mx-auto px-4 py-6">
         {/* Stats Cards */}
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
-          <StatCard 
-            icon={Building2} 
-            label="Total Pressings" 
-            value={stats.totalPartners} 
-            color="purple" 
-          />
-          <StatCard 
-            icon={CheckCircle} 
-            label="Actifs" 
-            value={stats.activePartners} 
-            color="green" 
-          />
-          <StatCard 
-            icon={Clock} 
-            label="En attente" 
-            value={stats.pendingPartners} 
-            color="yellow" 
-          />
-          <StatCard 
-            icon={Package} 
-            label="Commandes" 
-            value={stats.totalOrders} 
-            color="blue" 
-          />
-          <StatCard 
-            icon={Euro} 
-            label="CA Total" 
-            value={`${stats.totalRevenue.toFixed(0)}€`} 
-            color="pink" 
-          />
-          <StatCard 
-            icon={Users} 
-            label="Clients" 
-            value={stats.totalUsers} 
-            color="cyan" 
-          />
-        </div>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+          <div className="bg-white rounded-2xl p-5 shadow-md">
+            <div className="flex items-center gap-3 mb-2">
+              <div className="w-10 h-10 bg-yellow-100 rounded-xl flex items-center justify-center">
+                <Clock className="w-5 h-5 text-yellow-600" />
+              </div>
+              <span className="text-sm text-slate-500">En cours</span>
+            </div>
+            <p className="text-3xl font-bold text-slate-900">{stats.pendingOrders}</p>
+          </div>
 
-        {/* Alertes */}
-        {stats.pendingPartners > 0 && (
-          <div className="bg-yellow-500/20 border border-yellow-500/50 rounded-2xl p-4 mb-6 flex items-center gap-3">
-            <AlertCircle className="w-6 h-6 text-yellow-400" />
-            <p className="text-yellow-200">
-              <strong>{stats.pendingPartners} partenaire(s)</strong> en attente de validation
+          <div className="bg-white rounded-2xl p-5 shadow-md">
+            <div className="flex items-center gap-3 mb-2">
+              <div className="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center">
+                <CheckCircle className="w-5 h-5 text-green-600" />
+              </div>
+              <span className="text-sm text-slate-500">Terminées</span>
+            </div>
+            <p className="text-3xl font-bold text-slate-900">{stats.completedOrders}</p>
+          </div>
+
+          <div className="bg-white rounded-2xl p-5 shadow-md">
+            <div className="flex items-center gap-3 mb-2">
+              <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center">
+                <Euro className="w-5 h-5 text-blue-600" />
+              </div>
+              <span className="text-sm text-slate-500">Chiffre d'affaires</span>
+            </div>
+            <p className="text-3xl font-bold text-slate-900">{stats.totalRevenue.toFixed(0)}€</p>
+          </div>
+
+          <div className="bg-white rounded-2xl p-5 shadow-md">
+            <div className="flex items-center gap-3 mb-2">
+              <div className="w-10 h-10 bg-purple-100 rounded-xl flex items-center justify-center">
+                <Star className="w-5 h-5 text-purple-600" />
+              </div>
+              <span className="text-sm text-slate-500">Note moyenne</span>
+            </div>
+            <p className="text-3xl font-bold text-slate-900">
+              {stats.averageRating > 0 ? stats.averageRating.toFixed(1) : '-'}
+              <span className="text-sm font-normal text-slate-400"> ({stats.totalReviews} avis)</span>
             </p>
           </div>
-        )}
+        </div>
 
         {/* Filtres et recherche */}
-        <div className="bg-white/5 backdrop-blur-lg rounded-2xl p-4 mb-6">
+        <div className="bg-white rounded-2xl p-4 shadow-md mb-6">
           <div className="flex flex-col md:flex-row gap-4">
             {/* Recherche */}
-            <div className="relative flex-1">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/40" />
+            <div className="flex-1 relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
               <input
                 type="text"
-                placeholder="Rechercher par nom, email, ville..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-12 pr-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/40 focus:outline-none focus:border-purple-500"
+                placeholder="Rechercher par ID, client..."
+                className="w-full pl-10 pr-4 py-2 border rounded-lg focus:border-green-500 focus:outline-none"
               />
             </div>
 
-            {/* Boutons de filtre */}
-            <div className="flex gap-2">
-              {[
-                { key: 'pending', label: 'En attente', count: stats.pendingPartners },
-                { key: 'active', label: 'Actifs', count: stats.activePartners },
-                { key: 'all', label: 'Tous', count: stats.totalPartners }
-              ].map(({ key, label, count }) => (
+            {/* Filtre par statut */}
+            <div className="flex gap-2 overflow-x-auto">
+              {['all', 'pending', 'confirmed', 'in_progress', 'ready', 'completed'].map(status => (
                 <button
-                  key={key}
-                  onClick={() => setFilter(key as typeof filter)}
-                  className={`px-4 py-2 rounded-xl font-semibold transition flex items-center gap-2 ${
-                    filter === key
-                      ? 'bg-purple-600 text-white'
-                      : 'bg-white/10 text-white/70 hover:bg-white/20'
+                  key={status}
+                  onClick={() => setFilterStatus(status)}
+                  className={`px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition ${
+                    filterStatus === status
+                      ? 'bg-green-500 text-white'
+                      : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                   }`}
                 >
-                  {label}
-                  <span className={`px-2 py-0.5 rounded-full text-xs ${
-                    filter === key ? 'bg-white/20' : 'bg-white/10'
-                  }`}>
-                    {count}
-                  </span>
+                  {status === 'all' ? 'Toutes' : getStatusLabel(status)}
                 </button>
               ))}
             </div>
           </div>
         </div>
 
-        {/* Liste des partenaires */}
-        <div className="bg-white/5 backdrop-blur-lg rounded-2xl overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-white/10">
-                <tr>
-                  <th className="px-4 py-3 text-left text-sm font-semibold text-white/80">Pressing</th>
-                  <th className="px-4 py-3 text-left text-sm font-semibold text-white/80">Ville</th>
-                  <th className="px-4 py-3 text-left text-sm font-semibold text-white/80">Contact</th>
-                  <th className="px-4 py-3 text-left text-sm font-semibold text-white/80">Date</th>
-                  <th className="px-4 py-3 text-left text-sm font-semibold text-white/80">Statut</th>
-                  <th className="px-4 py-3 text-right text-sm font-semibold text-white/80">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-white/10">
-                {filteredPartners.length === 0 ? (
-                  <tr>
-                    <td colSpan={6} className="px-4 py-12 text-center text-white/50">
-                      Aucun partenaire trouvé
-                    </td>
-                  </tr>
-                ) : (
-                  filteredPartners.map((partner) => (
-                    <tr key={partner.id} className="hover:bg-white/5 transition">
-                      <td className="px-4 py-4">
-                        <div>
-                          <p className="font-semibold text-white">{partner.name}</p>
-                          <p className="text-sm text-white/50">{partner.address}</p>
-                        </div>
-                      </td>
-                      <td className="px-4 py-4">
-                        <p className="text-white">{partner.city}</p>
-                        <p className="text-sm text-white/50">{partner.postal_code}</p>
-                      </td>
-                      <td className="px-4 py-4">
-                        <p className="text-white text-sm">{partner.email}</p>
-                        {partner.phone && (
-                          <p className="text-sm text-white/50">{partner.phone}</p>
-                        )}
-                      </td>
-                      <td className="px-4 py-4 text-white/70 text-sm">
-                        {new Date(partner.created_at).toLocaleDateString('fr-FR')}
-                      </td>
-                      <td className="px-4 py-4">
-                        {partner.is_active === true ? (
-                          <span className="px-3 py-1 bg-green-500/20 text-green-400 rounded-full text-sm font-medium">
-                            Actif
-                          </span>
-                        ) : partner.is_active === false ? (
-                          <span className="px-3 py-1 bg-red-500/20 text-red-400 rounded-full text-sm font-medium">
-                            Refusé
-                          </span>
-                        ) : (
-                          <span className="px-3 py-1 bg-yellow-500/20 text-yellow-400 rounded-full text-sm font-medium">
-                            En attente
-                          </span>
-                        )}
-                      </td>
-                      <td className="px-4 py-4">
-                        <div className="flex items-center justify-end gap-2">
-                          <button
-                            onClick={() => setSelectedPartner(partner)}
-                            className="p-2 hover:bg-white/10 rounded-lg transition"
-                            title="Voir détails"
-                          >
-                            <Eye className="w-5 h-5 text-white/70" />
-                          </button>
-                          {!partner.is_active && (
-                            <>
-                              <button
-                                onClick={() => handleValidatePartner(partner.id, true)}
-                                className="p-2 hover:bg-green-500/20 rounded-lg transition"
-                                title="Valider"
-                              >
-                                <CheckCircle className="w-5 h-5 text-green-400" />
-                              </button>
-                              <button
-                                onClick={() => handleValidatePartner(partner.id, false)}
-                                className="p-2 hover:bg-red-500/20 rounded-lg transition"
-                                title="Refuser"
-                              >
-                                <XCircle className="w-5 h-5 text-red-400" />
-                              </button>
-                            </>
-                          )}
-                        </div>
-                      </td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
+        {/* Liste des commandes */}
+        <div className="bg-white rounded-2xl shadow-md overflow-hidden">
+          <div className="p-4 border-b">
+            <h2 className="text-lg font-bold text-slate-900">
+              Commandes ({filteredOrders.length})
+            </h2>
           </div>
+
+          {filteredOrders.length === 0 ? (
+            <div className="p-12 text-center">
+              <Package className="w-12 h-12 text-slate-300 mx-auto mb-4" />
+              <p className="text-slate-500">Aucune commande trouvée</p>
+            </div>
+          ) : (
+            <div className="divide-y">
+              {filteredOrders.map((order) => {
+                const nextStatus = getNextStatus(order.status);
+                return (
+                  <div key={order.id} className="p-4 hover:bg-slate-50 transition">
+                    <div className="flex items-start justify-between gap-4">
+                      {/* Infos commande */}
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-3 mb-2">
+                          <span className={`px-2 py-1 rounded-lg text-xs font-medium ${getStatusColor(order.status)}`}>
+                            {getStatusLabel(order.status)}
+                          </span>
+                          <span className={`px-2 py-1 rounded-lg text-xs font-medium ${
+                            order.service_type === 'express' 
+                              ? 'bg-orange-100 text-orange-700' 
+                              : 'bg-slate-100 text-slate-600'
+                          }`}>
+                            {order.service_type === 'express' ? '⚡ Express' : 'Standard'}
+                          </span>
+                        </div>
+
+                        <p className="font-medium text-slate-900 truncate">
+                          #{order.id.substring(0, 8).toUpperCase()}
+                        </p>
+                        <p className="text-sm text-slate-500">
+                          {order.user_name || order.user_email || 'Client'}
+                        </p>
+                        <p className="text-xs text-slate-400 mt-1">
+                          {new Date(order.created_at).toLocaleDateString('fr-FR', {
+                            day: 'numeric',
+                            month: 'short',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                          })}
+                        </p>
+
+                        {order.notes && (
+                          <p className="text-xs text-slate-500 mt-2 bg-yellow-50 p-2 rounded">
+                            📝 {order.notes}
+                          </p>
+                        )}
+                      </div>
+
+                      {/* Prix et poids */}
+                      <div className="text-right">
+                        <p className="text-lg font-bold text-slate-900">
+                          {order.total_amount?.toFixed(2)}€
+                        </p>
+                        <p className="text-sm text-slate-500">
+                          {order.weight_kg} kg × {order.price_per_kg}€
+                        </p>
+                      </div>
+
+                      {/* Actions */}
+                      <div className="flex flex-col gap-2">
+                        {nextStatus && order.status !== 'completed' && order.status !== 'cancelled' && (
+                          <button
+                            onClick={() => updateOrderStatus(order.id, nextStatus)}
+                            disabled={updatingStatus === order.id}
+                            className="px-4 py-2 bg-green-500 text-white rounded-lg text-sm font-medium hover:bg-green-600 transition disabled:opacity-50 flex items-center gap-2"
+                          >
+                            {updatingStatus === order.id ? (
+                              <Loader2 className="w-4 h-4 animate-spin" />
+                            ) : (
+                              <ChevronRight className="w-4 h-4" />
+                            )}
+                            {getStatusLabel(nextStatus)}
+                          </button>
+                        )}
+
+                        {order.status === 'ready' && (
+                          <Link
+                            to={`/scanner?order=${order.id}`}
+                            className="px-4 py-2 bg-blue-500 text-white rounded-lg text-sm font-medium hover:bg-blue-600 transition flex items-center gap-2"
+                          >
+                            <QrCode className="w-4 h-4" />
+                            Scanner
+                          </Link>
+                        )}
+
+                        <button
+                          onClick={() => setSelectedOrder(order)}
+                          className="px-4 py-2 bg-slate-100 text-slate-600 rounded-lg text-sm font-medium hover:bg-slate-200 transition flex items-center gap-2"
+                        >
+                          <Eye className="w-4 h-4" />
+                          Détails
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </div>
 
-        {/* Modal détails partenaire */}
-        {selectedPartner && (
-          <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-            <div className="bg-slate-800 rounded-3xl max-w-lg w-full p-6 max-h-[90vh] overflow-y-auto">
-              <div className="flex justify-between items-start mb-6">
-                <h2 className="text-2xl font-bold text-white">{selectedPartner.name}</h2>
+        {/* Rappel commission */}
+        <div className="mt-8 bg-green-50 rounded-2xl p-6 text-center">
+          <p className="text-green-800">
+            💰 <strong>Rappel :</strong> Commission Kilolab de 10% sur chaque commande. 
+            Votre part sur ce mois : <strong>{(stats.totalRevenue * 0.9).toFixed(2)}€</strong>
+          </p>
+        </div>
+      </div>
+
+      {/* Modal détails commande */}
+      {selectedOrder && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6 border-b flex items-center justify-between">
+              <h3 className="text-lg font-bold">Détails commande</h3>
+              <button
+                onClick={() => setSelectedOrder(null)}
+                className="p-2 hover:bg-slate-100 rounded-lg transition"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="p-6 space-y-4">
+              <div>
+                <p className="text-sm text-slate-500">ID Commande</p>
+                <p className="font-mono font-bold">{selectedOrder.id}</p>
+              </div>
+
+              <div>
+                <p className="text-sm text-slate-500">Statut</p>
+                <span className={`inline-block px-3 py-1 rounded-lg text-sm font-medium ${getStatusColor(selectedOrder.status)}`}>
+                  {getStatusLabel(selectedOrder.status)}
+                </span>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <p className="text-sm text-slate-500">Service</p>
+                  <p className="font-medium">{selectedOrder.service_type === 'express' ? '⚡ Express' : 'Standard'}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-slate-500">Poids</p>
+                  <p className="font-medium">{selectedOrder.weight_kg} kg</p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <p className="text-sm text-slate-500">Prix/kg</p>
+                  <p className="font-medium">{selectedOrder.price_per_kg}€</p>
+                </div>
+                <div>
+                  <p className="text-sm text-slate-500">Total</p>
+                  <p className="font-bold text-green-600 text-xl">{selectedOrder.total_amount?.toFixed(2)}€</p>
+                </div>
+              </div>
+
+              <div>
+                <p className="text-sm text-slate-500">Date de création</p>
+                <p className="font-medium">
+                  {new Date(selectedOrder.created_at).toLocaleDateString('fr-FR', {
+                    weekday: 'long',
+                    day: 'numeric',
+                    month: 'long',
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                  })}
+                </p>
+              </div>
+
+              {selectedOrder.notes && (
+                <div>
+                  <p className="text-sm text-slate-500">Instructions client</p>
+                  <p className="bg-yellow-50 p-3 rounded-lg">{selectedOrder.notes}</p>
+                </div>
+              )}
+
+              {/* QR Code pour retrait */}
+              {(selectedOrder.status === 'ready' || selectedOrder.status === 'completed') && (
+                <div className="bg-slate-50 p-4 rounded-xl text-center">
+                  <p className="text-sm text-slate-500 mb-2">Code de retrait</p>
+                  <p className="text-3xl font-mono font-bold text-slate-900">
+                    {selectedOrder.id.substring(0, 8).toUpperCase()}
+                  </p>
+                </div>
+              )}
+            </div>
+
+            <div className="p-6 border-t">
+              {getNextStatus(selectedOrder.status) && selectedOrder.status !== 'completed' && (
                 <button
-                  onClick={() => setSelectedPartner(null)}
-                  className="p-2 hover:bg-white/10 rounded-lg transition"
+                  onClick={() => {
+                    const next = getNextStatus(selectedOrder.status);
+                    if (next) {
+                      updateOrderStatus(selectedOrder.id, next);
+                      setSelectedOrder(null);
+                    }
+                  }}
+                  className="w-full py-3 bg-green-500 text-white rounded-xl font-bold hover:bg-green-600 transition"
                 >
-                  <XCircle className="w-6 h-6 text-white/70" />
+                  Passer à : {getStatusLabel(getNextStatus(selectedOrder.status) || '')}
                 </button>
-              </div>
-
-              <div className="space-y-4 mb-6">
-                <div className="flex items-start gap-3">
-                  <MapPin className="w-5 h-5 text-purple-400 mt-1" />
-                  <div>
-                    <p className="text-white">{selectedPartner.address}</p>
-                    <p className="text-white/70">{selectedPartner.postal_code} {selectedPartner.city}</p>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-3">
-                  <Mail className="w-5 h-5 text-purple-400" />
-                  <a href={`mailto:${selectedPartner.email}`} className="text-purple-400 hover:underline">
-                    {selectedPartner.email}
-                  </a>
-                </div>
-
-                {selectedPartner.phone && (
-                  <div className="flex items-center gap-3">
-                    <Phone className="w-5 h-5 text-purple-400" />
-                    <a href={`tel:${selectedPartner.phone}`} className="text-white">
-                      {selectedPartner.phone}
-                    </a>
-                  </div>
-                )}
-
-                {selectedPartner.siret && (
-                  <div className="flex items-center gap-3">
-                    <Building2 className="w-5 h-5 text-purple-400" />
-                    <span className="text-white">SIRET: {selectedPartner.siret}</span>
-                  </div>
-                )}
-
-                <div className="flex items-center gap-3">
-                  <Calendar className="w-5 h-5 text-purple-400" />
-                  <span className="text-white/70">
-                    Inscrit le {new Date(selectedPartner.created_at).toLocaleDateString('fr-FR')}
-                  </span>
-                </div>
-
-                {selectedPartner.description && (
-                  <div className="bg-white/5 rounded-xl p-4">
-                    <p className="text-white/80">{selectedPartner.description}</p>
-                  </div>
-                )}
-              </div>
-
-              {/* Actions */}
-              <div className="flex gap-3">
-                {selectedPartner.is_active !== true && (
-                  <button
-                    onClick={() => handleValidatePartner(selectedPartner.id, true)}
-                    className="flex-1 py-3 bg-green-600 text-white rounded-xl font-semibold hover:bg-green-700 transition flex items-center justify-center gap-2"
-                  >
-                    <CheckCircle className="w-5 h-5" />
-                    Valider
-                  </button>
-                )}
-                {selectedPartner.is_active !== false && (
-                  <button
-                    onClick={() => handleValidatePartner(selectedPartner.id, false)}
-                    className="flex-1 py-3 bg-red-600 text-white rounded-xl font-semibold hover:bg-red-700 transition flex items-center justify-center gap-2"
-                  >
-                    <XCircle className="w-5 h-5" />
-                    Refuser
-                  </button>
-                )}
-              </div>
+              )}
             </div>
           </div>
-        )}
-      </div>
-    </div>
-  );
-}
-
-// Composant carte stat
-function StatCard({ 
-  icon: Icon, 
-  label, 
-  value, 
-  color 
-}: { 
-  icon: any; 
-  label: string; 
-  value: string | number; 
-  color: string;
-}) {
-  const colors: Record<string, string> = {
-    purple: 'from-purple-500 to-purple-600',
-    green: 'from-green-500 to-green-600',
-    yellow: 'from-yellow-500 to-yellow-600',
-    blue: 'from-blue-500 to-blue-600',
-    pink: 'from-pink-500 to-pink-600',
-    cyan: 'from-cyan-500 to-cyan-600'
-  };
-
-  return (
-    <div className={`bg-gradient-to-br ${colors[color]} rounded-2xl p-4`}>
-      <Icon className="w-6 h-6 text-white/80 mb-2" />
-      <p className="text-2xl font-bold text-white">{value}</p>
-      <p className="text-sm text-white/80">{label}</p>
+        </div>
+      )}
     </div>
   );
 }
