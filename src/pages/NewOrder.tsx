@@ -1,5 +1,5 @@
 // src/pages/NewOrder.tsx
-// Page de création de commande - CORRIGÉE
+// Page de création de commande - 3€/kg Standard, 5€/kg Express
 
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -35,7 +35,8 @@ export default function NewOrder() {
   const [weightKg, setWeightKg] = useState(5);
   const [notes, setNotes] = useState('');
 
-  const pricePerKg = serviceType === 'express' ? 5 : 3.5;
+  // PRIX CORRIGÉS : 3€ standard, 5€ express
+  const pricePerKg = serviceType === 'express' ? 5 : 3;
   const totalAmount = weightKg * pricePerKg;
 
   useEffect(() => {
@@ -44,7 +45,6 @@ export default function NewOrder() {
 
   const checkAuthAndLoadData = async () => {
     try {
-      // Vérifier l'authentification
       const { data: { session } } = await supabase.auth.getSession();
       
       if (!session) {
@@ -55,14 +55,12 @@ export default function NewOrder() {
       
       setUser(session.user);
 
-      // Récupérer le partenaire depuis le state
       const selectedPartner = location.state?.selectedPartner;
       
       if (selectedPartner) {
         setPartner(selectedPartner);
         setNoPartnerSelected(false);
       } else {
-        // Aucun pressing sélectionné
         setNoPartnerSelected(true);
       }
 
@@ -113,8 +111,6 @@ export default function NewOrder() {
       }
 
       toast.success('Commande créée avec succès !');
-      
-      // Rediriger vers le tracking
       navigate(`/tracking/${data.id}`, { replace: true });
 
     } catch (error: any) {
@@ -128,19 +124,19 @@ export default function NewOrder() {
   // Loading
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 to-pink-50">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-50 to-teal-50">
         <div className="text-center">
-          <Loader2 className="w-12 h-12 text-purple-600 animate-spin mx-auto mb-4" />
+          <Loader2 className="w-12 h-12 text-green-600 animate-spin mx-auto mb-4" />
           <p className="text-slate-600">Chargement...</p>
         </div>
       </div>
     );
   }
 
-  // Aucun pressing sélectionné → Rediriger vers la liste
+  // Aucun pressing sélectionné
   if (noPartnerSelected) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-50 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-gradient-to-br from-green-50 to-teal-50 flex items-center justify-center p-4">
         <div className="bg-white rounded-3xl shadow-xl p-8 max-w-md w-full text-center">
           <div className="w-20 h-20 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-6">
             <AlertCircle className="w-10 h-10 text-orange-500" />
@@ -157,7 +153,7 @@ export default function NewOrder() {
           <div className="space-y-3">
             <button
               onClick={() => navigate('/partners-map')}
-              className="w-full py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl font-bold text-lg hover:shadow-xl transition flex items-center justify-center gap-2"
+              className="w-full py-4 bg-green-500 text-white rounded-xl font-bold text-lg hover:bg-green-600 transition flex items-center justify-center gap-2"
             >
               <Search className="w-5 h-5" />
               Trouver un pressing
@@ -176,14 +172,14 @@ export default function NewOrder() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-50">
+    <div className="min-h-screen bg-gradient-to-br from-green-50 to-teal-50">
       {/* Header */}
       <div className="bg-white border-b shadow-sm sticky top-0 z-50">
         <div className="max-w-2xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <button
               onClick={() => navigate(-1)}
-              className="flex items-center gap-2 text-purple-600 hover:text-purple-700 font-semibold"
+              className="flex items-center gap-2 text-green-600 hover:text-green-700 font-semibold"
             >
               <ArrowLeft className="w-5 h-5" />
               Retour
@@ -199,15 +195,15 @@ export default function NewOrder() {
         <div className="bg-white rounded-2xl p-5 shadow-lg">
           <h2 className="text-sm font-medium text-slate-500 mb-3">Pressing sélectionné</h2>
           <div className="flex items-start gap-4">
-            <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center flex-shrink-0">
-              <MapPin className="w-6 h-6 text-purple-600" />
+            <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center flex-shrink-0">
+              <MapPin className="w-6 h-6 text-green-600" />
             </div>
             <div className="flex-1">
               <h3 className="font-bold text-slate-900">{partner?.name}</h3>
               <p className="text-sm text-slate-600">{partner?.address}</p>
               <p className="text-sm text-slate-600">{partner?.postal_code} {partner?.city}</p>
               {partner?.phone && (
-                <a href={`tel:${partner.phone}`} className="text-sm text-purple-600 flex items-center gap-1 mt-1">
+                <a href={`tel:${partner.phone}`} className="text-sm text-green-600 flex items-center gap-1 mt-1">
                   <Phone className="w-3 h-3" />
                   {partner.phone}
                 </a>
@@ -216,7 +212,7 @@ export default function NewOrder() {
           </div>
           <button
             onClick={() => navigate('/partners-map')}
-            className="mt-4 text-sm text-purple-600 font-medium hover:underline"
+            className="mt-4 text-sm text-green-600 font-medium hover:underline"
           >
             Changer de pressing
           </button>
@@ -226,26 +222,26 @@ export default function NewOrder() {
         <div className="bg-white rounded-2xl p-5 shadow-lg">
           <h2 className="text-sm font-medium text-slate-500 mb-4">Type de service</h2>
           <div className="grid grid-cols-2 gap-4">
-            {/* Standard */}
+            {/* Standard - 3€/kg */}
             <button
               onClick={() => setServiceType('standard')}
               className={`p-4 rounded-2xl border-2 transition text-left ${
                 serviceType === 'standard'
-                  ? 'border-purple-500 bg-purple-50'
-                  : 'border-slate-200 hover:border-purple-300'
+                  ? 'border-green-500 bg-green-50'
+                  : 'border-slate-200 hover:border-green-300'
               }`}
             >
               <Package className={`w-8 h-8 mb-2 ${
-                serviceType === 'standard' ? 'text-purple-600' : 'text-slate-400'
+                serviceType === 'standard' ? 'text-green-600' : 'text-slate-400'
               }`} />
               <p className={`font-bold ${
-                serviceType === 'standard' ? 'text-purple-600' : 'text-slate-700'
+                serviceType === 'standard' ? 'text-green-600' : 'text-slate-700'
               }`}>Standard</p>
-              <p className="text-2xl font-bold text-purple-600 mt-1">3,50€<span className="text-sm font-normal">/kg</span></p>
+              <p className="text-3xl font-bold text-green-600 mt-1">3€<span className="text-sm font-normal">/kg</span></p>
               <p className="text-xs text-slate-500 mt-1">Retrait sous 24-48h</p>
             </button>
 
-            {/* Express */}
+            {/* Express - 5€/kg */}
             <button
               onClick={() => setServiceType('express')}
               className={`p-4 rounded-2xl border-2 transition text-left relative ${
@@ -263,7 +259,7 @@ export default function NewOrder() {
               <p className={`font-bold ${
                 serviceType === 'express' ? 'text-orange-600' : 'text-slate-700'
               }`}>Express</p>
-              <p className="text-2xl font-bold text-orange-600 mt-1">5€<span className="text-sm font-normal">/kg</span></p>
+              <p className="text-3xl font-bold text-orange-600 mt-1">5€<span className="text-sm font-normal">/kg</span></p>
               <p className="text-xs text-slate-500 mt-1">Retrait sous 4h</p>
             </button>
           </div>
@@ -281,15 +277,15 @@ export default function NewOrder() {
             </button>
             
             <div className="text-center">
-              <span className="text-5xl font-bold text-purple-600">{weightKg}</span>
+              <span className="text-5xl font-bold text-green-600">{weightKg}</span>
               <span className="text-2xl text-slate-400 ml-1">kg</span>
             </div>
             
             <button
               onClick={() => setWeightKg(Math.min(50, weightKg + 1))}
-              className="w-14 h-14 bg-purple-100 rounded-full flex items-center justify-center hover:bg-purple-200 transition"
+              className="w-14 h-14 bg-green-100 rounded-full flex items-center justify-center hover:bg-green-200 transition"
             >
-              <Plus className="w-6 h-6 text-purple-600" />
+              <Plus className="w-6 h-6 text-green-600" />
             </button>
           </div>
           
@@ -301,7 +297,7 @@ export default function NewOrder() {
                 onClick={() => setWeightKg(w)}
                 className={`px-4 py-2 rounded-full text-sm font-medium transition ${
                   weightKg === w
-                    ? 'bg-purple-600 text-white'
+                    ? 'bg-green-600 text-white'
                     : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                 }`}
               >
@@ -323,12 +319,12 @@ export default function NewOrder() {
             onChange={(e) => setNotes(e.target.value)}
             placeholder="Ex: Attention aux vêtements délicats, ne pas sécher le pull rouge..."
             rows={3}
-            className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-purple-500 focus:outline-none resize-none"
+            className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-green-500 focus:outline-none resize-none"
           />
         </div>
 
         {/* Récapitulatif */}
-        <div className="bg-gradient-to-r from-purple-600 to-pink-600 rounded-2xl p-6 text-white shadow-xl">
+        <div className="bg-gradient-to-r from-green-500 to-teal-500 rounded-2xl p-6 text-white shadow-xl">
           <h2 className="text-lg font-bold mb-4">Récapitulatif</h2>
           
           <div className="space-y-2 mb-4">
@@ -352,13 +348,20 @@ export default function NewOrder() {
             <span className="text-lg">Total estimé</span>
             <span className="text-3xl font-bold">{totalAmount.toFixed(2)}€</span>
           </div>
+
+          {/* Économie par rapport au traditionnel */}
+          <div className="mt-4 bg-white/20 rounded-xl p-3 text-center">
+            <p className="text-sm">
+              💰 Vous économisez environ <strong>{Math.round(totalAmount * 9)}€</strong> par rapport au pressing traditionnel !
+            </p>
+          </div>
         </div>
 
         {/* Bouton commander */}
         <button
           onClick={handleSubmit}
           disabled={submitting}
-          className="w-full py-5 bg-white text-purple-600 border-2 border-purple-600 rounded-2xl font-bold text-lg hover:bg-purple-50 transition disabled:opacity-50 flex items-center justify-center gap-2 shadow-lg"
+          className="w-full py-5 bg-white text-green-600 border-2 border-green-600 rounded-2xl font-bold text-lg hover:bg-green-50 transition disabled:opacity-50 flex items-center justify-center gap-2 shadow-lg"
         >
           {submitting ? (
             <>
