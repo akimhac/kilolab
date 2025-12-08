@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
-import { MapPin, Star, Clock, Euro, Search, Filter, Navigation, ArrowLeft, Loader2 } from 'lucide-react';
+import { MapPin, Star, Euro, Search, Navigation, ArrowLeft, Loader2 } from 'lucide-react';
 
 interface Partner {
   id: string;
@@ -9,10 +9,10 @@ interface Partner {
   address: string;
   city: string;
   postal_code: string;
-  latitude: number;
-  longitude: number;
-  rating: number;
-  review_count: number;
+  latitude: number | null;
+  longitude: number | null;
+  rating: number | null;
+  review_count: number | null;
   is_active: boolean;
 }
 
@@ -21,27 +21,37 @@ export default function PartnersMap() {
   const [partners, setPartners] = useState<Partner[]>([]);
   const [filteredPartners, setFilteredPartners] = useState<Partner[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [userLocation, setUserLocation] = useState<{lat: number, lng: number} | null>(null);
   const [locationEnabled, setLocationEnabled] = useState(false);
 
-  // Charger les pressings - OPTIMISÉ (limite 100, seulement colonnes nécessaires)
   useEffect(() => {
     const fetchPartners = async () => {
       try {
-        const { data, error } = await supabase
+        console.log('🔄 Chargement des partenaires...');
+        
+        const { data, error: fetchError } = await supabase
           .from('partners')
           .select('id, name, address, city, postal_code, latitude, longitude, rating, review_count, is_active')
           .eq('is_active', true)
-          .limit(100);
+          .order('name')
+          .limit(200);
 
-        if (error) throw error;
+        console.log('📊 Résultat:', { data: data?.length, error: fetchError });
+
+        if (fetchError) {
+          console.error('❌ Erreur Supabase:', fetchError);
+          setError(fetchError.message);
+          return;
+        }
+
         setPartners(data || []);
         setFilteredPartners(data || []);
-      } catch (err) {
-        console.error('Erreur chargement:', err);
-        setPartners([]);
-        setFilteredPartners([]);
+        setError(null);
+      } catch (err: any) {
+        console.error('❌ Erreur:', err);
+        setError(err.message || 'Erreur de chargement');
       } finally {
         setLoading(false);
       }
@@ -50,15 +60,11 @@ export default function PartnersMap() {
     fetchPartners();
   }, []);
 
-  // Géolocalisation
   useEffect(() => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
-          setUserLocation({
-            lat: position.coords.latitude,
-            lng: position.coords.longitude
-          });
+          setUserLocation({ lat: position.coords.latitude, lng: position.coords.longitude });
           setLocationEnabled(true);
         },
         () => setLocationEnabled(false)
@@ -66,25 +72,22 @@ export default function PartnersMap() {
     }
   }, []);
 
-  // Filtrer par recherche
   useEffect(() => {
     if (!searchQuery.trim()) {
       setFilteredPartners(partners);
       return;
     }
-
     const query = searchQuery.toLowerCase();
     const filtered = partners.filter(p =>
-      p.name.toLowerCase().includes(query) ||
-      p.city.toLowerCase().includes(query) ||
-      p.postal_code.includes(query)
+      p.name?.toLowerCase().includes(query) ||
+      p.city?.toLowerCase().includes(query) ||
+      p.postal_code?.includes(query)
     );
     setFilteredPartners(filtered);
   }, [searchQuery, partners]);
 
-  // Calculer distance
-  const calculateDistance = (lat: number, lng: number): string => {
-    if (!userLocation) return '';
+  const calculateDistance = (lat: number | null, lng: number | null): string => {
+    if (!userLocation || !lat || !lng) return '';
     const R = 6371;
     const dLat = (lat - userLocation.lat) * Math.PI / 180;
     const dLon = (lng - userLocation.lng) * Math.PI / 180;
@@ -96,11 +99,11 @@ export default function PartnersMap() {
     return d < 1 ? `${Math.round(d * 1000)}m` : `${d.toFixed(1)}km`;
   };
 
-  // Trier par distance si géoloc activée
   const sortedPartners = locationEnabled && userLocation
     ? [...filteredPartners].sort((a, b) => {
-        const distA = Math.hypot(a.latitude - userLocation.lat, a.longitude - userLocation.lng);
-        const distB = Math.hypot(b.latitude - userLocation.lat, b.longitude - userLocation.lng);
+        if (!a.latitude || !b.latitude) return 0;
+        const distA = Math.hypot((a.latitude || 0) - userLocation.lat, (a.longitude || 0) - userLocation.lng);
+        const distB = Math.hypot((b.latitude || 0) - userLocation.lat, (b.longitude || 0) - userLocation.lng);
         return distA - distB;
       })
     : filteredPartners;
@@ -112,23 +115,18 @@ export default function PartnersMap() {
 
   return (
     <div className="min-h-screen bg-slate-50">
-      {/* Header */}
       <header className="bg-white border-b sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <button onClick={() => navigate('/')} className="flex items-center gap-2 text-slate-600 hover:text-slate-900">
-                <ArrowLeft className="w-5 h-5" />
-                Retour
-              </button>
-            </div>
+            <button onClick={() => navigate('/')} className="flex items-center gap-2 text-slate-600 hover:text-slate-900">
+              <ArrowLeft className="w-5 h-5" />Retour
+            </button>
             <Link to="/" className="text-xl font-bold text-green-600">Kilolab</Link>
             <div className="w-20"></div>
           </div>
         </div>
       </header>
 
-      {/* Search */}
       <div className="max-w-7xl mx-auto px-4 py-4">
         <div className="relative">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
@@ -154,22 +152,31 @@ export default function PartnersMap() {
         </div>
       </div>
 
-      {/* Liste */}
       <div className="max-w-7xl mx-auto px-4 pb-8">
         {loading ? (
           <div className="flex flex-col items-center justify-center py-20">
             <Loader2 className="w-10 h-10 text-green-500 animate-spin mb-4" />
             <p className="text-slate-600">Chargement des pressings...</p>
           </div>
+        ) : error ? (
+          <div className="text-center py-20">
+            <p className="text-red-500 mb-4">Erreur: {error}</p>
+            <button onClick={() => window.location.reload()} className="px-4 py-2 bg-green-500 text-white rounded-lg">
+              Réessayer
+            </button>
+          </div>
         ) : sortedPartners.length === 0 ? (
           <div className="text-center py-20">
             <MapPin className="w-16 h-16 text-slate-300 mx-auto mb-4" />
             <h3 className="text-xl font-semibold text-slate-900 mb-2">Aucun pressing trouvé</h3>
-            <p className="text-slate-600">Essayez de modifier vos critères de recherche</p>
+            <p className="text-slate-600 mb-4">Essayez de modifier vos critères de recherche</p>
+            <button onClick={() => setSearchQuery('')} className="text-green-600 hover:underline">
+              Réinitialiser les filtres
+            </button>
           </div>
         ) : (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {sortedPartners.slice(0, 50).map((partner) => (
+            {sortedPartners.slice(0, 60).map((partner) => (
               <div
                 key={partner.id}
                 className="bg-white rounded-xl p-4 shadow-sm hover:shadow-md transition cursor-pointer border border-slate-100"
@@ -209,9 +216,9 @@ export default function PartnersMap() {
           </div>
         )}
 
-        {sortedPartners.length > 50 && (
+        {sortedPartners.length > 60 && (
           <p className="text-center text-slate-500 mt-6">
-            Affichage des 50 premiers résultats. Utilisez la recherche pour affiner.
+            Affichage des 60 premiers résultats. Utilisez la recherche pour affiner.
           </p>
         )}
       </div>
