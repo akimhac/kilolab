@@ -11,8 +11,6 @@ interface Partner {
   postal_code: string;
   latitude: number | null;
   longitude: number | null;
-  rating: number | null;
-  review_count: number | null;
   is_active: boolean;
 }
 
@@ -31,14 +29,15 @@ export default function PartnersMap() {
       try {
         console.log('🔄 Chargement des partenaires...');
         
+        // Sélectionner uniquement les colonnes qui existent
         const { data, error: fetchError } = await supabase
           .from('partners')
-          .select('id, name, address, city, postal_code, latitude, longitude, rating, review_count, is_active')
+          .select('id, name, address, city, postal_code, latitude, longitude, is_active')
           .eq('is_active', true)
           .order('name')
           .limit(200);
 
-        console.log('📊 Résultat:', { data: data?.length, error: fetchError });
+        console.log('📊 Résultat:', { count: data?.length, error: fetchError });
 
         if (fetchError) {
           console.error('❌ Erreur Supabase:', fetchError);
@@ -169,10 +168,7 @@ export default function PartnersMap() {
           <div className="text-center py-20">
             <MapPin className="w-16 h-16 text-slate-300 mx-auto mb-4" />
             <h3 className="text-xl font-semibold text-slate-900 mb-2">Aucun pressing trouvé</h3>
-            <p className="text-slate-600 mb-4">Essayez de modifier vos critères de recherche</p>
-            <button onClick={() => setSearchQuery('')} className="text-green-600 hover:underline">
-              Réinitialiser les filtres
-            </button>
+            <p className="text-slate-600">Essayez de modifier vos critères de recherche</p>
           </div>
         ) : (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -191,7 +187,7 @@ export default function PartnersMap() {
                   )}
                 </div>
 
-                <div className="flex items-center gap-1 text-slate-600 text-sm mb-2">
+                <div className="flex items-center gap-1 text-slate-600 text-sm mb-3">
                   <MapPin className="w-4 h-4 flex-shrink-0" />
                   <span className="line-clamp-1">{partner.address}, {partner.postal_code} {partner.city}</span>
                 </div>
@@ -199,8 +195,8 @@ export default function PartnersMap() {
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-1">
                     <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
-                    <span className="font-medium">{partner.rating?.toFixed(1) || '4.5'}</span>
-                    <span className="text-slate-400 text-sm">({partner.review_count || 0})</span>
+                    <span className="font-medium">4.5</span>
+                    <span className="text-slate-400 text-sm">(nouveau)</span>
                   </div>
                   <div className="flex items-center gap-1 text-green-600 font-semibold">
                     <Euro className="w-4 h-4" />
@@ -214,12 +210,6 @@ export default function PartnersMap() {
               </div>
             ))}
           </div>
-        )}
-
-        {sortedPartners.length > 60 && (
-          <p className="text-center text-slate-500 mt-6">
-            Affichage des 60 premiers résultats. Utilisez la recherche pour affiner.
-          </p>
         )}
       </div>
     </div>
