@@ -16,9 +16,9 @@ export default function LandingPage() {
 
   useEffect(() => { const timer = setInterval(() => { setCurrentSlide((prev) => (prev + 1) % slides.length); }, 6000); return () => clearInterval(timer); }, []);
 
-  const stats = [{ value: "1854", label: "Pressings partenaires" }, { value: "24h", label: "Service express" }, { value: "3€", label: "À partir de /kg" }];
+  const stats = [{ value: "2600+", label: "Pressings partenaires" }, { value: "24h", label: "Service express" }, { value: "3€", label: "À partir de /kg" }];
   const priceComparison = [{ item: "Chemise", weight: 0.15, traditional: 8, saving: 94 }, { item: "Pantalon", weight: 0.4, traditional: 10, saving: 88 }, { item: "Pull", weight: 0.5, traditional: 12, saving: 88 }, { item: "Veste", weight: 0.8, traditional: 18, saving: 87 }, { item: "Manteau", weight: 1.5, traditional: 25, saving: 82 }, { item: "Robe", weight: 0.3, traditional: 15, saving: 94 }];
-  const benefits = [{ icon: Euro, title: "Jusqu'à 90% d'économie", description: "Payez au poids, pas à la pièce." }, { icon: Clock, title: "Rapide et pratique", description: "Prêt en 24-48h, ou 4h en express." }, { icon: MapPin, title: "Près de chez vous", description: "Plus de 1850 pressings partenaires." }, { icon: Shield, title: "Qualité garantie", description: "Pressings professionnels sélectionnés." }];
+  const benefits = [{ icon: Euro, title: "Jusqu'à 90% d'économie", description: "Payez au poids, pas à la pièce." }, { icon: Clock, title: "Rapide et pratique", description: "Prêt en 24-48h, ou 4h en express." }, { icon: MapPin, title: "Près de chez vous", description: "Plus de 2600 pressings partenaires." }, { icon: Shield, title: "Qualité garantie", description: "Pressings professionnels sélectionnés." }];
 
   return (
     <div className="min-h-screen bg-white">
@@ -63,26 +63,18 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ========== COMMENT ÇA MARCHE - STYLE KILOLAB ========== */}
+      {/* Comment ça marche - Style Kilolab */}
       <section className="py-20 bg-gradient-to-br from-purple-600 via-purple-700 to-pink-600 relative overflow-hidden">
-        {/* Particules décoratives */}
         <div className="absolute inset-0 overflow-hidden">
           <div className="absolute top-10 left-10 w-4 h-4 bg-white/20 rounded-full animate-pulse" />
           <div className="absolute top-20 right-20 w-3 h-3 bg-white/30 rounded-full animate-pulse" style={{ animationDelay: '0.5s' }} />
           <div className="absolute bottom-20 left-1/4 w-2 h-2 bg-white/20 rounded-full animate-pulse" style={{ animationDelay: '1s' }} />
-          <div className="absolute top-1/3 right-1/3 w-3 h-3 bg-white/10 rounded-full animate-pulse" style={{ animationDelay: '1.5s' }} />
-          <div className="absolute bottom-10 right-10 w-4 h-4 bg-white/20 rounded-full animate-pulse" style={{ animationDelay: '0.7s' }} />
         </div>
 
         <div className="max-w-5xl mx-auto px-4 relative z-10">
-          <h2 className="text-3xl md:text-5xl font-bold text-center text-white mb-16">
-            Comment ça marche ?
-          </h2>
+          <h2 className="text-3xl md:text-5xl font-bold text-center text-white mb-16">Comment ça marche ?</h2>
 
-          {/* 3 étapes avec illustrations */}
           <div className="flex flex-col md:flex-row items-center justify-center gap-4 md:gap-8">
-            
-            {/* Étape 1 - Déposez */}
             <div className="flex flex-col items-center text-center">
               <div className="w-32 h-32 md:w-40 md:h-40 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center mb-4 border-4 border-white/30 hover:scale-110 transition-transform">
                 <div className="text-6xl">🧺</div>
@@ -91,133 +83,36 @@ export default function LandingPage() {
               <p className="text-white/80 text-sm md:text-base">votre linge</p>
             </div>
 
-            {/* Flèche 1 */}
             <div className="hidden md:flex items-center text-white/60 text-4xl">→</div>
             <div className="md:hidden text-white/60 text-2xl my-2">↓</div>
 
-            {/* Étape 2 - Kilolab s'occupe */}
             <div className="flex flex-col items-center text-center">
               <div className="w-32 h-32 md:w-40 md:h-40 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center mb-4 border-4 border-white/30 hover:scale-110 transition-transform relative">
                 <div className="text-6xl">🫧</div>
-                {/* Bulles animées */}
                 <div className="absolute -top-2 -right-2 w-6 h-6 bg-blue-300/50 rounded-full animate-bounce" />
-                <div className="absolute top-0 -left-1 w-4 h-4 bg-blue-200/50 rounded-full animate-bounce" style={{ animationDelay: '0.3s' }} />
               </div>
               <h3 className="text-xl md:text-2xl font-bold text-white mb-2">Kilolab</h3>
               <p className="text-white/80 text-sm md:text-base">s'en occupe</p>
             </div>
 
-            {/* Flèche 2 */}
             <div className="hidden md:flex items-center text-white/60 text-4xl">→</div>
             <div className="md:hidden text-white/60 text-2xl my-2">↓</div>
 
-            {/* Étape 3 - Récupérez */}
             <div className="flex flex-col items-center text-center">
               <div className="w-32 h-32 md:w-40 md:h-40 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center mb-4 border-4 border-white/30 hover:scale-110 transition-transform relative">
                 <div className="text-6xl">👕</div>
-                {/* Étoiles brillantes */}
                 <Sparkles className="absolute -top-1 -right-1 w-6 h-6 text-yellow-300 animate-pulse" />
-                <Sparkles className="absolute top-2 -left-2 w-4 h-4 text-yellow-200 animate-pulse" style={{ animationDelay: '0.5s' }} />
               </div>
-              <h3 className="text-xl md:text-2xl font-bold text-white mb-2">Récupérez-</h3>
-              <p className="text-white/80 text-sm md:text-base">le en 24h</p>
+              <h3 className="text-xl md:text-2xl font-bold text-white mb-2">Récupérez</h3>
+              <p className="text-white/80 text-sm md:text-base">en 24h</p>
             </div>
           </div>
 
-          {/* Prix */}
           <div className="text-center mt-12">
-            <p className="text-3xl md:text-5xl font-bold text-white mb-8">
-              À partir de <span className="text-yellow-300">3€/kg</span>
-            </p>
-            
-            {/* CTA */}
-            <button
-              onClick={() => navigate('/partners-map')}
-              className="px-8 py-4 bg-white text-purple-600 rounded-full font-bold text-lg hover:shadow-2xl hover:scale-105 transition-all inline-flex items-center gap-2"
-            >
-              Déposez votre linge
-              <ArrowRight className="w-5 h-5" />
+            <p className="text-3xl md:text-5xl font-bold text-white mb-8">À partir de <span className="text-yellow-300">3€/kg</span></p>
+            <button onClick={() => navigate('/partners-map')} className="px-8 py-4 bg-white text-purple-600 rounded-full font-bold text-lg hover:shadow-2xl hover:scale-105 transition-all inline-flex items-center gap-2">
+              Déposez votre linge <ArrowRight className="w-5 h-5" />
             </button>
-          </div>
-
-          {/* Logo */}
-          <div className="text-right mt-8">
-            <span className="text-2xl font-bold text-white/80">KILOLAB</span>
-          </div>
-        </div>
-      </section>
-
-      {/* ========== SECTION PARTENAIRES - STYLE KILOLAB ========== */}
-      <section className="py-20 bg-gradient-to-br from-purple-600 via-indigo-600 to-purple-700 relative overflow-hidden">
-        {/* Particules */}
-        <div className="absolute inset-0">
-          <div className="absolute top-10 right-20 w-3 h-3 bg-white/20 rounded-full animate-pulse" />
-          <div className="absolute bottom-20 left-10 w-4 h-4 bg-white/10 rounded-full animate-pulse" style={{ animationDelay: '0.5s' }} />
-        </div>
-
-        <div className="max-w-6xl mx-auto px-4 relative z-10">
-          <div className="grid md:grid-cols-2 gap-12 items-center">
-            
-            {/* Texte gauche */}
-            <div>
-              <div className="inline-block px-4 py-2 bg-yellow-400 text-purple-900 rounded-full font-bold text-sm mb-6">
-                GAGNEZ DÈS LE PREMIER CLIENT !
-              </div>
-              
-              <h2 className="text-3xl md:text-4xl font-bold text-white mb-6 italic">
-                Zéro abonnement<br />
-                Zéro engagement<br />
-                À la commission
-              </h2>
-              
-              <p className="text-xl md:text-2xl text-yellow-300 font-bold mb-8">
-                Inscrivez-vous<br />
-                et explosez<br />
-                vos revenus
-              </p>
-              
-              <button
-                onClick={() => navigate('/become-partner')}
-                className="px-8 py-4 bg-white text-purple-600 rounded-full font-bold text-lg hover:shadow-2xl hover:scale-105 transition-all"
-              >
-                Devenir partenaire gratuitement
-              </button>
-            </div>
-
-            {/* Illustrations droite */}
-            <div className="relative flex justify-center">
-              {/* Personnage stylisé */}
-              <div className="relative">
-                <div className="w-48 h-48 bg-white/10 rounded-full flex items-center justify-center">
-                  <span className="text-8xl">👨‍💼</span>
-                </div>
-                
-                {/* Bulle linge propre */}
-                <div className="absolute -top-4 -right-4 w-20 h-20 bg-pink-400/90 rounded-full flex items-center justify-center shadow-lg">
-                  <span className="text-3xl">✓</span>
-                </div>
-                
-                {/* Bulle panier */}
-                <div className="absolute top-1/2 -left-8 w-16 h-16 bg-blue-400/90 rounded-full flex items-center justify-center shadow-lg">
-                  <span className="text-2xl">🧺</span>
-                </div>
-                
-                {/* Bulle prix */}
-                <div className="absolute -bottom-4 right-0 px-4 py-2 bg-yellow-400 rounded-full shadow-lg">
-                  <span className="text-purple-900 font-bold">3€/kg</span>
-                </div>
-                
-                {/* Bulle linge plié */}
-                <div className="absolute bottom-1/3 -right-12 w-14 h-14 bg-orange-400/90 rounded-full flex items-center justify-center shadow-lg">
-                  <span className="text-xl">👕</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Logo */}
-          <div className="text-right mt-8">
-            <span className="text-3xl font-bold text-white">KILOLAB</span>
           </div>
         </div>
       </section>
@@ -249,10 +144,19 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* CTA Partenaires */}
+      <section className="py-16 bg-gradient-to-r from-purple-600 to-pink-600">
+        <div className="max-w-4xl mx-auto px-4 text-center text-white">
+          <h2 className="text-3xl md:text-4xl font-bold mb-4">Vous êtes un pressing ?</h2>
+          <p className="text-xl text-white/90 mb-8">Zéro abonnement. Zéro engagement. Rentable dès le 1er client.</p>
+          <button onClick={() => navigate('/become-partner')} className="px-8 py-4 bg-white text-purple-600 rounded-full font-bold text-lg hover:shadow-xl transition">Devenir partenaire gratuitement</button>
+        </div>
+      </section>
+
       {/* Footer */}
       <footer className="bg-slate-900 text-white py-12">
         <div className="max-w-7xl mx-auto px-4 grid md:grid-cols-4 gap-8">
-          <div><h3 className="text-xl font-bold mb-4">Kilolab</h3><p className="text-slate-400 text-sm">Le pressing au kilo.</p></div>
+          <div><h3 className="text-xl font-bold mb-4">Kilolab</h3><p className="text-slate-400 text-sm">Le pressing au kilo, simple et économique.</p></div>
           <div><h4 className="font-semibold mb-4">Navigation</h4><ul className="space-y-2 text-slate-400 text-sm"><li><Link to="/partners-map" className="hover:text-white">Trouver un pressing</Link></li><li><Link to="/pricing" className="hover:text-white">Tarifs</Link></li></ul></div>
           <div><h4 className="font-semibold mb-4">Partenaires</h4><ul className="space-y-2 text-slate-400 text-sm"><li><Link to="/become-partner" className="hover:text-white">Devenir partenaire</Link></li></ul></div>
           <div><h4 className="font-semibold mb-4">Légal</h4><ul className="space-y-2 text-slate-400 text-sm"><li><Link to="/legal/cgu" className="hover:text-white">CGU</Link></li><li><Link to="/legal/privacy" className="hover:text-white">Confidentialité</Link></li></ul></div>
