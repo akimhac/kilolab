@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { MapPin, Clock, Euro, ChevronRight, ChevronLeft, Shield, Calculator, ArrowRight, Menu, X } from 'lucide-react';
+import { MapPin, Clock, Euro, ChevronRight, ChevronLeft, Shield, Calculator, ArrowRight, Menu, X, Sparkles } from 'lucide-react';
 
 export default function LandingPage() {
   const navigate = useNavigate();
@@ -16,13 +16,13 @@ export default function LandingPage() {
 
   useEffect(() => { const timer = setInterval(() => { setCurrentSlide((prev) => (prev + 1) % slides.length); }, 6000); return () => clearInterval(timer); }, []);
 
-  const stats = [{ value: "1854", label: "Pressings en France & Belgique" }, { value: "24h", label: "Service express" }, { value: "3€", label: "À partir de /kg" }];
+  const stats = [{ value: "1854", label: "Pressings partenaires" }, { value: "24h", label: "Service express" }, { value: "3€", label: "À partir de /kg" }];
   const priceComparison = [{ item: "Chemise", weight: 0.15, traditional: 8, saving: 94 }, { item: "Pantalon", weight: 0.4, traditional: 10, saving: 88 }, { item: "Pull", weight: 0.5, traditional: 12, saving: 88 }, { item: "Veste", weight: 0.8, traditional: 18, saving: 87 }, { item: "Manteau", weight: 1.5, traditional: 25, saving: 82 }, { item: "Robe", weight: 0.3, traditional: 15, saving: 94 }];
   const benefits = [{ icon: Euro, title: "Jusqu'à 90% d'économie", description: "Payez au poids, pas à la pièce." }, { icon: Clock, title: "Rapide et pratique", description: "Prêt en 24-48h, ou 4h en express." }, { icon: MapPin, title: "Près de chez vous", description: "Plus de 1850 pressings partenaires." }, { icon: Shield, title: "Qualité garantie", description: "Pressings professionnels sélectionnés." }];
-  const steps = [{ step: 1, title: "Trouvez", description: "Sélectionnez un pressing" }, { step: 2, title: "Déposez", description: "Apportez votre linge" }, { step: 3, title: "Récupérez", description: "Payez sur place" }];
 
   return (
     <div className="min-h-screen bg-white">
+      {/* Navigation */}
       <nav className="bg-white border-b sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
           <Link to="/" className="text-2xl font-bold text-green-600">Kilolab</Link>
@@ -35,6 +35,7 @@ export default function LandingPage() {
         {mobileMenuOpen && <div className="md:hidden py-4 border-t mx-4"><Link to="/login" className="block py-2 text-slate-600">Connexion</Link><Link to="/partners-map" className="block py-2 px-4 bg-green-500 text-white rounded-lg text-center font-semibold mt-2">Trouver un pressing</Link></div>}
       </nav>
 
+      {/* Hero Carousel */}
       <section className="relative overflow-hidden h-[500px] md:h-[600px]">
         {slides.map((slide, index) => (
           <div key={index} className={`absolute inset-0 transition-opacity duration-1000 ${index === currentSlide ? 'opacity-100 z-10' : 'opacity-0 z-0'}`}>
@@ -55,12 +56,173 @@ export default function LandingPage() {
         <button onClick={() => setCurrentSlide((prev) => (prev + 1) % slides.length)} className="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center text-white hover:bg-white/30 transition z-20"><ChevronRight className="w-6 h-6" /></button>
       </section>
 
+      {/* Stats */}
       <section className="bg-gradient-to-r from-green-500 to-teal-500 py-12">
         <div className="max-w-7xl mx-auto px-4 grid grid-cols-3 gap-4 text-center text-white">
           {stats.map((stat, i) => (<div key={i}><div className="text-3xl md:text-5xl font-bold">{stat.value}</div><div className="text-sm md:text-base text-white/80">{stat.label}</div></div>))}
         </div>
       </section>
 
+      {/* ========== COMMENT ÇA MARCHE - STYLE KILOLAB ========== */}
+      <section className="py-20 bg-gradient-to-br from-purple-600 via-purple-700 to-pink-600 relative overflow-hidden">
+        {/* Particules décoratives */}
+        <div className="absolute inset-0 overflow-hidden">
+          <div className="absolute top-10 left-10 w-4 h-4 bg-white/20 rounded-full animate-pulse" />
+          <div className="absolute top-20 right-20 w-3 h-3 bg-white/30 rounded-full animate-pulse" style={{ animationDelay: '0.5s' }} />
+          <div className="absolute bottom-20 left-1/4 w-2 h-2 bg-white/20 rounded-full animate-pulse" style={{ animationDelay: '1s' }} />
+          <div className="absolute top-1/3 right-1/3 w-3 h-3 bg-white/10 rounded-full animate-pulse" style={{ animationDelay: '1.5s' }} />
+          <div className="absolute bottom-10 right-10 w-4 h-4 bg-white/20 rounded-full animate-pulse" style={{ animationDelay: '0.7s' }} />
+        </div>
+
+        <div className="max-w-5xl mx-auto px-4 relative z-10">
+          <h2 className="text-3xl md:text-5xl font-bold text-center text-white mb-16">
+            Comment ça marche ?
+          </h2>
+
+          {/* 3 étapes avec illustrations */}
+          <div className="flex flex-col md:flex-row items-center justify-center gap-4 md:gap-8">
+            
+            {/* Étape 1 - Déposez */}
+            <div className="flex flex-col items-center text-center">
+              <div className="w-32 h-32 md:w-40 md:h-40 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center mb-4 border-4 border-white/30 hover:scale-110 transition-transform">
+                <div className="text-6xl">🧺</div>
+              </div>
+              <h3 className="text-xl md:text-2xl font-bold text-white mb-2">Déposez</h3>
+              <p className="text-white/80 text-sm md:text-base">votre linge</p>
+            </div>
+
+            {/* Flèche 1 */}
+            <div className="hidden md:flex items-center text-white/60 text-4xl">→</div>
+            <div className="md:hidden text-white/60 text-2xl my-2">↓</div>
+
+            {/* Étape 2 - Kilolab s'occupe */}
+            <div className="flex flex-col items-center text-center">
+              <div className="w-32 h-32 md:w-40 md:h-40 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center mb-4 border-4 border-white/30 hover:scale-110 transition-transform relative">
+                <div className="text-6xl">🫧</div>
+                {/* Bulles animées */}
+                <div className="absolute -top-2 -right-2 w-6 h-6 bg-blue-300/50 rounded-full animate-bounce" />
+                <div className="absolute top-0 -left-1 w-4 h-4 bg-blue-200/50 rounded-full animate-bounce" style={{ animationDelay: '0.3s' }} />
+              </div>
+              <h3 className="text-xl md:text-2xl font-bold text-white mb-2">Kilolab</h3>
+              <p className="text-white/80 text-sm md:text-base">s'en occupe</p>
+            </div>
+
+            {/* Flèche 2 */}
+            <div className="hidden md:flex items-center text-white/60 text-4xl">→</div>
+            <div className="md:hidden text-white/60 text-2xl my-2">↓</div>
+
+            {/* Étape 3 - Récupérez */}
+            <div className="flex flex-col items-center text-center">
+              <div className="w-32 h-32 md:w-40 md:h-40 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center mb-4 border-4 border-white/30 hover:scale-110 transition-transform relative">
+                <div className="text-6xl">👕</div>
+                {/* Étoiles brillantes */}
+                <Sparkles className="absolute -top-1 -right-1 w-6 h-6 text-yellow-300 animate-pulse" />
+                <Sparkles className="absolute top-2 -left-2 w-4 h-4 text-yellow-200 animate-pulse" style={{ animationDelay: '0.5s' }} />
+              </div>
+              <h3 className="text-xl md:text-2xl font-bold text-white mb-2">Récupérez-</h3>
+              <p className="text-white/80 text-sm md:text-base">le en 24h</p>
+            </div>
+          </div>
+
+          {/* Prix */}
+          <div className="text-center mt-12">
+            <p className="text-3xl md:text-5xl font-bold text-white mb-8">
+              À partir de <span className="text-yellow-300">3€/kg</span>
+            </p>
+            
+            {/* CTA */}
+            <button
+              onClick={() => navigate('/partners-map')}
+              className="px-8 py-4 bg-white text-purple-600 rounded-full font-bold text-lg hover:shadow-2xl hover:scale-105 transition-all inline-flex items-center gap-2"
+            >
+              Déposez votre linge
+              <ArrowRight className="w-5 h-5" />
+            </button>
+          </div>
+
+          {/* Logo */}
+          <div className="text-right mt-8">
+            <span className="text-2xl font-bold text-white/80">KILOLAB</span>
+          </div>
+        </div>
+      </section>
+
+      {/* ========== SECTION PARTENAIRES - STYLE KILOLAB ========== */}
+      <section className="py-20 bg-gradient-to-br from-purple-600 via-indigo-600 to-purple-700 relative overflow-hidden">
+        {/* Particules */}
+        <div className="absolute inset-0">
+          <div className="absolute top-10 right-20 w-3 h-3 bg-white/20 rounded-full animate-pulse" />
+          <div className="absolute bottom-20 left-10 w-4 h-4 bg-white/10 rounded-full animate-pulse" style={{ animationDelay: '0.5s' }} />
+        </div>
+
+        <div className="max-w-6xl mx-auto px-4 relative z-10">
+          <div className="grid md:grid-cols-2 gap-12 items-center">
+            
+            {/* Texte gauche */}
+            <div>
+              <div className="inline-block px-4 py-2 bg-yellow-400 text-purple-900 rounded-full font-bold text-sm mb-6">
+                GAGNEZ DÈS LE PREMIER CLIENT !
+              </div>
+              
+              <h2 className="text-3xl md:text-4xl font-bold text-white mb-6 italic">
+                Zéro abonnement<br />
+                Zéro engagement<br />
+                À la commission
+              </h2>
+              
+              <p className="text-xl md:text-2xl text-yellow-300 font-bold mb-8">
+                Inscrivez-vous<br />
+                et explosez<br />
+                vos revenus
+              </p>
+              
+              <button
+                onClick={() => navigate('/become-partner')}
+                className="px-8 py-4 bg-white text-purple-600 rounded-full font-bold text-lg hover:shadow-2xl hover:scale-105 transition-all"
+              >
+                Devenir partenaire gratuitement
+              </button>
+            </div>
+
+            {/* Illustrations droite */}
+            <div className="relative flex justify-center">
+              {/* Personnage stylisé */}
+              <div className="relative">
+                <div className="w-48 h-48 bg-white/10 rounded-full flex items-center justify-center">
+                  <span className="text-8xl">👨‍💼</span>
+                </div>
+                
+                {/* Bulle linge propre */}
+                <div className="absolute -top-4 -right-4 w-20 h-20 bg-pink-400/90 rounded-full flex items-center justify-center shadow-lg">
+                  <span className="text-3xl">✓</span>
+                </div>
+                
+                {/* Bulle panier */}
+                <div className="absolute top-1/2 -left-8 w-16 h-16 bg-blue-400/90 rounded-full flex items-center justify-center shadow-lg">
+                  <span className="text-2xl">🧺</span>
+                </div>
+                
+                {/* Bulle prix */}
+                <div className="absolute -bottom-4 right-0 px-4 py-2 bg-yellow-400 rounded-full shadow-lg">
+                  <span className="text-purple-900 font-bold">3€/kg</span>
+                </div>
+                
+                {/* Bulle linge plié */}
+                <div className="absolute bottom-1/3 -right-12 w-14 h-14 bg-orange-400/90 rounded-full flex items-center justify-center shadow-lg">
+                  <span className="text-xl">👕</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Logo */}
+          <div className="text-right mt-8">
+            <span className="text-3xl font-bold text-white">KILOLAB</span>
+          </div>
+        </div>
+      </section>
+
+      {/* Comparateur de prix */}
       <section className="py-16 bg-green-50">
         <div className="max-w-4xl mx-auto px-4">
           <div className="bg-white rounded-3xl shadow-xl p-6 md:p-8 border-2 border-green-100">
@@ -69,7 +231,7 @@ export default function LandingPage() {
               <div><h2 className="text-2xl md:text-3xl font-bold text-slate-900">Comparateur de prix</h2><p className="text-slate-600">Pressing traditionnel vs Kilolab</p></div>
             </div>
             <div className="space-y-4">
-              {priceComparison.map((item, i) => (<div key={i} className="bg-slate-50 rounded-2xl p-4"><div className="flex items-center justify-between mb-2"><span className="font-bold text-slate-900">{item.item}</span><span className="text-sm text-slate-500">~{item.weight}kg</span></div><div className="grid grid-cols-3 gap-4 text-center"><div><p className="text-xs text-slate-500">Traditionnel</p><p className="font-bold text-slate-400 line-through">{item.traditional}€</p></div><div><p className="text-xs text-slate-500">Kilolab</p><p className="font-bold text-green-600">{(item.weight * 3).toFixed(2)}€</p></div><div><p className="text-xs text-slate-500">Économie</p><p className="font-bold text-green-600">↘ {item.saving}%</p></div></div></div>))}
+              {priceComparison.map((item, i) => (<div key={i} className="bg-slate-50 rounded-2xl p-4 hover:bg-green-50 transition-colors"><div className="flex items-center justify-between mb-2"><span className="font-bold text-slate-900">{item.item}</span><span className="text-sm text-slate-500">~{item.weight}kg</span></div><div className="grid grid-cols-3 gap-4 text-center"><div><p className="text-xs text-slate-500">Traditionnel</p><p className="font-bold text-slate-400 line-through">{item.traditional}€</p></div><div><p className="text-xs text-slate-500">Kilolab</p><p className="font-bold text-green-600">{(item.weight * 3).toFixed(2)}€</p></div><div><p className="text-xs text-slate-500">Économie</p><p className="font-bold text-green-600">↘ {item.saving}%</p></div></div></div>))}
             </div>
             <div className="mt-6 p-4 bg-green-100 rounded-2xl text-center"><p className="text-green-800 font-medium">💡 Économisez en moyenne <strong>90%</strong> sur votre pressing !</p></div>
             <button onClick={() => navigate('/partners-map')} className="w-full mt-6 py-4 bg-green-500 text-white rounded-2xl font-bold text-lg hover:bg-green-600 transition">Trouver un pressing près de chez moi</button>
@@ -77,32 +239,17 @@ export default function LandingPage() {
         </div>
       </section>
 
-      <section className="py-16">
-        <div className="max-w-7xl mx-auto px-4">
-          <h2 className="text-3xl md:text-4xl font-bold text-center text-slate-900 mb-12">Comment ça marche ?</h2>
-          <div className="grid md:grid-cols-3 gap-8">
-            {steps.map((step, i) => (<div key={i} className="text-center"><div className="w-16 h-16 bg-gradient-to-br from-green-500 to-teal-500 rounded-full flex items-center justify-center mx-auto mb-4 text-white text-2xl font-bold">{step.step}</div><h3 className="text-xl font-bold text-slate-900 mb-2">{step.title}</h3><p className="text-slate-600">{step.description}</p></div>))}
-          </div>
-        </div>
-      </section>
-
-      <section className="py-16 bg-slate-50">
+      {/* Avantages */}
+      <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4">
           <h2 className="text-3xl md:text-4xl font-bold text-center text-slate-900 mb-12">Pourquoi choisir Kilolab ?</h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {benefits.map((benefit, i) => (<div key={i} className="bg-white rounded-2xl p-6 shadow-lg"><div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center mb-4"><benefit.icon className="w-6 h-6 text-green-600" /></div><h3 className="text-lg font-bold text-slate-900 mb-2">{benefit.title}</h3><p className="text-slate-600 text-sm">{benefit.description}</p></div>))}
+            {benefits.map((benefit, i) => (<div key={i} className="bg-slate-50 rounded-2xl p-6 hover:shadow-lg transition-all hover:-translate-y-1"><div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center mb-4"><benefit.icon className="w-6 h-6 text-green-600" /></div><h3 className="text-lg font-bold text-slate-900 mb-2">{benefit.title}</h3><p className="text-slate-600 text-sm">{benefit.description}</p></div>))}
           </div>
         </div>
       </section>
 
-      <section className="py-16 bg-gradient-to-r from-purple-600 to-pink-600">
-        <div className="max-w-4xl mx-auto px-4 text-center text-white">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">Vous êtes un pressing ?</h2>
-          <p className="text-xl text-white/90 mb-8">Zéro abonnement. Zéro engagement. Rentable dès le 1er client.</p>
-          <button onClick={() => navigate('/become-partner')} className="px-8 py-4 bg-white text-purple-600 rounded-full font-bold text-lg hover:shadow-xl transition">Devenir partenaire gratuitement</button>
-        </div>
-      </section>
-
+      {/* Footer */}
       <footer className="bg-slate-900 text-white py-12">
         <div className="max-w-7xl mx-auto px-4 grid md:grid-cols-4 gap-8">
           <div><h3 className="text-xl font-bold mb-4">Kilolab</h3><p className="text-slate-400 text-sm">Le pressing au kilo.</p></div>
