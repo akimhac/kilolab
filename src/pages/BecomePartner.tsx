@@ -19,29 +19,25 @@ export default function BecomePartner() {
 
     try {
       // Vérifier si l'email existe déjà
-      const { data: existing, error: checkError } = await supabase
+      const { data: existing } = await supabase
         .from('partners')
         .select('id, is_active, name')
         .eq('email', email)
         .maybeSingle();
-
-      if (checkError) {
-        console.error('Erreur vérification:', checkError);
-      }
 
       if (existing) {
         if (existing.is_active) {
           toast.error(`"${existing.name}" est déjà partenaire ! Connectez-vous.`);
           navigate('/login');
         } else {
-          toast.error('Une demande est déjà en cours pour cet email. Nous vous contacterons sous 24h.');
+          toast.error('Une demande est déjà en cours pour cet email.');
         }
         setLoading(false);
         return;
       }
 
       // Insérer le nouveau partenaire
-      const { data: newPartner, error: insertError } = await supabase
+      const { error: insertError } = await supabase
         .from('partners')
         .insert({
           name: formData.name.trim(),
@@ -53,41 +49,24 @@ export default function BecomePartner() {
           postal_code: formData.postal_code.trim(),
           is_active: false,
           price_per_kg: 3.00
-        })
-        .select()
-        .single();
+        });
 
       if (insertError) {
-        console.error('Erreur insertion:', insertError);
-        
-        if (insertError.code === '23505') {
-          toast.error('Cet email est déjà utilisé.');
-        } else if (insertError.code === '42501') {
-          toast.error('Erreur de permission. Contactez le support.');
-        } else {
-          toast.error(`Erreur: ${insertError.message}`);
-        }
+        console.error('Erreur:', insertError);
+        toast.error('Erreur lors de l\'inscription. Réessayez.');
         setLoading(false);
         return;
       }
 
-      console.log('✅ Partenaire créé:', newPartner);
       toast.success('Demande envoyée ! Validation sous 24h.');
       navigate('/partner-coming-soon');
 
-    } catch (err: any) {
-      console.error('Erreur:', err);
-      toast.error('Une erreur est survenue. Réessayez.');
+    } catch (err) {
+      toast.error('Une erreur est survenue');
     } finally {
       setLoading(false);
     }
   };
-
-  const benefits = [
-    { icon: Euro, title: "0€ d'inscription" },
-    { icon: Shield, title: "0€ d'abonnement" },
-    { icon: CheckCircle, title: "0 engagement" }
-  ];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-600 via-purple-700 to-pink-600">
@@ -111,7 +90,11 @@ export default function BecomePartner() {
             <p className="text-xl text-white/90 mb-8">Inscription 100% gratuite • Validation sous 24h</p>
 
             <div className="flex flex-wrap gap-3 mb-12">
-              {benefits.map((b, i) => (
+              {[
+                { icon: Euro, title: "0€ d'inscription" },
+                { icon: Shield, title: "0€ d'abonnement" },
+                { icon: CheckCircle, title: "0 engagement" }
+              ].map((b, i) => (
                 <div key={i} className="flex items-center gap-2 bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full">
                   <b.icon className="w-5 h-5 text-green-400" />
                   <span className="font-medium">{b.title}</span>
@@ -119,10 +102,10 @@ export default function BecomePartner() {
               ))}
             </div>
 
-            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 mb-8">
+            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6">
               <h3 className="text-xl font-bold mb-4">Pourquoi nous rejoindre ?</h3>
               <ul className="space-y-3">
-                <li className="flex items-center gap-3"><CheckCircle className="w-5 h-5 text-green-400" /><span>+2600 pressings déjà partenaires</span></li>
+                <li className="flex items-center gap-3"><CheckCircle className="w-5 h-5 text-green-400" /><span>+1800 pressings déjà partenaires</span></li>
                 <li className="flex items-center gap-3"><CheckCircle className="w-5 h-5 text-green-400" /><span>Commission de seulement 10%</span></li>
                 <li className="flex items-center gap-3"><CheckCircle className="w-5 h-5 text-green-400" /><span>Nouveaux clients chaque jour</span></li>
                 <li className="flex items-center gap-3"><CheckCircle className="w-5 h-5 text-green-400" /><span>Dashboard de gestion inclus</span></li>
@@ -142,14 +125,14 @@ export default function BecomePartner() {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-1">Email professionnel *</label>
-                  <input type="email" required value={formData.email} onChange={(e) => setFormData({...formData, email: e.target.value})} className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-purple-500" placeholder="contact@pressing.fr" />
+                  <input type="email" required value={formData.email} onChange={(e) => setFormData({...formData, email: e.target.value})} className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-purple-500" placeholder="contact@monpressing.fr" />
                 </div>
               </div>
 
               <div className="grid md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-1">Téléphone *</label>
-                  <input type="tel" required value={formData.phone} onChange={(e) => setFormData({...formData, phone: e.target.value})} className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-purple-500" placeholder="06 12 34 56 78" />
+                  <input type="tel" required value={formData.phone} onChange={(e) => setFormData({...formData, phone: e.target.value})} className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-purple-500" placeholder="01 23 45 67 89" />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-1">N° SIRET (optionnel)</label>
@@ -176,6 +159,11 @@ export default function BecomePartner() {
               <button type="submit" disabled={loading} className="w-full py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl font-bold text-lg hover:shadow-lg transition disabled:opacity-50 flex items-center justify-center gap-2">
                 {loading ? <><Loader2 className="w-5 h-5 animate-spin" />Envoi...</> : <><Store className="w-5 h-5" />Devenir partenaire gratuitement</>}
               </button>
+
+              <p className="text-center text-xs text-slate-500 mt-4">
+                En vous inscrivant, vous acceptez nos <Link to="/legal/cgu" className="text-purple-600 hover:underline">CGU</Link>.
+                Contact : contact@kilolab.fr
+              </p>
             </form>
           </div>
         </div>

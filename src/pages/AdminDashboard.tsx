@@ -1,233 +1,173 @@
-// src/pages/PartnerDashboard.tsx
-// Dashboard complet pour les pressings partenaires
-
 import { useState, useEffect } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { 
-  Package, Clock, CheckCircle, Truck, Euro, Star, 
-  Users, TrendingUp, ArrowLeft, LogOut, RefreshCw,
-  ChevronRight, Phone, Mail, MapPin, QrCode, Search,
-  AlertCircle, Loader2, Eye, MessageSquare, BarChart3,
-  Calendar, Filter, X, Check, Play, Pause
+  Users, Store, ShoppingBag, Mail, TrendingUp, MapPin, 
+  Clock, CheckCircle, XCircle, Eye, RefreshCw, LogOut,
+  AlertTriangle, Settings, BarChart3, Bell
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
-interface Order {
-  id: string;
-  user_id: string;
-  weight_kg: number;
-  service_type: 'standard' | 'express';
-  price_per_kg: number;
-  total_amount: number;
-  status: 'pending' | 'confirmed' | 'in_progress' | 'ready' | 'completed' | 'cancelled';
-  notes?: string;
-  created_at: string;
-  updated_at: string;
-  user_email?: string;
-  user_name?: string;
-}
+// Email admin autorisé
+const ADMIN_EMAIL = 'contact@kilolab.fr';
 
 interface Stats {
+  totalUsers: number;
+  totalPartners: number;
+  activePartners: number;
+  pendingPartners: number;
   totalOrders: number;
   pendingOrders: number;
-  completedOrders: number;
-  totalRevenue: number;
-  averageRating: number;
-  totalReviews: number;
+  totalContacts: number;
+  unreadContacts: number;
 }
 
-export default function PartnerDashboard() {
+interface Partner {
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+  city: string;
+  postal_code: string;
+  is_active: boolean;
+  created_at: string;
+}
+
+interface ContactMessage {
+  id: string;
+  name: string;
+  email: string;
+  subject: string;
+  message: string;
+  is_read: boolean;
+  created_at: string;
+}
+
+export default function AdminDashboard() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
-  const [partner, setPartner] = useState<any>(null);
-  const [orders, setOrders] = useState<Order[]>([]);
+  const [authorized, setAuthorized] = useState(false);
   const [stats, setStats] = useState<Stats>({
-    totalOrders: 0,
-    pendingOrders: 0,
-    completedOrders: 0,
-    totalRevenue: 0,
-    averageRating: 0,
-    totalReviews: 0
+    totalUsers: 0, totalPartners: 0, activePartners: 0, pendingPartners: 0,
+    totalOrders: 0, pendingOrders: 0, totalContacts: 0, unreadContacts: 0
   });
-  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
-  const [filterStatus, setFilterStatus] = useState<string>('all');
-  const [searchQuery, setSearchQuery] = useState('');
-  const [updatingStatus, setUpdatingStatus] = useState<string | null>(null);
+  const [partners, setPartners] = useState<Partner[]>([]);
+  const [contacts, setContacts] = useState<ContactMessage[]>([]);
+  const [activeTab, setActiveTab] = useState<'overview' | 'partners' | 'contacts' | 'users'>('overview');
 
   useEffect(() => {
-    checkAuthAndLoadData();
+    checkAuth();
   }, []);
 
-  const checkAuthAndLoadData = async () => {
+  const checkAuth = async () => {
+    const { data: { session } } = await supabase.auth.getSession();
+    
+    if (!session) {
+      toast.error('Vous devez être connecté');
+      navigate('/login');
+      return;
+    }
+
+    const userEmail = session.user.email?.toLowerCase();
+    
+    // Vérifier si c'est l'admin
+    if (userEmail !== ADMIN_EMAIL && userEmail !== 'akim.hachili@gmail.com') {
+      toast.error('Accès non autorisé');
+      navigate('/');
+      return;
+    }
+
+    setAuthorized(true);
+    await loadAllData();
+  };
+
+  const loadAllData = async () => {
+    setLoading(true);
     try {
-      const { data: { session } } = await supabase.auth.getSession();
-      
-      if (!session) {
-        navigate('/login');
-        return;
-      }
+      // Stats utilisateurs
+      const { count: userCount } = await supabase
+        .from('user_profiles')
+        .select('*', { count: 'exact', head: true });
 
-      // Trouver le partenaire associé à cet email
-      const { data: partnerData, error: partnerError } = await supabase
+      // Stats partenaires
+      const { data: partnersData, count: partnerCount } = await supabase
         .from('partners')
-        .select('*')
-        .eq('email', session.user.email)
-        .single();
+        .select('*', { count: 'exact' })
+        .order('created_at', { ascending: false });
 
-      if (partnerError || !partnerData) {
-        toast.error('Compte partenaire non trouvé');
-        navigate('/');
-        return;
+      const activeCount = partnersData?.filter(p => p.is_active).length || 0;
+      const pendingCount = partnersData?.filter(p => !p.is_active).length || 0;
+
+      // Stats commandes
+      const { count: orderCount } = await supabase
+        .from('orders')
+        .select('*', { count: 'exact', head: true });
+
+      const { count: pendingOrderCount } = await supabase
+        .from('orders')
+        .select('*', { count: 'exact', head: true })
+        .eq('status', 'pending');
+
+      // Messages contact (si la table existe)
+      let contactCount = 0;
+      let unreadCount = 0;
+      let contactsData: ContactMessage[] = [];
+      
+      const { data: contactData, count: cCount } = await supabase
+        .from('contact_messages')
+        .select('*', { count: 'exact' })
+        .order('created_at', { ascending: false })
+        .limit(50);
+      
+      if (contactData) {
+        contactsData = contactData;
+        contactCount = cCount || 0;
+        unreadCount = contactData.filter(c => !c.is_read).length;
       }
 
-      if (!partnerData.is_active) {
-        toast.error('Votre compte est en attente de validation');
-        navigate('/');
-        return;
-      }
+      setStats({
+        totalUsers: userCount || 0,
+        totalPartners: partnerCount || 0,
+        activePartners: activeCount,
+        pendingPartners: pendingCount,
+        totalOrders: orderCount || 0,
+        pendingOrders: pendingOrderCount || 0,
+        totalContacts: contactCount,
+        unreadContacts: unreadCount
+      });
 
-      setPartner(partnerData);
-      await loadOrders(partnerData.id);
-      await loadStats(partnerData.id);
+      setPartners(partnersData || []);
+      setContacts(contactsData);
 
-    } catch (error) {
-      console.error('Erreur:', error);
-      toast.error('Erreur de chargement');
+    } catch (err) {
+      console.error('Erreur chargement:', err);
     } finally {
       setLoading(false);
     }
   };
 
-  const loadOrders = async (partnerId: string) => {
-    try {
-      const { data, error } = await supabase
-        .from('orders')
-        .select('*')
-        .eq('partner_id', partnerId)
-        .order('created_at', { ascending: false });
+  const togglePartnerStatus = async (partnerId: string, currentStatus: boolean) => {
+    const { error } = await supabase
+      .from('partners')
+      .update({ is_active: !currentStatus })
+      .eq('id', partnerId);
 
-      if (error) throw error;
-
-      // Charger les infos utilisateurs
-      const ordersWithUsers = await Promise.all(
-        (data || []).map(async (order) => {
-          const { data: userData } = await supabase.auth.admin.getUserById(order.user_id).catch(() => ({ data: null }));
-          return {
-            ...order,
-            user_email: userData?.user?.email || 'Client',
-            user_name: userData?.user?.user_metadata?.name || 'Client'
-          };
-        })
-      );
-
-      setOrders(ordersWithUsers);
-    } catch (error) {
-      console.error('Erreur chargement commandes:', error);
-    }
-  };
-
-  const loadStats = async (partnerId: string) => {
-    try {
-      // Commandes
-      const { data: ordersData } = await supabase
-        .from('orders')
-        .select('*')
-        .eq('partner_id', partnerId);
-
-      const orders = ordersData || [];
-      const completed = orders.filter(o => o.status === 'completed');
-      const pending = orders.filter(o => ['pending', 'confirmed', 'in_progress', 'ready'].includes(o.status));
-
-      // Avis
-      const { data: reviewsData } = await supabase
-        .from('reviews')
-        .select('rating')
-        .eq('partner_id', partnerId);
-
-      const reviews = reviewsData || [];
-      const avgRating = reviews.length > 0
-        ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length
-        : 0;
-
-      setStats({
-        totalOrders: orders.length,
-        pendingOrders: pending.length,
-        completedOrders: completed.length,
-        totalRevenue: completed.reduce((sum, o) => sum + (o.total_amount || 0), 0),
-        averageRating: Math.round(avgRating * 10) / 10,
-        totalReviews: reviews.length
-      });
-    } catch (error) {
-      console.error('Erreur stats:', error);
-    }
-  };
-
-  const updateOrderStatus = async (orderId: string, newStatus: string) => {
-    setUpdatingStatus(orderId);
-    try {
-      const { error } = await supabase
-        .from('orders')
-        .update({ 
-          status: newStatus,
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', orderId);
-
-      if (error) throw error;
-
-      // Mettre à jour localement
-      setOrders(prev => prev.map(o => 
-        o.id === orderId ? { ...o, status: newStatus as any } : o
-      ));
-
-      toast.success(`Statut mis à jour : ${getStatusLabel(newStatus)}`);
-
-      // Recharger les stats
-      if (partner) {
-        await loadStats(partner.id);
-      }
-
-    } catch (error) {
-      console.error('Erreur:', error);
+    if (error) {
       toast.error('Erreur lors de la mise à jour');
-    } finally {
-      setUpdatingStatus(null);
+      return;
     }
+
+    toast.success(currentStatus ? 'Partenaire désactivé' : 'Partenaire activé !');
+    await loadAllData();
   };
 
-  const getStatusLabel = (status: string): string => {
-    const labels: Record<string, string> = {
-      pending: 'En attente',
-      confirmed: 'Confirmée',
-      in_progress: 'En cours',
-      ready: 'Prêt',
-      completed: 'Terminée',
-      cancelled: 'Annulée'
-    };
-    return labels[status] || status;
-  };
-
-  const getStatusColor = (status: string): string => {
-    const colors: Record<string, string> = {
-      pending: 'bg-yellow-100 text-yellow-700',
-      confirmed: 'bg-blue-100 text-blue-700',
-      in_progress: 'bg-purple-100 text-purple-700',
-      ready: 'bg-green-100 text-green-700',
-      completed: 'bg-slate-100 text-slate-700',
-      cancelled: 'bg-red-100 text-red-700'
-    };
-    return colors[status] || 'bg-slate-100 text-slate-700';
-  };
-
-  const getNextStatus = (currentStatus: string): string | null => {
-    const flow: Record<string, string> = {
-      pending: 'confirmed',
-      confirmed: 'in_progress',
-      in_progress: 'ready',
-      ready: 'completed'
-    };
-    return flow[currentStatus] || null;
+  const markContactAsRead = async (contactId: string) => {
+    await supabase
+      .from('contact_messages')
+      .update({ is_read: true })
+      .eq('id', contactId);
+    
+    await loadAllData();
   };
 
   const handleLogout = async () => {
@@ -235,360 +175,264 @@ export default function PartnerDashboard() {
     navigate('/');
   };
 
-  // Filtrer les commandes
-  const filteredOrders = orders.filter(order => {
-    if (filterStatus !== 'all' && order.status !== filterStatus) return false;
-    if (searchQuery) {
-      const query = searchQuery.toLowerCase();
-      return (
-        order.id.toLowerCase().includes(query) ||
-        order.user_email?.toLowerCase().includes(query) ||
-        order.user_name?.toLowerCase().includes(query)
-      );
-    }
-    return true;
-  });
-
-  if (loading) {
+  if (!authorized) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50">
-        <div className="text-center">
-          <Loader2 className="w-12 h-12 text-green-600 animate-spin mx-auto mb-4" />
-          <p className="text-slate-600">Chargement...</p>
+      <div className="min-h-screen flex items-center justify-center bg-slate-900">
+        <div className="text-white text-center">
+          <AlertTriangle className="w-16 h-16 mx-auto mb-4 text-red-500" />
+          <h1 className="text-2xl font-bold">Accès non autorisé</h1>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-slate-900 text-white">
       {/* Header */}
-      <div className="bg-white border-b shadow-sm sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
+      <header className="bg-slate-800 border-b border-slate-700 sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <div className="w-10 h-10 bg-gradient-to-br from-teal-500 to-emerald-500 rounded-xl flex items-center justify-center font-bold">
+              K
+            </div>
             <div>
-              <h1 className="text-xl font-bold text-slate-900">{partner?.name}</h1>
-              <p className="text-sm text-slate-500">{partner?.city}</p>
+              <h1 className="text-xl font-bold">Kilolab Admin</h1>
+              <p className="text-xs text-slate-400">Dashboard administrateur</p>
             </div>
-            <div className="flex items-center gap-3">
-              <Link
-                to="/scanner"
-                className="flex items-center gap-2 px-4 py-2 bg-green-500 text-white rounded-lg font-medium hover:bg-green-600 transition"
-              >
-                <QrCode className="w-5 h-5" />
-                Scanner QR
-              </Link>
-              <button
-                onClick={handleLogout}
-                className="p-2 text-slate-400 hover:text-slate-600 transition"
-              >
-                <LogOut className="w-5 h-5" />
-              </button>
-            </div>
+          </div>
+          
+          <div className="flex items-center gap-4">
+            <button onClick={loadAllData} className="p-2 hover:bg-slate-700 rounded-lg transition">
+              <RefreshCw className={`w-5 h-5 ${loading ? 'animate-spin' : ''}`} />
+            </button>
+            <button onClick={handleLogout} className="flex items-center gap-2 px-4 py-2 bg-red-500/20 text-red-400 rounded-lg hover:bg-red-500/30 transition">
+              <LogOut className="w-4 h-4" /> Déconnexion
+            </button>
           </div>
         </div>
-      </div>
+      </header>
 
-      <div className="max-w-7xl mx-auto px-4 py-6">
-        {/* Stats Cards */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-          <div className="bg-white rounded-2xl p-5 shadow-md">
-            <div className="flex items-center gap-3 mb-2">
-              <div className="w-10 h-10 bg-yellow-100 rounded-xl flex items-center justify-center">
-                <Clock className="w-5 h-5 text-yellow-600" />
-              </div>
-              <span className="text-sm text-slate-500">En cours</span>
-            </div>
-            <p className="text-3xl font-bold text-slate-900">{stats.pendingOrders}</p>
-          </div>
-
-          <div className="bg-white rounded-2xl p-5 shadow-md">
-            <div className="flex items-center gap-3 mb-2">
-              <div className="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center">
-                <CheckCircle className="w-5 h-5 text-green-600" />
-              </div>
-              <span className="text-sm text-slate-500">Terminées</span>
-            </div>
-            <p className="text-3xl font-bold text-slate-900">{stats.completedOrders}</p>
-          </div>
-
-          <div className="bg-white rounded-2xl p-5 shadow-md">
-            <div className="flex items-center gap-3 mb-2">
-              <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center">
-                <Euro className="w-5 h-5 text-blue-600" />
-              </div>
-              <span className="text-sm text-slate-500">Chiffre d'affaires</span>
-            </div>
-            <p className="text-3xl font-bold text-slate-900">{stats.totalRevenue.toFixed(0)}€</p>
-          </div>
-
-          <div className="bg-white rounded-2xl p-5 shadow-md">
-            <div className="flex items-center gap-3 mb-2">
-              <div className="w-10 h-10 bg-purple-100 rounded-xl flex items-center justify-center">
-                <Star className="w-5 h-5 text-purple-600" />
-              </div>
-              <span className="text-sm text-slate-500">Note moyenne</span>
-            </div>
-            <p className="text-3xl font-bold text-slate-900">
-              {stats.averageRating > 0 ? stats.averageRating.toFixed(1) : '-'}
-              <span className="text-sm font-normal text-slate-400"> ({stats.totalReviews} avis)</span>
-            </p>
-          </div>
+      <div className="max-w-7xl mx-auto px-4 py-8">
+        {/* Tabs */}
+        <div className="flex gap-2 mb-8 overflow-x-auto pb-2">
+          {[
+            { id: 'overview', label: 'Vue d\'ensemble', icon: BarChart3 },
+            { id: 'partners', label: 'Partenaires', icon: Store, badge: stats.pendingPartners },
+            { id: 'contacts', label: 'Messages', icon: Mail, badge: stats.unreadContacts },
+            { id: 'users', label: 'Utilisateurs', icon: Users }
+          ].map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id as any)}
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition whitespace-nowrap ${
+                activeTab === tab.id 
+                  ? 'bg-teal-500 text-white' 
+                  : 'bg-slate-800 text-slate-400 hover:bg-slate-700'
+              }`}
+            >
+              <tab.icon className="w-4 h-4" />
+              {tab.label}
+              {tab.badge > 0 && (
+                <span className="bg-red-500 text-white text-xs px-2 py-0.5 rounded-full">{tab.badge}</span>
+              )}
+            </button>
+          ))}
         </div>
 
-        {/* Filtres et recherche */}
-        <div className="bg-white rounded-2xl p-4 shadow-md mb-6">
-          <div className="flex flex-col md:flex-row gap-4">
-            {/* Recherche */}
-            <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Rechercher par ID, client..."
-                className="w-full pl-10 pr-4 py-2 border rounded-lg focus:border-green-500 focus:outline-none"
-              />
+        {/* Overview Tab */}
+        {activeTab === 'overview' && (
+          <div className="space-y-8">
+            {/* Stats Cards */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="bg-slate-800 rounded-2xl p-6 border border-slate-700">
+                <div className="flex items-center gap-3 mb-2">
+                  <div className="p-2 bg-blue-500/20 rounded-lg"><Users className="w-5 h-5 text-blue-400" /></div>
+                  <span className="text-slate-400 text-sm">Utilisateurs</span>
+                </div>
+                <p className="text-3xl font-bold">{stats.totalUsers}</p>
+              </div>
+              
+              <div className="bg-slate-800 rounded-2xl p-6 border border-slate-700">
+                <div className="flex items-center gap-3 mb-2">
+                  <div className="p-2 bg-green-500/20 rounded-lg"><Store className="w-5 h-5 text-green-400" /></div>
+                  <span className="text-slate-400 text-sm">Partenaires actifs</span>
+                </div>
+                <p className="text-3xl font-bold text-green-400">{stats.activePartners}</p>
+                <p className="text-xs text-slate-500 mt-1">{stats.pendingPartners} en attente</p>
+              </div>
+              
+              <div className="bg-slate-800 rounded-2xl p-6 border border-slate-700">
+                <div className="flex items-center gap-3 mb-2">
+                  <div className="p-2 bg-purple-500/20 rounded-lg"><ShoppingBag className="w-5 h-5 text-purple-400" /></div>
+                  <span className="text-slate-400 text-sm">Commandes</span>
+                </div>
+                <p className="text-3xl font-bold">{stats.totalOrders}</p>
+                <p className="text-xs text-slate-500 mt-1">{stats.pendingOrders} en cours</p>
+              </div>
+              
+              <div className="bg-slate-800 rounded-2xl p-6 border border-slate-700">
+                <div className="flex items-center gap-3 mb-2">
+                  <div className="p-2 bg-amber-500/20 rounded-lg"><Mail className="w-5 h-5 text-amber-400" /></div>
+                  <span className="text-slate-400 text-sm">Messages</span>
+                </div>
+                <p className="text-3xl font-bold">{stats.totalContacts}</p>
+                <p className="text-xs text-slate-500 mt-1">{stats.unreadContacts} non lus</p>
+              </div>
             </div>
 
-            {/* Filtre par statut */}
-            <div className="flex gap-2 overflow-x-auto">
-              {['all', 'pending', 'confirmed', 'in_progress', 'ready', 'completed'].map(status => (
-                <button
-                  key={status}
-                  onClick={() => setFilterStatus(status)}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition ${
-                    filterStatus === status
-                      ? 'bg-green-500 text-white'
-                      : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                  }`}
+            {/* Partenaires en attente */}
+            {stats.pendingPartners > 0 && (
+              <div className="bg-amber-500/10 border border-amber-500/30 rounded-2xl p-6">
+                <div className="flex items-center gap-3 mb-4">
+                  <Bell className="w-6 h-6 text-amber-400" />
+                  <h3 className="text-lg font-bold text-amber-400">
+                    {stats.pendingPartners} partenaire(s) en attente de validation
+                  </h3>
+                </div>
+                <button 
+                  onClick={() => setActiveTab('partners')}
+                  className="px-4 py-2 bg-amber-500 text-white rounded-lg font-medium hover:bg-amber-600 transition"
                 >
-                  {status === 'all' ? 'Toutes' : getStatusLabel(status)}
+                  Voir les demandes
                 </button>
-              ))}
-            </div>
-          </div>
-        </div>
+              </div>
+            )}
 
-        {/* Liste des commandes */}
-        <div className="bg-white rounded-2xl shadow-md overflow-hidden">
-          <div className="p-4 border-b">
-            <h2 className="text-lg font-bold text-slate-900">
-              Commandes ({filteredOrders.length})
-            </h2>
-          </div>
-
-          {filteredOrders.length === 0 ? (
-            <div className="p-12 text-center">
-              <Package className="w-12 h-12 text-slate-300 mx-auto mb-4" />
-              <p className="text-slate-500">Aucune commande trouvée</p>
-            </div>
-          ) : (
-            <div className="divide-y">
-              {filteredOrders.map((order) => {
-                const nextStatus = getNextStatus(order.status);
-                return (
-                  <div key={order.id} className="p-4 hover:bg-slate-50 transition">
-                    <div className="flex items-start justify-between gap-4">
-                      {/* Infos commande */}
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-3 mb-2">
-                          <span className={`px-2 py-1 rounded-lg text-xs font-medium ${getStatusColor(order.status)}`}>
-                            {getStatusLabel(order.status)}
-                          </span>
-                          <span className={`px-2 py-1 rounded-lg text-xs font-medium ${
-                            order.service_type === 'express' 
-                              ? 'bg-orange-100 text-orange-700' 
-                              : 'bg-slate-100 text-slate-600'
-                          }`}>
-                            {order.service_type === 'express' ? '⚡ Express' : 'Standard'}
-                          </span>
-                        </div>
-
-                        <p className="font-medium text-slate-900 truncate">
-                          #{order.id.substring(0, 8).toUpperCase()}
-                        </p>
-                        <p className="text-sm text-slate-500">
-                          {order.user_name || order.user_email || 'Client'}
-                        </p>
-                        <p className="text-xs text-slate-400 mt-1">
-                          {new Date(order.created_at).toLocaleDateString('fr-FR', {
-                            day: 'numeric',
-                            month: 'short',
-                            hour: '2-digit',
-                            minute: '2-digit'
-                          })}
-                        </p>
-
-                        {order.notes && (
-                          <p className="text-xs text-slate-500 mt-2 bg-yellow-50 p-2 rounded">
-                            📝 {order.notes}
-                          </p>
-                        )}
-                      </div>
-
-                      {/* Prix et poids */}
-                      <div className="text-right">
-                        <p className="text-lg font-bold text-slate-900">
-                          {order.total_amount?.toFixed(2)}€
-                        </p>
-                        <p className="text-sm text-slate-500">
-                          {order.weight_kg} kg × {order.price_per_kg}€
-                        </p>
-                      </div>
-
-                      {/* Actions */}
-                      <div className="flex flex-col gap-2">
-                        {nextStatus && order.status !== 'completed' && order.status !== 'cancelled' && (
-                          <button
-                            onClick={() => updateOrderStatus(order.id, nextStatus)}
-                            disabled={updatingStatus === order.id}
-                            className="px-4 py-2 bg-green-500 text-white rounded-lg text-sm font-medium hover:bg-green-600 transition disabled:opacity-50 flex items-center gap-2"
-                          >
-                            {updatingStatus === order.id ? (
-                              <Loader2 className="w-4 h-4 animate-spin" />
-                            ) : (
-                              <ChevronRight className="w-4 h-4" />
-                            )}
-                            {getStatusLabel(nextStatus)}
-                          </button>
-                        )}
-
-                        {order.status === 'ready' && (
-                          <Link
-                            to={`/scanner?order=${order.id}`}
-                            className="px-4 py-2 bg-blue-500 text-white rounded-lg text-sm font-medium hover:bg-blue-600 transition flex items-center gap-2"
-                          >
-                            <QrCode className="w-4 h-4" />
-                            Scanner
-                          </Link>
-                        )}
-
-                        <button
-                          onClick={() => setSelectedOrder(order)}
-                          className="px-4 py-2 bg-slate-100 text-slate-600 rounded-lg text-sm font-medium hover:bg-slate-200 transition flex items-center gap-2"
-                        >
-                          <Eye className="w-4 h-4" />
-                          Détails
-                        </button>
-                      </div>
+            {/* Derniers partenaires */}
+            <div className="bg-slate-800 rounded-2xl p-6 border border-slate-700">
+              <h3 className="text-lg font-bold mb-4">Derniers partenaires inscrits</h3>
+              <div className="space-y-3">
+                {partners.slice(0, 5).map((partner) => (
+                  <div key={partner.id} className="flex items-center justify-between p-3 bg-slate-700/50 rounded-xl">
+                    <div>
+                      <p className="font-medium">{partner.name}</p>
+                      <p className="text-sm text-slate-400">{partner.city} ({partner.postal_code})</p>
+                    </div>
+                    <div className={`px-3 py-1 rounded-full text-xs font-medium ${
+                      partner.is_active 
+                        ? 'bg-green-500/20 text-green-400' 
+                        : 'bg-amber-500/20 text-amber-400'
+                    }`}>
+                      {partner.is_active ? 'Actif' : 'En attente'}
                     </div>
                   </div>
-                );
-              })}
-            </div>
-          )}
-        </div>
-
-        {/* Rappel commission */}
-        <div className="mt-8 bg-green-50 rounded-2xl p-6 text-center">
-          <p className="text-green-800">
-            💰 <strong>Rappel :</strong> Commission Kilolab de 10% sur chaque commande. 
-            Votre part sur ce mois : <strong>{(stats.totalRevenue * 0.9).toFixed(2)}€</strong>
-          </p>
-        </div>
-      </div>
-
-      {/* Modal détails commande */}
-      {selectedOrder && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto">
-            <div className="p-6 border-b flex items-center justify-between">
-              <h3 className="text-lg font-bold">Détails commande</h3>
-              <button
-                onClick={() => setSelectedOrder(null)}
-                className="p-2 hover:bg-slate-100 rounded-lg transition"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            <div className="p-6 space-y-4">
-              <div>
-                <p className="text-sm text-slate-500">ID Commande</p>
-                <p className="font-mono font-bold">{selectedOrder.id}</p>
+                ))}
               </div>
-
-              <div>
-                <p className="text-sm text-slate-500">Statut</p>
-                <span className={`inline-block px-3 py-1 rounded-lg text-sm font-medium ${getStatusColor(selectedOrder.status)}`}>
-                  {getStatusLabel(selectedOrder.status)}
-                </span>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <p className="text-sm text-slate-500">Service</p>
-                  <p className="font-medium">{selectedOrder.service_type === 'express' ? '⚡ Express' : 'Standard'}</p>
-                </div>
-                <div>
-                  <p className="text-sm text-slate-500">Poids</p>
-                  <p className="font-medium">{selectedOrder.weight_kg} kg</p>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <p className="text-sm text-slate-500">Prix/kg</p>
-                  <p className="font-medium">{selectedOrder.price_per_kg}€</p>
-                </div>
-                <div>
-                  <p className="text-sm text-slate-500">Total</p>
-                  <p className="font-bold text-green-600 text-xl">{selectedOrder.total_amount?.toFixed(2)}€</p>
-                </div>
-              </div>
-
-              <div>
-                <p className="text-sm text-slate-500">Date de création</p>
-                <p className="font-medium">
-                  {new Date(selectedOrder.created_at).toLocaleDateString('fr-FR', {
-                    weekday: 'long',
-                    day: 'numeric',
-                    month: 'long',
-                    year: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit'
-                  })}
-                </p>
-              </div>
-
-              {selectedOrder.notes && (
-                <div>
-                  <p className="text-sm text-slate-500">Instructions client</p>
-                  <p className="bg-yellow-50 p-3 rounded-lg">{selectedOrder.notes}</p>
-                </div>
-              )}
-
-              {/* QR Code pour retrait */}
-              {(selectedOrder.status === 'ready' || selectedOrder.status === 'completed') && (
-                <div className="bg-slate-50 p-4 rounded-xl text-center">
-                  <p className="text-sm text-slate-500 mb-2">Code de retrait</p>
-                  <p className="text-3xl font-mono font-bold text-slate-900">
-                    {selectedOrder.id.substring(0, 8).toUpperCase()}
-                  </p>
-                </div>
-              )}
-            </div>
-
-            <div className="p-6 border-t">
-              {getNextStatus(selectedOrder.status) && selectedOrder.status !== 'completed' && (
-                <button
-                  onClick={() => {
-                    const next = getNextStatus(selectedOrder.status);
-                    if (next) {
-                      updateOrderStatus(selectedOrder.id, next);
-                      setSelectedOrder(null);
-                    }
-                  }}
-                  className="w-full py-3 bg-green-500 text-white rounded-xl font-bold hover:bg-green-600 transition"
-                >
-                  Passer à : {getStatusLabel(getNextStatus(selectedOrder.status) || '')}
-                </button>
-              )}
             </div>
           </div>
-        </div>
-      )}
+        )}
+
+        {/* Partners Tab */}
+        {activeTab === 'partners' && (
+          <div className="bg-slate-800 rounded-2xl border border-slate-700 overflow-hidden">
+            <div className="p-4 border-b border-slate-700 flex items-center justify-between">
+              <h3 className="font-bold">Tous les partenaires ({stats.totalPartners})</h3>
+            </div>
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead className="bg-slate-700/50 text-left text-sm text-slate-400">
+                  <tr>
+                    <th className="p-4">Nom</th>
+                    <th className="p-4">Email</th>
+                    <th className="p-4">Téléphone</th>
+                    <th className="p-4">Ville</th>
+                    <th className="p-4">Statut</th>
+                    <th className="p-4">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {partners.map((partner) => (
+                    <tr key={partner.id} className="border-t border-slate-700 hover:bg-slate-700/30">
+                      <td className="p-4 font-medium">{partner.name}</td>
+                      <td className="p-4 text-slate-400">{partner.email}</td>
+                      <td className="p-4 text-slate-400">{partner.phone}</td>
+                      <td className="p-4 text-slate-400">{partner.city} ({partner.postal_code})</td>
+                      <td className="p-4">
+                        <span className={`px-3 py-1 rounded-full text-xs font-medium ${
+                          partner.is_active 
+                            ? 'bg-green-500/20 text-green-400' 
+                            : 'bg-amber-500/20 text-amber-400'
+                        }`}>
+                          {partner.is_active ? 'Actif' : 'En attente'}
+                        </span>
+                      </td>
+                      <td className="p-4">
+                        <button
+                          onClick={() => togglePartnerStatus(partner.id, partner.is_active)}
+                          className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
+                            partner.is_active
+                              ? 'bg-red-500/20 text-red-400 hover:bg-red-500/30'
+                              : 'bg-green-500/20 text-green-400 hover:bg-green-500/30'
+                          }`}
+                        >
+                          {partner.is_active ? 'Désactiver' : 'Activer'}
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
+        {/* Contacts Tab */}
+        {activeTab === 'contacts' && (
+          <div className="space-y-4">
+            {contacts.length === 0 ? (
+              <div className="bg-slate-800 rounded-2xl p-12 text-center">
+                <Mail className="w-16 h-16 text-slate-600 mx-auto mb-4" />
+                <p className="text-slate-400">Aucun message de contact</p>
+              </div>
+            ) : (
+              contacts.map((contact) => (
+                <div 
+                  key={contact.id} 
+                  className={`bg-slate-800 rounded-2xl p-6 border ${
+                    contact.is_read ? 'border-slate-700' : 'border-teal-500'
+                  }`}
+                >
+                  <div className="flex items-start justify-between mb-4">
+                    <div>
+                      <h4 className="font-bold">{contact.name}</h4>
+                      <p className="text-sm text-slate-400">{contact.email}</p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      {!contact.is_read && (
+                        <span className="bg-teal-500 text-white text-xs px-2 py-1 rounded-full">Nouveau</span>
+                      )}
+                      <span className="text-xs text-slate-500">
+                        {new Date(contact.created_at).toLocaleDateString('fr-FR')}
+                      </span>
+                    </div>
+                  </div>
+                  <p className="font-medium text-teal-400 mb-2">{contact.subject}</p>
+                  <p className="text-slate-300">{contact.message}</p>
+                  {!contact.is_read && (
+                    <button
+                      onClick={() => markContactAsRead(contact.id)}
+                      className="mt-4 px-4 py-2 bg-teal-500/20 text-teal-400 rounded-lg text-sm hover:bg-teal-500/30 transition"
+                    >
+                      Marquer comme lu
+                    </button>
+                  )}
+                </div>
+              ))
+            )}
+          </div>
+        )}
+
+        {/* Users Tab */}
+        {activeTab === 'users' && (
+          <div className="bg-slate-800 rounded-2xl p-6 border border-slate-700">
+            <h3 className="font-bold mb-4">Statistiques utilisateurs</h3>
+            <p className="text-slate-400">Total: {stats.totalUsers} utilisateurs inscrits</p>
+            <p className="text-sm text-slate-500 mt-4">
+              Pour des raisons de confidentialité, les détails des utilisateurs ne sont pas affichés ici.
+            </p>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
