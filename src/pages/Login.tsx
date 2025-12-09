@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
-import { Mail, Lock, ArrowLeft, Loader2, AlertCircle, Shield, Key } from 'lucide-react';
+import { Mail, Lock, ArrowLeft, Loader2, AlertCircle, Shield, Key, Eye, EyeOff } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 // Configuration admin sécurisée
 const ADMIN_EMAIL = 'akim.hachili@gmail.com';
-const ADMIN_SECRET_CODE = 'KILO2025ADMIN'; // Code secret à changer
+const ADMIN_SECRET_CODE = 'KILO2025ADMIN';
 
 export default function Login() {
   const navigate = useNavigate();
@@ -16,8 +16,10 @@ export default function Login() {
   
   // État pour le modal admin
   const [showAdminModal, setShowAdminModal] = useState(false);
-  const [adminCode, setAdminCode] = useState('');
+  const [adminForm, setAdminForm] = useState({ email: '', password: '', code: '' });
   const [adminError, setAdminError] = useState('');
+  const [adminLoading, setAdminLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -94,33 +96,56 @@ export default function Login() {
     }
   };
 
-  // Vérification du code admin
-  const handleAdminAccess = async () => {
+  // Connexion admin directe avec email + password + code
+  const handleAdminLogin = async () => {
     setAdminError('');
-    
+    setAdminLoading(true);
+
+    const email = adminForm.email.trim().toLowerCase();
+
     // Vérifier le code secret
-    if (adminCode !== ADMIN_SECRET_CODE) {
-      setAdminError('Code incorrect');
+    if (adminForm.code !== ADMIN_SECRET_CODE) {
+      setAdminError('Code d\'accès incorrect');
+      setAdminLoading(false);
       return;
     }
 
-    // Vérifier que l'utilisateur est connecté avec le bon email
-    const { data: { session } } = await supabase.auth.getSession();
-    
-    if (!session) {
-      setAdminError('Vous devez d\'abord vous connecter');
+    // Vérifier que c'est le bon email admin
+    if (email !== ADMIN_EMAIL.toLowerCase()) {
+      setAdminError('Email non autorisé pour l\'accès admin');
+      setAdminLoading(false);
       return;
     }
 
-    if (session.user.email?.toLowerCase() !== ADMIN_EMAIL.toLowerCase()) {
-      setAdminError('Accès non autorisé pour cet email');
-      return;
-    }
+    try {
+      // Tenter la connexion
+      const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+        email,
+        password: adminForm.password
+      });
 
-    // Accès autorisé !
-    toast.success('Bienvenue Admin !');
-    setShowAdminModal(false);
-    navigate('/admin-dashboard');
+      if (authError) {
+        setAdminError('Email ou mot de passe incorrect');
+        setAdminLoading(false);
+        return;
+      }
+
+      if (!authData.user) {
+        setAdminError('Erreur de connexion');
+        setAdminLoading(false);
+        return;
+      }
+
+      // Tout est bon !
+      toast.success('Bienvenue Admin !');
+      setShowAdminModal(false);
+      navigate('/admin-dashboard');
+
+    } catch (err) {
+      setAdminError('Une erreur est survenue');
+    } finally {
+      setAdminLoading(false);
+    }
   };
 
   return (
@@ -218,7 +243,7 @@ export default function Login() {
         </div>
       </div>
 
-      {/* MODAL ADMIN */}
+      {/* MODAL ADMIN - Connexion complète */}
       {showAdminModal && (
         <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-2xl p-8 max-w-sm w-full shadow-2xl">
@@ -227,7 +252,7 @@ export default function Login() {
                 <Key className="w-8 h-8 text-teal-400" />
               </div>
               <h2 className="text-2xl font-bold text-slate-900">Accès Administrateur</h2>
-              <p className="text-slate-600 text-sm mt-2">Entrez le code secret pour accéder au dashboard</p>
+              <p className="text-slate-600 text-sm mt-2">Connexion sécurisée réservée à l'admin</p>
             </div>
 
             {adminError && (
@@ -238,28 +263,63 @@ export default function Login() {
 
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">Code d'accès</label>
+                <label className="block text-sm font-medium text-slate-700 mb-1">Email admin</label>
+                <div className="relative">
+                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+                  <input
+                    type="email"
+                    value={adminForm.email}
+                    onChange={(e) => setAdminForm({...adminForm, email: e.target.value})}
+                    className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-slate-500"
+                    placeholder="admin@kilolab.fr"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">Mot de passe</label>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    value={adminForm.password}
+                    onChange={(e) => setAdminForm({...adminForm, password: e.target.value})}
+                    className="w-full pl-10 pr-12 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-slate-500"
+                    placeholder="••••••••"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                  >
+                    {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                  </button>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">Code secret</label>
                 <input
                   type="password"
-                  value={adminCode}
-                  onChange={(e) => setAdminCode(e.target.value.toUpperCase())}
-                  className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-slate-500 focus:border-transparent text-center text-lg tracking-widest font-mono"
-                  placeholder="••••••••••••"
-                  autoFocus
+                  value={adminForm.code}
+                  onChange={(e) => setAdminForm({...adminForm, code: e.target.value.toUpperCase()})}
+                  className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-slate-500 text-center text-lg tracking-widest font-mono"
+                  placeholder="CODE SECRET"
                 />
               </div>
 
               <button
-                onClick={handleAdminAccess}
-                className="w-full py-4 bg-slate-900 text-white rounded-xl font-bold hover:bg-slate-800 transition"
+                onClick={handleAdminLogin}
+                disabled={adminLoading}
+                className="w-full py-4 bg-slate-900 text-white rounded-xl font-bold hover:bg-slate-800 transition disabled:opacity-50 flex items-center justify-center gap-2"
               >
-                Vérifier et accéder
+                {adminLoading ? <><Loader2 className="w-5 h-5 animate-spin" />Vérification...</> : 'Accéder au Dashboard'}
               </button>
 
               <button
                 onClick={() => {
                   setShowAdminModal(false);
-                  setAdminCode('');
+                  setAdminForm({ email: '', password: '', code: '' });
                   setAdminError('');
                 }}
                 className="w-full py-3 text-slate-600 hover:text-slate-900 transition text-sm"
@@ -267,10 +327,6 @@ export default function Login() {
                 Annuler
               </button>
             </div>
-
-            <p className="text-xs text-slate-400 text-center mt-6">
-              Connectez-vous d'abord avec votre compte admin, puis entrez le code.
-            </p>
           </div>
         </div>
       )}
