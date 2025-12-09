@@ -1,27 +1,54 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 
-// Pages existantes
+// Pages principales
 import LandingPage from './pages/LandingPage';
 import PartnersMap from './pages/PartnersMap';
 import BecomePartner from './pages/BecomePartner';
+import PartnerLanding from './pages/PartnerLanding';
+import Pricing from './pages/Pricing';
+import About from './pages/About';
+import Contact from './pages/Contact';
+import FAQ from './pages/FAQ';
+import Blog from './pages/Blog';
+
+// Auth
 import Login from './pages/Login';
 import Signup from './pages/Signup';
+import Register from './pages/Register';
+
+// Dashboards
 import ClientDashboard from './pages/ClientDashboard';
 import PartnerDashboard from './pages/PartnerDashboard';
 import AdminDashboard from './pages/AdminDashboard';
+import LoyaltyDashboard from './pages/LoyaltyDashboard';
+import UserProfile from './pages/UserProfile';
+
+// Orders
 import NewOrder from './pages/NewOrder';
 import OrderTracking from './pages/OrderTracking';
-import Pricing from './pages/Pricing';
+import ReviewOrder from './pages/ReviewOrder';
+import PickupQR from './pages/PickupQR';
+import PaymentSuccess from './pages/PaymentSuccess';
+import PaymentCancel from './pages/PaymentCancel';
 
-// Placeholder pour les pages pas encore créées
-const Placeholder = ({ title }: { title: string }) => (
-  <div className="min-h-screen flex flex-col items-center justify-center bg-slate-50 text-slate-900">
-    <h1 className="text-3xl font-bold mb-2">{title}</h1>
-    <p className="text-slate-500">Bientôt disponible</p>
-    <a href="/" className="mt-4 text-teal-600 hover:underline">← Retour à l'accueil</a>
-  </div>
-);
+// Partner
+import PartnerComingSoon from './pages/PartnerComingSoon';
+
+// Content pages
+import ForWho from './pages/ForWho';
+import LaverVsPressing from './pages/LaverVsPressing';
+import EconomiserPressing from './pages/EconomiserPressing';
+import Referral from './pages/Referral';
+
+// Legal
+import Legal from './pages/Legal';
+import Privacy from './pages/Privacy';
+import PrivacyPolicy from './pages/PrivacyPolicy';
+import MentionsLegales from './pages/MentionsLegales';
+
+// 404
+import NotFound from './pages/NotFound';
 
 function App() {
   return (
@@ -32,31 +59,53 @@ function App() {
         <Route path="/" element={<LandingPage />} />
         <Route path="/partners-map" element={<PartnersMap />} />
         <Route path="/become-partner" element={<BecomePartner />} />
+        <Route path="/partner-landing" element={<PartnerLanding />} />
         <Route path="/pricing" element={<Pricing />} />
+        <Route path="/about" element={<About />} />
+        <Route path="/contact" element={<Contact />} />
+        <Route path="/faq" element={<FAQ />} />
+        <Route path="/blog" element={<Blog />} />
+        <Route path="/how-it-works" element={<ForWho />} />
         
         {/* Auth */}
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
+        <Route path="/register" element={<Register />} />
         
         {/* Dashboards */}
         <Route path="/client-dashboard" element={<ClientDashboard />} />
         <Route path="/partner-dashboard" element={<PartnerDashboard />} />
         <Route path="/admin-dashboard" element={<AdminDashboard />} />
+        <Route path="/loyalty" element={<LoyaltyDashboard />} />
+        <Route path="/profile" element={<UserProfile />} />
         
         {/* Orders */}
         <Route path="/new-order" element={<NewOrder />} />
         <Route path="/tracking/:orderId" element={<OrderTracking />} />
+        <Route path="/review-order" element={<ReviewOrder />} />
+        <Route path="/pickup-qr/:orderId" element={<PickupQR />} />
+        <Route path="/payment-success" element={<PaymentSuccess />} />
+        <Route path="/payment-cancel" element={<PaymentCancel />} />
         
-        {/* Pages à créer (placeholder) */}
-        <Route path="/how-it-works" element={<Placeholder title="Comment ça marche" />} />
-        <Route path="/contact" element={<Placeholder title="Contact" />} />
-        <Route path="/about" element={<Placeholder title="À Propos" />} />
-        <Route path="/legal/cgu" element={<Placeholder title="Conditions Générales d'Utilisation" />} />
-        <Route path="/legal/privacy" element={<Placeholder title="Politique de Confidentialité" />} />
-        <Route path="/legal/cookies" element={<Placeholder title="Politique des Cookies" />} />
+        {/* Partner */}
+        <Route path="/partner-coming-soon" element={<PartnerComingSoon />} />
         
-        {/* Fallback */}
-        <Route path="*" element={<Placeholder title="Page non trouvée" />} />
+        {/* Content */}
+        <Route path="/for-who" element={<ForWho />} />
+        <Route path="/laver-vs-pressing" element={<LaverVsPressing />} />
+        <Route path="/economiser-pressing" element={<EconomiserPressing />} />
+        <Route path="/referral" element={<Referral />} />
+        
+        {/* Legal */}
+        <Route path="/legal" element={<Legal />} />
+        <Route path="/legal/cgu" element={<Legal />} />
+        <Route path="/legal/privacy" element={<PrivacyPolicy />} />
+        <Route path="/legal/cookies" element={<Privacy />} />
+        <Route path="/privacy" element={<PrivacyPolicy />} />
+        <Route path="/mentions-legales" element={<MentionsLegales />} />
+        
+        {/* 404 */}
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </Router>
   );
