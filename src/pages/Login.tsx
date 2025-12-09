@@ -1,31 +1,48 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
-import { Mail, Lock, ArrowLeft, Loader2 } from 'lucide-react';
+import { Mail, Lock, ArrowLeft, Loader2, AlertCircle } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 export default function Login() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
-  const [formData, setFormData] = useState({
-    email: '',
-    password: ''
-  });
+  const [formData, setFormData] = useState({ email: '', password: '' });
+  const [partnerNeedsAccount, setPartnerNeedsAccount] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    setPartnerNeedsAccount(false);
+
+    const email = formData.email.trim().toLowerCase();
 
     try {
-      // 1. Connexion
+      // 1. Tenter la connexion
       const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
-        email: formData.email.trim().toLowerCase(),
+        email,
         password: formData.password
       });
 
       if (authError) {
-        if (authError.message.includes('Invalid login')) {
-          toast.error('Email ou mot de passe incorrect');
+        console.log('Auth error:', authError.message);
+        
+        // Si identifiants invalides, vérifier si c'est un partenaire sans compte
+        if (authError.message.includes('Invalid login credentials')) {
+          // Vérifier si l'email existe dans partners
+          const { data: partner } = await supabase
+            .from('partners')
+            .select('id, name')
+            .eq('email', email)
+            .maybeSingle();
+
+          if (partner) {
+            // C'est un partenaire mais il n'a pas encore créé son compte auth
+            setPartnerNeedsAccount(true);
+            toast.error(`Le pressing "${partner.name}" doit d'abord créer un compte.`);
+          } else {
+            toast.error('Email ou mot de passe incorrect');
+          }
         } else {
           toast.error(authError.message);
         }
@@ -39,17 +56,18 @@ export default function Login() {
         return;
       }
 
+      // 2. Connexion réussie - Vérifier le type d'utilisateur
       const userEmail = authData.user.email?.toLowerCase();
 
-      // 2. Vérifier si c'est un partenaire
+      // Vérifier si c'est un partenaire
       const { data: partner } = await supabase
         .from('partners')
         .select('id, name, is_active, user_id')
         .eq('email', userEmail)
-        .single();
+        .maybeSingle();
 
       if (partner) {
-        // Si le user_id n'est pas encore lié, le faire maintenant
+        // Lier le user_id si pas encore fait
         if (!partner.user_id) {
           await supabase
             .from('partners')
@@ -58,29 +76,23 @@ export default function Login() {
         }
 
         toast.success(`Bienvenue ${partner.name} !`);
-        
-        if (partner.is_active) {
-          navigate('/partner-dashboard');
-        } else {
-          navigate('/partner-coming-soon');
-        }
+        navigate(partner.is_active ? '/partner-dashboard' : '/partner-coming-soon');
         return;
       }
 
-      // 3. Vérifier si c'est un admin
+      // Vérifier le profil utilisateur
       const { data: profile } = await supabase
         .from('user_profiles')
         .select('role, first_name')
         .eq('user_id', authData.user.id)
-        .single();
+        .maybeSingle();
 
       if (profile?.role === 'admin') {
-        toast.success(`Bienvenue Admin !`);
+        toast.success('Bienvenue Admin !');
         navigate('/admin-dashboard');
         return;
       }
 
-      // 4. Sinon c'est un client
       toast.success(`Bienvenue ${profile?.first_name || ''} !`);
       navigate('/client-dashboard');
 
@@ -96,10 +108,7 @@ export default function Login() {
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         <div className="bg-white rounded-3xl shadow-2xl p-8">
-          <button 
-            onClick={() => navigate('/')} 
-            className="flex items-center gap-2 text-slate-500 hover:text-slate-700 mb-6"
-          >
+          <button onClick={() => navigate('/')} className="flex items-center gap-2 text-slate-500 hover:text-slate-700 mb-6">
             <ArrowLeft className="w-4 h-4" /> Retour
           </button>
 
@@ -107,6 +116,24 @@ export default function Login() {
             <h1 className="text-3xl font-bold text-slate-900 mb-2">Connexion</h1>
             <p className="text-slate-600">Accédez à votre espace Kilolab</p>
           </div>
+
+          {/* Message pour partenaire sans compte */}
+          {partnerNeedsAccount && (
+            <div className="mb-6 p-4 bg-amber-50 border border-amber-200 rounded-xl">
+              <div className="flex items-start gap-3">
+                <AlertCircle className="w-5 h-5 text-amber-600 mt-0.5" />
+                <div>
+                  <p className="font-medium text-amber-800">Compte non créé</p>
+                  <p className="text-sm text-amber-700 mt-1">
+                    Votre pressing est enregistré mais vous devez créer un compte pour accéder à votre espace.
+                  </p>
+                  <Link to="/signup" className="inline-block mt-2 text-sm font-semibold text-amber-700 hover:text-amber-800 underline">
+                    Créer mon compte →
+                  </Link>
+                </div>
+              </div>
+            </div>
+          )}
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
@@ -144,35 +171,20 @@ export default function Login() {
               disabled={loading}
               className="w-full py-4 bg-teal-600 text-white rounded-xl font-bold text-lg hover:bg-teal-700 transition disabled:opacity-50 flex items-center justify-center gap-2"
             >
-              {loading ? (
-                <>
-                  <Loader2 className="w-5 h-5 animate-spin" />
-                  Connexion...
-                </>
-              ) : (
-                'Se connecter'
-              )}
+              {loading ? <><Loader2 className="w-5 h-5 animate-spin" />Connexion...</> : 'Se connecter'}
             </button>
           </form>
 
           <div className="mt-6 text-center space-y-2">
-            <Link to="/forgot-password" className="text-sm text-teal-600 hover:underline block">
-              Mot de passe oublié ?
-            </Link>
             <p className="text-slate-600">
               Pas encore de compte ?{' '}
-              <Link to="/signup" className="text-teal-600 font-semibold hover:underline">
-                S'inscrire
-              </Link>
+              <Link to="/signup" className="text-teal-600 font-semibold hover:underline">S'inscrire</Link>
             </p>
           </div>
 
           <div className="mt-6 pt-6 border-t border-slate-100">
             <p className="text-center text-sm text-slate-500 mb-3">Vous êtes un pressing ?</p>
-            <Link 
-              to="/become-partner"
-              className="block w-full py-3 text-center border-2 border-teal-500 text-teal-600 rounded-xl font-semibold hover:bg-teal-50 transition"
-            >
+            <Link to="/become-partner" className="block w-full py-3 text-center border-2 border-teal-500 text-teal-600 rounded-xl font-semibold hover:bg-teal-50 transition">
               Devenir partenaire
             </Link>
           </div>
