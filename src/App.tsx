@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
+import { AuthProvider } from './contexts/AuthContext';
 
 // Pages principales
 import LandingPage from './pages/LandingPage';
@@ -52,62 +53,64 @@ import NotFound from './pages/NotFound';
 
 function App() {
   return (
-    <Router>
-      <Toaster position="top-center" />
-      <Routes>
-        {/* Pages principales */}
-        <Route path="/" element={<LandingPage />} />
-        <Route path="/partners-map" element={<PartnersMap />} />
-        <Route path="/become-partner" element={<BecomePartner />} />
-        <Route path="/partner-landing" element={<PartnerLanding />} />
-        <Route path="/pricing" element={<Pricing />} />
-        <Route path="/about" element={<About />} />
-        <Route path="/contact" element={<Contact />} />
-        <Route path="/faq" element={<FAQ />} />
-        <Route path="/blog" element={<Blog />} />
-        <Route path="/how-it-works" element={<ForWho />} />
-        
-        {/* Auth */}
-        <Route path="/login" element={<Login />} />
-        <Route path="/signup" element={<Signup />} />
-        <Route path="/register" element={<Register />} />
-        
-        {/* Dashboards */}
-        <Route path="/client-dashboard" element={<ClientDashboard />} />
-        <Route path="/partner-dashboard" element={<PartnerDashboard />} />
-        <Route path="/admin-dashboard" element={<AdminDashboard />} />
-        <Route path="/loyalty" element={<LoyaltyDashboard />} />
-        <Route path="/profile" element={<UserProfile />} />
-        
-        {/* Orders */}
-        <Route path="/new-order" element={<NewOrder />} />
-        <Route path="/tracking/:orderId" element={<OrderTracking />} />
-        <Route path="/review-order" element={<ReviewOrder />} />
-        <Route path="/pickup-qr/:orderId" element={<PickupQR />} />
-        <Route path="/payment-success" element={<PaymentSuccess />} />
-        <Route path="/payment-cancel" element={<PaymentCancel />} />
-        
-        {/* Partner */}
-        <Route path="/partner-coming-soon" element={<PartnerComingSoon />} />
-        
-        {/* Content */}
-        <Route path="/for-who" element={<ForWho />} />
-        <Route path="/laver-vs-pressing" element={<LaverVsPressing />} />
-        <Route path="/economiser-pressing" element={<EconomiserPressing />} />
-        <Route path="/referral" element={<Referral />} />
-        
-        {/* Legal */}
-        <Route path="/legal" element={<Legal />} />
-        <Route path="/legal/cgu" element={<Legal />} />
-        <Route path="/legal/privacy" element={<PrivacyPolicy />} />
-        <Route path="/legal/cookies" element={<Privacy />} />
-        <Route path="/privacy" element={<PrivacyPolicy />} />
-        <Route path="/mentions-legales" element={<MentionsLegales />} />
-        
-        {/* 404 */}
-        <Route path="*" element={<NotFound />} />
-      </Routes>
-    </Router>
+    <AuthProvider>
+      <Router>
+        <Toaster position="top-center" />
+        <Routes>
+          {/* Pages principales */}
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/partners-map" element={<PartnersMap />} />
+          <Route path="/become-partner" element={<BecomePartner />} />
+          <Route path="/partner-landing" element={<PartnerLanding />} />
+          <Route path="/pricing" element={<Pricing />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/contact" element={<Contact />} />
+          <Route path="/faq" element={<FAQ />} />
+          <Route path="/blog" element={<Blog />} />
+          <Route path="/how-it-works" element={<ForWho />} />
+          
+          {/* Auth */}
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
+          <Route path="/register" element={<Register />} />
+          
+          {/* Dashboards */}
+          <Route path="/client-dashboard" element={<ClientDashboard />} />
+          <Route path="/partner-dashboard" element={<PartnerDashboard />} />
+          <Route path="/admin-dashboard" element={<AdminDashboard />} />
+          <Route path="/loyalty" element={<LoyaltyDashboard />} />
+          <Route path="/profile" element={<UserProfile />} />
+          
+          {/* Orders */}
+          <Route path="/new-order" element={<NewOrder />} />
+          <Route path="/tracking/:orderId" element={<OrderTracking />} />
+          <Route path="/review-order" element={<ReviewOrder />} />
+          <Route path="/pickup-qr/:orderId" element={<PickupQR />} />
+          <Route path="/payment-success" element={<PaymentSuccess />} />
+          <Route path="/payment-cancel" element={<PaymentCancel />} />
+          
+          {/* Partner */}
+          <Route path="/partner-coming-soon" element={<PartnerComingSoon />} />
+          
+          {/* Content */}
+          <Route path="/for-who" element={<ForWho />} />
+          <Route path="/laver-vs-pressing" element={<LaverVsPressing />} />
+          <Route path="/economiser-pressing" element={<EconomiserPressing />} />
+          <Route path="/referral" element={<Referral />} />
+          
+          {/* Legal */}
+          <Route path="/legal" element={<Legal />} />
+          <Route path="/legal/cgu" element={<Legal />} />
+          <Route path="/legal/privacy" element={<PrivacyPolicy />} />
+          <Route path="/legal/cookies" element={<Privacy />} />
+          <Route path="/privacy" element={<PrivacyPolicy />} />
+          <Route path="/mentions-legales" element={<MentionsLegales />} />
+          
+          {/* 404 */}
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </Router>
+    </AuthProvider>
   );
 }
 

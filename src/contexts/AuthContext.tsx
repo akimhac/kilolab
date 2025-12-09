@@ -30,7 +30,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [partnerData, setPartnerData] = useState<any>(null);
 
   useEffect(() => {
-    // Récupérer la session initiale
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
@@ -40,7 +39,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setLoading(false);
     });
 
-    // Écouter les changements d'auth
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
       setUser(session?.user ?? null);
@@ -58,13 +56,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const checkPartnerStatus = async (email: string | undefined) => {
     if (!email) return;
-    
     const { data: partner } = await supabase
       .from('partners')
       .select('*')
       .eq('email', email.toLowerCase())
       .maybeSingle();
-
     if (partner) {
       setIsPartner(true);
       setPartnerData(partner);
