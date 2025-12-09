@@ -1,19 +1,23 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
-import { Mail, Lock, ArrowLeft, Loader2, AlertCircle, Shield } from 'lucide-react';
+import { Mail, Lock, ArrowLeft, Loader2, AlertCircle, Shield, Key } from 'lucide-react';
 import toast from 'react-hot-toast';
 
-// Email admin autorisé
-const ADMIN_EMAIL = 'contact@kilolab.fr';
-const ADMIN_EMAIL_BACKUP = 'akim.hachili@gmail.com';
+// Configuration admin sécurisée
+const ADMIN_EMAIL = 'akim.hachili@gmail.com';
+const ADMIN_SECRET_CODE = 'KILO2025ADMIN'; // Code secret à changer
 
 export default function Login() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({ email: '', password: '' });
   const [partnerNeedsAccount, setPartnerNeedsAccount] = useState(false);
-  const [showAdminHint, setShowAdminHint] = useState(false);
+  
+  // État pour le modal admin
+  const [showAdminModal, setShowAdminModal] = useState(false);
+  const [adminCode, setAdminCode] = useState('');
+  const [adminError, setAdminError] = useState('');
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -24,12 +28,6 @@ export default function Login() {
   const redirectUser = async (email: string | undefined) => {
     if (!email) return;
     const lowerEmail = email.toLowerCase();
-
-    // Vérifier si admin
-    if (lowerEmail === ADMIN_EMAIL || lowerEmail === ADMIN_EMAIL_BACKUP) {
-      navigate('/admin-dashboard');
-      return;
-    }
 
     // Vérifier si partenaire
     const { data: partner } = await supabase
@@ -96,9 +94,33 @@ export default function Login() {
     }
   };
 
-  // Easter egg: triple-click sur le logo pour afficher le hint admin
-  const handleLogoClick = () => {
-    setShowAdminHint(prev => !prev);
+  // Vérification du code admin
+  const handleAdminAccess = async () => {
+    setAdminError('');
+    
+    // Vérifier le code secret
+    if (adminCode !== ADMIN_SECRET_CODE) {
+      setAdminError('Code incorrect');
+      return;
+    }
+
+    // Vérifier que l'utilisateur est connecté avec le bon email
+    const { data: { session } } = await supabase.auth.getSession();
+    
+    if (!session) {
+      setAdminError('Vous devez d\'abord vous connecter');
+      return;
+    }
+
+    if (session.user.email?.toLowerCase() !== ADMIN_EMAIL.toLowerCase()) {
+      setAdminError('Accès non autorisé pour cet email');
+      return;
+    }
+
+    // Accès autorisé !
+    toast.success('Bienvenue Admin !');
+    setShowAdminModal(false);
+    navigate('/admin-dashboard');
   };
 
   return (
@@ -109,38 +131,13 @@ export default function Login() {
             <button onClick={() => navigate('/')} className="flex items-center gap-2 text-slate-500 hover:text-slate-700">
               <ArrowLeft className="w-4 h-4" /> Retour
             </button>
-            
-            {/* Logo cliquable pour révéler accès admin */}
-            <button 
-              onClick={handleLogoClick}
-              className="text-xl font-bold text-teal-600 hover:text-teal-700 transition"
-            >
-              Kilolab
-            </button>
+            <span className="text-xl font-bold text-teal-600">Kilolab</span>
           </div>
 
           <div className="text-center mb-8">
             <h1 className="text-3xl font-bold text-slate-900 mb-2">Connexion</h1>
             <p className="text-slate-600">Accédez à votre espace Kilolab</p>
           </div>
-
-          {/* Hint Admin (apparaît au clic sur logo) */}
-          {showAdminHint && (
-            <div className="mb-6 p-4 bg-slate-100 border border-slate-200 rounded-xl">
-              <div className="flex items-center gap-3">
-                <Shield className="w-5 h-5 text-slate-600" />
-                <div>
-                  <p className="text-sm font-medium text-slate-700">Espace Administrateur</p>
-                  <Link 
-                    to="/admin-dashboard" 
-                    className="text-xs text-teal-600 hover:underline"
-                  >
-                    Accéder au dashboard admin →
-                  </Link>
-                </div>
-              </div>
-            </div>
-          )}
 
           {partnerNeedsAccount && (
             <div className="mb-6 p-4 bg-amber-50 border border-amber-200 rounded-xl">
@@ -204,23 +201,79 @@ export default function Login() {
             </p>
           </div>
 
-          <div className="mt-6 pt-6 border-t border-slate-100">
+          <div className="mt-6 pt-6 border-t border-slate-100 space-y-3">
             <Link to="/become-partner" className="block w-full py-3 text-center border-2 border-teal-500 text-teal-600 rounded-xl font-semibold hover:bg-teal-50 transition">
               Devenir partenaire pressing
             </Link>
+            
+            {/* BOUTON ADMIN */}
+            <button
+              onClick={() => setShowAdminModal(true)}
+              className="w-full py-3 text-center bg-slate-900 text-white rounded-xl font-semibold hover:bg-slate-800 transition flex items-center justify-center gap-2"
+            >
+              <Shield className="w-4 h-4" />
+              Espace Administrateur
+            </button>
           </div>
         </div>
-        
-        {/* Lien admin discret en bas */}
-        <div className="mt-4 text-center">
-          <Link 
-            to="/admin-dashboard" 
-            className="text-xs text-slate-500 hover:text-slate-300 transition opacity-50 hover:opacity-100"
-          >
-            Administration
-          </Link>
-        </div>
       </div>
+
+      {/* MODAL ADMIN */}
+      {showAdminModal && (
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl p-8 max-w-sm w-full shadow-2xl">
+            <div className="text-center mb-6">
+              <div className="w-16 h-16 bg-slate-900 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                <Key className="w-8 h-8 text-teal-400" />
+              </div>
+              <h2 className="text-2xl font-bold text-slate-900">Accès Administrateur</h2>
+              <p className="text-slate-600 text-sm mt-2">Entrez le code secret pour accéder au dashboard</p>
+            </div>
+
+            {adminError && (
+              <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm text-center">
+                {adminError}
+              </div>
+            )}
+
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">Code d'accès</label>
+                <input
+                  type="password"
+                  value={adminCode}
+                  onChange={(e) => setAdminCode(e.target.value.toUpperCase())}
+                  className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-slate-500 focus:border-transparent text-center text-lg tracking-widest font-mono"
+                  placeholder="••••••••••••"
+                  autoFocus
+                />
+              </div>
+
+              <button
+                onClick={handleAdminAccess}
+                className="w-full py-4 bg-slate-900 text-white rounded-xl font-bold hover:bg-slate-800 transition"
+              >
+                Vérifier et accéder
+              </button>
+
+              <button
+                onClick={() => {
+                  setShowAdminModal(false);
+                  setAdminCode('');
+                  setAdminError('');
+                }}
+                className="w-full py-3 text-slate-600 hover:text-slate-900 transition text-sm"
+              >
+                Annuler
+              </button>
+            </div>
+
+            <p className="text-xs text-slate-400 text-center mt-6">
+              Connectez-vous d'abord avec votre compte admin, puis entrez le code.
+            </p>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
