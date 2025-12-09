@@ -1,262 +1,266 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { motion, useScroll, useTransform } from 'framer-motion';
+import { MapPin, Clock, Check, X as XIcon, Menu, X, ArrowRight } from 'lucide-react';
 import { supabase } from '../lib/supabase';
-import { 
-  MapPin, Clock, Check, X as XIcon, Menu, X, 
-  ArrowRight, Star, ShieldCheck, Truck, Sparkles 
-} from 'lucide-react';
 
 export default function LandingPage() {
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [partnerCount, setPartnerCount] = useState<number>(0);
+  const [partnerCount, setPartnerCount] = useState(0);
+  const { scrollYProgress } = useScroll();
+  const yHero = useTransform(scrollYProgress, [0, 1], [0, 300]);
+  const opacityHero = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
 
-  // Charger le vrai nombre de partenaires
   useEffect(() => {
-    const fetchPartnerCount = async () => {
-      const { count } = await supabase
-        .from('partners')
-        .select('*', { count: 'exact', head: true })
-        .eq('is_active', true);
-      
+    const fetchCount = async () => {
+      const { count } = await supabase.from('partners').select('*', { count: 'exact', head: true }).eq('is_active', true);
       setPartnerCount(count || 0);
     };
-    fetchPartnerCount();
+    fetchCount();
   }, []);
 
-  const stats = [
-    { value: partnerCount > 0 ? `${partnerCount}+` : "1800+", label: "Pressings partenaires" },
-    { value: "4.8/5", label: "Note moyenne" },
-    { value: "24h", label: "Délai standard" }
-  ];
-
-  const priceComparison = [
-    { item: "Chemise", weight: "0.2kg", traditional: "8.00€", kilolab: "0.60€" },
-    { item: "Pantalon", weight: "0.5kg", traditional: "10.00€", kilolab: "1.50€" },
-    { item: "Pull", weight: "0.6kg", traditional: "12.00€", kilolab: "1.80€" },
-    { item: "Manteau", weight: "1.5kg", traditional: "25.00€", kilolab: "4.50€" },
-  ];
-
-  const steps = [
-    { icon: "��", title: "1. Préparez", desc: "Mettez tout votre linge dans un sac, sans trier." },
-    { icon: "⚖️", title: "2. Pesez", desc: "Le prix est fixé au poids, pas à la pièce." },
-    { icon: "✨", title: "3. Récupérez", desc: "Linge lavé, plié et frais en 24h chrono." }
-  ];
-
   return (
-    <div className="min-h-screen bg-slate-50 font-sans text-slate-900">
+    <div className="bg-slate-950 font-sans text-slate-100 selection:bg-teal-500 selection:text-white overflow-x-hidden">
       
-      {/* Navigation */}
-      <nav className="fixed w-full z-50 bg-white/90 backdrop-blur-md border-b border-slate-100">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      {/* NAVIGATION */}
+      <nav className="fixed w-full z-50 bg-slate-950/80 backdrop-blur-xl border-b border-white/5">
+        <div className="max-w-7xl mx-auto px-6">
           <div className="flex justify-between items-center h-20">
-            <Link to="/" className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-teal-600 rounded-lg flex items-center justify-center text-white font-bold text-xl">K</div>
-              <span className="text-2xl font-bold tracking-tight text-slate-900">Kilolab</span>
+            <Link to="/" className="flex items-center gap-2 group">
+              <div className="w-9 h-9 bg-gradient-to-tr from-teal-400 to-emerald-500 rounded-lg flex items-center justify-center text-slate-900 font-bold text-xl shadow-lg shadow-teal-500/20 group-hover:scale-110 transition-transform">K</div>
+              <span className="text-xl font-bold tracking-tight text-white">Kilolab</span>
             </Link>
+            
             <div className="hidden md:flex items-center gap-8">
-              <Link to="/pricing" className="text-sm font-medium text-slate-600 hover:text-teal-600 transition">Tarifs</Link>
-              <Link to="/how-it-works" className="text-sm font-medium text-slate-600 hover:text-teal-600 transition">Comment ça marche</Link>
-              <Link to="/become-partner" className="text-sm font-medium text-slate-600 hover:text-teal-600 transition">Devenir Partenaire</Link>
-              <Link to="/login" className="text-sm font-medium text-slate-900 hover:text-teal-600 transition">Connexion</Link>
-              <button onClick={() => navigate('/partners-map')} className="bg-slate-900 text-white px-5 py-2.5 rounded-full font-medium hover:bg-slate-800 transition shadow-lg shadow-slate-900/20">
+              <Link to="/pricing" className="text-sm font-medium text-slate-400 hover:text-white transition">Comparateur</Link>
+              <Link to="/how-it-works" className="text-sm font-medium text-slate-400 hover:text-white transition">Fonctionnement</Link>
+              <span className="h-4 w-px bg-white/10"></span>
+              <Link to="/become-partner" className="text-sm font-bold text-teal-400 hover:text-teal-300 transition flex items-center gap-1">
+                Espace Pro <span className="bg-teal-500/20 text-teal-400 text-[10px] px-2 py-0.5 rounded-full">{partnerCount > 0 ? partnerCount : '1800+'}</span>
+              </Link>
+            </div>
+
+            <div className="hidden md:flex items-center gap-4">
+              <Link to="/login" className="text-sm font-medium text-white hover:text-teal-400 transition">Connexion</Link>
+              <button onClick={() => navigate('/partners-map')} className="bg-white text-slate-950 px-6 py-2.5 rounded-full font-bold text-sm hover:bg-teal-50 transition shadow-[0_0_20px_rgba(255,255,255,0.3)]">
                 Trouver un pressing
               </button>
             </div>
-            <button className="md:hidden p-2 text-slate-600" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
+            
+            <button className="md:hidden p-2 text-white" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
               {mobileMenuOpen ? <X /> : <Menu />}
             </button>
           </div>
         </div>
+        
         {mobileMenuOpen && (
-          <div className="md:hidden absolute top-20 left-0 w-full bg-white border-b border-slate-100 p-4 flex flex-col gap-4 shadow-xl">
-            <Link to="/pricing" className="text-lg font-medium text-slate-600">Tarifs</Link>
-            <Link to="/how-it-works" className="text-lg font-medium text-slate-600">Comment ça marche</Link>
-            <Link to="/become-partner" className="text-lg font-medium text-slate-600">Devenir Partenaire</Link>
-            <Link to="/login" className="text-lg font-medium text-slate-600">Connexion</Link>
-            <button onClick={() => navigate('/partners-map')} className="bg-teal-600 text-white py-3 rounded-xl font-bold">Trouver un pressing</button>
+          <div className="md:hidden bg-slate-900 border-t border-white/10 p-6 space-y-4">
+            <Link to="/pricing" className="block text-white font-medium">Tarifs</Link>
+            <Link to="/how-it-works" className="block text-white font-medium">Comment ça marche</Link>
+            <Link to="/become-partner" className="block text-teal-400 font-medium">Devenir Partenaire</Link>
+            <Link to="/login" className="block text-white font-medium">Connexion</Link>
+            <button onClick={() => navigate('/partners-map')} className="w-full py-3 bg-teal-500 text-white rounded-xl font-bold">
+              Trouver un pressing
+            </button>
           </div>
         )}
       </nav>
 
-      {/* Hero */}
-      <section className="pt-32 pb-16 lg:pt-40 lg:pb-24 px-4 overflow-hidden">
-        <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-12 items-center">
-          <div className="max-w-2xl">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-teal-50 text-teal-700 text-sm font-semibold mb-6 border border-teal-100">
-              <Sparkles className="w-4 h-4" /> Nouvelle approche du pressing
+      {/* HERO IMMERSIF */}
+      <section className="relative h-screen flex items-center justify-center overflow-hidden">
+        <motion.div style={{ y: yHero, opacity: opacityHero }} className="absolute inset-0 z-0">
+          <img src="https://images.unsplash.com/photo-1604328698692-f76ea9498e76?auto=format&fit=crop&w=1920&q=80" alt="Background" className="w-full h-full object-cover scale-110" />
+          <div className="absolute inset-0 bg-gradient-to-b from-slate-950/80 via-slate-950/50 to-slate-950" />
+        </motion.div>
+
+        <div className="relative z-10 max-w-5xl mx-auto px-6 text-center mt-20">
+          <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1 }}>
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/10 text-teal-300 text-sm font-bold mb-8">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-teal-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-teal-500"></span>
+              </span>
+              Le nouveau standard du pressing
             </div>
-            <h1 className="text-5xl lg:text-7xl font-extrabold tracking-tight text-slate-900 leading-[1.1] mb-6">
-              Votre linge lavé <br/><span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-600 to-emerald-600">au kilo.</span>
+
+            <h1 className="text-5xl md:text-7xl lg:text-8xl font-extrabold tracking-tight text-white mb-8 leading-[1.1]">
+              Votre temps est précieux.<br/>
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-400 via-emerald-300 to-teal-400">Pas votre lessive.</span>
             </h1>
-            <p className="text-xl text-slate-600 mb-8 leading-relaxed">
-              Fini le paiement à la pièce. Déposez votre linge en vrac, on le lave, sèche et plie. <span className="font-semibold text-slate-900">À partir de 3€/kg.</span>
+
+            <p className="text-xl md:text-2xl text-slate-300 mb-10 max-w-3xl mx-auto leading-relaxed">
+              Confiez-nous votre linge <span className="text-white font-bold">au kilo</span>. Nous le lavons, séchons et plions pour vous. Moins cher qu'un café par jour.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4">
-              <button onClick={() => navigate('/partners-map')} className="px-8 py-4 bg-teal-600 text-white rounded-full font-bold text-lg hover:bg-teal-700 transition shadow-xl shadow-teal-600/20 flex items-center justify-center gap-2">
-                Trouver un pressing <ArrowRight className="w-5 h-5" />
+
+            <div className="flex flex-col sm:flex-row gap-5 justify-center">
+              <button onClick={() => navigate('/partners-map')} className="group px-8 py-4 bg-teal-500 text-white rounded-full font-bold text-lg hover:bg-teal-400 transition shadow-[0_10px_40px_-10px_rgba(20,184,166,0.6)] flex items-center justify-center gap-3">
+                Me libérer de la corvée <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </button>
-              <button onClick={() => navigate('/pricing')} className="px-8 py-4 bg-white text-slate-700 border border-slate-200 rounded-full font-bold text-lg hover:bg-slate-50 transition flex items-center justify-center">
-                Voir les tarifs
+              <button onClick={() => navigate('/pricing')} className="px-8 py-4 bg-white/5 backdrop-blur-sm border border-white/10 text-white rounded-full font-bold text-lg hover:bg-white/10 transition">
+                Voir les tarifs (3€/kg)
+              </button>
+            </div>
+
+            <div className="mt-12 flex items-center justify-center gap-8 text-sm font-medium text-slate-400 flex-wrap">
+              <div className="flex items-center gap-2"><Check className="text-teal-400" size={16}/> Assurance incluse</div>
+              <div className="flex items-center gap-2"><Check className="text-teal-400" size={16}/> Prêt en 24h chrono</div>
+              <div className="flex items-center gap-2"><Check className="text-teal-400" size={16}/> Satisfait ou relavé</div>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* COMPARATEUR */}
+      <section className="py-32 bg-white text-slate-900 relative">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="text-center mb-20">
+            <h2 className="text-4xl md:text-6xl font-extrabold mb-6">Arrêtez de brûler votre argent.</h2>
+            <p className="text-xl text-slate-500 max-w-2xl mx-auto">Le modèle traditionnel "à la pièce" est obsolète. Passez au modèle "au poids".</p>
+          </div>
+
+          <div className="grid lg:grid-cols-2 gap-12 items-center max-w-6xl mx-auto">
+            <div className="p-10 rounded-[2.5rem] bg-slate-50 border border-slate-200 opacity-60 hover:opacity-100 transition-opacity">
+              <div className="flex items-center gap-4 mb-8">
+                <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center text-red-500"><XIcon /></div>
+                <h3 className="text-2xl font-bold text-slate-400">Pressing Traditionnel</h3>
+              </div>
+              <div className="space-y-6 text-lg font-medium text-slate-500">
+                <div className="flex justify-between border-b border-slate-200 pb-4"><span>3 Chemises</span><span>24.00€</span></div>
+                <div className="flex justify-between border-b border-slate-200 pb-4"><span>2 Pantalons</span><span>20.00€</span></div>
+                <div className="flex justify-between border-b border-slate-200 pb-4"><span>1 Manteau</span><span>25.00€</span></div>
+                <div className="pt-4 text-right text-red-400 text-3xl font-bold">Total: 69.00€</div>
+              </div>
+            </div>
+
+            <motion.div whileHover={{ scale: 1.02 }} className="p-10 rounded-[2.5rem] bg-slate-900 text-white shadow-2xl relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-64 h-64 bg-teal-500/20 rounded-full blur-[80px] -mr-16 -mt-16"></div>
+              <div className="flex items-center gap-4 mb-8 relative z-10">
+                <div className="w-12 h-12 bg-teal-500 rounded-full flex items-center justify-center text-white"><Check strokeWidth={3} /></div>
+                <h3 className="text-2xl font-bold">La Méthode Kilolab</h3>
+              </div>
+              <div className="space-y-6 text-lg font-medium relative z-10">
+                <div className="flex justify-between border-b border-white/10 pb-4"><span>3 Chemises (0.6kg)</span><span className="text-teal-400">1.80€</span></div>
+                <div className="flex justify-between border-b border-white/10 pb-4"><span>2 Pantalons (1kg)</span><span className="text-teal-400">3.00€</span></div>
+                <div className="flex justify-between border-b border-white/10 pb-4"><span>1 Manteau (1.5kg)</span><span className="text-teal-400">4.50€</span></div>
+                <div className="pt-6 mt-4 bg-white/5 rounded-2xl p-6 text-center border border-white/10">
+                  <p className="text-sm text-slate-400 mb-2">Total Kilolab</p>
+                  <p className="text-5xl font-extrabold text-white mb-2">9.30€</p>
+                  <p className="text-teal-400 font-bold bg-teal-500/10 inline-block px-3 py-1 rounded-full text-sm">Vous économisez 59.70€</p>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
+      {/* BENTO GRID */}
+      <section className="py-32 bg-slate-50 px-6">
+        <div className="max-w-7xl mx-auto">
+          <h2 className="text-4xl font-extrabold text-slate-900 mb-16 text-center">L'expérience pressing, réinventée.</h2>
+          <div className="grid md:grid-cols-3 gap-6">
+            <div className="bg-white rounded-[2.5rem] p-8 shadow-sm hover:shadow-xl transition-shadow relative overflow-hidden group">
+              <div className="w-14 h-14 bg-purple-100 rounded-2xl flex items-center justify-center text-purple-600 mb-6"><Clock size={28}/></div>
+              <h3 className="text-2xl font-bold text-slate-900 mb-2">J+1 Garanti.</h3>
+              <p className="text-slate-500">Déposez aujourd'hui. Récupérez demain. Aussi simple que ça.</p>
+            </div>
+
+            <div className="md:col-span-2 bg-slate-900 text-white rounded-[2.5rem] p-10 relative overflow-hidden">
+              <div className="relative z-10 max-w-md">
+                <h3 className="text-3xl font-bold mb-4">Ne triez plus rien.</h3>
+                <p className="text-slate-400 text-lg mb-8">Mettez tout en vrac dans le sac Kilolab. Nous trions les couleurs et les matières pour vous.</p>
+                <button onClick={() => navigate('/how-it-works')} className="bg-teal-500 text-white px-6 py-3 rounded-full font-bold text-sm hover:bg-teal-400 transition">
+                  Voir comment ça marche
+                </button>
+              </div>
+            </div>
+
+            <div className="md:col-span-3 bg-teal-50 rounded-[2.5rem] p-10 flex flex-col md:flex-row items-center gap-12 border border-teal-100">
+              <div className="flex-1">
+                <div className="inline-block bg-teal-200/50 text-teal-800 px-3 py-1 rounded-full text-xs font-bold mb-4">Éco-Responsable</div>
+                <h3 className="text-3xl font-bold text-teal-900 mb-4">Moins d'eau, moins de produits.</h3>
+                <p className="text-teal-800/70 text-lg">Nos machines industrielles optimisent la consommation d'eau et utilisent des détergents biodégradables.</p>
+              </div>
+              <div className="flex-1 flex justify-center">
+                <div className="text-9xl font-black text-teal-200/50 select-none">-40%</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* RÉSEAU */}
+      <section className="relative py-32 bg-slate-950 overflow-hidden">
+        <div className="absolute inset-0 z-0 opacity-30" style={{backgroundImage: 'radial-gradient(circle at 2px 2px, rgba(255,255,255,0.15) 1px, transparent 0)', backgroundSize: '40px 40px'}}></div>
+        <div className="relative z-10 max-w-4xl mx-auto text-center px-6">
+          <motion.div initial={{ scale: 0.8, opacity: 0 }} whileInView={{ scale: 1, opacity: 1 }} transition={{ type: "spring" }} className="w-24 h-24 bg-teal-500 mx-auto rounded-3xl flex items-center justify-center text-white mb-8 shadow-[0_0_50px_rgba(20,184,166,0.4)]">
+            <MapPin size={40} />
+          </motion.div>
+
+          <h2 className="text-5xl md:text-7xl font-extrabold text-white mb-8 tracking-tight">
+            Nous sommes partout.<br/><span className="text-slate-500">Vraiment partout.</span>
+          </h2>
+
+          <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-8 max-w-2xl mx-auto">
+            <div className="flex items-center justify-between mb-6 border-b border-white/10 pb-6">
+              <div className="text-left">
+                <p className="text-sm text-slate-400 uppercase font-bold tracking-wider">Réseau actuel</p>
+                <p className="text-4xl font-bold text-white">{partnerCount > 0 ? partnerCount.toLocaleString() : '1,800+'}</p>
+                <p className="text-xs text-teal-400">Points de collecte</p>
+              </div>
+              <div className="h-12 w-px bg-white/10"></div>
+              <div className="text-right">
+                <p className="text-sm text-slate-400 uppercase font-bold tracking-wider">Couverture</p>
+                <p className="text-4xl font-bold text-white">92%</p>
+                <p className="text-xs text-teal-400">Des villes &gt; 10k hab.</p>
+              </div>
+            </div>
+            
+            <div className="text-left">
+              <h3 className="text-white font-bold text-lg mb-2">Vous gérez un pressing ?</h3>
+              <p className="text-slate-400 text-sm mb-6">Rejoignez le réseau Kilolab sans frais d'entrée.</p>
+              <button onClick={() => navigate('/become-partner')} className="w-full py-4 bg-white text-slate-950 rounded-xl font-bold hover:bg-teal-500 hover:text-white transition-colors flex items-center justify-center gap-2 group">
+                Devenir partenaire <ArrowRight className="group-hover:translate-x-1 transition-transform"/>
               </button>
             </div>
           </div>
-          <div className="relative">
-            <div className="absolute -inset-4 bg-gradient-to-r from-teal-500/30 to-blue-500/30 blur-3xl rounded-[3rem] opacity-50 -z-10" />
-            <img src="https://images.unsplash.com/photo-1545173168-9f1947eebb7f?auto=format&fit=crop&w=1000&q=80" alt="Linge propre" className="rounded-[2.5rem] shadow-2xl border border-white/50 w-full object-cover h-[500px] lg:h-[600px]" />
-          </div>
         </div>
       </section>
 
-      {/* Stats */}
-      <div className="border-y border-slate-200 bg-white">
-        <div className="max-w-7xl mx-auto px-4 py-8 grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-          {stats.map((stat, i) => (
-            <div key={i} className="flex flex-col items-center">
-              <span className="text-3xl font-extrabold text-slate-900">{stat.value}</span>
-              <span className="text-sm font-medium text-slate-500 uppercase tracking-wide mt-1">{stat.label}</span>
-            </div>
-          ))}
-          <div className="flex flex-col items-center justify-center">
-            <div className="flex text-yellow-400 gap-1 mb-1"><Star fill="currentColor" /><Star fill="currentColor" /><Star fill="currentColor" /><Star fill="currentColor" /><Star fill="currentColor" /></div>
-            <span className="text-sm font-medium text-slate-500">Satisfaction client</span>
-          </div>
-        </div>
-      </div>
-
-      {/* Comment ça marche */}
-      <section className="py-24 bg-white">
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="text-center max-w-3xl mx-auto mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">Simple comme bonjour</h2>
-            <p className="text-lg text-slate-600">Notre processus est optimisé pour vous faire gagner un temps précieux.</p>
-          </div>
-          <div className="grid md:grid-cols-3 gap-8 relative">
-            <div className="hidden md:block absolute top-12 left-[16%] right-[16%] h-0.5 bg-gradient-to-r from-teal-100 via-teal-200 to-teal-100 -z-0" />
-            {steps.map((step, i) => (
-              <div key={i} className="relative bg-white p-8 rounded-3xl border border-slate-100 shadow-lg hover:shadow-xl transition-all hover:-translate-y-1 z-10 text-center group">
-                <div className="w-24 h-24 mx-auto bg-teal-50 rounded-full flex items-center justify-center text-4xl mb-6 group-hover:bg-teal-100 transition-colors shadow-inner">{step.icon}</div>
-                <h3 className="text-xl font-bold text-slate-900 mb-3">{step.title}</h3>
-                <p className="text-slate-600 leading-relaxed">{step.desc}</p>
-              </div>
-            ))}
-          </div>
-          <div className="text-center mt-12">
-            <button onClick={() => navigate('/how-it-works')} className="px-6 py-3 bg-teal-100 text-teal-700 rounded-full font-semibold hover:bg-teal-200 transition">
-              En savoir plus →
-            </button>
-          </div>
-        </div>
-      </section>
-
-      {/* Comparateur */}
-      <section className="py-24 bg-slate-900 text-white relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-teal-500/20 rounded-full blur-[100px]" />
-        <div className="max-w-7xl mx-auto px-4 relative z-10">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-5xl font-bold mb-6">Arrêtez de payer à la pièce.</h2>
-            <p className="text-xl text-slate-400">Voyez combien vous économisez avec Kilolab.</p>
-          </div>
-          <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto items-center">
-            <div className="bg-white/5 border border-white/10 rounded-3xl p-8 backdrop-blur-sm">
-              <div className="flex items-center gap-3 mb-8">
-                <div className="p-3 bg-red-500/20 rounded-xl text-red-400"><XIcon /></div>
-                <h3 className="text-2xl font-bold">Pressing Traditionnel</h3>
-              </div>
-              <ul className="space-y-6">
-                {priceComparison.map((row, i) => (
-                  <li key={i} className="flex justify-between items-center border-b border-white/10 pb-4">
-                    <span className="text-slate-400">{row.item} <span className="text-xs">({row.weight})</span></span>
-                    <span className="text-xl font-semibold text-red-300">{row.traditional}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-            <div className="bg-white text-slate-900 rounded-3xl p-8 shadow-2xl relative transform md:scale-105 border-4 border-teal-500">
-              <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-teal-500 text-white px-4 py-1 rounded-full text-sm font-bold uppercase tracking-wider shadow-lg">Le choix malin</div>
-              <div className="flex items-center gap-3 mb-8">
-                <div className="p-3 bg-teal-100 rounded-xl text-teal-600"><Check /></div>
-                <h3 className="text-2xl font-bold text-teal-700">Kilolab</h3>
-              </div>
-              <ul className="space-y-6">
-                {priceComparison.map((row, i) => (
-                  <li key={i} className="flex justify-between items-center border-b border-slate-100 pb-4">
-                    <span className="font-medium text-slate-700">{row.item}</span>
-                    <span className="text-xl font-bold text-teal-600">{row.kilolab}</span>
-                  </li>
-                ))}
-              </ul>
-              <div className="mt-8 pt-6 border-t border-slate-100 text-center">
-                <p className="text-green-600 font-bold mb-4">✅ Économisez jusqu'à 85%</p>
-                <button onClick={() => navigate('/partners-map')} className="w-full py-4 bg-slate-900 text-white rounded-xl font-bold hover:bg-slate-800 transition shadow-lg">Profiter de ces tarifs</button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Features */}
-      <section className="py-24 bg-white">
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {[
-              { icon: "💰", title: "Économique", text: "Jusqu'à 85% moins cher qu'un pressing traditionnel." },
-              { icon: "⚡", title: "Rapide", text: "Prêt en 24h standard, ou express 4h." },
-              { icon: "📍", title: "Proximité", text: `${partnerCount > 0 ? partnerCount : '1800'}+ points de collecte.` },
-              { icon: "✅", title: "Qualité", text: "Pressings professionnels certifiés." }
-            ].map((feature, i) => (
-              <div key={i} className="bg-slate-50 p-6 rounded-2xl hover:bg-teal-50 transition-colors group">
-                <div className="w-12 h-12 bg-white rounded-xl shadow-sm flex items-center justify-center text-2xl mb-4 group-hover:scale-110 transition-transform">{feature.icon}</div>
-                <h4 className="text-lg font-bold text-slate-900 mb-2">{feature.title}</h4>
-                <p className="text-slate-600 text-sm">{feature.text}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* CTA Partenaires */}
-      <section className="py-20 bg-teal-600 text-white text-center px-4">
-        <div className="max-w-4xl mx-auto">
-          <Truck className="w-16 h-16 mx-auto mb-6 opacity-80" />
-          <h2 className="text-3xl md:text-5xl font-bold mb-6">Vous possédez un pressing ?</h2>
-          <p className="text-xl text-teal-100 mb-10 max-w-2xl mx-auto">Remplissez vos machines pendant les heures creuses. Zéro frais d'entrée. Rentable dès le premier kilo.</p>
-          <button onClick={() => navigate('/become-partner')} className="px-10 py-4 bg-white text-teal-700 rounded-full font-bold text-lg hover:shadow-2xl transition hover:scale-105">Devenir Partenaire</button>
-        </div>
-      </section>
-
-      {/* Footer */}
-      <footer className="bg-slate-950 text-slate-400 py-16">
-        <div className="max-w-7xl mx-auto px-4 grid grid-cols-2 md:grid-cols-4 gap-12 text-sm">
-          <div className="col-span-2 md:col-span-1">
-            <h3 className="text-white font-bold text-xl mb-4">Kilolab.</h3>
-            <p className="mb-4">Le pressing au kilo, simple et économique.</p>
+      {/* FOOTER */}
+      <footer className="bg-slate-950 border-t border-white/5 pt-20 pb-10 text-slate-400 text-sm">
+        <div className="max-w-7xl mx-auto px-6 grid md:grid-cols-4 gap-12 mb-16">
+          <div>
+            <Link to="/" className="text-2xl font-bold text-white mb-6 block">Kilolab.</Link>
+            <p className="mb-6">La première plateforme de pressing au kilo en France.</p>
           </div>
           <div>
-            <h4 className="text-white font-bold mb-4">Service</h4>
-            <ul className="space-y-3">
-              <li><Link to="/partners-map" className="hover:text-white transition">Trouver un pressing</Link></li>
-              <li><Link to="/pricing" className="hover:text-white transition">Tarifs</Link></li>
-              <li><Link to="/how-it-works" className="hover:text-white transition">Comment ça marche</Link></li>
+            <h4 className="text-white font-bold mb-6">Service</h4>
+            <ul className="space-y-4">
+              <li><Link to="/partners-map" className="hover:text-teal-400 transition">Trouver un pressing</Link></li>
+              <li><Link to="/pricing" className="hover:text-teal-400 transition">Tarifs</Link></li>
+              <li><Link to="/how-it-works" className="hover:text-teal-400 transition">Comment ça marche</Link></li>
             </ul>
           </div>
           <div>
-            <h4 className="text-white font-bold mb-4">Entreprise</h4>
-            <ul className="space-y-3">
-              <li><Link to="/about" className="hover:text-white transition">À propos</Link></li>
-              <li><Link to="/become-partner" className="hover:text-white transition">Espace Partenaires</Link></li>
-              <li><Link to="/contact" className="hover:text-white transition">Contact</Link></li>
+            <h4 className="text-white font-bold mb-6">Société</h4>
+            <ul className="space-y-4">
+              <li><Link to="/about" className="hover:text-teal-400 transition">À propos</Link></li>
+              <li><Link to="/contact" className="hover:text-teal-400 transition">Contact</Link></li>
+              <li><Link to="/become-partner" className="text-teal-400 font-bold">Devenir Partenaire</Link></li>
             </ul>
           </div>
           <div>
-            <h4 className="text-white font-bold mb-4">Légal</h4>
-            <ul className="space-y-3">
-              <li><Link to="/legal/cgu" className="hover:text-white transition">CGU</Link></li>
-              <li><Link to="/legal/privacy" className="hover:text-white transition">Confidentialité</Link></li>
+            <h4 className="text-white font-bold mb-6">Légal</h4>
+            <ul className="space-y-4">
+              <li><Link to="/legal" className="hover:text-teal-400 transition">CGU</Link></li>
+              <li><Link to="/privacy" className="hover:text-teal-400 transition">Confidentialité</Link></li>
             </ul>
           </div>
         </div>
-        <div className="max-w-7xl mx-auto px-4 mt-16 pt-8 border-t border-slate-900 text-center text-xs">© 2025 Kilolab. Tous droits réservés.</div>
+        <div className="max-w-7xl mx-auto px-6 pt-8 border-t border-white/5 text-center">
+          <p>© 2025 Kilolab. Tous droits réservés.</p>
+        </div>
       </footer>
     </div>
   );

@@ -33,21 +33,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
-      if (session?.user) {
-        checkPartnerStatus(session.user.email);
-      }
+      if (session?.user) checkPartnerStatus(session.user.email);
       setLoading(false);
     });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
       setUser(session?.user ?? null);
-      if (session?.user) {
-        checkPartnerStatus(session.user.email);
-      } else {
-        setIsPartner(false);
-        setPartnerData(null);
-      }
+      if (session?.user) checkPartnerStatus(session.user.email);
+      else { setIsPartner(false); setPartnerData(null); }
       setLoading(false);
     });
 
@@ -56,26 +50,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const checkPartnerStatus = async (email: string | undefined) => {
     if (!email) return;
-    const { data: partner } = await supabase
-      .from('partners')
-      .select('*')
-      .eq('email', email.toLowerCase())
-      .maybeSingle();
-    if (partner) {
-      setIsPartner(true);
-      setPartnerData(partner);
-    } else {
-      setIsPartner(false);
-      setPartnerData(null);
-    }
+    const { data: partner } = await supabase.from('partners').select('*').eq('email', email.toLowerCase()).maybeSingle();
+    if (partner) { setIsPartner(true); setPartnerData(partner); }
+    else { setIsPartner(false); setPartnerData(null); }
   };
 
   const signOut = async () => {
     await supabase.auth.signOut();
-    setUser(null);
-    setSession(null);
-    setIsPartner(false);
-    setPartnerData(null);
+    setUser(null); setSession(null); setIsPartner(false); setPartnerData(null);
   };
 
   return (
