@@ -1,59 +1,48 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
-import { Mail, Lock, ArrowLeft, Loader2, AlertCircle } from 'lucide-react';
+import { Mail, Lock, ArrowLeft, Loader2, AlertCircle, Shield } from 'lucide-react';
 import toast from 'react-hot-toast';
+
+// Email admin autorisé
+const ADMIN_EMAIL = 'contact@kilolab.fr';
+const ADMIN_EMAIL_BACKUP = 'akim.hachili@gmail.com';
 
 export default function Login() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({ email: '', password: '' });
   const [partnerNeedsAccount, setPartnerNeedsAccount] = useState(false);
+  const [showAdminHint, setShowAdminHint] = useState(false);
 
-  // Vérifier si déjà connecté
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session) {
-        redirectUser(session.user.email);
-      }
+      if (session) redirectUser(session.user.email);
     });
   }, []);
 
   const redirectUser = async (email: string | undefined) => {
     if (!email) return;
+    const lowerEmail = email.toLowerCase();
+
+    // Vérifier si admin
+    if (lowerEmail === ADMIN_EMAIL || lowerEmail === ADMIN_EMAIL_BACKUP) {
+      navigate('/admin-dashboard');
+      return;
+    }
 
     // Vérifier si partenaire
     const { data: partner } = await supabase
       .from('partners')
       .select('id, is_active')
-      .eq('email', email.toLowerCase())
+      .eq('email', lowerEmail)
       .maybeSingle();
 
     if (partner) {
-      if (partner.is_active) {
-        navigate('/partner-dashboard');
-      } else {
-        navigate('/partner-coming-soon');
-      }
+      navigate(partner.is_active ? '/partner-dashboard' : '/partner-coming-soon');
       return;
     }
 
-    // Vérifier si admin
-    const { data: { user } } = await supabase.auth.getUser();
-    if (user) {
-      const { data: profile } = await supabase
-        .from('user_profiles')
-        .select('role')
-        .eq('user_id', user.id)
-        .maybeSingle();
-
-      if (profile?.role === 'admin') {
-        navigate('/admin-dashboard');
-        return;
-      }
-    }
-
-    // Client par défaut
     navigate('/client-dashboard');
   };
 
@@ -72,7 +61,6 @@ export default function Login() {
 
       if (authError) {
         if (authError.message.includes('Invalid login credentials')) {
-          // Vérifier si c'est un partenaire sans compte
           const { data: partner } = await supabase
             .from('partners')
             .select('id, name')
@@ -101,26 +89,58 @@ export default function Login() {
       toast.success('Connexion réussie !');
       await redirectUser(authData.user.email);
 
-    } catch (err: any) {
-      console.error('Erreur:', err);
+    } catch (err) {
       toast.error('Une erreur est survenue');
     } finally {
       setLoading(false);
     }
   };
 
+  // Easter egg: triple-click sur le logo pour afficher le hint admin
+  const handleLogoClick = () => {
+    setShowAdminHint(prev => !prev);
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         <div className="bg-white rounded-3xl shadow-2xl p-8">
-          <button onClick={() => navigate('/')} className="flex items-center gap-2 text-slate-500 hover:text-slate-700 mb-6">
-            <ArrowLeft className="w-4 h-4" /> Retour
-          </button>
+          <div className="flex items-center justify-between mb-6">
+            <button onClick={() => navigate('/')} className="flex items-center gap-2 text-slate-500 hover:text-slate-700">
+              <ArrowLeft className="w-4 h-4" /> Retour
+            </button>
+            
+            {/* Logo cliquable pour révéler accès admin */}
+            <button 
+              onClick={handleLogoClick}
+              className="text-xl font-bold text-teal-600 hover:text-teal-700 transition"
+            >
+              Kilolab
+            </button>
+          </div>
 
           <div className="text-center mb-8">
             <h1 className="text-3xl font-bold text-slate-900 mb-2">Connexion</h1>
             <p className="text-slate-600">Accédez à votre espace Kilolab</p>
           </div>
+
+          {/* Hint Admin (apparaît au clic sur logo) */}
+          {showAdminHint && (
+            <div className="mb-6 p-4 bg-slate-100 border border-slate-200 rounded-xl">
+              <div className="flex items-center gap-3">
+                <Shield className="w-5 h-5 text-slate-600" />
+                <div>
+                  <p className="text-sm font-medium text-slate-700">Espace Administrateur</p>
+                  <Link 
+                    to="/admin-dashboard" 
+                    className="text-xs text-teal-600 hover:underline"
+                  >
+                    Accéder au dashboard admin →
+                  </Link>
+                </div>
+              </div>
+            </div>
+          )}
 
           {partnerNeedsAccount && (
             <div className="mb-6 p-4 bg-amber-50 border border-amber-200 rounded-xl">
@@ -128,9 +148,7 @@ export default function Login() {
                 <AlertCircle className="w-5 h-5 text-amber-600 mt-0.5" />
                 <div>
                   <p className="font-medium text-amber-800">Compte non créé</p>
-                  <p className="text-sm text-amber-700 mt-1">
-                    Votre pressing est enregistré mais vous devez créer un compte.
-                  </p>
+                  <p className="text-sm text-amber-700 mt-1">Votre pressing est enregistré mais vous devez créer un compte.</p>
                   <Link to="/signup" className="inline-block mt-2 text-sm font-semibold text-amber-700 hover:text-amber-800 underline">
                     Créer mon compte →
                   </Link>
@@ -149,7 +167,7 @@ export default function Login() {
                   required
                   value={formData.email}
                   onChange={(e) => setFormData({...formData, email: e.target.value})}
-                  className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-teal-500"
+                  className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-teal-500 focus:border-transparent"
                   placeholder="votre@email.fr"
                 />
               </div>
@@ -164,13 +182,17 @@ export default function Login() {
                   required
                   value={formData.password}
                   onChange={(e) => setFormData({...formData, password: e.target.value})}
-                  className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-teal-500"
+                  className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-teal-500 focus:border-transparent"
                   placeholder="••••••••"
                 />
               </div>
             </div>
 
-            <button type="submit" disabled={loading} className="w-full py-4 bg-teal-600 text-white rounded-xl font-bold text-lg hover:bg-teal-700 transition disabled:opacity-50 flex items-center justify-center gap-2">
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full py-4 bg-teal-600 text-white rounded-xl font-bold text-lg hover:bg-teal-700 transition disabled:opacity-50 flex items-center justify-center gap-2"
+            >
               {loading ? <><Loader2 className="w-5 h-5 animate-spin" />Connexion...</> : 'Se connecter'}
             </button>
           </form>
@@ -187,6 +209,16 @@ export default function Login() {
               Devenir partenaire pressing
             </Link>
           </div>
+        </div>
+        
+        {/* Lien admin discret en bas */}
+        <div className="mt-4 text-center">
+          <Link 
+            to="/admin-dashboard" 
+            className="text-xs text-slate-500 hover:text-slate-300 transition opacity-50 hover:opacity-100"
+          >
+            Administration
+          </Link>
         </div>
       </div>
     </div>
