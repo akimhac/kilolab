@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { Mail, Lock, ArrowLeft, Loader2, AlertCircle } from 'lucide-react';
@@ -10,6 +10,53 @@ export default function Login() {
   const [formData, setFormData] = useState({ email: '', password: '' });
   const [partnerNeedsAccount, setPartnerNeedsAccount] = useState(false);
 
+  // Vérifier si déjà connecté
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session) {
+        redirectUser(session.user.email);
+      }
+    });
+  }, []);
+
+  const redirectUser = async (email: string | undefined) => {
+    if (!email) return;
+
+    // Vérifier si partenaire
+    const { data: partner } = await supabase
+      .from('partners')
+      .select('id, is_active')
+      .eq('email', email.toLowerCase())
+      .maybeSingle();
+
+    if (partner) {
+      if (partner.is_active) {
+        navigate('/partner-dashboard');
+      } else {
+        navigate('/partner-coming-soon');
+      }
+      return;
+    }
+
+    // Vérifier si admin
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) {
+      const { data: profile } = await supabase
+        .from('user_profiles')
+        .select('role')
+        .eq('user_id', user.id)
+        .maybeSingle();
+
+      if (profile?.role === 'admin') {
+        navigate('/admin-dashboard');
+        return;
+      }
+    }
+
+    // Client par défaut
+    navigate('/client-dashboard');
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -18,18 +65,14 @@ export default function Login() {
     const email = formData.email.trim().toLowerCase();
 
     try {
-      // 1. Tenter la connexion
       const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
         email,
         password: formData.password
       });
 
       if (authError) {
-        console.log('Auth error:', authError.message);
-        
-        // Si identifiants invalides, vérifier si c'est un partenaire sans compte
         if (authError.message.includes('Invalid login credentials')) {
-          // Vérifier si l'email existe dans partners
+          // Vérifier si c'est un partenaire sans compte
           const { data: partner } = await supabase
             .from('partners')
             .select('id, name')
@@ -37,7 +80,6 @@ export default function Login() {
             .maybeSingle();
 
           if (partner) {
-            // C'est un partenaire mais il n'a pas encore créé son compte auth
             setPartnerNeedsAccount(true);
             toast.error(`Le pressing "${partner.name}" doit d'abord créer un compte.`);
           } else {
@@ -56,45 +98,8 @@ export default function Login() {
         return;
       }
 
-      // 2. Connexion réussie - Vérifier le type d'utilisateur
-      const userEmail = authData.user.email?.toLowerCase();
-
-      // Vérifier si c'est un partenaire
-      const { data: partner } = await supabase
-        .from('partners')
-        .select('id, name, is_active, user_id')
-        .eq('email', userEmail)
-        .maybeSingle();
-
-      if (partner) {
-        // Lier le user_id si pas encore fait
-        if (!partner.user_id) {
-          await supabase
-            .from('partners')
-            .update({ user_id: authData.user.id })
-            .eq('id', partner.id);
-        }
-
-        toast.success(`Bienvenue ${partner.name} !`);
-        navigate(partner.is_active ? '/partner-dashboard' : '/partner-coming-soon');
-        return;
-      }
-
-      // Vérifier le profil utilisateur
-      const { data: profile } = await supabase
-        .from('user_profiles')
-        .select('role, first_name')
-        .eq('user_id', authData.user.id)
-        .maybeSingle();
-
-      if (profile?.role === 'admin') {
-        toast.success('Bienvenue Admin !');
-        navigate('/admin-dashboard');
-        return;
-      }
-
-      toast.success(`Bienvenue ${profile?.first_name || ''} !`);
-      navigate('/client-dashboard');
+      toast.success('Connexion réussie !');
+      await redirectUser(authData.user.email);
 
     } catch (err: any) {
       console.error('Erreur:', err);
@@ -117,7 +122,6 @@ export default function Login() {
             <p className="text-slate-600">Accédez à votre espace Kilolab</p>
           </div>
 
-          {/* Message pour partenaire sans compte */}
           {partnerNeedsAccount && (
             <div className="mb-6 p-4 bg-amber-50 border border-amber-200 rounded-xl">
               <div className="flex items-start gap-3">
@@ -125,7 +129,7 @@ export default function Login() {
                 <div>
                   <p className="font-medium text-amber-800">Compte non créé</p>
                   <p className="text-sm text-amber-700 mt-1">
-                    Votre pressing est enregistré mais vous devez créer un compte pour accéder à votre espace.
+                    Votre pressing est enregistré mais vous devez créer un compte.
                   </p>
                   <Link to="/signup" className="inline-block mt-2 text-sm font-semibold text-amber-700 hover:text-amber-800 underline">
                     Créer mon compte →
@@ -145,7 +149,7 @@ export default function Login() {
                   required
                   value={formData.email}
                   onChange={(e) => setFormData({...formData, email: e.target.value})}
-                  className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+                  className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-teal-500"
                   placeholder="votre@email.fr"
                 />
               </div>
@@ -160,22 +164,18 @@ export default function Login() {
                   required
                   value={formData.password}
                   onChange={(e) => setFormData({...formData, password: e.target.value})}
-                  className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+                  className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-teal-500"
                   placeholder="••••••••"
                 />
               </div>
             </div>
 
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full py-4 bg-teal-600 text-white rounded-xl font-bold text-lg hover:bg-teal-700 transition disabled:opacity-50 flex items-center justify-center gap-2"
-            >
+            <button type="submit" disabled={loading} className="w-full py-4 bg-teal-600 text-white rounded-xl font-bold text-lg hover:bg-teal-700 transition disabled:opacity-50 flex items-center justify-center gap-2">
               {loading ? <><Loader2 className="w-5 h-5 animate-spin" />Connexion...</> : 'Se connecter'}
             </button>
           </form>
 
-          <div className="mt-6 text-center space-y-2">
+          <div className="mt-6 text-center">
             <p className="text-slate-600">
               Pas encore de compte ?{' '}
               <Link to="/signup" className="text-teal-600 font-semibold hover:underline">S'inscrire</Link>
@@ -183,9 +183,8 @@ export default function Login() {
           </div>
 
           <div className="mt-6 pt-6 border-t border-slate-100">
-            <p className="text-center text-sm text-slate-500 mb-3">Vous êtes un pressing ?</p>
             <Link to="/become-partner" className="block w-full py-3 text-center border-2 border-teal-500 text-teal-600 rounded-xl font-semibold hover:bg-teal-50 transition">
-              Devenir partenaire
+              Devenir partenaire pressing
             </Link>
           </div>
         </div>

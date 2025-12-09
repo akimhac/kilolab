@@ -1,18 +1,33 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { supabase } from '../lib/supabase';
 import { 
-  MapPin, Clock, Euro, Check, X as XIcon, Menu, X, 
+  MapPin, Clock, Check, X as XIcon, Menu, X, 
   ArrowRight, Star, ShieldCheck, Truck, Sparkles 
 } from 'lucide-react';
 
 export default function LandingPage() {
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [partnerCount, setPartnerCount] = useState<number>(0);
+
+  // Charger le vrai nombre de partenaires
+  useEffect(() => {
+    const fetchPartnerCount = async () => {
+      const { count } = await supabase
+        .from('partners')
+        .select('*', { count: 'exact', head: true })
+        .eq('is_active', true);
+      
+      setPartnerCount(count || 0);
+    };
+    fetchPartnerCount();
+  }, []);
 
   const stats = [
-    { value: "2600+", label: "Pressings partenaires" },
-    { value: "4.9/5", label: "Note moyenne clients" },
-    { value: "24h", label: "Délai moyen" }
+    { value: partnerCount > 0 ? `${partnerCount}+` : "1800+", label: "Pressings partenaires" },
+    { value: "4.8/5", label: "Note moyenne" },
+    { value: "24h", label: "Délai standard" }
   ];
 
   const priceComparison = [
@@ -23,7 +38,7 @@ export default function LandingPage() {
   ];
 
   const steps = [
-    { icon: "🧺", title: "1. Préparez", desc: "Mettez tout votre linge dans un sac, sans trier." },
+    { icon: "��", title: "1. Préparez", desc: "Mettez tout votre linge dans un sac, sans trier." },
     { icon: "⚖️", title: "2. Pesez", desc: "Le prix est fixé au poids, pas à la pièce." },
     { icon: "✨", title: "3. Récupérez", desc: "Linge lavé, plié et frais en 24h chrono." }
   ];
@@ -41,6 +56,7 @@ export default function LandingPage() {
             </Link>
             <div className="hidden md:flex items-center gap-8">
               <Link to="/pricing" className="text-sm font-medium text-slate-600 hover:text-teal-600 transition">Tarifs</Link>
+              <Link to="/how-it-works" className="text-sm font-medium text-slate-600 hover:text-teal-600 transition">Comment ça marche</Link>
               <Link to="/become-partner" className="text-sm font-medium text-slate-600 hover:text-teal-600 transition">Devenir Partenaire</Link>
               <Link to="/login" className="text-sm font-medium text-slate-900 hover:text-teal-600 transition">Connexion</Link>
               <button onClick={() => navigate('/partners-map')} className="bg-slate-900 text-white px-5 py-2.5 rounded-full font-medium hover:bg-slate-800 transition shadow-lg shadow-slate-900/20">
@@ -55,6 +71,7 @@ export default function LandingPage() {
         {mobileMenuOpen && (
           <div className="md:hidden absolute top-20 left-0 w-full bg-white border-b border-slate-100 p-4 flex flex-col gap-4 shadow-xl">
             <Link to="/pricing" className="text-lg font-medium text-slate-600">Tarifs</Link>
+            <Link to="/how-it-works" className="text-lg font-medium text-slate-600">Comment ça marche</Link>
             <Link to="/become-partner" className="text-lg font-medium text-slate-600">Devenir Partenaire</Link>
             <Link to="/login" className="text-lg font-medium text-slate-600">Connexion</Link>
             <button onClick={() => navigate('/partners-map')} className="bg-teal-600 text-white py-3 rounded-xl font-bold">Trouver un pressing</button>
@@ -77,33 +94,16 @@ export default function LandingPage() {
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
               <button onClick={() => navigate('/partners-map')} className="px-8 py-4 bg-teal-600 text-white rounded-full font-bold text-lg hover:bg-teal-700 transition shadow-xl shadow-teal-600/20 flex items-center justify-center gap-2">
-                Commander maintenant <ArrowRight className="w-5 h-5" />
+                Trouver un pressing <ArrowRight className="w-5 h-5" />
               </button>
               <button onClick={() => navigate('/pricing')} className="px-8 py-4 bg-white text-slate-700 border border-slate-200 rounded-full font-bold text-lg hover:bg-slate-50 transition flex items-center justify-center">
                 Voir les tarifs
               </button>
             </div>
-            <div className="mt-8 flex items-center gap-4 text-sm text-slate-500">
-              <div className="flex -space-x-2">
-                {[1,2,3,4].map(i => (
-                  <div key={i} className="w-8 h-8 rounded-full bg-slate-200 border-2 border-white flex items-center justify-center overflow-hidden">
-                    <img src={`https://i.pravatar.cc/100?img=${i+10}`} alt="user" />
-                  </div>
-                ))}
-              </div>
-              <p>Rejoint par 10,000+ utilisateurs</p>
-            </div>
           </div>
           <div className="relative">
             <div className="absolute -inset-4 bg-gradient-to-r from-teal-500/30 to-blue-500/30 blur-3xl rounded-[3rem] opacity-50 -z-10" />
             <img src="https://images.unsplash.com/photo-1545173168-9f1947eebb7f?auto=format&fit=crop&w=1000&q=80" alt="Linge propre" className="rounded-[2.5rem] shadow-2xl border border-white/50 w-full object-cover h-[500px] lg:h-[600px]" />
-            <div className="absolute bottom-8 left-8 bg-white/95 backdrop-blur-sm p-4 rounded-2xl shadow-xl border border-slate-100 max-w-xs">
-              <div className="flex items-center gap-3 mb-2">
-                <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center text-green-600"><Check size={20} /></div>
-                <div><p className="font-bold text-slate-900">Commande terminée</p><p className="text-xs text-slate-500">Il y a 2 min</p></div>
-              </div>
-              <p className="text-sm text-slate-600">5kg de linge sauvés de la corvée !</p>
-            </div>
           </div>
         </div>
       </section>
@@ -119,7 +119,7 @@ export default function LandingPage() {
           ))}
           <div className="flex flex-col items-center justify-center">
             <div className="flex text-yellow-400 gap-1 mb-1"><Star fill="currentColor" /><Star fill="currentColor" /><Star fill="currentColor" /><Star fill="currentColor" /><Star fill="currentColor" /></div>
-            <span className="text-sm font-medium text-slate-500">Excellence Client</span>
+            <span className="text-sm font-medium text-slate-500">Satisfaction client</span>
           </div>
         </div>
       </div>
@@ -128,7 +128,7 @@ export default function LandingPage() {
       <section className="py-24 bg-white">
         <div className="max-w-7xl mx-auto px-4">
           <div className="text-center max-w-3xl mx-auto mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">Aussi simple que de commander un VTC</h2>
+            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">Simple comme bonjour</h2>
             <p className="text-lg text-slate-600">Notre processus est optimisé pour vous faire gagner un temps précieux.</p>
           </div>
           <div className="grid md:grid-cols-3 gap-8 relative">
@@ -141,20 +141,24 @@ export default function LandingPage() {
               </div>
             ))}
           </div>
+          <div className="text-center mt-12">
+            <button onClick={() => navigate('/how-it-works')} className="px-6 py-3 bg-teal-100 text-teal-700 rounded-full font-semibold hover:bg-teal-200 transition">
+              En savoir plus →
+            </button>
+          </div>
         </div>
       </section>
 
       {/* Comparateur */}
       <section className="py-24 bg-slate-900 text-white relative overflow-hidden">
         <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-teal-500/20 rounded-full blur-[100px]" />
-        <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-purple-500/20 rounded-full blur-[100px]" />
         <div className="max-w-7xl mx-auto px-4 relative z-10">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-5xl font-bold mb-6">Arrêtez de payer à la pièce.</h2>
             <p className="text-xl text-slate-400">Voyez combien vous économisez avec Kilolab.</p>
           </div>
           <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto items-center">
-            <div className="bg-white/5 border border-white/10 rounded-3xl p-8 backdrop-blur-sm opacity-80 hover:opacity-100 transition">
+            <div className="bg-white/5 border border-white/10 rounded-3xl p-8 backdrop-blur-sm">
               <div className="flex items-center gap-3 mb-8">
                 <div className="p-3 bg-red-500/20 rounded-xl text-red-400"><XIcon /></div>
                 <h3 className="text-2xl font-bold">Pressing Traditionnel</h3>
@@ -183,7 +187,7 @@ export default function LandingPage() {
                 ))}
               </ul>
               <div className="mt-8 pt-6 border-t border-slate-100 text-center">
-                <p className="text-green-600 font-bold mb-4">✅ Vous économisez ~85%</p>
+                <p className="text-green-600 font-bold mb-4">✅ Économisez jusqu'à 85%</p>
                 <button onClick={() => navigate('/partners-map')} className="w-full py-4 bg-slate-900 text-white rounded-xl font-bold hover:bg-slate-800 transition shadow-lg">Profiter de ces tarifs</button>
               </div>
             </div>
@@ -196,13 +200,13 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto px-4">
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
             {[
-              { icon: Euro, title: "Économique", text: "Jusqu'à 90% moins cher qu'un pressing traditionnel." },
-              { icon: Clock, title: "Ultra Rapide", text: "Prêt en 24h standard, ou option express 4h." },
-              { icon: MapPin, title: "Proximité", text: "Plus de 2600 points de collecte en France." },
-              { icon: ShieldCheck, title: "Qualité Pro", text: "Traité par des artisans pressings certifiés." }
+              { icon: "💰", title: "Économique", text: "Jusqu'à 85% moins cher qu'un pressing traditionnel." },
+              { icon: "⚡", title: "Rapide", text: "Prêt en 24h standard, ou express 4h." },
+              { icon: "📍", title: "Proximité", text: `${partnerCount > 0 ? partnerCount : '1800'}+ points de collecte.` },
+              { icon: "✅", title: "Qualité", text: "Pressings professionnels certifiés." }
             ].map((feature, i) => (
               <div key={i} className="bg-slate-50 p-6 rounded-2xl hover:bg-teal-50 transition-colors group">
-                <div className="w-12 h-12 bg-white rounded-xl shadow-sm flex items-center justify-center text-teal-600 mb-4 group-hover:scale-110 transition-transform"><feature.icon /></div>
+                <div className="w-12 h-12 bg-white rounded-xl shadow-sm flex items-center justify-center text-2xl mb-4 group-hover:scale-110 transition-transform">{feature.icon}</div>
                 <h4 className="text-lg font-bold text-slate-900 mb-2">{feature.title}</h4>
                 <p className="text-slate-600 text-sm">{feature.text}</p>
               </div>
@@ -217,7 +221,7 @@ export default function LandingPage() {
           <Truck className="w-16 h-16 mx-auto mb-6 opacity-80" />
           <h2 className="text-3xl md:text-5xl font-bold mb-6">Vous possédez un pressing ?</h2>
           <p className="text-xl text-teal-100 mb-10 max-w-2xl mx-auto">Remplissez vos machines pendant les heures creuses. Zéro frais d'entrée. Rentable dès le premier kilo.</p>
-          <button onClick={() => navigate('/become-partner')} className="px-10 py-4 bg-white text-teal-700 rounded-full font-bold text-lg hover:shadow-2xl transition hover:scale-105">Devenir Partenaire Kilolab</button>
+          <button onClick={() => navigate('/become-partner')} className="px-10 py-4 bg-white text-teal-700 rounded-full font-bold text-lg hover:shadow-2xl transition hover:scale-105">Devenir Partenaire</button>
         </div>
       </section>
 
@@ -226,18 +230,20 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto px-4 grid grid-cols-2 md:grid-cols-4 gap-12 text-sm">
           <div className="col-span-2 md:col-span-1">
             <h3 className="text-white font-bold text-xl mb-4">Kilolab.</h3>
-            <p className="mb-4">Le futur du pressing est au poids.</p>
+            <p className="mb-4">Le pressing au kilo, simple et économique.</p>
           </div>
           <div>
             <h4 className="text-white font-bold mb-4">Service</h4>
             <ul className="space-y-3">
               <li><Link to="/partners-map" className="hover:text-white transition">Trouver un pressing</Link></li>
-              <li><Link to="/pricing" className="hover:text-white transition">Grille tarifaire</Link></li>
+              <li><Link to="/pricing" className="hover:text-white transition">Tarifs</Link></li>
+              <li><Link to="/how-it-works" className="hover:text-white transition">Comment ça marche</Link></li>
             </ul>
           </div>
           <div>
             <h4 className="text-white font-bold mb-4">Entreprise</h4>
             <ul className="space-y-3">
+              <li><Link to="/about" className="hover:text-white transition">À propos</Link></li>
               <li><Link to="/become-partner" className="hover:text-white transition">Espace Partenaires</Link></li>
               <li><Link to="/contact" className="hover:text-white transition">Contact</Link></li>
             </ul>
