@@ -15,52 +15,69 @@ export default function BecomePartner() {
     e.preventDefault();
     setLoading(true);
 
+    const email = formData.email.trim().toLowerCase();
+
     try {
-      const { data: existing } = await supabase
+      // Vérifier si l'email existe déjà
+      const { data: existing, error: checkError } = await supabase
         .from('partners')
-        .select('id, is_active')
-        .eq('email', formData.email.trim().toLowerCase())
-        .single();
+        .select('id, is_active, name')
+        .eq('email', email)
+        .maybeSingle();
+
+      if (checkError) {
+        console.error('Erreur vérification:', checkError);
+      }
 
       if (existing) {
         if (existing.is_active) {
-          toast.error('Ce pressing est déjà partenaire ! Connectez-vous.');
+          toast.error(`"${existing.name}" est déjà partenaire ! Connectez-vous.`);
           navigate('/login');
         } else {
-          toast.error('Une demande est déjà en cours pour cet email.');
+          toast.error('Une demande est déjà en cours pour cet email. Nous vous contacterons sous 24h.');
         }
         setLoading(false);
         return;
       }
 
-      const { error } = await supabase.from('partners').insert({
-        name: formData.name.trim(),
-        email: formData.email.trim().toLowerCase(),
-        phone: formData.phone.trim(),
-        siret: formData.siret.trim() || null,
-        address: formData.address.trim(),
-        city: formData.city.trim(),
-        postal_code: formData.postal_code.trim(),
-        is_active: false,
-        rating: 4.5,
-        review_count: 0,
-        price_per_kg: 3.00
-      });
+      // Insérer le nouveau partenaire
+      const { data: newPartner, error: insertError } = await supabase
+        .from('partners')
+        .insert({
+          name: formData.name.trim(),
+          email: email,
+          phone: formData.phone.trim(),
+          siret: formData.siret.trim() || null,
+          address: formData.address.trim(),
+          city: formData.city.trim().toUpperCase(),
+          postal_code: formData.postal_code.trim(),
+          is_active: false,
+          price_per_kg: 3.00
+        })
+        .select()
+        .single();
 
-      if (error) {
-        if (error.code === '23505') {
+      if (insertError) {
+        console.error('Erreur insertion:', insertError);
+        
+        if (insertError.code === '23505') {
           toast.error('Cet email est déjà utilisé.');
+        } else if (insertError.code === '42501') {
+          toast.error('Erreur de permission. Contactez le support.');
         } else {
-          toast.error('Erreur lors de l\'inscription.');
+          toast.error(`Erreur: ${insertError.message}`);
         }
         setLoading(false);
         return;
       }
 
+      console.log('✅ Partenaire créé:', newPartner);
       toast.success('Demande envoyée ! Validation sous 24h.');
       navigate('/partner-coming-soon');
-    } catch (err) {
-      toast.error('Une erreur est survenue.');
+
+    } catch (err: any) {
+      console.error('Erreur:', err);
+      toast.error('Une erreur est survenue. Réessayez.');
     } finally {
       setLoading(false);
     }

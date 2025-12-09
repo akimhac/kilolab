@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { MapPin, Star, Euro, Search, Navigation, ArrowLeft, Loader2 } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 interface Partner {
   id: string;
@@ -29,7 +30,6 @@ export default function PartnersMap() {
       try {
         console.log('🔄 Chargement des partenaires...');
         
-        // Sélectionner uniquement les colonnes qui existent
         const { data, error: fetchError } = await supabase
           .from('partners')
           .select('id, name, address, city, postal_code, latitude, longitude, is_active')
@@ -108,7 +108,20 @@ export default function PartnersMap() {
     : filteredPartners;
 
   const handleSelectPartner = (partner: Partner) => {
-    sessionStorage.setItem('selectedPartner', JSON.stringify(partner));
+    // Sauvegarder le pressing sélectionné
+    const partnerData = {
+      id: partner.id,
+      name: partner.name,
+      address: partner.address,
+      city: partner.city,
+      postal_code: partner.postal_code,
+      price_per_kg: 3.00
+    };
+    
+    console.log('✅ Pressing sélectionné:', partnerData);
+    sessionStorage.setItem('selectedPartner', JSON.stringify(partnerData));
+    
+    toast.success(`${partner.name} sélectionné !`);
     navigate('/new-order');
   };
 
@@ -120,7 +133,7 @@ export default function PartnersMap() {
             <button onClick={() => navigate('/')} className="flex items-center gap-2 text-slate-600 hover:text-slate-900">
               <ArrowLeft className="w-5 h-5" />Retour
             </button>
-            <Link to="/" className="text-xl font-bold text-green-600">Kilolab</Link>
+            <Link to="/" className="text-xl font-bold text-teal-600">Kilolab</Link>
             <div className="w-20"></div>
           </div>
         </div>
@@ -134,7 +147,7 @@ export default function PartnersMap() {
             placeholder="Rechercher par nom, ville, code postal..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-12 pr-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-green-500 focus:border-transparent"
+            className="w-full pl-12 pr-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-teal-500 focus:border-transparent"
           />
         </div>
 
@@ -143,7 +156,7 @@ export default function PartnersMap() {
             <span className="font-semibold">{sortedPartners.length}</span> pressings trouvés
           </p>
           {locationEnabled && (
-            <div className="flex items-center gap-2 text-green-600">
+            <div className="flex items-center gap-2 text-teal-600">
               <Navigation className="w-4 h-4" />
               <span className="text-sm">Position activée</span>
             </div>
@@ -154,13 +167,13 @@ export default function PartnersMap() {
       <div className="max-w-7xl mx-auto px-4 pb-8">
         {loading ? (
           <div className="flex flex-col items-center justify-center py-20">
-            <Loader2 className="w-10 h-10 text-green-500 animate-spin mb-4" />
+            <Loader2 className="w-10 h-10 text-teal-500 animate-spin mb-4" />
             <p className="text-slate-600">Chargement des pressings...</p>
           </div>
         ) : error ? (
           <div className="text-center py-20">
             <p className="text-red-500 mb-4">Erreur: {error}</p>
-            <button onClick={() => window.location.reload()} className="px-4 py-2 bg-green-500 text-white rounded-lg">
+            <button onClick={() => window.location.reload()} className="px-4 py-2 bg-teal-500 text-white rounded-lg">
               Réessayer
             </button>
           </div>
@@ -175,13 +188,13 @@ export default function PartnersMap() {
             {sortedPartners.slice(0, 60).map((partner) => (
               <div
                 key={partner.id}
-                className="bg-white rounded-xl p-4 shadow-sm hover:shadow-md transition cursor-pointer border border-slate-100"
+                className="bg-white rounded-xl p-4 shadow-sm hover:shadow-lg transition-all cursor-pointer border border-slate-100 hover:border-teal-300"
                 onClick={() => handleSelectPartner(partner)}
               >
                 <div className="flex justify-between items-start mb-2">
                   <h3 className="font-semibold text-slate-900 line-clamp-1">{partner.name}</h3>
                   {locationEnabled && partner.latitude && (
-                    <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full">
+                    <span className="text-xs bg-teal-100 text-teal-700 px-2 py-1 rounded-full">
                       {calculateDistance(partner.latitude, partner.longitude)}
                     </span>
                   )}
@@ -196,16 +209,15 @@ export default function PartnersMap() {
                   <div className="flex items-center gap-1">
                     <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
                     <span className="font-medium">4.5</span>
-                    <span className="text-slate-400 text-sm">(nouveau)</span>
                   </div>
-                  <div className="flex items-center gap-1 text-green-600 font-semibold">
+                  <div className="flex items-center gap-1 text-teal-600 font-semibold">
                     <Euro className="w-4 h-4" />
                     <span>3€/kg</span>
                   </div>
                 </div>
 
-                <button className="w-full mt-3 py-2 bg-green-500 text-white rounded-lg font-medium hover:bg-green-600 transition">
-                  Commander
+                <button className="w-full mt-3 py-2 bg-teal-500 text-white rounded-lg font-medium hover:bg-teal-600 transition">
+                  Sélectionner
                 </button>
               </div>
             ))}
