@@ -1,158 +1,180 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
-import { ArrowLeft, Mail, Lock, Eye, EyeOff } from 'lucide-react';
+import { Mail, Lock, ArrowLeft, Loader2 } from 'lucide-react';
 import toast from 'react-hot-toast';
-import LoadingButton from '../components/LoadingButton';
 
 export default function Login() {
   const navigate = useNavigate();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [formData, setFormData] = useState({
+    email: '',
+    password: ''
+  });
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (!email || !password) {
-      toast.error('Veuillez remplir tous les champs');
-      return;
-    }
-
     setLoading(true);
+
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email: email.trim(),
-        password: password
+      // 1. Connexion
+      const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+        email: formData.email.trim().toLowerCase(),
+        password: formData.password
       });
 
-      if (error) {
-        console.error('Login error:', error);
-        
-        if (error.message.includes('Invalid login credentials')) {
+      if (authError) {
+        if (authError.message.includes('Invalid login')) {
           toast.error('Email ou mot de passe incorrect');
-        } else if (error.message.includes('Email not confirmed')) {
-          toast.error('Veuillez confirmer votre email avant de vous connecter');
         } else {
-          toast.error('Erreur de connexion. Veuillez réessayer.');
+          toast.error(authError.message);
+        }
+        setLoading(false);
+        return;
+      }
+
+      if (!authData.user) {
+        toast.error('Erreur de connexion');
+        setLoading(false);
+        return;
+      }
+
+      const userEmail = authData.user.email?.toLowerCase();
+
+      // 2. Vérifier si c'est un partenaire
+      const { data: partner } = await supabase
+        .from('partners')
+        .select('id, name, is_active, user_id')
+        .eq('email', userEmail)
+        .single();
+
+      if (partner) {
+        // Si le user_id n'est pas encore lié, le faire maintenant
+        if (!partner.user_id) {
+          await supabase
+            .from('partners')
+            .update({ user_id: authData.user.id })
+            .eq('id', partner.id);
+        }
+
+        toast.success(`Bienvenue ${partner.name} !`);
+        
+        if (partner.is_active) {
+          navigate('/partner-dashboard');
+        } else {
+          navigate('/partner-coming-soon');
         }
         return;
       }
 
-      if (data.user) {
-        toast.success('Connexion réussie !');
-        
-        // Vérifier si c'est un pressing ou un client
-        const { data: partnerData } = await supabase
-          .from('partners')
-          .select('id')
-          .eq('email', email.trim())
-          .single();
+      // 3. Vérifier si c'est un admin
+      const { data: profile } = await supabase
+        .from('user_profiles')
+        .select('role, first_name')
+        .eq('user_id', authData.user.id)
+        .single();
 
-        if (partnerData) {
-          navigate('/partner-dashboard');
-        } else {
-          navigate('/client-dashboard');
-        }
+      if (profile?.role === 'admin') {
+        toast.success(`Bienvenue Admin !`);
+        navigate('/admin-dashboard');
+        return;
       }
-    } catch (error: any) {
-      console.error('Unexpected error:', error);
-      toast.error('Une erreur inattendue est survenue');
+
+      // 4. Sinon c'est un client
+      toast.success(`Bienvenue ${profile?.first_name || ''} !`);
+      navigate('/client-dashboard');
+
+    } catch (err: any) {
+      console.error('Erreur:', err);
+      toast.error('Une erreur est survenue');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white flex items-center justify-center px-4 py-12">
-      <div className="max-w-md w-full">
-        <button
-          onClick={() => navigate('/')}
-          className="flex items-center gap-2 text-blue-600 hover:text-blue-700 mb-8 transition font-semibold"
-        >
-          <ArrowLeft className="w-5 h-5" />
-          Retour
-        </button>
-
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center p-4">
+      <div className="w-full max-w-md">
         <div className="bg-white rounded-3xl shadow-2xl p-8">
-          <h1 className="text-4xl font-black text-slate-900 mb-2 text-center">
-            Connexion
-          </h1>
-          <p className="text-slate-600 mb-8 text-center">
-            Accédez à votre compte Kilolab
-          </p>
+          <button 
+            onClick={() => navigate('/')} 
+            className="flex items-center gap-2 text-slate-500 hover:text-slate-700 mb-6"
+          >
+            <ArrowLeft className="w-4 h-4" /> Retour
+          </button>
 
-          <form onSubmit={handleLogin} className="space-y-6">
-            <div>
-              <label className="block text-sm font-bold text-slate-900 mb-2">
-                <Mail className="w-4 h-4 inline mr-2" />
-                Email
-              </label>
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-4 py-3 border-2 border-slate-300 rounded-xl focus:border-blue-600 focus:outline-none"
-                placeholder="votre@email.com"
-                required
-                autoComplete="email"
-              />
-            </div>
+          <div className="text-center mb-8">
+            <h1 className="text-3xl font-bold text-slate-900 mb-2">Connexion</h1>
+            <p className="text-slate-600">Accédez à votre espace Kilolab</p>
+          </div>
 
+          <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-sm font-bold text-slate-900 mb-2">
-                <Lock className="w-4 h-4 inline mr-2" />
-                Mot de passe
-              </label>
+              <label className="block text-sm font-medium text-slate-700 mb-1">Email</label>
               <div className="relative">
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
                 <input
-                  type={showPassword ? 'text' : 'password'}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="w-full px-4 py-3 border-2 border-slate-300 rounded-xl focus:border-blue-600 focus:outline-none pr-12"
-                  placeholder="••••••••"
+                  type="email"
                   required
-                  autoComplete="current-password"
+                  value={formData.email}
+                  onChange={(e) => setFormData({...formData, email: e.target.value})}
+                  className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+                  placeholder="votre@email.fr"
                 />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
-                >
-                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                </button>
               </div>
             </div>
 
-            <LoadingButton
-              loading={loading}
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1">Mot de passe</label>
+              <div className="relative">
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+                <input
+                  type="password"
+                  required
+                  value={formData.password}
+                  onChange={(e) => setFormData({...formData, password: e.target.value})}
+                  className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+                  placeholder="••••••••"
+                />
+              </div>
+            </div>
+
+            <button
               type="submit"
-              className="w-full py-4 bg-gradient-to-r from-blue-600 to-cyan-600 text-white rounded-xl font-bold hover:shadow-xl transition"
+              disabled={loading}
+              className="w-full py-4 bg-teal-600 text-white rounded-xl font-bold text-lg hover:bg-teal-700 transition disabled:opacity-50 flex items-center justify-center gap-2"
             >
-              Se connecter
-            </LoadingButton>
+              {loading ? (
+                <>
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                  Connexion...
+                </>
+              ) : (
+                'Se connecter'
+              )}
+            </button>
           </form>
 
-          <div className="mt-6 text-center">
-            <p className="text-slate-600 text-sm">
+          <div className="mt-6 text-center space-y-2">
+            <Link to="/forgot-password" className="text-sm text-teal-600 hover:underline block">
+              Mot de passe oublié ?
+            </Link>
+            <p className="text-slate-600">
               Pas encore de compte ?{' '}
-              <button
-                onClick={() => navigate('/signup')}
-                className="text-blue-600 hover:text-blue-700 font-bold"
-              >
+              <Link to="/signup" className="text-teal-600 font-semibold hover:underline">
                 S'inscrire
-              </button>
+              </Link>
             </p>
           </div>
 
-          <div className="mt-4 text-center">
-            <button
-              onClick={() => toast('Fonctionnalité bientôt disponible', { icon: 'ℹ️' })}
-              className="text-sm text-slate-500 hover:text-slate-700"
+          <div className="mt-6 pt-6 border-t border-slate-100">
+            <p className="text-center text-sm text-slate-500 mb-3">Vous êtes un pressing ?</p>
+            <Link 
+              to="/become-partner"
+              className="block w-full py-3 text-center border-2 border-teal-500 text-teal-600 rounded-xl font-semibold hover:bg-teal-50 transition"
             >
-              Mot de passe oublié ?
-            </button>
+              Devenir partenaire
+            </Link>
           </div>
         </div>
       </div>
