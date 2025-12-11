@@ -53,7 +53,7 @@ export default function LandingPage() {
 
         {/* Mobile menu panel */}
         {mobileMenuOpen && (
-          <div className="md:hidden absolute top-full left-0 w-full bg-slate-950/98 backdrop-blur-xl border-t border-white/10 shadow-2xl">
+          <div className="md:hidden fixed top-20 left-0 w-full bg-slate-950 backdrop-blur-xl border-t border-white/10 shadow-2xl">
             <div className="px-6 py-6 space-y-4">
               <Link to="/pricing" onClick={() => setMobileMenuOpen(false)} className="flex items-center justify-between py-3 text-lg font-medium text-slate-300 hover:text-white border-b border-white/5">
                 Comparateur <ChevronRight className="w-5 h-5 text-slate-500" />
