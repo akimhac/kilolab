@@ -1,143 +1,133 @@
-import { useNavigate, useLocation } from 'react-router-dom';
-import { LogIn, Menu, X } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { Link, useLocation } from 'react-router-dom';
+import { Menu, X, ChevronRight } from 'lucide-react';
 
 export default function Navbar() {
-  const navigate = useNavigate();
+  const [isOpen, setIsOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const isHomePage = location.pathname === '/';
 
-  const isActive = (path: string) => location.pathname === path;
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 50);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // Fermer le menu quand on change de page
+  useEffect(() => {
+    setIsOpen(false);
+  }, [location]);
+
+  const navigation = [
+    { name: 'Accueil', href: '/' },
+    { name: 'Comment ça marche', href: '/#how-it-works' },
+    { name: 'Tarifs', href: '/pricing' },
+    { name: 'Devenir partenaire', href: '/become-partner', highlight: true },
+  ];
 
   return (
-    <nav className="fixed top-0 w-full bg-white/90 backdrop-blur-md z-50 border-b border-slate-200 shadow-sm">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-        <div className="flex items-center justify-between">
+    <nav className={`fixed w-full z-50 transition-all duration-300 ${
+      scrolled || isOpen || !isHomePage 
+        ? 'bg-slate-950 shadow-lg py-2' 
+        : 'bg-transparent py-4'
+    }`}>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between items-center">
           {/* Logo */}
-          <div 
-            onClick={() => navigate('/')}
-            className="text-3xl font-black cursor-pointer"
-            style={{
-              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-              backgroundClip: 'text'
-            }}
-          >
-            Kilolab
-          </div>
-
-          {/* Desktop Menu */}
-          <div className="hidden md:flex items-center gap-8">
-            <button
-              onClick={() => {
-                navigate('/');
-                setTimeout(() => {
-                  document.getElementById('how')?.scrollIntoView({ behavior: 'smooth' });
-                }, 100);
-              }}
-              className={`font-medium transition ${
-                isActive('/') 
-                  ? 'text-blue-600' 
-                  : 'text-slate-700 hover:text-blue-600'
-              }`}
+          <Link to="/" className="flex items-center space-x-2 group">
+            <div className="w-8 h-8 bg-teal-500 rounded-lg flex items-center justify-center">
+              <span className="text-slate-900 font-bold text-lg">K</span>
+            </div>
+            <span className="text-xl font-bold text-white">Kilolab</span>
+          </Link>
+          
+          {/* Desktop menu */}
+          <div className="hidden md:flex items-center space-x-8">
+            {navigation.map((item) => (
+              <Link
+                key={item.name}
+                to={item.href}
+                className={`${
+                  item.highlight
+                    ? 'bg-teal-500 text-slate-900 px-4 py-2 rounded-full font-medium hover:bg-teal-400 transition-all hover:scale-105'
+                    : 'text-gray-300 hover:text-white font-medium transition-colors'
+                }`}
+              >
+                {item.name}
+              </Link>
+            ))}
+            {/* Bouton Connexion */}
+            <Link
+              to="/login"
+              className="text-gray-300 hover:text-white font-medium transition-colors"
             >
-              Comment ça marche
-            </button>
-            <button
-              onClick={() => {
-                navigate('/');
-                setTimeout(() => {
-                  document.getElementById('reviews')?.scrollIntoView({ behavior: 'smooth' });
-                }, 100);
-              }}
-              className={`font-medium transition ${
-                isActive('/') 
-                  ? 'text-blue-600' 
-                  : 'text-slate-700 hover:text-blue-600'
-              }`}
-            >
-              Avis
-            </button>
-            <button
-              onClick={() => navigate('/login')}
-              className="flex items-center gap-2 px-5 py-2.5 text-slate-700 hover:text-blue-600 transition font-medium"
-            >
-              <LogIn className="w-4 h-4" />
               Connexion
-            </button>
-            <button
-              onClick={() => navigate('/partners-map')}
-              className="px-6 py-2.5 rounded-full font-semibold text-white shadow-lg hover:shadow-xl transition-all transform hover:scale-105"
-              style={{
-                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-              }}
+            </Link>
+            {/* Bouton S'inscrire */}
+            <Link
+              to="/signup"
+              className="border-2 border-teal-500 text-teal-500 px-4 py-2 rounded-full font-medium hover:bg-teal-500 hover:text-slate-900 transition-all"
             >
-              Trouver un pressing
-            </button>
+              S'inscrire
+            </Link>
           </div>
 
-          {/* Mobile Menu Button */}
-          <button
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="md:hidden p-2 text-slate-700"
-          >
-            {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-          </button>
+          {/* Mobile menu button */}
+          <div className="md:hidden">
+            <button
+              onClick={() => setIsOpen(!isOpen)}
+              className="text-gray-300 hover:text-white p-2 transition-colors"
+              aria-label="Menu principal"
+            >
+              {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+            </button>
+          </div>
         </div>
-
-        {/* Mobile Menu */}
-        {mobileMenuOpen && (
-          <div className="md:hidden mt-4 pb-4 space-y-3">
-            <button
-              onClick={() => {
-                navigate('/');
-                setMobileMenuOpen(false);
-                setTimeout(() => {
-                  document.getElementById('how')?.scrollIntoView({ behavior: 'smooth' });
-                }, 100);
-              }}
-              className="block w-full text-left px-4 py-2 text-slate-700 hover:bg-blue-50 rounded-lg"
-            >
-              Comment ça marche
-            </button>
-            <button
-              onClick={() => {
-                navigate('/');
-                setMobileMenuOpen(false);
-                setTimeout(() => {
-                  document.getElementById('reviews')?.scrollIntoView({ behavior: 'smooth' });
-                }, 100);
-              }}
-              className="block w-full text-left px-4 py-2 text-slate-700 hover:bg-blue-50 rounded-lg"
-            >
-              Avis
-            </button>
-            <button
-              onClick={() => {
-                navigate('/login');
-                setMobileMenuOpen(false);
-              }}
-              className="block w-full text-left px-4 py-2 text-slate-700 hover:bg-blue-50 rounded-lg"
-            >
-              <LogIn className="w-4 h-4 inline mr-2" />
-              Connexion
-            </button>
-            <button
-              onClick={() => {
-                navigate('/partners-map');
-                setMobileMenuOpen(false);
-              }}
-              className="block w-full px-6 py-3 rounded-full font-semibold text-white text-center"
-              style={{
-                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-              }}
-            >
-              Trouver un pressing
-            </button>
-          </div>
-        )}
       </div>
+
+      {/* Mobile menu panel */}
+      {isOpen && (
+        <div className="md:hidden absolute top-full left-0 w-full bg-slate-950 shadow-xl border-t border-gray-800">
+          <div className="px-4 pt-4 pb-6 space-y-4">
+            {navigation.map((item) => (
+              <Link
+                key={item.name}
+                to={item.href}
+                onClick={() => setIsOpen(false)}
+                className={`block text-lg font-medium ${
+                  item.highlight
+                    ? 'text-teal-500'
+                    : 'text-gray-300 hover:text-white'
+                } flex items-center justify-between group`}
+              >
+                {item.name}
+                <ChevronRight className={`h-5 w-5 opacity-0 group-hover:opacity-100 transition-opacity ${item.highlight ? 'text-teal-500' : 'text-gray-500'}`} />
+              </Link>
+            ))}
+            {/* Bouton Connexion Mobile */}
+            <Link
+              to="/login"
+              onClick={() => setIsOpen(false)}
+              className="block text-lg font-medium text-gray-300 hover:text-white"
+            >
+              Connexion
+            </Link>
+            {/* Bouton S'inscrire bien visible sur Mobile */}
+            <div className="pt-4 mt-4 border-t border-gray-800">
+              <Link
+                to="/signup"
+                onClick={() => setIsOpen(false)}
+                className="w-full flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-slate-900 bg-teal-500 hover:bg-teal-400 transition-all"
+              >
+                S'inscrire maintenant
+              </Link>
+            </div>
+          </div>
+        </div>
+      )}
     </nav>
   );
 }
