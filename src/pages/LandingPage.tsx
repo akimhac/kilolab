@@ -3,7 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { 
   MapPin, Clock, Check, X as XIcon, Menu, X, 
-  ArrowRight
+  ArrowRight, ChevronRight
 } from 'lucide-react';
 
 export default function LandingPage() {
@@ -31,23 +31,55 @@ export default function LandingPage() {
               <Link to="/how-it-works" className="text-sm font-medium text-slate-400 hover:text-white transition">Fonctionnement</Link>
               <span className="h-4 w-px bg-white/10"></span>
               <Link to="/become-partner" className="text-sm font-bold text-teal-400 hover:text-teal-300 transition flex items-center gap-1">
-                {/* MODIF ICI : 1800+ au lieu de 1849 précis pour faire moins 'compteur' */}
                 Espace Pro <span className="bg-teal-500/20 text-teal-400 text-[10px] px-2 py-0.5 rounded-full">1800+</span>
               </Link>
             </div>
 
+            {/* Desktop buttons - AVEC S'INSCRIRE */}
             <div className="hidden md:flex items-center gap-4">
               <Link to="/login" className="text-sm font-medium text-white hover:text-teal-400 transition">Connexion</Link>
+              <Link to="/signup" className="text-sm font-medium text-teal-400 border border-teal-500 px-4 py-2 rounded-full hover:bg-teal-500 hover:text-slate-900 transition">S'inscrire</Link>
               <button onClick={() => navigate('/partners-map')} className="bg-white text-slate-950 px-6 py-2.5 rounded-full font-bold text-sm hover:bg-teal-50 transition shadow-[0_0_20px_rgba(255,255,255,0.3)] hover:shadow-[0_0_30px_rgba(20,184,166,0.5)] transform duration-300">
                 Trouver un pressing
               </button>
             </div>
             
+            {/* Mobile menu button */}
             <button className="md:hidden p-2 text-white" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
               {mobileMenuOpen ? <X /> : <Menu />}
             </button>
           </div>
         </div>
+
+        {/* Mobile menu panel */}
+        {mobileMenuOpen && (
+          <div className="md:hidden absolute top-full left-0 w-full bg-slate-950/98 backdrop-blur-xl border-t border-white/10 shadow-2xl">
+            <div className="px-6 py-6 space-y-4">
+              <Link to="/pricing" onClick={() => setMobileMenuOpen(false)} className="flex items-center justify-between py-3 text-lg font-medium text-slate-300 hover:text-white border-b border-white/5">
+                Comparateur <ChevronRight className="w-5 h-5 text-slate-500" />
+              </Link>
+              <Link to="/how-it-works" onClick={() => setMobileMenuOpen(false)} className="flex items-center justify-between py-3 text-lg font-medium text-slate-300 hover:text-white border-b border-white/5">
+                Fonctionnement <ChevronRight className="w-5 h-5 text-slate-500" />
+              </Link>
+              <Link to="/become-partner" onClick={() => setMobileMenuOpen(false)} className="flex items-center justify-between py-3 text-lg font-medium text-teal-400 hover:text-teal-300 border-b border-white/5">
+                Espace Pro <span className="bg-teal-500/20 text-teal-400 text-xs px-2 py-1 rounded-full">1800+</span>
+              </Link>
+              <Link to="/partners-map" onClick={() => setMobileMenuOpen(false)} className="flex items-center justify-between py-3 text-lg font-medium text-slate-300 hover:text-white border-b border-white/5">
+                Trouver un pressing <ChevronRight className="w-5 h-5 text-slate-500" />
+              </Link>
+              
+              {/* Boutons CTA Mobile */}
+              <div className="pt-4 space-y-3">
+                <Link to="/login" onClick={() => setMobileMenuOpen(false)} className="block w-full py-3 text-center text-white border border-white/20 rounded-xl font-medium hover:bg-white/5 transition">
+                  Connexion
+                </Link>
+                <Link to="/signup" onClick={() => setMobileMenuOpen(false)} className="block w-full py-4 text-center bg-teal-500 text-slate-900 rounded-xl font-bold text-lg hover:bg-teal-400 transition">
+                  S'inscrire maintenant
+                </Link>
+              </div>
+            </div>
+          </div>
+        )}
       </nav>
 
       {/* --- HERO --- */}
@@ -86,7 +118,7 @@ export default function LandingPage() {
             </p>
 
             <div className="flex flex-col sm:flex-row gap-5 justify-center">
-              <button onClick={() => navigate('/partners-map')} className="group px-8 py-4 bg-teal-500 text-white rounded-full font-bold text-lg hover:bg-teal-400 transition shadow-[0_10px_40px_-10px_rgba(20,184,166,0.6)] flex items-center justify-center gap-3">
+              <button onClick={() => navigate('/signup')} className="group px-8 py-4 bg-teal-500 text-white rounded-full font-bold text-lg hover:bg-teal-400 transition shadow-[0_10px_40px_-10px_rgba(20,184,166,0.6)] flex items-center justify-center gap-3">
                 Me libérer de la corvée <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </button>
               <button onClick={() => navigate('/pricing')} className="px-8 py-4 bg-white/5 backdrop-blur-sm border border-white/10 text-white rounded-full font-bold text-lg hover:bg-white/10 transition flex items-center justify-center">
@@ -94,10 +126,10 @@ export default function LandingPage() {
               </button>
             </div>
 
-            <div className="mt-12 flex items-center justify-center gap-8 text-sm font-medium text-slate-400">
-              <div className="flex items-center gap-2"><Check className="text-teal-400" size={16}/> Assurance incluse</div>
+            <div className="mt-12 flex flex-wrap items-center justify-center gap-6 md:gap-8 text-sm font-medium text-slate-400">
               <div className="flex items-center gap-2"><Check className="text-teal-400" size={16}/> Prêt en 24h chrono</div>
               <div className="flex items-center gap-2"><Check className="text-teal-400" size={16}/> Satisfait ou relavé</div>
+              <div className="flex items-center gap-2"><Check className="text-teal-400" size={16}/> 1800+ pressings</div>
             </div>
           </motion.div>
         </div>
@@ -154,7 +186,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* --- SECTION RESEAU (MODIFIÉE) --- */}
+      {/* --- SECTION RESEAU --- */}
       <section className="relative py-32 bg-slate-950 overflow-hidden">
         <div className="absolute inset-0 z-0 opacity-30" style={{backgroundImage: 'radial-gradient(circle at 2px 2px, rgba(255,255,255,0.15) 1px, transparent 0)', backgroundSize: '40px 40px'}}></div>
         <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-slate-950"></div>
@@ -177,7 +209,6 @@ export default function LandingPage() {
            <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-8 max-w-2xl mx-auto">
               <div className="flex items-center justify-between mb-6 border-b border-white/10 pb-6">
                  <div className="text-left">
-                    {/* MODIF ICI : Référencés au lieu de Actuel */}
                     <p className="text-sm text-slate-400 uppercase font-bold tracking-wider">Pressings Référencés</p>
                     <p className="text-4xl font-bold text-white">1,800+</p>
                     <p className="text-xs text-teal-400">Zones éligibles identifiées</p>
@@ -192,7 +223,6 @@ export default function LandingPage() {
               
               <div className="text-left">
                  <h3 className="text-white font-bold text-lg mb-2">Vous gérez un pressing ?</h3>
-                 {/* MODIF ICI : Vérifier éligibilité au lieu de rejoindre */}
                  <p className="text-slate-400 text-sm mb-6">Votre établissement fait peut-être partie de notre sélection d'élite. Vérifiez votre éligibilité.</p>
                  <button onClick={() => navigate('/become-partner')} className="w-full py-4 bg-white text-slate-950 rounded-xl font-bold hover:bg-teal-500 hover:text-white transition-colors flex items-center justify-center gap-2 group">
                    Vérifier si mon pressing est éligible <ArrowRight className="group-hover:translate-x-1 transition-transform"/>
