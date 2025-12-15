@@ -1,80 +1,86 @@
-import { Smartphone, Shirt, PackageCheck } from 'lucide-react';
+import { MapPin, Scale, QrCode, Sparkles, ArrowRight } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 export default function HowItWorks() {
   const steps = [
     {
       number: "1",
-      icon: Smartphone,
+      icon: MapPin,
       title: "Localisez & Déposez",
-      desc: "Trouvez le pressing partenaire le plus proche. Déposez votre linge sale, peu importe le sac.",
-      image: "https://images.unsplash.com/photo-1524661135-423995f22d0b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" // Carte/Navigation (style Uber/Maps)
+      desc: "Trouvez le pressing partenaire le plus proche sur la carte. Déposez votre linge sale, peu importe le sac.",
+      // Image : Une personne dépose un sac de linge à un comptoir
+      image: "https://images.unsplash.com/photo-1581578731548-c64695cc6952?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" 
     },
     {
       number: "2",
-      icon: PackageCheck,
+      icon: Scale,
       title: "Pesée & Traitement Pro",
-      desc: "Votre artisan pèse le linge devant vous pour un prix transparent. Il est ensuite lavé avec soin.",
-      image: "https://images.unsplash.com/photo-1606741965326-cb990ae01bb2?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" // Balance/Pesée professionnelle
+      desc: "Votre artisan pèse le linge devant vous (prix au kg transparent). Il est ensuite lavé, séché et plié avec soin.",
+      // Image : Balance professionnelle avec du linge dessus
+      image: "https://images.unsplash.com/photo-1604698127954-909062375664?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
     },
     {
       number: "3",
-      icon: Shirt,
+      icon: QrCode,
       title: "Notif & Retrait Flash",
-      desc: "Recevez une alerte quand c'est prêt. Présentez votre QR code pour un retrait instantané.",
-      image: "https://images.unsplash.com/photo-1556656793-08538906a9f8?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" // Smartphone avec notification
+      desc: "Recevez un SMS quand c'est prêt. Présentez votre QR code pour récupérer votre linge propre en 30 secondes.",
+      // Image : Smartphone avec une notification de fin de tâche
+      image: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
     }
   ];
 
   return (
-    <section id="how-it-works" className="py-24 bg-slate-950 relative overflow-hidden">
-      <div className="absolute inset-0 opacity-5">
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-teal-500 rounded-full blur-3xl"></div>
-      </div>
+    <section id="how-it-works" className="py-24 bg-white relative overflow-hidden">
+      {/* Texture de fond subtile */}
+      <div className="absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px] opacity-30"></div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        <div className="text-center mb-16">
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-teal-500/10 border border-teal-500/30 rounded-full text-teal-400 text-sm font-bold mb-6">
-            <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-teal-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-teal-500"></span>
-            </span>
-            C'est magique
+        <div className="text-center mb-20">
+          <div className="inline-flex items-center gap-2 px-4 py-2 bg-teal-50 border border-teal-100 rounded-full text-teal-600 text-sm font-bold mb-6 shadow-sm">
+            <Sparkles size={16} /> C'est magique
           </div>
-          <h2 className="text-3xl md:text-5xl font-extrabold text-white mb-4">
-            Plus simple que de commander une pizza.
+          <h2 className="text-4xl md:text-5xl font-extrabold text-slate-900 mb-4 leading-tight">
+            Votre nouveau rituel linge.
           </h2>
+          <p className="text-xl text-slate-500 max-w-2xl mx-auto">
+            Plus simple que de commander une pizza.
+          </p>
         </div>
 
-        <div className="space-y-24">
+        <div className="grid md:grid-cols-3 gap-12 relative">
+          {/* Ligne connecteur (Desktop uniquement) */}
+          <div className="hidden md:block absolute top-[120px] left-0 w-full h-0.5 bg-gradient-to-r from-teal-100 via-teal-400 to-teal-100 -z-10"></div>
+
           {steps.map((step, index) => (
-            <div 
-              key={index} 
-              className={`grid md:grid-cols-2 gap-12 items-center ${index % 2 === 1 ? 'md:flex-row-reverse' : ''}`}
-            >
-              {/* Image */}
-              <div className={`relative ${index % 2 === 1 ? 'md:order-2' : ''}`}>
-                <div className="absolute inset-0 bg-teal-500/20 blur-3xl rounded-full"></div>
-                <img
-                  src={step.image}
-                  alt={step.title}
-                  className="relative rounded-3xl shadow-2xl transform hover:scale-[1.02] transition duration-500 border border-white/10"
-                />
-                {/* Badge numéro */}
-                <div className="absolute -top-6 -left-6 w-16 h-16 bg-teal-500 rounded-full flex items-center justify-center text-slate-900 font-extrabold text-2xl shadow-xl border-4 border-slate-950">
+            <div key={index} className="flex flex-col items-center text-center group">
+              
+              {/* IMAGE RONDE AVEC EFFET */}
+              <div className="relative mb-8 w-64 h-64 mx-auto">
+                <div className="w-full h-full rounded-full overflow-hidden border-8 border-white shadow-2xl relative z-10 group-hover:scale-105 transition duration-500 bg-white">
+                    <img src={step.image} alt={step.title} className="w-full h-full object-cover" />
+                </div>
+                {/* Badge Numéro */}
+                <div className="absolute bottom-0 right-4 w-16 h-16 bg-teal-500 text-white rounded-full flex items-center justify-center font-extrabold text-2xl shadow-lg border-4 border-white z-20">
                   {step.number}
                 </div>
               </div>
 
-              {/* Texte */}
-              <div className={index % 2 === 1 ? 'md:order-1' : ''}>
-                <div className="bg-teal-500/10 w-fit p-3 rounded-xl mb-6">
-                  <step.icon className="w-10 h-10 text-teal-400" />
-                </div>
-                <h3 className="text-3xl font-extrabold text-white mb-4">{step.title}</h3>
-                <p className="text-lg text-slate-300 leading-relaxed">{step.desc}</p>
+              {/* CONTENU */}
+              <div className="bg-white p-6 rounded-2xl shadow-lg border border-slate-100 relative mt-4 w-full hover:shadow-xl transition duration-300">
+                 <div className="w-12 h-12 bg-teal-50 rounded-xl flex items-center justify-center mx-auto mb-4 text-teal-500">
+                    <step.icon size={24} />
+                 </div>
+                <h3 className="text-2xl font-extrabold text-slate-900 mb-3">{step.title}</h3>
+                <p className="text-slate-600 leading-relaxed text-sm">{step.desc}</p>
               </div>
             </div>
           ))}
+        </div>
+
+        <div className="text-center mt-20">
+          <Link to="/trouver" className="inline-flex items-center px-10 py-5 bg-teal-500 text-slate-900 rounded-full font-bold text-lg hover:bg-teal-400 transition shadow-xl shadow-teal-500/20 hover:scale-105">
+            Trouver un pressing <ArrowRight className="ml-2 w-5 h-5" />
+          </Link>
         </div>
       </div>
     </section>
