@@ -1,131 +1,102 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, ChevronRight } from 'lucide-react';
+import { Sparkles, Menu, X, User } from 'lucide-react';
+import { supabase } from '../lib/supabase';
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [user, setUser] = useState<any>(null);
   const location = useLocation();
-  const isHomePage = location.pathname === '/';
 
   useEffect(() => {
+    // Gestion du scroll pour l'effet de transparence
     const handleScroll = () => {
-      setScrolled(window.scrollY > 50);
+      setIsScrolled(window.scrollY > 20);
     };
     window.addEventListener('scroll', handleScroll);
+    
+    // Vérifier si connecté
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      setUser(user);
+    });
+
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Fermer le menu quand on change de page
-  useEffect(() => {
-    setIsOpen(false);
-  }, [location]);
+  // Design : Fond blanc si scrollé ou si on n'est pas sur l'accueil
+  const isHome = location.pathname === '/';
+  const navClass = isScrolled || !isHome || isOpen
+    ? 'bg-white/90 backdrop-blur-md shadow-sm py-4' 
+    : 'bg-transparent py-6';
 
-  const navigation = [
-    { name: 'Accueil', href: '/' },
-    { name: 'Comment ça marche', href: '/#how-it-works' },
-    { name: 'Tarifs', href: '/pricing' },
-    { name: 'Devenir partenaire', href: '/become-partner', highlight: true },
-  ];
+  const textClass = isScrolled || !isHome || isOpen
+    ? 'text-slate-900' 
+    : 'text-slate-900 lg:text-white'; // Blanc sur fond sombre (Hero), Noir sinon
 
   return (
-    <nav className={`fixed w-full z-50 transition-all duration-300 ${
-      scrolled || isOpen || !isHomePage 
-        ? 'bg-slate-950 shadow-lg py-2' 
-        : 'bg-transparent py-4'
-    }`}>
+    <nav className={`fixed w-full z-50 transition-all duration-300 ${navClass}`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center">
-          {/* Logo */}
-          <Link to="/" className="flex items-center space-x-2 group">
-            <div className="w-8 h-8 bg-teal-500 rounded-lg flex items-center justify-center">
-              <span className="text-slate-900 font-bold text-lg">K</span>
-            </div>
-            <span className="text-xl font-bold text-white">Kilolab</span>
-          </Link>
           
-          {/* Desktop menu */}
-          <div className="hidden md:flex items-center space-x-8">
-            {navigation.map((item) => (
-              <Link
-                key={item.name}
-                to={item.href}
-                className={`${
-                  item.highlight
-                    ? 'bg-teal-500 text-slate-900 px-4 py-2 rounded-full font-medium hover:bg-teal-400 transition-all hover:scale-105'
-                    : 'text-gray-300 hover:text-white font-medium transition-colors'
-                }`}
-              >
-                {item.name}
+          {/* LOGO */}
+          <Link to="/" className={`flex items-center gap-2 font-extrabold text-2xl ${textClass}`}>
+            <div className="bg-teal-500 p-1.5 rounded-lg text-white shadow-lg shadow-teal-500/30">
+              <Sparkles size={20} fill="currentColor" />
+            </div>
+            Kilolab
+          </Link>
+
+          {/* DESKTOP MENU */}
+          <div className="hidden md:flex items-center gap-8">
+            <Link to="/trouver" className={`font-medium hover:text-teal-500 transition ${textClass}`}>
+              Trouver un pressing
+            </Link>
+            <Link to="/tarifs" className={`font-medium hover:text-teal-500 transition ${textClass}`}>
+              Tarifs
+            </Link>
+            <Link to="/partner" className={`font-medium hover:text-teal-500 transition ${textClass}`}>
+              Espace Pro <span className="text-xs bg-teal-100 text-teal-700 px-2 py-0.5 rounded-full ml-1">B2B</span>
+            </Link>
+
+            {user ? (
+              <Link to="/dashboard" className="flex items-center gap-2 px-5 py-2.5 bg-slate-900 text-white rounded-full font-bold hover:bg-slate-800 transition">
+                <User size={18} /> Mon Espace
               </Link>
-            ))}
-            {/* Bouton Connexion */}
-            <Link
-              to="/login"
-              className="text-gray-300 hover:text-white font-medium transition-colors"
-            >
-              Connexion
-            </Link>
-            {/* Bouton S'inscrire */}
-            <Link
-              to="/signup"
-              className="border-2 border-teal-500 text-teal-500 px-4 py-2 rounded-full font-medium hover:bg-teal-500 hover:text-slate-900 transition-all"
-            >
-              S'inscrire
-            </Link>
+            ) : (
+              <div className="flex items-center gap-4">
+                <Link to="/login" className={`font-bold hover:text-teal-500 transition ${textClass}`}>
+                  Connexion
+                </Link>
+                <Link to="/signup" className="px-6 py-2.5 bg-teal-500 hover:bg-teal-400 text-slate-900 rounded-full font-bold transition shadow-lg shadow-teal-500/20 hover:scale-105">
+                  S'inscrire
+                </Link>
+              </div>
+            )}
           </div>
 
-          {/* Mobile menu button */}
-          <div className="md:hidden">
-            <button
-              onClick={() => setIsOpen(!isOpen)}
-              className="text-gray-300 hover:text-white p-2 transition-colors"
-              aria-label="Menu principal"
-            >
-              {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-            </button>
-          </div>
+          {/* MOBILE BUTTON */}
+          <button onClick={() => setIsOpen(!isOpen)} className={`md:hidden ${textClass}`}>
+            {isOpen ? <X size={28} /> : <Menu size={28} />}
+          </button>
         </div>
       </div>
 
-      {/* Mobile menu panel */}
+      {/* MOBILE MENU */}
       {isOpen && (
-        <div className="md:hidden absolute top-full left-0 w-full bg-slate-950 shadow-xl border-t border-gray-800">
-          <div className="px-4 pt-4 pb-6 space-y-4">
-            {navigation.map((item) => (
-              <Link
-                key={item.name}
-                to={item.href}
-                onClick={() => setIsOpen(false)}
-                className={`block text-lg font-medium ${
-                  item.highlight
-                    ? 'text-teal-500'
-                    : 'text-gray-300 hover:text-white'
-                } flex items-center justify-between group`}
-              >
-                {item.name}
-                <ChevronRight className={`h-5 w-5 opacity-0 group-hover:opacity-100 transition-opacity ${item.highlight ? 'text-teal-500' : 'text-gray-500'}`} />
-              </Link>
-            ))}
-            {/* Bouton Connexion Mobile */}
-            <Link
-              to="/login"
-              onClick={() => setIsOpen(false)}
-              className="block text-lg font-medium text-gray-300 hover:text-white"
-            >
-              Connexion
-            </Link>
-            {/* Bouton S'inscrire bien visible sur Mobile */}
-            <div className="pt-4 mt-4 border-t border-gray-800">
-              <Link
-                to="/signup"
-                onClick={() => setIsOpen(false)}
-                className="w-full flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-slate-900 bg-teal-500 hover:bg-teal-400 transition-all"
-              >
-                S'inscrire maintenant
-              </Link>
-            </div>
-          </div>
+        <div className="md:hidden absolute top-full left-0 w-full bg-white border-t border-slate-100 shadow-xl py-6 px-4 flex flex-col gap-4">
+          <Link to="/trouver" className="text-lg font-medium text-slate-900 py-2 border-b border-slate-50">Trouver un pressing</Link>
+          <Link to="/tarifs" className="text-lg font-medium text-slate-900 py-2 border-b border-slate-50">Tarifs</Link>
+          <Link to="/partner" className="text-lg font-medium text-teal-600 py-2 border-b border-slate-50">Devenir Partenaire</Link>
+          
+          {user ? (
+             <Link to="/dashboard" className="w-full text-center py-3 bg-slate-900 text-white rounded-xl font-bold">Mon Espace</Link>
+          ) : (
+             <>
+               <Link to="/login" className="w-full text-center py-3 border border-slate-200 text-slate-900 rounded-xl font-bold">Connexion</Link>
+               <Link to="/signup" className="w-full text-center py-3 bg-teal-500 text-slate-900 rounded-xl font-bold">S'inscrire</Link>
+             </>
+          )}
         </div>
       )}
     </nav>
