@@ -1,526 +1,249 @@
-import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
-import { 
-  ArrowLeft, Building2, CheckCircle, XCircle, Clock, Eye, 
-  Users, Package, Euro, TrendingUp, AlertCircle, Search,
-  Mail, Phone, MapPin, Calendar, Filter, MessageSquare, RefreshCw
-} from 'lucide-react';
+import Navbar from '../components/Navbar';
+import { Users, ShoppingBag, Phone, MapPin, CheckCircle, XCircle, Clock, Search, AlertTriangle, ArrowRight } from 'lucide-react';
 import toast from 'react-hot-toast';
 
-interface Partner {
-  id: string;
-  user_id?: string;
-  name: string;
-  email: string;
-  phone?: string;
-  address: string;
-  city: string;
-  postal_code: string;
-  siret?: string;
-  description?: string;
-  is_active: boolean;
-  created_at: string;
-  price_per_kg?: number;
-}
-
-interface ContactMessage {
-  id: string;
-  name: string;
-  email: string;
-  subject?: string;
-  message: string;
-  is_read: boolean;
-  created_at: string;
-}
-
-interface Stats {
-  totalPartners: number;
-  activePartners: number;
-  pendingPartners: number;
-  totalOrders: number;
-  totalRevenue: number;
-  totalUsers: number;
-  unreadMessages: number;
-}
-
-// ⚠️ EMAILS ADMIN AUTORISÉS - Ajoute le tien ici !
-const ADMIN_EMAILS = [
-  'akim.hachili@gmail.com',
-  'contact@kilolab.fr',
-  'admin@kilolab.fr'
-];
-
 export default function AdminDashboard() {
-  const navigate = useNavigate();
+  const [users, setUsers] = useState<any[]>([]);
+  const [orders, setOrders] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [partners, setPartners] = useState<Partner[]>([]);
-  const [messages, setMessages] = useState<ContactMessage[]>([]);
-  const [stats, setStats] = useState<Stats>({
-    totalPartners: 0,
-    activePartners: 0,
-    pendingPartners: 0,
-    totalOrders: 0,
-    totalRevenue: 0,
-    totalUsers: 0,
-    unreadMessages: 0
-  });
-  const [selectedPartner, setSelectedPartner] = useState<Partner | null>(null);
-  const [selectedMessage, setSelectedMessage] = useState<ContactMessage | null>(null);
-  const [filter, setFilter] = useState<'all' | 'pending' | 'active' | 'inactive'>('pending');
-  const [searchQuery, setSearchQuery] = useState('');
-  const [isAdmin, setIsAdmin] = useState(false);
-  const [activeTab, setActiveTab] = useState<'partners' | 'messages' | 'stats'>('partners');
+  const [filter, setFilter] = useState('all'); // 'all', 'waiting', 'partners'
 
   useEffect(() => {
-    checkAdminAndLoad();
+    fetchData();
   }, []);
 
-  const checkAdminAndLoad = async () => {
+  const fetchData = async () => {
+    setLoading(true);
     try {
-      const { data: { session } } = await supabase.auth.getSession();
-      
-      if (!session) {
-        toast.error('Vous devez être connecté');
-        navigate('/login');
-        return;
-      }
+        // 1. Récupérer TOUS les profils (Clients + Partners)
+        const { data: profiles } = await supabase
+            .from('user_profiles')
+            .select('*')
+            .order('created_at', { ascending: false });
+        setUsers(profiles || []);
 
-      const userEmail = session.user.email?.toLowerCase() || '';
-      
-      // Vérifier si l'utilisateur est admin
-      if (!ADMIN_EMAILS.map(e => e.toLowerCase()).includes(userEmail)) {
-        toast.error('Accès non autorisé');
-        navigate('/');
-        return;
-      }
+        // 2. Récupérer TOUTES les commandes (avec infos basiques)
+        // Note: Pour avoir le nom/tel du client, on fera le lien manuellement avec les profils chargés ci-dessus
+        const { data: orderData } = await supabase
+            .from('orders')
+            .select('*')
+            .order('created_at', { ascending: false });
+        setOrders(orderData || []);
 
-      setIsAdmin(true);
-      await loadData();
-    } catch (error) {
-      console.error('Erreur:', error);
-      toast.error('Erreur de chargement');
+    } catch (e) {
+        console.error(e);
+        toast.error("Erreur chargement données");
     } finally {
-      setLoading(false);
+        setLoading(false);
     }
   };
 
-  const loadData = async () => {
-    try {
-      // Charger tous les partenaires
-      const { data: partnersData, error: partnersError } = await supabase
-        .from('partners')
-        .select('*')
-        .order('created_at', { ascending: false });
+  // --- ACTIONS ---
 
-      if (partnersError) throw partnersError;
-      setPartners(partnersData || []);
-
-      // Charger les messages de contact
-      const { data: messagesData } = await supabase
-        .from('contact_messages')
-        .select('*')
-        .order('created_at', { ascending: false });
-      
-      setMessages(messagesData || []);
-
-      // Calculer les stats
-      const active = partnersData?.filter(p => p.is_active === true).length || 0;
-      const pending = partnersData?.filter(p => p.is_active === false || p.is_active === null).length || 0;
-      const unread = messagesData?.filter(m => !m.is_read).length || 0;
-
-      // Charger les commandes
-      const { data: ordersData } = await supabase
-        .from('orders')
-        .select('total_amount');
-
-      const totalRevenue = ordersData?.reduce((sum, o) => sum + (o.total_amount || 0), 0) || 0;
-
-      setStats({
-        totalPartners: partnersData?.length || 0,
-        activePartners: active,
-        pendingPartners: pending,
-        totalOrders: ordersData?.length || 0,
-        totalRevenue,
-        totalUsers: 0,
-        unreadMessages: unread
-      });
-
-    } catch (error) {
-      console.error('Erreur:', error);
-    }
+  const verifyPartner = async (userId: string) => {
+    if(!confirm("Valider ce partenaire ? Il aura accès au dashboard.")) return;
+    const { error } = await supabase.from('user_profiles').update({ status: 'active' }).eq('id', userId);
+    if (error) toast.error('Erreur');
+    else { toast.success('Partenaire validé !'); fetchData(); }
   };
 
-  const handleValidatePartner = async (partnerId: string, approve: boolean) => {
-    try {
-      const { error } = await supabase
-        .from('partners')
-        .update({ 
-          is_active: approve,
-          validated_at: approve ? new Date().toISOString() : null
-        })
-        .eq('id', partnerId);
-
-      if (error) throw error;
-
-      toast.success(approve ? '✅ Partenaire validé !' : '❌ Partenaire refusé');
-      
-      await loadData();
-      setSelectedPartner(null);
-
-    } catch (error) {
-      console.error('Erreur:', error);
-      toast.error('Erreur lors de la validation');
-    }
+  const deleteUser = async (userId: string) => {
+     if(!confirm("SUPPRIMER DÉFINITIVEMENT ?")) return;
+     // On supprime le profil (la base supprimera le reste via cascade si configuré, sinon faudra nettoyer)
+     const { error } = await supabase.from('user_profiles').delete().eq('id', userId);
+     if (error) toast.error('Erreur suppression');
+     else { toast.success('Utilisateur supprimé'); fetchData(); }
   };
 
-  const handleMarkMessageRead = async (messageId: string) => {
-    try {
-      await supabase
-        .from('contact_messages')
-        .update({ is_read: true })
-        .eq('id', messageId);
-      
-      await loadData();
-    } catch (error) {
-      console.error('Erreur:', error);
-    }
+  const markOrderHandled = async (orderId: string) => {
+      // Pour la conciergerie : on dit qu'on a traité le lead
+      const { error } = await supabase.from('orders').update({ status: 'pending' }).eq('id', orderId);
+      if (error) toast.error('Erreur');
+      else { toast.success('Lead traité ! Commande en attente de pressing.'); fetchData(); }
   };
 
-  const filteredPartners = partners.filter(p => {
-    if (filter === 'active' && !p.is_active) return false;
-    if (filter === 'inactive' && p.is_active !== false) return false;
-    if (filter === 'pending' && p.is_active === true) return false;
+  // --- HELPER POUR LIER LES DONNÉES ---
+  const getUser = (id: string) => users.find(u => u.id === id) || { full_name: 'Inconnu', phone: 'Non renseigné' };
 
-    if (searchQuery) {
-      const query = searchQuery.toLowerCase();
-      return (
-        p.name?.toLowerCase().includes(query) ||
-        p.email?.toLowerCase().includes(query) ||
-        p.city?.toLowerCase().includes(query) ||
-        p.postal_code?.includes(query)
-      );
-    }
-
-    return true;
-  });
-
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 to-purple-900">
-        <div className="w-16 h-16 border-4 border-purple-500 border-t-transparent rounded-full animate-spin"></div>
-      </div>
-    );
-  }
-
-  if (!isAdmin) {
-    return null;
-  }
+  // --- CALCULS STATS ---
+  const pendingPartners = users.filter(u => u.role === 'partner' && u.status === 'pending').length;
+  const waitingLeads = orders.filter(o => o.status === 'waiting_list').length;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
-      {/* Header */}
-      <div className="bg-black/20 backdrop-blur-lg border-b border-white/10 sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <button onClick={() => navigate('/')} className="flex items-center gap-2 text-white/80 hover:text-white transition">
-              <ArrowLeft className="w-5 h-5" /> Retour
-            </button>
-            <h1 className="text-xl font-bold text-white flex items-center gap-2">
-              <Building2 className="w-6 h-6 text-purple-400" />
-              Administration Kilolab
-            </h1>
-            <button onClick={loadData} className="flex items-center gap-2 text-white/80 hover:text-white transition">
-              <RefreshCw className="w-5 h-5" /> Actualiser
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <div className="max-w-7xl mx-auto px-4 py-8">
-        {/* Stats Cards */}
-        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4 mb-8">
-          <StatCard icon={Building2} label="Total Pressings" value={stats.totalPartners} color="purple" />
-          <StatCard icon={CheckCircle} label="Actifs" value={stats.activePartners} color="green" />
-          <StatCard icon={Clock} label="En attente" value={stats.pendingPartners} color="yellow" />
-          <StatCard icon={Package} label="Commandes" value={stats.totalOrders} color="blue" />
-          <StatCard icon={Euro} label="Revenue" value={`${stats.totalRevenue.toFixed(0)}€`} color="pink" />
-          <StatCard icon={Users} label="Utilisateurs" value={stats.totalUsers} color="cyan" />
-          <StatCard icon={MessageSquare} label="Messages" value={stats.unreadMessages} color="orange" />
-        </div>
-
-        {/* Tabs */}
-        <div className="flex gap-2 mb-6">
-          <button
-            onClick={() => setActiveTab('partners')}
-            className={`px-6 py-3 rounded-xl font-semibold transition ${
-              activeTab === 'partners' ? 'bg-purple-500 text-white' : 'bg-white/10 text-white/70 hover:bg-white/20'
-            }`}
-          >
-            Partenaires ({stats.totalPartners})
-          </button>
-          <button
-            onClick={() => setActiveTab('messages')}
-            className={`px-6 py-3 rounded-xl font-semibold transition flex items-center gap-2 ${
-              activeTab === 'messages' ? 'bg-purple-500 text-white' : 'bg-white/10 text-white/70 hover:bg-white/20'
-            }`}
-          >
-            Messages
-            {stats.unreadMessages > 0 && (
-              <span className="bg-red-500 text-white text-xs px-2 py-0.5 rounded-full">{stats.unreadMessages}</span>
-            )}
-          </button>
-        </div>
-
-        {activeTab === 'partners' && (
-          <>
-            {/* Filtres */}
-            <div className="flex flex-wrap gap-4 mb-6">
-              <div className="relative flex-1 min-w-[200px]">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-white/50" />
-                <input
-                  type="text"
-                  placeholder="Rechercher un pressing..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 bg-white/10 border border-white/10 rounded-xl text-white placeholder-white/50 focus:outline-none focus:border-purple-500"
-                />
-              </div>
-              
-              <div className="flex gap-2">
-                {(['all', 'pending', 'active', 'inactive'] as const).map((f) => (
-                  <button
-                    key={f}
-                    onClick={() => setFilter(f)}
-                    className={`px-4 py-2 rounded-lg font-medium transition ${
-                      filter === f ? 'bg-purple-500 text-white' : 'bg-white/10 text-white/70 hover:bg-white/20'
-                    }`}
-                  >
-                    {f === 'all' ? 'Tous' : f === 'pending' ? 'En attente' : f === 'active' ? 'Actifs' : 'Refusés'}
-                  </button>
-                ))}
-              </div>
+    <div className="min-h-screen bg-slate-950 font-sans text-white pb-20">
+      <Navbar />
+      
+      <div className="pt-32 px-4 max-w-7xl mx-auto">
+        
+        {/* HEADER */}
+        <div className="flex flex-col md:flex-row justify-between items-center mb-10 gap-4">
+            <div>
+                <h1 className="text-3xl font-bold flex items-center gap-3">
+                    <div className="p-2 bg-indigo-500 rounded-lg"><Users className="text-white"/></div>
+                    Tour de Contrôle
+                </h1>
+                <p className="text-slate-400 mt-2">Gérez les leads, les partenaires et les utilisateurs.</p>
             </div>
+            <button onClick={fetchData} className="px-4 py-2 bg-slate-800 rounded-lg hover:bg-slate-700 transition text-sm">
+                Actualiser
+            </button>
+        </div>
 
-            {/* Liste des partenaires */}
-            <div className="bg-white/5 backdrop-blur-lg rounded-2xl overflow-hidden">
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead className="bg-white/10">
-                    <tr>
-                      <th className="px-4 py-3 text-left text-sm font-semibold text-white/80">Pressing</th>
-                      <th className="px-4 py-3 text-left text-sm font-semibold text-white/80">Ville</th>
-                      <th className="px-4 py-3 text-left text-sm font-semibold text-white/80">Contact</th>
-                      <th className="px-4 py-3 text-left text-sm font-semibold text-white/80">Date</th>
-                      <th className="px-4 py-3 text-left text-sm font-semibold text-white/80">Statut</th>
-                      <th className="px-4 py-3 text-right text-sm font-semibold text-white/80">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-white/10">
-                    {filteredPartners.length === 0 ? (
-                      <tr>
-                        <td colSpan={6} className="px-4 py-12 text-center text-white/50">
-                          Aucun partenaire trouvé
-                        </td>
-                      </tr>
-                    ) : (
-                      filteredPartners.map((partner) => (
-                        <tr key={partner.id} className="hover:bg-white/5 transition">
-                          <td className="px-4 py-4">
-                            <div>
-                              <p className="font-semibold text-white">{partner.name}</p>
-                              <p className="text-sm text-white/50">{partner.address}</p>
-                            </div>
-                          </td>
-                          <td className="px-4 py-4">
-                            <p className="text-white">{partner.city}</p>
-                            <p className="text-sm text-white/50">{partner.postal_code}</p>
-                          </td>
-                          <td className="px-4 py-4">
-                            <p className="text-white text-sm">{partner.email}</p>
-                            {partner.phone && <p className="text-sm text-white/50">{partner.phone}</p>}
-                          </td>
-                          <td className="px-4 py-4 text-white/70 text-sm">
-                            {new Date(partner.created_at).toLocaleDateString('fr-FR')}
-                          </td>
-                          <td className="px-4 py-4">
-                            {partner.is_active === true ? (
-                              <span className="px-3 py-1 bg-green-500/20 text-green-400 rounded-full text-sm font-medium">Actif</span>
-                            ) : (
-                              <span className="px-3 py-1 bg-yellow-500/20 text-yellow-400 rounded-full text-sm font-medium">En attente</span>
-                            )}
-                          </td>
-                          <td className="px-4 py-4">
-                            <div className="flex items-center justify-end gap-2">
-                              <button onClick={() => setSelectedPartner(partner)} className="p-2 hover:bg-white/10 rounded-lg transition" title="Voir détails">
-                                <Eye className="w-5 h-5 text-white/70" />
-                              </button>
-                              {!partner.is_active && (
-                                <>
-                                  <button onClick={() => handleValidatePartner(partner.id, true)} className="p-2 hover:bg-green-500/20 rounded-lg transition" title="Valider">
-                                    <CheckCircle className="w-5 h-5 text-green-400" />
-                                  </button>
-                                  <button onClick={() => handleValidatePartner(partner.id, false)} className="p-2 hover:bg-red-500/20 rounded-lg transition" title="Refuser">
-                                    <XCircle className="w-5 h-5 text-red-400" />
-                                  </button>
-                                </>
-                              )}
-                            </div>
-                          </td>
-                        </tr>
-                      ))
-                    )}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </>
-        )}
-
-        {activeTab === 'messages' && (
-          <div className="bg-white/5 backdrop-blur-lg rounded-2xl overflow-hidden">
-            {messages.length === 0 ? (
-              <div className="p-12 text-center text-white/50">Aucun message</div>
-            ) : (
-              <div className="divide-y divide-white/10">
-                {messages.map((msg) => (
-                  <div 
-                    key={msg.id} 
-                    className={`p-4 hover:bg-white/5 cursor-pointer transition ${!msg.is_read ? 'bg-purple-500/10' : ''}`}
-                    onClick={() => {
-                      setSelectedMessage(msg);
-                      if (!msg.is_read) handleMarkMessageRead(msg.id);
-                    }}
-                  >
-                    <div className="flex items-start justify-between">
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <p className="font-semibold text-white">{msg.name}</p>
-                          {!msg.is_read && <span className="w-2 h-2 bg-purple-500 rounded-full"></span>}
-                        </div>
-                        <p className="text-sm text-white/50">{msg.email}</p>
-                        {msg.subject && <p className="text-white/80 mt-1">{msg.subject}</p>}
-                        <p className="text-white/60 text-sm mt-1 line-clamp-1">{msg.message}</p>
-                      </div>
-                      <p className="text-sm text-white/50">{new Date(msg.created_at).toLocaleDateString('fr-FR')}</p>
+        {/* ALERTES / STATS */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+            {/* CARTE LEADS (URGENT) */}
+            <div className={`p-6 rounded-2xl border ${waitingLeads > 0 ? 'bg-amber-500/10 border-amber-500/50' : 'bg-slate-900 border-white/10'}`}>
+                <div className="flex justify-between items-start mb-4">
+                    <div>
+                        <p className={`text-sm font-bold uppercase ${waitingLeads > 0 ? 'text-amber-400' : 'text-slate-400'}`}>Leads Conciergerie</p>
+                        <h3 className="text-4xl font-bold mt-1">{waitingLeads}</h3>
                     </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* Modal détails partenaire */}
-        {selectedPartner && (
-          <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-            <div className="bg-slate-800 rounded-3xl max-w-lg w-full p-6 max-h-[90vh] overflow-y-auto">
-              <div className="flex justify-between items-start mb-6">
-                <h2 className="text-2xl font-bold text-white">{selectedPartner.name}</h2>
-                <button onClick={() => setSelectedPartner(null)} className="p-2 hover:bg-white/10 rounded-lg transition">
-                  <XCircle className="w-6 h-6 text-white/70" />
-                </button>
-              </div>
-
-              <div className="space-y-4 mb-6">
-                <div className="flex items-start gap-3">
-                  <MapPin className="w-5 h-5 text-purple-400 mt-1" />
-                  <div>
-                    <p className="text-white">{selectedPartner.address}</p>
-                    <p className="text-white/70">{selectedPartner.postal_code} {selectedPartner.city}</p>
-                  </div>
+                    <div className={`p-3 rounded-full ${waitingLeads > 0 ? 'bg-amber-500 text-black' : 'bg-slate-800 text-slate-500'}`}>
+                        <Phone size={24}/>
+                    </div>
                 </div>
-
-                <div className="flex items-center gap-3">
-                  <Mail className="w-5 h-5 text-purple-400" />
-                  <a href={`mailto:${selectedPartner.email}`} className="text-purple-400 hover:underline">{selectedPartner.email}</a>
-                </div>
-
-                {selectedPartner.phone && (
-                  <div className="flex items-center gap-3">
-                    <Phone className="w-5 h-5 text-purple-400" />
-                    <a href={`tel:${selectedPartner.phone}`} className="text-white">{selectedPartner.phone}</a>
-                  </div>
-                )}
-
-                {selectedPartner.siret && (
-                  <div className="flex items-center gap-3">
-                    <Building2 className="w-5 h-5 text-purple-400" />
-                    <span className="text-white">SIRET: {selectedPartner.siret}</span>
-                  </div>
-                )}
-
-                <div className="flex items-center gap-3">
-                  <Calendar className="w-5 h-5 text-purple-400" />
-                  <span className="text-white/70">Inscrit le {new Date(selectedPartner.created_at).toLocaleDateString('fr-FR')}</span>
-                </div>
-              </div>
-
-              <div className="flex gap-3">
-                {!selectedPartner.is_active && (
-                  <button
-                    onClick={() => handleValidatePartner(selectedPartner.id, true)}
-                    className="flex-1 py-3 bg-green-600 text-white rounded-xl font-semibold hover:bg-green-700 transition flex items-center justify-center gap-2"
-                  >
-                    <CheckCircle className="w-5 h-5" /> Valider
-                  </button>
-                )}
-                {selectedPartner.is_active && (
-                  <button
-                    onClick={() => handleValidatePartner(selectedPartner.id, false)}
-                    className="flex-1 py-3 bg-red-600 text-white rounded-xl font-semibold hover:bg-red-700 transition flex items-center justify-center gap-2"
-                  >
-                    <XCircle className="w-5 h-5" /> Désactiver
-                  </button>
-                )}
-              </div>
+                <p className="text-xs text-slate-400">Clients en attente d'appel (Zone sans pressing)</p>
             </div>
-          </div>
+
+            {/* CARTE PARTENAIRES À VALIDER */}
+            <div className={`p-6 rounded-2xl border ${pendingPartners > 0 ? 'bg-teal-500/10 border-teal-500/50' : 'bg-slate-900 border-white/10'}`}>
+                <div className="flex justify-between items-start mb-4">
+                    <div>
+                        <p className={`text-sm font-bold uppercase ${pendingPartners > 0 ? 'text-teal-400' : 'text-slate-400'}`}>Partenaires en attente</p>
+                        <h3 className="text-4xl font-bold mt-1">{pendingPartners}</h3>
+                    </div>
+                    <div className={`p-3 rounded-full ${pendingPartners > 0 ? 'bg-teal-500 text-black' : 'bg-slate-800 text-slate-500'}`}>
+                        <CheckCircle size={24}/>
+                    </div>
+                </div>
+                <p className="text-xs text-slate-400">Pressings inscrits à vérifier</p>
+            </div>
+
+            {/* CARTE TOTAL USERS */}
+            <div className="bg-slate-900 p-6 rounded-2xl border border-white/10">
+                <div className="flex justify-between items-start mb-4">
+                    <div>
+                        <p className="text-slate-400 text-sm font-bold uppercase">Total Inscrits</p>
+                        <h3 className="text-4xl font-bold mt-1">{users.length}</h3>
+                    </div>
+                    <div className="p-3 bg-slate-800 rounded-full text-slate-400"><Users size={24}/></div>
+                </div>
+                <p className="text-xs text-slate-400">Clients + Partenaires</p>
+            </div>
+        </div>
+
+        {/* SECTION 1 : LEADS CONCIERGERIE (Ce qu'il faut traiter) */}
+        {waitingLeads > 0 && (
+            <div className="mb-12">
+                <h2 className="text-xl font-bold mb-4 text-amber-400 flex items-center gap-2">
+                    <AlertTriangle size={20}/> À TRAITER EN PRIORITÉ
+                </h2>
+                <div className="bg-slate-900 border border-amber-500/30 rounded-2xl overflow-hidden">
+                    <table className="w-full text-left">
+                        <thead className="bg-amber-500/10 text-amber-200 text-xs uppercase">
+                            <tr>
+                                <th className="p-4">Date</th>
+                                <th className="p-4">Client</th>
+                                <th className="p-4">Adresse & Besoin</th>
+                                <th className="p-4">Téléphone</th>
+                                <th className="p-4 text-right">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody className="divide-y divide-white/5">
+                            {orders.filter(o => o.status === 'waiting_list').map(o => {
+                                const client = getUser(o.client_id);
+                                return (
+                                    <tr key={o.id} className="hover:bg-white/5">
+                                        <td className="p-4 text-sm text-slate-400">{new Date(o.created_at).toLocaleDateString()}</td>
+                                        <td className="p-4 font-bold">{client.full_name}</td>
+                                        <td className="p-4">
+                                            <div className="flex items-center gap-1 text-sm"><MapPin size={14} className="text-slate-500"/> {o.pickup_address}</div>
+                                            <div className="text-xs text-slate-500 mt-1">{o.weight} kg • {o.total_price} €</div>
+                                        </td>
+                                        <td className="p-4">
+                                            <a href={`tel:${client.phone}`} className="inline-flex items-center gap-2 px-3 py-1 bg-amber-500 text-black font-bold rounded-lg hover:bg-amber-400 transition">
+                                                <Phone size={14}/> {client.phone || "Non renseigné"}
+                                            </a>
+                                        </td>
+                                        <td className="p-4 text-right">
+                                            <button onClick={() => markOrderHandled(o.id)} className="text-xs border border-slate-600 px-3 py-1 rounded hover:bg-slate-800 text-slate-400">
+                                                Marquer traité
+                                            </button>
+                                        </td>
+                                    </tr>
+                                );
+                            })}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         )}
 
-        {/* Modal message */}
-        {selectedMessage && (
-          <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-            <div className="bg-slate-800 rounded-3xl max-w-lg w-full p-6">
-              <div className="flex justify-between items-start mb-4">
-                <div>
-                  <h2 className="text-xl font-bold text-white">{selectedMessage.name}</h2>
-                  <p className="text-white/50">{selectedMessage.email}</p>
+        {/* SECTION 2 : TOUS LES UTILISATEURS */}
+        <div>
+            <div className="flex items-center justify-between mb-4">
+                <h2 className="text-xl font-bold text-white">Base de données Utilisateurs</h2>
+                <div className="flex gap-2">
+                    <button onClick={() => setFilter('all')} className={`px-3 py-1 rounded-full text-xs font-bold ${filter === 'all' ? 'bg-indigo-500' : 'bg-slate-800'}`}>Tout</button>
+                    <button onClick={() => setFilter('partner')} className={`px-3 py-1 rounded-full text-xs font-bold ${filter === 'partner' ? 'bg-indigo-500' : 'bg-slate-800'}`}>Partenaires</button>
                 </div>
-                <button onClick={() => setSelectedMessage(null)} className="p-2 hover:bg-white/10 rounded-lg transition">
-                  <XCircle className="w-6 h-6 text-white/70" />
-                </button>
-              </div>
-              {selectedMessage.subject && <p className="text-purple-400 font-medium mb-2">{selectedMessage.subject}</p>}
-              <p className="text-white/80 whitespace-pre-wrap">{selectedMessage.message}</p>
-              <p className="text-white/50 text-sm mt-4">{new Date(selectedMessage.created_at).toLocaleString('fr-FR')}</p>
-              <a href={`mailto:${selectedMessage.email}`} className="mt-4 block w-full py-3 bg-purple-600 text-white text-center rounded-xl font-semibold hover:bg-purple-700 transition">
-                Répondre par email
-              </a>
             </div>
-          </div>
-        )}
+
+            <div className="bg-slate-900 border border-white/10 rounded-2xl overflow-hidden">
+                <div className="overflow-x-auto">
+                    <table className="w-full text-left text-sm">
+                        <thead className="bg-white/5 text-slate-400">
+                            <tr>
+                                <th className="p-4">Nom / Email</th>
+                                <th className="p-4">Rôle</th>
+                                <th className="p-4">Téléphone</th>
+                                <th className="p-4">Statut</th>
+                                <th className="p-4 text-right">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody className="divide-y divide-white/5">
+                            {users
+                                .filter(u => filter === 'all' || u.role === filter)
+                                .map(user => (
+                                <tr key={user.id} className="hover:bg-white/5 transition">
+                                    <td className="p-4">
+                                        <div className="font-bold">{user.full_name || 'Sans nom'}</div>
+                                        <div className="text-slate-500 text-xs">{user.email}</div>
+                                    </td>
+                                    <td className="p-4">
+                                        <span className={`px-2 py-1 rounded text-xs font-bold ${user.role === 'partner' ? 'bg-purple-500/20 text-purple-400' : 'bg-blue-500/20 text-blue-400'}`}>
+                                            {user.role === 'partner' ? 'PRO' : 'CLIENT'}
+                                        </span>
+                                    </td>
+                                    <td className="p-4 text-slate-400">{user.phone || '-'}</td>
+                                    <td className="p-4">
+                                        {user.status === 'pending' ? (
+                                            <span className="text-yellow-400 flex items-center gap-1"><Clock size={12}/> À vérifier</span>
+                                        ) : (
+                                            <span className="text-teal-400 flex items-center gap-1"><CheckCircle size={12}/> Actif</span>
+                                        )}
+                                    </td>
+                                    <td className="p-4 flex justify-end gap-2">
+                                        {user.role === 'partner' && user.status === 'pending' && (
+                                            <button onClick={() => verifyPartner(user.id)} className="bg-teal-500 hover:bg-teal-400 text-black px-3 py-1 rounded font-bold text-xs flex items-center gap-1">
+                                                <CheckCircle size={14}/> Valider
+                                            </button>
+                                        )}
+                                        <button onClick={() => deleteUser(user.id)} className="p-2 text-slate-500 hover:text-red-500 transition">
+                                            <XCircle size={18}/>
+                                        </button>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
       </div>
-    </div>
-  );
-}
-
-function StatCard({ icon: Icon, label, value, color }: { icon: any; label: string; value: string | number; color: string }) {
-  const colors: Record<string, string> = {
-    purple: 'from-purple-500 to-purple-600',
-    green: 'from-green-500 to-green-600',
-    yellow: 'from-yellow-500 to-yellow-600',
-    blue: 'from-blue-500 to-blue-600',
-    pink: 'from-pink-500 to-pink-600',
-    cyan: 'from-cyan-500 to-cyan-600',
-    orange: 'from-orange-500 to-orange-600'
-  };
-
-  return (
-    <div className={`bg-gradient-to-br ${colors[color]} rounded-2xl p-4`}>
-      <Icon className="w-6 h-6 text-white/80 mb-2" />
-      <p className="text-2xl font-bold text-white">{value}</p>
-      <p className="text-sm text-white/80">{label}</p>
     </div>
   );
 }
