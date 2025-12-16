@@ -5,6 +5,31 @@ import Navbar from '../components/Navbar';
 import { Scale, MapPin, ArrowRight, CheckCircle, Loader2, Sparkles, X, MessageCircle } from 'lucide-react';
 import toast from 'react-hot-toast';
 
+// --- FONCTION D'ENVOI EMAIL SIMPLE ---
+async function sendConfirmationEmail(email: string, name: string, orderId: string, isWaitingList: boolean) {
+  try {
+     const res = await fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: {
+           'Content-Type': 'application/json',
+           'Authorization': `Bearer ${import.meta.env.VITE_RESEND_API_KEY}`
+        },
+        body: JSON.stringify({
+           from: 'Kilolab <onboarding@resend.dev>', // Domaine de test obligatoire au début
+           to: [email],
+           subject: isWaitingList ? 'Bienvenue sur la liste d\'attente Kilolab !' : 'Confirmation de votre commande Kilolab',
+           html: `
+             <h1>Bonjour ${name},</h1>
+             <p>${isWaitingList ? 'Votre demande a bien été reçue par notre conciergerie.' : 'Votre commande est validée !'}</p>
+             <p>Numéro de commande : <strong>${orderId}</strong></p>
+             <p>À très vite,<br/>L'équipe Kilolab</p>
+           `
+        })
+     });
+     if(!res.ok) console.error("Erreur envoi email", await res.text());
+  } catch(e) { console.error(e); }
+}
+
 export default function NewOrder() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
@@ -48,27 +73,28 @@ export default function NewOrder() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Non connecté");
 
-      // QU'IL Y AIT UN PARTENAIRE OU NON, ON SAUVEGARDE LA DEMANDE !
-      // Si waiting_list, on met le statut 'waiting_list' pour que l'Admin le sache
       const isConcierge = partnerId === 'waiting_list';
       
-      const { error } = await supabase.from('orders').insert({
+      // 1. Sauvegarde BDD
+      const { data: order, error } = await supabase.from('orders').insert({
         client_id: user.id,
-        partner_id: isConcierge ? null : partnerId, // NULL si pas de partenaire
+        partner_id: isConcierge ? null : partnerId,
         weight: weight,
         pickup_address: address,
         pickup_date: pickupDate,
         total_price: parseFloat(totalPrice),
-        status: isConcierge ? 'waiting_list' : 'pending' // Statut spécial
-      });
+        status: isConcierge ? 'waiting_list' : 'pending'
+      }).select().single();
 
       if (error) throw error;
 
+      // 2. Envoi Email (En arrière plan)
+      // Note: En test Resend, ça n'envoie qu'à ton email admin
+      sendConfirmationEmail(user.email || '', "Client", order.id, isConcierge);
+
       if (isConcierge) {
-          // Si c'est conciergerie, on ouvre la pop-up APRÈS avoir sauvegardé
           setShowWaitingModal(true);
       } else {
-          // Si c'est normal
           toast.success("Commande validée !");
           navigate('/dashboard');
       }
@@ -84,46 +110,24 @@ export default function NewOrder() {
     <div className="min-h-screen bg-slate-50 font-sans text-slate-900 pb-20 relative">
       <Navbar />
       
-      {/* POP-UP CONCIERGERIE */}
       {showWaitingModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/90 backdrop-blur-sm animate-in fade-in duration-300">
             <div className="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl relative animate-in zoom-in-95 duration-300 text-center border border-white/20">
                 <button onClick={() => navigate('/dashboard')} className="absolute top-4 right-4 p-2 bg-slate-50 rounded-full hover:bg-slate-100 transition"><X size={20}/></button>
-                
-                <div className="w-20 h-20 bg-teal-50 text-teal-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg shadow-teal-500/20">
-                    <Sparkles size={40} />
-                </div>
-                
+                <div className="w-20 h-20 bg-teal-50 text-teal-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg shadow-teal-500/20"><Sparkles size={40} /></div>
                 <h2 className="text-2xl font-extrabold text-slate-900 mb-3">Demande bien reçue !</h2>
-                
                 <div className="space-y-4 mb-8 text-left bg-slate-50 p-5 rounded-2xl border border-slate-100">
-                    <p className="text-slate-600 text-sm leading-relaxed">
-                        Votre demande est <strong>enregistrée et sécurisée</strong>.
-                    </p>
-                    <ul className="space-y-2">
-                        <li className="flex items-start gap-2 text-sm font-medium text-slate-800">
-                            <CheckCircle size={16} className="text-teal-500 mt-0.5 shrink-0"/>
-                            Notre équipe Conciergerie a reçu votre alerte.
-                        </li>
-                        <li className="flex items-start gap-2 text-sm font-medium text-slate-800">
-                            <CheckCircle size={16} className="text-teal-500 mt-0.5 shrink-0"/>
-                            Nous vous appelons sous 24h pour organiser le ramassage.
-                        </li>
-                    </ul>
+                    <p className="text-slate-600 text-sm leading-relaxed">Votre demande est <strong>enregistrée</strong>. Un email de confirmation vient de vous être envoyé.</p>
                 </div>
-
-                <button onClick={() => navigate('/dashboard')} className="w-full py-4 bg-slate-900 text-white rounded-xl font-bold hover:bg-slate-800 transition shadow-lg transform hover:-translate-y-1 mb-4">
-                    Voir mon suivi
-                </button>
+                <button onClick={() => navigate('/dashboard')} className="w-full py-4 bg-slate-900 text-white rounded-xl font-bold hover:bg-slate-800 transition shadow-lg mb-4">Voir mon suivi</button>
             </div>
         </div>
       )}
 
-      {/* RESTE DU FORMULAIRE (NE CHANGE PAS) */}
       <div className="pt-32 max-w-3xl mx-auto px-4">
         <h1 className="text-3xl font-bold mb-8 text-center">Nouvelle Commande</h1>
-        {/* ... (Garder le reste du code des étapes 1, 2, 3 identique) ... */}
-        {/* INDICATEUR D'ÉTAPES */}
+        
+        {/* STEPS INDICATOR */}
         <div className="flex justify-center mb-12 text-sm md:text-base">
             <StepIndicator num={1} current={step} label="Panier" />
             <div className="w-8 md:w-12 h-0.5 bg-slate-200 mx-2 self-center"></div>
@@ -162,11 +166,7 @@ export default function NewOrder() {
                                     <option key={p.id} value={p.id}>{p.full_name}</option>
                                 ))}
                             </select>
-                            {partnerId === 'waiting_list' && (
-                                <p className="text-xs text-teal-700 mt-2 flex items-center gap-1 font-medium bg-teal-50 p-2 rounded-lg border border-teal-100">
-                                    <Sparkles size={14}/> Service Conciergerie activé pour votre zone.
-                                </p>
-                            )}
+                            {partnerId === 'waiting_list' && <p className="text-xs text-teal-700 mt-2 bg-teal-50 p-2 rounded-lg"><Sparkles size={14} className="inline mr-1"/> Service Conciergerie activé.</p>}
                         </div>
                         <div>
                             <label className="block text-sm font-bold text-slate-700 mb-2">Adresse de collecte</label>
@@ -189,14 +189,12 @@ export default function NewOrder() {
                     <h2 className="text-xl font-bold mb-6 flex items-center gap-2"><CheckCircle className="text-teal-500"/> Récapitulatif</h2>
                     <div className="bg-slate-50 p-6 rounded-2xl border border-slate-200 space-y-4 mb-8 text-sm md:text-base">
                         <div className="flex justify-between"><span className="text-slate-500">Poids</span><span className="font-bold">{weight} kg</span></div>
-                        <div className="flex justify-between"><span className="text-slate-500">Adresse</span><span className="font-bold text-right truncate max-w-[200px]">{address}</span></div>
-                        <div className="flex justify-between"><span className="text-slate-500">Date</span><span className="font-bold">{pickupDate}</span></div>
-                        <div className="border-t border-slate-200 pt-4 flex justify-between items-center"><span className="font-bold text-lg">Total</span><span className="font-extrabold text-3xl text-teal-600">{totalPrice} €</span></div>
+                        <div className="flex justify-between"><span className="text-slate-500">Total</span><span className="font-extrabold text-3xl text-teal-600">{totalPrice} €</span></div>
                     </div>
                     <div className="flex justify-between items-center">
                          <button onClick={() => setStep(2)} className="text-slate-500 font-bold hover:text-slate-800">Retour</button>
-                         <button onClick={handleSubmit} disabled={loading} className={`px-8 py-4 text-white rounded-xl font-bold transition shadow-lg w-full ml-4 flex justify-center items-center gap-2 ${partnerId === 'waiting_list' ? 'bg-slate-900 hover:bg-slate-800' : 'bg-teal-500 hover:bg-teal-400 text-slate-900'}`}>
-                            {loading ? <Loader2 className="animate-spin"/> : (partnerId === 'waiting_list' ? "Valider ma demande" : "Valider et Payer")}
+                         <button onClick={handleSubmit} disabled={loading} className="px-8 py-4 bg-teal-500 text-slate-900 rounded-xl font-bold hover:bg-teal-400 transition shadow-lg w-full ml-4 flex justify-center items-center gap-2">
+                            {loading ? <Loader2 className="animate-spin"/> : "Valider la commande"}
                         </button>
                     </div>
                 </div>
