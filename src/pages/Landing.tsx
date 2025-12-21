@@ -1,7 +1,6 @@
 import Navbar from '../components/Navbar';
-// Les composants sont masqués pour l'instant :
-// import Hero from '../components/Hero';
-// import TrustBar from '../components/TrustBar';
+import Hero from '../components/Hero';
+import TrustBar from '../components/TrustBar';
 // import HowItWorks from '../components/HowItWorks';
 // import Features from '../components/Features';
 // import PriceComparator from '../components/PriceComparator';
@@ -11,18 +10,17 @@ import Navbar from '../components/Navbar';
 export default function Landing() {
   return (
     <div className="min-h-screen bg-white font-sans text-slate-900">
-      {/* On teste seulement la Navbar */}
       <Navbar />
       
-      <main className="pt-32 px-4 text-center">
-        <div className="p-8 border-4 border-teal-500 rounded-xl max-w-2xl mx-auto">
-          <h1 className="text-4xl font-black mb-4">MODE DIAGNOSTIC</h1>
-          <p className="text-xl text-slate-600">
-            Si tu vois ce texte, c'est une EXCELLENTE nouvelle.
-            <br />
-            Cela signifie que le "cœur" du site fonctionne.
-            <br />
-            Le bug se cache dans une des sections masquées.
+      {/* ON TESTE CES DEUX-LÀ */}
+      <Hero />
+      <TrustBar />
+
+      <main className="py-16 text-center">
+        <div className="p-4 border-2 border-dashed border-slate-300 rounded-xl max-w-xl mx-auto bg-slate-50">
+          <p className="text-slate-500">
+            Si tu vois le Hero au-dessus ☝️, c'est que le bug est plus bas !
+            <br/>(HowItWorks, Features ou Footer)
           </p>
         </div>
       </main>
