@@ -1,51 +1,62 @@
-import { useNavigate, Link } from 'react-router-dom';
-import { ArrowLeft, Gift, Users, Euro } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { supabase } from '../lib/supabase';
+import Navbar from '../components/Navbar';
+import { Gift, Copy, CheckCircle } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 export default function Referral() {
-  const navigate = useNavigate();
+  const [code, setCode] = useState('...');
+  const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    async function loadUser() {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const prefix = user.email ? user.email.split('@')[0].toUpperCase().slice(0,4) : 'KILO';
+        setCode(prefix + '-PROMO');
+      }
+    }
+    loadUser();
+  }, []);
+
+  const copyToClipboard = () => {
+    navigator.clipboard.writeText(`Rejoins Kilolab avec ${code} et gagne 5€ ! https://kilolab.fr`);
+    setCopied(true);
+    toast.success('Copié !');
+    setTimeout(() => setCopied(false), 2000);
+  };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-purple-50 to-white">
-      <header className="bg-white border-b sticky top-0 z-50">
-        <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
-          <button onClick={() => navigate('/')} className="flex items-center gap-2 text-slate-600 hover:text-slate-900">
-            <ArrowLeft className="w-5 h-5" /> Retour
-          </button>
-          <Link to="/" className="text-xl font-bold text-teal-600">Kilolab</Link>
-          <div className="w-20"></div>
-        </div>
-      </header>
-
-      <div className="max-w-4xl mx-auto px-4 py-12 text-center">
-        <Gift className="w-16 h-16 text-purple-500 mx-auto mb-6" />
-        <h1 className="text-4xl font-bold text-slate-900 mb-4">Programme de parrainage</h1>
-        <p className="text-xl text-slate-600 mb-12">Parrainez vos amis et gagnez des réductions !</p>
-
-        <div className="grid md:grid-cols-3 gap-6 mb-12">
-          <div className="bg-white rounded-2xl p-6 shadow-sm">
-            <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center mx-auto mb-4">
-              <Users className="w-6 h-6 text-purple-600" />
+    <div className="min-h-screen bg-slate-50 font-sans text-slate-900 pb-20">
+      <Navbar />
+      <div className="pt-32 max-w-4xl mx-auto px-4">
+        <div className="bg-gradient-to-br from-indigo-600 to-purple-700 rounded-3xl p-8 md:p-12 text-white text-center shadow-xl mb-12 relative overflow-hidden">
+            <div className="relative z-10">
+                <div className="w-20 h-20 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center mx-auto mb-6">
+                    <Gift size={40} className="text-white"/>
+                </div>
+                <h1 className="text-3xl md:text-5xl font-extrabold mb-4">Offrez 5€, Recevez 5€</h1>
+                <p className="text-indigo-100 text-lg max-w-xl mx-auto">
+                    Le linge sale, c'est mieux quand on ne le lave pas soi-même. Invitez vos amis à découvrir Kilolab.
+                </p>
             </div>
-            <h3 className="font-bold text-slate-900 mb-2">Invitez</h3>
-            <p className="text-sm text-slate-600">Partagez votre code avec vos amis</p>
-          </div>
-          <div className="bg-white rounded-2xl p-6 shadow-sm">
-            <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center mx-auto mb-4">
-              <Gift className="w-6 h-6 text-purple-600" />
-            </div>
-            <h3 className="font-bold text-slate-900 mb-2">Ils profitent</h3>
-            <p className="text-sm text-slate-600">-5€ sur leur première commande</p>
-          </div>
-          <div className="bg-white rounded-2xl p-6 shadow-sm">
-            <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center mx-auto mb-4">
-              <Euro className="w-6 h-6 text-purple-600" />
-            </div>
-            <h3 className="font-bold text-slate-900 mb-2">Vous gagnez</h3>
-            <p className="text-sm text-slate-600">5€ de crédit par filleul</p>
-          </div>
         </div>
 
-        <p className="text-slate-500">Programme bientôt disponible. Inscrivez-vous pour être notifié !</p>
+        <div className="grid md:grid-cols-2 gap-8 items-start">
+            <div className="bg-white rounded-3xl p-8 shadow-sm border border-slate-200 text-center h-full">
+                <h2 className="font-bold mb-6 text-xl">Votre code parrain unique</h2>
+                <div onClick={copyToClipboard} className="bg-slate-100 p-6 rounded-2xl border-2 border-dashed border-slate-300 font-mono text-3xl font-bold cursor-pointer hover:bg-slate-200 transition text-slate-700 select-all">
+                    {code}
+                </div>
+                <button onClick={copyToClipboard} className="mt-6 w-full py-3 bg-slate-900 text-white font-bold rounded-xl flex items-center justify-center gap-2 hover:bg-slate-800 transition">
+                    {copied ? <><CheckCircle size={18}/> Copié</> : <><Copy size={18}/> Copier le code</>}
+                </button>
+            </div>
+            <div className="bg-white rounded-3xl p-8 shadow-sm border border-slate-200 h-full">
+                <h2 className="font-bold mb-6 text-xl">Comment ça marche ?</h2>
+                <p className="text-slate-500">Partagez votre code. Vos amis gagnent 5€ sur leur première commande, et vous aussi !</p>
+            </div>
+        </div>
       </div>
     </div>
   );

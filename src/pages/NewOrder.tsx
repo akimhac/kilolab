@@ -1,145 +1,180 @@
 import { useState, useEffect } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import Navbar from '../components/Navbar';
-import { Scale, MapPin, ArrowRight, CheckCircle, Loader2, Sparkles, X, MessageCircle } from 'lucide-react';
+import { Scale, MapPin, ArrowRight, CheckCircle, Loader2, Sparkles, X, Tag, Search } from 'lucide-react';
 import toast from 'react-hot-toast';
 
-// --- FONCTION D'ENVOI EMAIL SIMPLE ---
+// --- FONCTION EMAIL (Inchangée) ---
 async function sendConfirmationEmail(email: string, name: string, orderId: string, isWaitingList: boolean) {
   try {
-     const res = await fetch('https://api.resend.com/emails', {
+     await fetch('https://api.resend.com/emails', {
         method: 'POST',
-        headers: {
-           'Content-Type': 'application/json',
-           'Authorization': `Bearer ${import.meta.env.VITE_RESEND_API_KEY}`
+        headers: { 
+            'Content-Type': 'application/json', 
+            'Authorization': `Bearer ${import.meta.env.VITE_RESEND_API_KEY}` 
         },
         body: JSON.stringify({
-           from: 'Kilolab <onboarding@resend.dev>', // Domaine de test obligatoire au début
+           from: 'Kilolab <onboarding@resend.dev>',
            to: [email],
-           subject: isWaitingList ? 'Bienvenue sur la liste d\'attente Kilolab !' : 'Confirmation de votre commande Kilolab',
-           html: `
-             <h1>Bonjour ${name},</h1>
-             <p>${isWaitingList ? 'Votre demande a bien été reçue par notre conciergerie.' : 'Votre commande est validée !'}</p>
-             <p>Numéro de commande : <strong>${orderId}</strong></p>
-             <p>À très vite,<br/>L'équipe Kilolab</p>
-           `
+           subject: isWaitingList ? 'Bienvenue sur la liste d\'attente Kilolab' : 'Confirmation de commande',
+           html: `<h1>Bonjour ${name},</h1><p>Commande ${orderId} bien reçue !</p>`
         })
      });
-     if(!res.ok) console.error("Erreur envoi email", await res.text());
   } catch(e) { console.error(e); }
 }
 
 export default function NewOrder() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
-  const [step, setStep] = useState(1);
+  const [step, setStep] = useState(0); 
   const [showWaitingModal, setShowWaitingModal] = useState(false);
   
-  // Données
+  // Données Commande
+  const [formula, setFormula] = useState<'eco' | 'express'>('eco');
   const [weight, setWeight] = useState(5);
-  const [address, setAddress] = useState('');
   const [pickupDate, setPickupDate] = useState('');
-  const [partnerId, setPartnerId] = useState<string>('');
-  const [partners, setPartners] = useState<any[]>([]);
+  
+  // Données Recherche & Partenaires
+  const [allPartners, setAllPartners] = useState<any[]>([]);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [isSearching, setIsSearching] = useState(false);
+  const [searchDone, setSearchDone] = useState(false);
+  const [filteredPartners, setFilteredPartners] = useState<any[]>([]);
+  const [selectedPartnerId, setSelectedPartnerId] = useState<string>('');
+  const [finalAddress, setFinalAddress] = useState('');
 
-  useEffect(() => {
-    fetchPartners();
-  }, []);
 
+  useEffect(() => { fetchPartners(); }, []);
+
+  // On charge TOUS les partenaires actifs au début
   const fetchPartners = async () => {
-    try {
-        const { data } = await supabase
-          .from('user_profiles')
-          .select('id, full_name')
-          .eq('role', 'partner')
-          .eq('status', 'active');
-          
-        if (data && data.length > 0) {
-            setPartners(data);
-            setPartnerId(data[0].id);
-        } else {
-            setPartners([{ id: 'waiting_list', full_name: '📍 Zone en cours d\'ouverture (Service Conciergerie)' }]);
-            setPartnerId('waiting_list');
-        }
-    } catch (e) { console.error(e); }
+    const { data } = await supabase.from('user_profiles')
+      .select('id, full_name, address') // On récupère l'adresse pour filtrer
+      .eq('role', 'partner')
+      .eq('status', 'active');
+    setAllPartners(data || []);
   };
 
-  const totalPrice = (weight * 4.90).toFixed(2);
+  // Fonction de recherche "Radar"
+  const handleSearchLocally = () => {
+    if (!searchQuery) return;
+    setIsSearching(true);
+    setSearchDone(false);
+
+    // Simulation d'attente pour l'effet "Radar" (1.5 secondes)
+    setTimeout(() => {
+        // Filtrage basique sur le nom ou l'adresse (si elle existe)
+        const results = allPartners.filter(p => 
+            (p.address && p.address.toLowerCase().includes(searchQuery.toLowerCase())) ||
+            (p.full_name && p.full_name.toLowerCase().includes(searchQuery.toLowerCase()))
+        );
+        setFilteredPartners(results);
+        setIsSearching(false);
+        setSearchDone(true);
+        // Si on trouve des partenaires, on sélectionne le premier par défaut
+        if (results.length > 0) setSelectedPartnerId(results[0].id);
+        // Sinon, on sélectionne le réseau global
+        else setSelectedPartnerId('waiting_list');
+    }, 1500);
+  };
+
+  // Reset de la recherche si on change l'input
+  useEffect(() => { if(searchDone) setSearchDone(false); }, [searchQuery]);
+
+
+  // CALCUL DU PRIX
+  const pricePerKg = formula === 'eco' ? 3 : 5;
+  const totalPrice = (weight * pricePerKg).toFixed(2);
 
   const handleSubmit = async () => {
     setLoading(true);
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Non connecté");
-
-      const isConcierge = partnerId === 'waiting_list';
+      // Si partnerId est vide ou 'waiting_list', c'est le réseau global
+      const isNetwork = !selectedPartnerId || selectedPartnerId === 'waiting_list';
       
-      // 1. Sauvegarde BDD
       const { data: order, error } = await supabase.from('orders').insert({
         client_id: user.id,
-        partner_id: isConcierge ? null : partnerId,
+        partner_id: isNetwork ? null : selectedPartnerId,
         weight: weight,
-        pickup_address: address,
+        pickup_address: finalAddress + ' (' + searchQuery + ')', // On combine pour avoir l'info
         pickup_date: pickupDate,
         total_price: parseFloat(totalPrice),
-        status: isConcierge ? 'waiting_list' : 'pending'
+        status: isNetwork ? 'waiting_list' : 'pending'
       }).select().single();
 
       if (error) throw error;
+      sendConfirmationEmail(user.email || '', "Client", order.id, isNetwork);
 
-      // 2. Envoi Email (En arrière plan)
-      // Note: En test Resend, ça n'envoie qu'à ton email admin
-      sendConfirmationEmail(user.email || '', "Client", order.id, isConcierge);
+      if (isNetwork) setShowWaitingModal(true);
+      else { toast.success("Commande validée !"); navigate('/dashboard'); }
 
-      if (isConcierge) {
-          setShowWaitingModal(true);
-      } else {
-          toast.success("Commande validée !");
-          navigate('/dashboard');
-      }
-
-    } catch (error: any) {
-      toast.error("Erreur : " + error.message);
-    } finally {
-      setLoading(false);
-    }
+    } catch (error: any) { toast.error("Erreur : " + error.message); } finally { setLoading(false); }
   };
 
+  const partnerLabel = selectedPartnerId === 'waiting_list' || !selectedPartnerId 
+    ? 'Réseau Kilolab (Assignation auto)' 
+    : partners.find(p => p.id === selectedPartnerId)?.full_name || 'Partenaire';
+
+
   return (
-    <div className="min-h-screen bg-slate-50 font-sans text-slate-900 pb-20 relative">
+    <div className="min-h-screen bg-slate-50 font-sans text-slate-900 pb-20 relative overflow-x-hidden">
       <Navbar />
       
+      {/* MODALE SUCCÈS RÉSEAU GLOBAL */}
       {showWaitingModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/90 backdrop-blur-sm animate-in fade-in duration-300">
-            <div className="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl relative animate-in zoom-in-95 duration-300 text-center border border-white/20">
-                <button onClick={() => navigate('/dashboard')} className="absolute top-4 right-4 p-2 bg-slate-50 rounded-full hover:bg-slate-100 transition"><X size={20}/></button>
-                <div className="w-20 h-20 bg-teal-50 text-teal-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg shadow-teal-500/20"><Sparkles size={40} /></div>
-                <h2 className="text-2xl font-extrabold text-slate-900 mb-3">Demande bien reçue !</h2>
-                <div className="space-y-4 mb-8 text-left bg-slate-50 p-5 rounded-2xl border border-slate-100">
-                    <p className="text-slate-600 text-sm leading-relaxed">Votre demande est <strong>enregistrée</strong>. Un email de confirmation vient de vous être envoyé.</p>
-                </div>
-                <button onClick={() => navigate('/dashboard')} className="w-full py-4 bg-slate-900 text-white rounded-xl font-bold hover:bg-slate-800 transition shadow-lg mb-4">Voir mon suivi</button>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/90 backdrop-blur-sm animate-in fade-in">
+            <div className="bg-white rounded-3xl p-8 max-w-md w-full text-center">
+                <div className="w-20 h-20 bg-teal-50 text-teal-600 rounded-full flex items-center justify-center mx-auto mb-6"><Sparkles size={40} /></div>
+                <h2 className="text-2xl font-extrabold mb-3">Commande enregistrée !</h2>
+                <p className="text-slate-600 mb-6">Votre commande est bien prise en compte par le réseau Kilolab.</p>
+                <button onClick={() => navigate('/dashboard')} className="w-full py-4 bg-slate-900 text-white rounded-xl font-bold">Voir mon suivi</button>
             </div>
         </div>
       )}
 
-      <div className="pt-32 max-w-3xl mx-auto px-4">
+      <div className="pt-32 max-w-3xl mx-auto px-4 w-full">
         <h1 className="text-3xl font-bold mb-8 text-center">Nouvelle Commande</h1>
         
-        {/* STEPS INDICATOR */}
-        <div className="flex justify-center mb-12 text-sm md:text-base">
-            <StepIndicator num={1} current={step} label="Panier" />
-            <div className="w-8 md:w-12 h-0.5 bg-slate-200 mx-2 self-center"></div>
-            <StepIndicator num={2} current={step} label="Détails" />
-            <div className="w-8 md:w-12 h-0.5 bg-slate-200 mx-2 self-center"></div>
-            <StepIndicator num={3} current={step} label="Validation" />
+        {/* PROGRESS BAR */}
+        <div className="flex justify-center mb-8 text-xs md:text-sm overflow-x-auto">
+            <div className={`px-3 py-1 md:px-4 md:py-2 rounded-full whitespace-nowrap ${step >= 0 ? 'bg-teal-100 text-teal-800 font-bold' : 'text-slate-400'}`}>1. Formule</div>
+            <div className="w-4 md:w-8 h-0.5 bg-slate-200 self-center mx-1 md:mx-2"></div>
+            <div className={`px-3 py-1 md:px-4 md:py-2 rounded-full whitespace-nowrap ${step >= 1 ? 'bg-teal-100 text-teal-800 font-bold' : 'text-slate-400'}`}>2. Poids</div>
+            <div className="w-4 md:w-8 h-0.5 bg-slate-200 self-center mx-1 md:mx-2"></div>
+            <div className={`px-3 py-1 md:px-4 md:py-2 rounded-full whitespace-nowrap ${step >= 2 ? 'bg-teal-100 text-teal-800 font-bold' : 'text-slate-400'}`}>3. Localisation</div>
+            <div className="w-4 md:w-8 h-0.5 bg-slate-200 self-center mx-1 md:mx-2"></div>
+            <div className={`px-3 py-1 md:px-4 md:py-2 rounded-full whitespace-nowrap ${step >= 3 ? 'bg-teal-100 text-teal-800 font-bold' : 'text-slate-400'}`}>4. Validation</div>
         </div>
 
-        <div className="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden min-h-[400px]">
+        <div className="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden min-h-[450px] p-6 md:p-8 relative">
+            
+            {/* ETAPE 0 : CHOIX FORMULE */}
+            {step === 0 && (
+                <div className="animate-in slide-in-from-right-8 fade-in">
+                    <h2 className="text-xl font-bold mb-6 flex items-center gap-2"><Tag className="text-teal-500"/> Votre formule</h2>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div onClick={() => setFormula('eco')} className={`p-6 border-2 rounded-2xl cursor-pointer transition ${formula === 'eco' ? 'border-teal-500 bg-teal-50' : 'border-slate-100 hover:border-slate-200'}`}>
+                            <div className="flex justify-between items-center mb-2"><span className="font-bold text-lg">ÉCO</span><span className="text-2xl font-bold">3€<span className="text-sm font-normal text-slate-500">/kg</span></span></div>
+                            <p className="text-slate-500 text-sm">Lavage Soigneux 48h.</p>
+                        </div>
+                        <div onClick={() => setFormula('express')} className={`p-6 border-2 rounded-2xl cursor-pointer transition ${formula === 'express' ? 'border-teal-500 bg-teal-50' : 'border-slate-100 hover:border-slate-200'}`}>
+                            <div className="flex justify-between items-center mb-2"><span className="font-bold text-lg">EXPRESS</span><span className="text-2xl font-bold">5€<span className="text-sm font-normal text-slate-500">/kg</span></span></div>
+                            <p className="text-slate-500 text-sm">Prioritaire 24h.</p>
+                        </div>
+                    </div>
+                    <div className="mt-8 flex justify-end">
+                        <button onClick={() => setStep(1)} className="px-8 py-3 bg-slate-900 text-white rounded-xl font-bold flex items-center gap-2">Suivant <ArrowRight size={18}/></button>
+                    </div>
+                </div>
+            )}
+
+            {/* ETAPE 1 : POIDS */}
             {step === 1 && (
-                <div className="p-8 animate-in slide-in-from-right-8 duration-300">
-                    <h2 className="text-xl font-bold mb-6 flex items-center gap-2"><Scale className="text-teal-500"/> Volume de linge</h2>
+                <div className="animate-in slide-in-from-right-8 fade-in">
+                    <h2 className="text-xl font-bold mb-6 flex items-center gap-2"><Scale className="text-teal-500"/> Volume ({formula === 'eco' ? 'Éco' : 'Express'})</h2>
                     <div className="mb-8 text-center">
                         <div className="text-6xl font-extrabold text-slate-900 mb-2">{weight} <span className="text-2xl text-slate-400 font-normal">kg</span></div>
                         <p className="text-slate-500">~ {Math.ceil(weight / 5)} machine(s)</p>
@@ -149,52 +184,151 @@ export default function NewOrder() {
                         <span className="font-bold text-teal-800">Prix estimé</span>
                         <span className="text-2xl font-bold text-teal-600">{totalPrice} €</span>
                     </div>
-                    <div className="mt-8 flex justify-end">
-                        <button onClick={() => setStep(2)} className="px-8 py-3 bg-slate-900 text-white rounded-xl font-bold hover:bg-slate-800 transition flex items-center gap-2">Continuer <ArrowRight size={18}/></button>
+                    <div className="mt-8 flex justify-between">
+                        <button onClick={() => setStep(0)} className="text-slate-500 font-bold">Retour</button>
+                        <button onClick={() => setStep(2)} className="px-8 py-3 bg-slate-900 text-white rounded-xl font-bold flex items-center gap-2">Suivant <ArrowRight size={18}/></button>
                     </div>
                 </div>
             )}
 
+            {/* ETAPE 2 : LE RADAR (NOUVEAU !) */}
             {step === 2 && (
-                <div className="p-8 animate-in slide-in-from-right-8 duration-300">
-                    <h2 className="text-xl font-bold mb-6 flex items-center gap-2"><MapPin className="text-teal-500"/> Retrait & Partenaire</h2>
-                    <div className="space-y-6">
+                <div className="animate-in slide-in-from-right-8 fade-in h-full flex flex-col">
+                    <h2 className="text-xl font-bold mb-4 flex items-center gap-2"><MapPin className="text-teal-500"/> Votre zone</h2>
+                    
+                    {/* BARRE DE RECHERCHE */}
+                    <div className="flex gap-2 mb-6">
+                        <div className="relative flex-1">
+                            <Search className="absolute left-3 top-3.5 text-slate-400" size={20}/>
+                            <input 
+                                type="text" 
+                                placeholder="Code postal ou ville..." 
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                className="w-full pl-10 p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-teal-500 font-bold text-lg"
+                                onKeyDown={(e) => e.key === 'Enter' && handleSearchLocally()}
+                            />
+                        </div>
+                        <button onClick={handleSearchLocally} disabled={!searchQuery || isSearching} className="px-6 bg-slate-900 text-white rounded-xl font-bold disabled:opacity-50">
+                            {isSearching ? <Loader2 className="animate-spin"/> : 'Chercher'}
+                        </button>
+                    </div>
+
+                    {/* ZONE MAP / RADAR */}
+                    <div className="flex-1 relative rounded-2xl overflow-hidden bg-slate-100 border border-slate-200 min-h-[250px]">
+                        {/* Fausse carte en fond */}
+                        <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1569336415962-a4bd9f69c07b?q=80&w=1000&auto=format&fit=crop')] bg-cover bg-center opacity-40 blur-[2px] grayscale"></div>
+                        
+                        {/* LOGIQUE D'AFFICHAGE CENTRALE */}
+                        <div className="absolute inset-0 flex flex-col items-center justify-center p-4 text-center z-10">
+                            
+                            {isSearching && (
+                                // ANIMATION RADAR PENDANT LA RECHERCHE
+                                <div className="flex flex-col items-center justify-center">
+                                    <div className="relative flex items-center justify-center mb-4">
+                                        <div className="w-4 h-4 bg-teal-500 rounded-full z-20 relative"></div>
+                                        <div className="absolute w-24 h-24 bg-teal-500/30 rounded-full animate-ping opacity-75 z-10"></div>
+                                        <div className="absolute w-48 h-48 bg-teal-500/10 rounded-full animate-ping opacity-50 animation-delay-500 z-0"></div>
+                                    </div>
+                                    <p className="font-bold text-slate-700 bg-white/80 px-4 py-2 rounded-full backdrop-blur-md">Recherche des artisans à proximité...</p>
+                                </div>
+                            )}
+
+                            {!isSearching && searchDone && (
+                                // RÉSULTAT DE LA RECHERCHE
+                                <div className="bg-white/90 backdrop-blur-md p-6 rounded-2xl shadow-lg border border-teal-100 animate-in zoom-in duration-300">
+                                    {filteredPartners.length > 0 ? (
+                                        <>
+                                            <CheckCircle size={40} className="text-teal-500 mx-auto mb-2"/>
+                                            <h3 className="text-xl font-extrabold text-slate-900">Bonne nouvelle !</h3>
+                                            <p className="text-slate-600 font-medium mb-4">{filteredPartners.length} pressing(s) trouvés dans votre zone.</p>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <Sparkles size={40} className="text-indigo-500 mx-auto mb-2"/>
+                                            <h3 className="text-xl font-extrabold text-slate-900">Zone couverte !</h3>
+                                            <p className="text-slate-600 font-medium mb-4">Le Réseau Kilolab est disponible chez vous.</p>
+                                        </>
+                                    )}
+                                    <button onClick={() => setStep(3)} className="px-8 py-3 bg-teal-500 text-slate-900 rounded-xl font-bold hover:bg-teal-400 transition w-full flex items-center justify-center gap-2 shadow-md">
+                                        Poursuivre ma commande <ArrowRight size={18}/>
+                                    </button>
+                                </div>
+                            )}
+
+                             {!isSearching && !searchDone && (
+                                // ETAT INITIAL
+                                <div className="bg-white/80 backdrop-blur-md p-4 rounded-full text-slate-500 font-medium flex items-center gap-2">
+                                    <MapPin size={18}/> Localisez-vous pour voir les disponibilités.
+                                </div>
+                             )}
+                        </div>
+                    </div>
+                     <div className="mt-6 flex justify-between">
+                        <button onClick={() => setStep(1)} className="text-slate-500 font-bold">Retour</button>
+                    </div>
+                </div>
+            )}
+
+            {/* ETAPE 3 : SÉLECTION FINALE & DATE */}
+            {step === 3 && (
+                <div className="animate-in slide-in-from-right-8 fade-in">
+                    <h2 className="text-xl font-bold mb-6 flex items-center gap-2"><Clock className="text-teal-500"/> Finalisation</h2>
+                    
+                    <div className="bg-teal-50 p-4 rounded-xl border border-teal-100 mb-6 flex items-center gap-3">
+                        <MapPin className="text-teal-600"/>
                         <div>
-                            <label className="block text-sm font-bold text-slate-700 mb-2">Choisir un Pressing</label>
-                            <select className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-teal-500 font-medium" value={partnerId} onChange={(e) => setPartnerId(e.target.value)}>
-                                {partners.map(p => (
-                                    <option key={p.id} value={p.id}>{p.full_name}</option>
-                                ))}
-                            </select>
-                            {partnerId === 'waiting_list' && <p className="text-xs text-teal-700 mt-2 bg-teal-50 p-2 rounded-lg"><Sparkles size={14} className="inline mr-1"/> Service Conciergerie activé.</p>}
+                            <p className="text-sm text-teal-800 font-bold">Zone de collecte</p>
+                            <p className="text-teal-900 font-extrabold text-lg">{searchQuery}</p>
+                        </div>
+                    </div>
+
+                    <div className="space-y-4">
+                        {filteredPartners.length > 0 && (
+                            <div>
+                                <label className="block text-sm font-bold text-slate-700 mb-1">Choisir un artisan (Optionnel)</label>
+                                <select className="w-full p-3 bg-slate-50 border rounded-xl font-medium" value={selectedPartnerId} onChange={(e) => setSelectedPartnerId(e.target.value)}>
+                                    {filteredPartners.map(p => <option key={p.id} value={p.id}>{p.full_name} {p.address ? `(${p.address})` : ''}</option>)}
+                                    <option value="waiting_list">✨ Confier au Réseau Kilolab (Recommandé)</option>
+                                </select>
+                            </div>
+                        )}
+
+                        <div>
+                            <label className="block text-sm font-bold text-slate-700 mb-1">Adresse exacte de retrait</label>
+                            <input type="text" placeholder="N°, Rue, Digicode..." value={finalAddress} onChange={(e) => setFinalAddress(e.target.value)} className="w-full p-3 bg-slate-50 border rounded-xl"/>
                         </div>
                         <div>
-                            <label className="block text-sm font-bold text-slate-700 mb-2">Adresse de collecte</label>
-                            <input type="text" placeholder="Ex: 10 rue de la Paix, Paris" value={address} onChange={(e) => setAddress(e.target.value)} className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-teal-500"/>
-                        </div>
+                            <label className="block text-sm font-bold text-slate-700 mb-1">Date souhaitée</label>
                         <div>
-                            <label className="block text-sm font-bold text-slate-700 mb-2">Date souhaitée</label>
-                            <input type="date" value={pickupDate} onChange={(e) => setPickupDate(e.target.value)} className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-teal-500"/>
+                            <label className="block text-sm font-bold text-slate-700 mb-1">Code Promo / Parrainage (Optionnel)</label>
+                            <input type="text" placeholder="Ex: KILO-2025" className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl dashed-border" />
+                        </div>
+                            <input type="date" value={pickupDate} onChange={(e) => setPickupDate(e.target.value)} className="w-full p-3 bg-slate-50 border rounded-xl"/>
                         </div>
                     </div>
                     <div className="mt-8 flex justify-between">
-                        <button onClick={() => setStep(1)} className="text-slate-500 font-bold hover:text-slate-800">Retour</button>
-                        <button disabled={!address || !pickupDate} onClick={() => setStep(3)} className="px-8 py-3 bg-slate-900 text-white rounded-xl font-bold hover:bg-slate-800 transition flex items-center gap-2 disabled:opacity-50">Continuer <ArrowRight size={18}/></button>
+                        <button onClick={() => setStep(2)} className="text-slate-500 font-bold">Retour zone</button>
+                        <button disabled={!finalAddress || !pickupDate} onClick={() => setStep(4)} className="px-8 py-3 bg-slate-900 text-white rounded-xl font-bold flex items-center gap-2 disabled:opacity-50">Résumé <ArrowRight size={18}/></button>
                     </div>
                 </div>
             )}
 
-            {step === 3 && (
-                <div className="p-8 animate-in slide-in-from-right-8 duration-300">
+            {/* ETAPE 4 : RÉCAPITULATIF (Inchangée) */}
+            {step === 4 && (
+                <div className="animate-in slide-in-from-right-8 fade-in">
                     <h2 className="text-xl font-bold mb-6 flex items-center gap-2"><CheckCircle className="text-teal-500"/> Récapitulatif</h2>
-                    <div className="bg-slate-50 p-6 rounded-2xl border border-slate-200 space-y-4 mb-8 text-sm md:text-base">
+                    <div className="bg-slate-50 p-6 rounded-2xl border border-slate-200 space-y-4 mb-8">
+                        <div className="flex justify-between"><span className="text-slate-500">Formule</span><span className="font-bold uppercase">{formula}</span></div>
                         <div className="flex justify-between"><span className="text-slate-500">Poids</span><span className="font-bold">{weight} kg</span></div>
-                        <div className="flex justify-between"><span className="text-slate-500">Total</span><span className="font-extrabold text-3xl text-teal-600">{totalPrice} €</span></div>
+                        <div className="flex justify-between"><span className="text-slate-500">Lieu</span><span className="font-bold text-right truncate max-w-[150px]">{searchQuery}</span></div>
+                         <div className="flex justify-between items-center"><span className="text-slate-500">Prestataire</span><span className="font-bold text-sm bg-white px-2 py-1 rounded-md border truncate max-w-[180px]">{selectedPartnerId === 'waiting_list' ? '✨ Réseau Kilolab' : partners.find(p=>p.id===selectedPartnerId)?.full_name}</span></div>
+                        <div className="border-t border-slate-200 pt-4 flex justify-between items-center"><span className="font-bold text-lg">Total estimé</span><span className="font-extrabold text-3xl text-teal-600">{totalPrice} €</span></div>
                     </div>
                     <div className="flex justify-between items-center">
-                         <button onClick={() => setStep(2)} className="text-slate-500 font-bold hover:text-slate-800">Retour</button>
-                         <button onClick={handleSubmit} disabled={loading} className="px-8 py-4 bg-teal-500 text-slate-900 rounded-xl font-bold hover:bg-teal-400 transition shadow-lg w-full ml-4 flex justify-center items-center gap-2">
-                            {loading ? <Loader2 className="animate-spin"/> : "Valider la commande"}
+                         <button onClick={() => setStep(3)} className="text-slate-500 font-bold">Retour</button>
+                         <button onClick={handleSubmit} disabled={loading} className="px-8 py-4 bg-teal-500 text-slate-900 rounded-xl font-bold hover:bg-teal-400 transition w-full ml-4 shadow-lg">
+                            {loading ? <Loader2 className="animate-spin mx-auto"/> : "Valider la commande"}
                         </button>
                     </div>
                 </div>
@@ -203,14 +337,4 @@ export default function NewOrder() {
       </div>
     </div>
   );
-}
-
-function StepIndicator({ num, current, label }: { num: number, current: number, label: string }) {
-    const isActive = current >= num;
-    return (
-        <div className={`flex items-center gap-2 ${isActive ? 'text-teal-600 font-bold' : 'text-slate-300'}`}>
-            <div className={`w-8 h-8 rounded-full flex items-center justify-center border-2 ${isActive ? 'border-teal-600 bg-teal-50' : 'border-slate-200'}`}>{num}</div>
-            <span className="hidden md:inline">{label}</span>
-        </div>
-    );
 }

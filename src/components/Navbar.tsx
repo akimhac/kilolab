@@ -1,102 +1,61 @@
-import { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { Sparkles, Menu, X, User } from 'lucide-react';
+import { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { Menu, X, User } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
-  const [isScrolled, setIsScrolled] = useState(false);
-  const [user, setUser] = useState<any>(null);
-  const location = useLocation();
+  const navigate = useNavigate();
 
-  useEffect(() => {
-    // Gestion du scroll pour l'effet de transparence
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20);
-    };
-    window.addEventListener('scroll', handleScroll);
-    
-    // Vérifier si connecté
-    supabase.auth.getUser().then(({ data: { user } }) => {
-      setUser(user);
-    });
-
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  // Design : Fond blanc si scrollé ou si on n'est pas sur l'accueil
-  const isHome = location.pathname === '/';
-  const navClass = isScrolled || !isHome || isOpen
-    ? 'bg-white/90 backdrop-blur-md shadow-sm py-4' 
-    : 'bg-transparent py-6';
-
-  const textClass = isScrolled || !isHome || isOpen
-    ? 'text-slate-900' 
-    : 'text-slate-900 lg:text-white'; // Blanc sur fond sombre (Hero), Noir sinon
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    setIsOpen(false);
+    navigate('/');
+  };
 
   return (
-    <nav className={`fixed w-full z-50 transition-all duration-300 ${navClass}`}>
+    <nav className="fixed w-full z-50 bg-white/80 backdrop-blur-md border-b border-slate-100 transition-all duration-300">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center">
+        <div className="flex justify-between items-center h-20">
           
           {/* LOGO */}
-          <Link to="/" className={`flex items-center gap-2 font-extrabold text-2xl ${textClass}`}>
-            <div className="bg-teal-500 p-1.5 rounded-lg text-white shadow-lg shadow-teal-500/30">
-              <Sparkles size={20} fill="currentColor" />
-            </div>
-            Kilolab
+          <Link to="/" className="text-2xl font-black tracking-tighter text-slate-900 flex items-center gap-2">
+            KILOLAB<span className="w-2 h-2 rounded-full bg-teal-500"></span>
           </Link>
 
-          {/* DESKTOP MENU */}
-          <div className="hidden md:flex items-center gap-8">
-            <Link to="/trouver" className={`font-medium hover:text-teal-500 transition ${textClass}`}>
-              Trouver un pressing
+          {/* MENU ORDI */}
+          <div className="hidden md:flex items-center space-x-8">
+            <Link to="/trouver" className="text-slate-600 font-bold hover:text-teal-600 transition">Trouver un pressing</Link>
+            <Link to="/partner" className="text-slate-600 font-bold hover:text-teal-600 transition">Devenir Partenaire</Link>
+            <Link to="/login" className="px-6 py-2.5 bg-slate-900 text-white rounded-full font-bold hover:bg-slate-800 transition shadow-lg shadow-slate-900/20 flex items-center gap-2">
+              <User size={18} /> Mon Espace
             </Link>
-            <Link to="/tarifs" className={`font-medium hover:text-teal-500 transition ${textClass}`}>
-              Tarifs
-            </Link>
-            <Link to="/partner" className={`font-medium hover:text-teal-500 transition ${textClass}`}>
-              Espace Pro <span className="text-xs bg-teal-100 text-teal-700 px-2 py-0.5 rounded-full ml-1">B2B</span>
-            </Link>
-
-            {user ? (
-              <Link to="/dashboard" className="flex items-center gap-2 px-5 py-2.5 bg-slate-900 text-white rounded-full font-bold hover:bg-slate-800 transition">
-                <User size={18} /> Mon Espace
-              </Link>
-            ) : (
-              <div className="flex items-center gap-4">
-                <Link to="/login" className={`font-bold hover:text-teal-500 transition ${textClass}`}>
-                  Connexion
-                </Link>
-                <Link to="/signup" className="px-6 py-2.5 bg-teal-500 hover:bg-teal-400 text-slate-900 rounded-full font-bold transition shadow-lg shadow-teal-500/20 hover:scale-105">
-                  S'inscrire
-                </Link>
-              </div>
-            )}
           </div>
 
-          {/* MOBILE BUTTON */}
-          <button onClick={() => setIsOpen(!isOpen)} className={`md:hidden ${textClass}`}>
-            {isOpen ? <X size={28} /> : <Menu size={28} />}
+          {/* BOUTON MOBILE */}
+          <button 
+            onClick={() => setIsOpen(!isOpen)} 
+            className="md:hidden p-2 text-slate-900 bg-slate-100 rounded-xl hover:bg-slate-200 transition"
+          >
+            {isOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
         </div>
       </div>
 
-      {/* MOBILE MENU */}
+      {/* MENU MOBILE DÉROULANT */}
       {isOpen && (
-        <div className="md:hidden absolute top-full left-0 w-full bg-white border-t border-slate-100 shadow-xl py-6 px-4 flex flex-col gap-4">
-          <Link to="/trouver" className="text-lg font-medium text-slate-900 py-2 border-b border-slate-50">Trouver un pressing</Link>
-          <Link to="/tarifs" className="text-lg font-medium text-slate-900 py-2 border-b border-slate-50">Tarifs</Link>
-          <Link to="/partner" className="text-lg font-medium text-teal-600 py-2 border-b border-slate-50">Devenir Partenaire</Link>
-          
-          {user ? (
-             <Link to="/dashboard" className="w-full text-center py-3 bg-slate-900 text-white rounded-xl font-bold">Mon Espace</Link>
-          ) : (
-             <>
-               <Link to="/login" className="w-full text-center py-3 border border-slate-200 text-slate-900 rounded-xl font-bold">Connexion</Link>
-               <Link to="/signup" className="w-full text-center py-3 bg-teal-500 text-slate-900 rounded-xl font-bold">S'inscrire</Link>
-             </>
-          )}
+        <div className="md:hidden bg-white border-t border-slate-100 absolute w-full left-0 top-20 shadow-xl animate-in slide-in-from-top-5">
+          <div className="px-4 py-6 space-y-4 flex flex-col">
+            <Link onClick={() => setIsOpen(false)} to="/trouver" className="text-lg font-bold text-slate-900 py-2 border-b border-slate-50">
+              Trouver un pressing
+            </Link>
+            <Link onClick={() => setIsOpen(false)} to="/partner" className="text-lg font-bold text-slate-900 py-2 border-b border-slate-50">
+              Devenir Partenaire
+            </Link>
+            <Link onClick={() => setIsOpen(false)} to="/login" className="text-lg font-bold text-teal-600 py-2 flex items-center gap-2">
+              <User size={20}/> Accéder à mon compte
+            </Link>
+          </div>
         </div>
       )}
     </nav>
