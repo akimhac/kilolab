@@ -1,52 +1,38 @@
 import { Helmet } from 'react-helmet-async';
 
-interface SEOHeadProps {
+interface SEOProps {
   title?: string;
   description?: string;
-  image?: string;
-  url?: string;
+  canonical?: string;
 }
 
-export default function SEOHead({
-  title = 'KiloLab - Pressing au kilo, livré en 24h',
-  description = 'Service de pressing nouvelle génération. Lavage, séchage, pliage, emballage. Déposez votre linge, on s\'occupe du reste. À partir de 5€/kg.',
-  image = 'https://kilolab.fr/og-image.jpg',
-  url = 'https://kilolab.fr',
-}: SEOHeadProps) {
+export default function SEOHead({ 
+  title = "Kilolab - Le Pressing Nouvelle Génération au Kilo", 
+  description = "Fini la corvée de lessive. Kilolab collecte, lave, plie et livre votre linge au kilo. Simple, économique, écologique. Commandez en 2 minutes.",
+  canonical 
+}: SEOProps) {
+  
+  const siteTitle = title.includes('Kilolab') ? title : `${title} | Kilolab`;
+
   return (
     <Helmet>
-      <title>{title}</title>
+      {/* Standard Metadata */}
+      <title>{siteTitle}</title>
       <meta name="description" content={description} />
       
-      {/* Open Graph */}
+      {/* Open Graph / Facebook / LinkedIn */}
       <meta property="og:type" content="website" />
-      <meta property="og:url" content={url} />
-      <meta property="og:title" content={title} />
+      <meta property="og:title" content={siteTitle} />
       <meta property="og:description" content={description} />
-      <meta property="og:image" content={image} />
+      <meta property="og:image" content="https://kilolab.fr/og-image.jpg" /> {/* Faudra mettre une image ici */}
       
       {/* Twitter */}
       <meta name="twitter:card" content="summary_large_image" />
-      <meta name="twitter:title" content={title} />
+      <meta name="twitter:title" content={siteTitle} />
       <meta name="twitter:description" content={description} />
-      <meta name="twitter:image" content={image} />
       
-      {/* Schema.org */}
-      <script type="application/ld+json">
-        {JSON.stringify({
-          "@context": "https://schema.org",
-          "@type": "LocalBusiness",
-          "name": "KiloLab",
-          "description": description,
-          "url": url,
-          "priceRange": "€€",
-          "aggregateRating": {
-            "@type": "AggregateRating",
-            "ratingValue": "4.8",
-            "reviewCount": "500"
-          }
-        })}
-      </script>
+      {/* Canonical */}
+      {canonical && <link rel="canonical" href={`https://kilolab.fr${canonical}`} />}
     </Helmet>
   );
 }

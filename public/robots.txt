@@ -1,38 +1,3 @@
-# Robots.txt pour Kilolab.fr
-# https://kilolab.fr/robots.txt
-
 User-agent: *
 Allow: /
-
-# Pages à ne pas indexer
-Disallow: /client-dashboard
-Disallow: /partner-dashboard
-Disallow: /admin-dashboard
-Disallow: /new-order
-Disallow: /tracking/*
-Disallow: /pickup/*
-Disallow: /review/*
-Disallow: /api/*
-
-# Sitemap
 Sitemap: https://kilolab.fr/sitemap.xml
-
-# Crawl-delay pour être gentil avec les serveurs
-Crawl-delay: 1
-
-# Google specifique
-User-agent: Googlebot
-Allow: /
-Disallow: /client-dashboard
-Disallow: /partner-dashboard
-Disallow: /admin-dashboard
-
-# Bing
-User-agent: Bingbot
-Allow: /
-Crawl-delay: 2
-
-# Autoriser les images pour Google Images
-User-agent: Googlebot-Image
-Allow: /images/
-Allow: /icons/

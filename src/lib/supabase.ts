@@ -1,18 +1,16 @@
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = 'https://dhecegehcjelbxydeolg.supabase.co';
-const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRoZWNlZ2VoY2plbGJ4eWRlb2xnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjAwOTcyMjEsImV4cCI6MjA3NTY3MzIyMX0.ckfg9qpfAvJBXuxxIEAjZAfe5rydAurlsx65sP4Jk8s';
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
-  auth: {
-    autoRefreshToken: true,
-    persistSession: true,
-    detectSessionInUrl: true
-  },
-  global: {
-    headers: {
-      'Content-Type': 'application/json',
-      'Accept': 'application/json'
-    }
-  }
-});
+if (!supabaseUrl || !supabaseAnonKey) {
+  console.error("🚨 ERREUR CRITIQUE : Les clés Supabase (URL ou KEY) sont manquantes !");
+  console.error("Vérifiez vos variables d'environnement dans Vercel.");
+}
+
+// On crée le client même s'il manque des clés pour éviter le crash immédiat (White Screen)
+// Mais les requêtes échoueront proprement plus tard.
+export const supabase = createClient(
+  supabaseUrl || 'https://placeholder.supabase.co', 
+  supabaseAnonKey || 'placeholder'
+);
