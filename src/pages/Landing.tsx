@@ -9,11 +9,11 @@ export default function Landing() {
       <Navbar />
 
       {/* =========================================
-          1. HERO SECTION (Celle du cercle rouge : IMAGE FOND + TEXTE BLANC)
+          1. HERO SECTION (CELLE DU CERCLE ROUGE : IMAGE FOND + TEXTE BLANC)
       ========================================= */}
       <div className="relative h-[90vh] min-h-[600px] flex items-center justify-center overflow-hidden">
         
-        {/* IMAGE DE FOND : Gros plan linge plié/chaud (Style Pulls/Serviettes) */}
+        {/* IMAGE DE FOND : Gros plan linge plié/chaud (Style Pulls/Mailles) */}
         <div className="absolute inset-0 z-0">
             <img 
                 src="https://images.unsplash.com/photo-1489274495757-95c7c83700c0?q=80&w=2000&auto=format&fit=crop" 
@@ -59,16 +59,18 @@ export default function Landing() {
       </div>
 
       {/* =========================================
-          2. NOTRE HISTOIRE (BALI IMAGES INCLINÉES - Validé)
+          2. NOTRE HISTOIRE (BALI IMAGES INCLINÉES)
       ========================================= */}
       <div className="py-24 px-4 bg-white overflow-hidden">
          <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-16 items-center">
             <div className="relative h-[450px] w-full flex items-center justify-center scale-95">
+                {/* Image Temple */}
                 <img 
                     src="https://images.unsplash.com/photo-1555400038-63f5ba517a47?w=600&auto=format&fit=crop&q=60" 
                     className="absolute left-4 top-0 w-[60%] h-72 object-cover rounded-3xl shadow-2xl z-10 border-4 border-white -rotate-6 hover:rotate-0 transition duration-500"
                     alt="Bali Temple"
                 />
+                {/* Image Machines */}
                 <img 
                     src="https://images.unsplash.com/photo-1545173168-9f1947eebb8f?w=600&auto=format&fit=crop&q=60" 
                     className="absolute right-4 bottom-0 w-[60%] h-72 object-cover rounded-3xl shadow-2xl z-0 border-4 border-white rotate-6 hover:rotate-0 transition duration-500"
@@ -100,7 +102,7 @@ export default function Landing() {
       </div>
 
       {/* =========================================
-          3. COMPARATIF PRIX (CARTE NOIRE 9.30€ - Validé)
+          3. COMPARATIF PRIX (CARTE NOIRE 9.30€)
       ========================================= */}
       <div className="py-24 bg-slate-50 border-y border-slate-200">
         <div className="max-w-5xl mx-auto px-4 text-center">
@@ -115,6 +117,7 @@ export default function Landing() {
             </p>
 
             <div className="grid md:grid-cols-2 gap-8 items-center">
+                {/* Modèle Vieux */}
                 <div className="bg-white p-8 rounded-3xl shadow-sm border border-slate-200 scale-95 opacity-80 grayscale transition hover:grayscale-0 hover:opacity-100 hover:scale-100">
                     <div className="flex items-center gap-2 mb-6 text-red-500 font-bold bg-red-50 w-fit px-3 py-1 rounded-full text-sm">
                         <X size={16}/> Pressing Traditionnel
@@ -130,6 +133,7 @@ export default function Landing() {
                     </div>
                 </div>
 
+                {/* Modèle Kilolab (FONCÉ) */}
                 <div className="bg-slate-900 p-8 rounded-3xl shadow-2xl border-2 border-teal-500 relative transform md:scale-105 z-10 text-white">
                     <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-teal-500 text-white text-xs font-bold px-4 py-1 rounded-full uppercase tracking-wider shadow-lg flex items-center gap-1">
                         <Check size={14}/> La Méthode Kilolab
@@ -162,7 +166,7 @@ export default function Landing() {
       </div>
 
       {/* =========================================
-          4. LE RITUEL (ICONES SIMPLES - Validé)
+          4. LE RITUEL (ICONES SIMPLES)
       ========================================= */}
       <div className="py-24 px-4 bg-white">
         <div className="max-w-6xl mx-auto">
