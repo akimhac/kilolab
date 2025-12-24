@@ -9,7 +9,7 @@ export default function Landing() {
       <Navbar />
 
       {/* =========================================
-          1. HERO SECTION (Celle que tu veux : IMAGE DE FOND LINGE + TEXTE BLANC)
+          1. HERO SECTION (Celle du cercle rouge : IMAGE FOND + TEXTE BLANC)
       ========================================= */}
       <div className="relative h-[90vh] min-h-[600px] flex items-center justify-center overflow-hidden">
         
@@ -59,7 +59,7 @@ export default function Landing() {
       </div>
 
       {/* =========================================
-          2. NOTRE HISTOIRE (BALI IMAGES INCLINÉES - inchangé)
+          2. NOTRE HISTOIRE (BALI IMAGES INCLINÉES - Validé)
       ========================================= */}
       <div className="py-24 px-4 bg-white overflow-hidden">
          <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-16 items-center">
@@ -100,7 +100,7 @@ export default function Landing() {
       </div>
 
       {/* =========================================
-          3. COMPARATIF PRIX (CARTE NOIRE 9.30€ - inchangé)
+          3. COMPARATIF PRIX (CARTE NOIRE 9.30€ - Validé)
       ========================================= */}
       <div className="py-24 bg-slate-50 border-y border-slate-200">
         <div className="max-w-5xl mx-auto px-4 text-center">
@@ -162,7 +162,7 @@ export default function Landing() {
       </div>
 
       {/* =========================================
-          4. LE RITUEL (ICONES SIMPLES - inchangé)
+          4. LE RITUEL (ICONES SIMPLES - Validé)
       ========================================= */}
       <div className="py-24 px-4 bg-white">
         <div className="max-w-6xl mx-auto">
