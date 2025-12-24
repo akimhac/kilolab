@@ -1,85 +1,56 @@
 import { useState } from 'react';
-import { Star } from 'lucide-react';
 import { supabase } from '../lib/supabase';
+import { Star } from 'lucide-react';
+import toast from 'react-hot-toast';
 
-interface ReviewFormProps {
-  orderId: string;
-  partnerId: string;
-  onSuccess: () => void;
-}
-
-export default function ReviewForm({ orderId, partnerId, onSuccess }: ReviewFormProps) {
+export default function ReviewForm({ orderId, clientName, onSubmitted }: any) {
   const [rating, setRating] = useState(0);
-  const [hover, setHover] = useState(0);
   const [comment, setComment] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [hover, setHover] = useState(0);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
+  const submitReview = async () => {
+    if (rating === 0) return toast.error('Notez avec des étoiles');
+    
+    const { error } = await supabase.from('reviews').insert({
+      order_id: orderId,
+      rating: rating,
+      comment: comment,
+      client_name: clientName
+    });
 
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
-
-      const { error } = await supabase.from('reviews').insert({
-        order_id: orderId,
-        partner_id: partnerId,
-        client_id: user.id,
-        rating,
-        comment,
-      });
-
-      if (error) throw error;
-
-      alert('✅ Merci pour votre avis !');
-      onSuccess();
-    } catch (error) {
-      console.error('Erreur:', error);
-      alert('Erreur lors de l\'envoi');
-    } finally {
-      setLoading(false);
+    if (error) toast.error('Erreur');
+    else {
+      toast.success('Merci pour votre avis !');
+      onSubmitted();
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="bg-white/5 rounded-xl p-6 space-y-4">
-      <h3 className="text-xl font-bold text-white mb-4">⭐ Donnez votre avis</h3>
-      
-      <div className="flex gap-2">
+    <div className="bg-white p-6 rounded-xl border border-teal-100 shadow-sm text-center">
+      <h3 className="font-bold text-lg mb-4">Notez votre expérience</h3>
+      <div className="flex justify-center gap-2 mb-4">
         {[1, 2, 3, 4, 5].map((star) => (
           <button
             key={star}
-            type="button"
             onClick={() => setRating(star)}
             onMouseEnter={() => setHover(star)}
             onMouseLeave={() => setHover(0)}
-            className="transition-transform hover:scale-110"
+            className="transition"
           >
-            <Star
-              className={`w-8 h-8 ${
-                star <= (hover || rating) ? 'fill-yellow-400 text-yellow-400' : 'text-white/20'
-              }`}
-            />
+            <Star size={32} className={`${star <= (hover || rating) ? 'fill-yellow-400 text-yellow-400' : 'text-slate-300'}`} />
           </button>
         ))}
       </div>
-
-      <textarea
+      <textarea 
+        className="w-full p-3 border rounded-lg mb-4 text-sm" 
+        placeholder="Le linge était-il propre ? Le service rapide ?"
         value={comment}
         onChange={(e) => setComment(e.target.value)}
-        placeholder="Partagez votre expérience..."
-        rows={4}
-        className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-blue-500"
       />
-
-      <button
-        type="submit"
-        disabled={loading || rating === 0}
-        className="w-full bg-gradient-to-r from-blue-600 to-blue-600 hover:from-blue-700 hover:to-blue-700 text-white py-3 rounded-lg font-semibold disabled:opacity-50"
-      >
-        {loading ? 'Envoi...' : 'Envoyer mon avis'}
+      <button onClick={submitReview} className="w-full py-3 bg-slate-900 text-white font-bold rounded-lg hover:bg-black">
+        Publier mon avis certifié
       </button>
-    </form>
+    </div>
   );
 }
+
