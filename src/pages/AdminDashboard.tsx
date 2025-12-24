@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
 import Navbar from '../components/Navbar';
-import { Users, ShoppingBag, CheckCircle, XCircle, LogOut, ExternalLink, Search, X } from 'lucide-react';
+import { Users, ShoppingBag, LogOut, ExternalLink, Search, X } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 export default function AdminDashboard() {
@@ -28,10 +28,10 @@ export default function AdminDashboard() {
     const { data: ordersData } = await supabase.from('orders').select('*').order('created_at', { ascending: false });
     setOrders(ordersData || []);
     
-    // Simulation de partenaires "Riches" pour le test
+    // Simulation de partenaires AVEC NOTE (Algo Confiance)
     setPartners([
-        { id: '1', company: 'Pressing des Lices', manager: 'Jean Dupont', email: 'jean@lices.fr', siret: '80293489200012', city: 'Vannes', status: 'pending' },
-        { id: '2', company: 'Clean City', manager: 'Sarah Connor', email: 'sarah@skynet.com', siret: '40212345600023', city: 'Lille', status: 'pending' }
+        { id: '1', company: 'Pressing des Lices', manager: 'Jean Dupont', email: 'jean@lices.fr', siret: '80293489200012', city: 'Vannes', status: 'pending', rating: 4.8 },
+        { id: '2', company: 'Clean City', manager: 'Sarah Connor', email: 'sarah@skynet.com', siret: '40212345600023', city: 'Lille', status: 'pending', rating: 3.9 }
     ]);
     setLoading(false);
   };
@@ -55,7 +55,7 @@ export default function AdminDashboard() {
     <div className="min-h-screen bg-slate-100 font-sans text-slate-900">
       <Navbar />
       
-      {/* MODALE INSPECTION (Le "Plus" que tu voulais) */}
+      {/* MODALE INSPECTION */}
       {inspectPartner && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-sm animate-in fade-in">
             <div className="bg-white rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl">
@@ -88,7 +88,7 @@ export default function AdminDashboard() {
                             <span className="font-bold text-slate-700">Pappers.fr</span>
                             <ExternalLink size={16} className="text-slate-400 group-hover:text-teal-500"/>
                         </a>
-                        <a href={`https://www.google.com/maps/search/${inspectPartner.company}+${inspectPartner.city}`} target="_blank" className="flex items-center justify-between p-3 bg-white border border-slate-200 rounded-lg hover:border-teal-500 transition group">
+                        <a href={`http://googleusercontent.com/maps.google.com/?q=${inspectPartner.company}+${inspectPartner.city}`} target="_blank" className="flex items-center justify-between p-3 bg-white border border-slate-200 rounded-lg hover:border-teal-500 transition group">
                             <span className="font-bold text-slate-700">Google Maps (Avis)</span>
                             <ExternalLink size={16} className="text-slate-400 group-hover:text-teal-500"/>
                         </a>
@@ -130,7 +130,7 @@ export default function AdminDashboard() {
         </div>
 
         <div className="grid lg:grid-cols-2 gap-8">
-            {/* LISTE PARTENAIRES */}
+            {/* LISTE PARTENAIRES (AVEC NOTE DE CONFIANCE) */}
             <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden h-fit">
                 <div className="p-6 border-b border-slate-100 flex justify-between items-center">
                     <h2 className="font-bold text-lg flex items-center gap-2"><Users className="text-teal-500"/> Candidatures</h2>
@@ -141,7 +141,14 @@ export default function AdminDashboard() {
                     {partners.map(p => (
                         <div key={p.id} className="p-4 flex justify-between items-center hover:bg-slate-50 transition">
                             <div>
-                                <div className="font-bold text-slate-900">{p.company}</div>
+                                <div className="font-bold text-slate-900 flex items-center gap-2">
+                                    {p.company}
+                                    {p.rating && (
+                                        <span className={`text-xs px-2 py-0.5 rounded-full flex items-center gap-1 font-bold ${p.rating >= 4 ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                                            ★ {p.rating}
+                                        </span>
+                                    )}
+                                </div>
                                 <div className="text-sm text-slate-500">{p.city}</div>
                             </div>
                             <button onClick={() => setInspectPartner(p)} className="bg-slate-900 text-white px-4 py-2 rounded-lg text-xs font-bold flex items-center gap-1 hover:bg-teal-500 transition">
