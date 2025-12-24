@@ -9,10 +9,8 @@ export default function PartnerLanding() {
   // État pour le simulateur
   const [dailyVolume, setDailyVolume] = useState(20); // Valeur par défaut : 20kg
   
-  // LOGIQUE DE CALCUL : 
-  // Hypothèse : Le partenaire touche ~2.20€ net par kg (après com Kilolab)
-  // Jours ouvrés : 26 jours / mois
-  const revenuePerKg = 2.2; 
+  // LOGIQUE DE CALCUL MISE À JOUR (Basé sur le CA affiché sur ton site : 4.90€/kg)
+  const revenuePerKg = 4.9; 
   const monthlyRevenue = Math.round(dailyVolume * revenuePerKg * 26);
 
   return (
@@ -46,11 +44,13 @@ export default function PartnerLanding() {
          </div>
       </div>
 
-      {/* --- SECTION SIMULATEUR (NOUVEAU !) --- */}
+      {/* --- SECTION SIMULATEUR --- */}
       <div className="py-20 px-4 bg-slate-50 relative overflow-hidden">
         <div className="max-w-4xl mx-auto">
             <div className="text-center mb-12">
-                <h2 className="text-3xl font-extrabold text-slate-900 mb-4">Combien allez-vous gagner ?</h2>
+                <h2 className="text-3xl font-extrabold text-slate-900 mb-4 flex items-center justify-center gap-2">
+                    <Calculator className="text-teal-500"/> Estimez votre Chiffre d'Affaires
+                </h2>
                 <p className="text-slate-500">Utilisez notre simulateur pour estimer vos nouveaux revenus avec Kilolab.</p>
             </div>
 
@@ -79,7 +79,7 @@ export default function PartnerLanding() {
 
                     {/* COLONNE DROITE : LE RÉSULTAT */}
                     <div className="bg-teal-50 rounded-2xl p-8 text-center border border-teal-100">
-                        <p className="text-slate-600 font-medium mb-2">Revenu mensuel estimé (Net)</p>
+                        <p className="text-slate-600 font-medium mb-2">CA Mensuel Estimé</p>
                         <div className="text-5xl font-extrabold text-slate-900 mb-2">
                             {monthlyRevenue} €<span className="text-lg text-slate-500 font-medium">/mois</span>
                         </div>
@@ -87,17 +87,14 @@ export default function PartnerLanding() {
                             Basé sur 26 jours ouvrés.
                         </p>
                         <Link to="/become-partner" className="inline-block w-full py-3 bg-slate-900 text-white font-bold rounded-xl hover:bg-slate-800 transition shadow-lg">
-                            Commencer à générer ces revenus
+                            Capter ce chiffre d'affaires
                         </Link>
                     </div>
 
                 </div>
             </div>
-            {/* Décoration background */}
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-gradient-to-tr from-teal-500/10 to-indigo-500/10 rounded-full blur-3xl opacity-50 -z-10 pointer-events-none"></div>
         </div>
       </div>
-      {/* -------------------------------------- */}
 
       {/* ARGUMENTS */}
       <div className="py-24 px-4 bg-white">
@@ -108,54 +105,24 @@ export default function PartnerLanding() {
                         <TrendingUp size={32}/>
                     </div>
                     <h3 className="font-bold text-xl mb-3">Revenus Garantis</h3>
-                    <p className="text-slate-500">Augmentez votre CA de 20% à 30% grâce à nos flux de commandes réguliers.</p>
+                    <p className="text-slate-500">Augmentez votre CA grâce à nos flux de commandes réguliers.</p>
                 </div>
                 <div className="bg-slate-50 p-8 rounded-3xl border border-slate-100">
                     <div className="w-14 h-14 bg-white text-teal-600 rounded-2xl flex items-center justify-center mb-6 shadow-sm">
                         <Users size={32}/>
                     </div>
-                    <h3 className="font-bold text-xl mb-3">Zéro Gestion Client</h3>
-                    <p className="text-slate-500">Marketing, paiement, support : on gère tout. Vous recevez juste le linge.</p>
+                    <h3 className="font-bold text-xl mb-3">Clients Qualifiés</h3>
+                    <p className="text-slate-500">On vous apporte une clientèle qui cherche la qualité avant tout.</p>
                 </div>
                 <div className="bg-slate-50 p-8 rounded-3xl border border-slate-100">
                     <div className="w-14 h-14 bg-white text-blue-600 rounded-2xl flex items-center justify-center mb-6 shadow-sm">
                         <ShieldCheck size={32}/>
                     </div>
-                    <h3 className="font-bold text-xl mb-3">Paiement Sécurisé</h3>
-                    <p className="text-slate-500">Vous êtes payé automatiquement toutes les semaines pour les commandes traitées.</p>
+                    <h3 className="font-bold text-xl mb-3">Paiement Simple</h3>
+                    <p className="text-slate-500">Vous êtes payé automatiquement toutes les semaines.</p>
                 </div>
             </div>
         </div>
-      </div>
-
-      {/* PROCESSUS */}
-      <div className="py-24 px-4 bg-white border-t border-slate-100">
-         <div className="max-w-4xl mx-auto text-center">
-            <h2 className="text-3xl font-bold mb-12">Comment ça marche ?</h2>
-            <div className="space-y-8 text-left">
-                <div className="flex gap-6 items-start">
-                    <div className="w-8 h-8 rounded-full bg-slate-900 text-white flex items-center justify-center font-bold shrink-0 mt-1">1</div>
-                    <div>
-                        <h4 className="font-bold text-lg">Candidature</h4>
-                        <p className="text-slate-500">Remplissez le formulaire en 2 minutes avec votre Kbis.</p>
-                    </div>
-                </div>
-                <div className="flex gap-6 items-start">
-                    <div className="w-8 h-8 rounded-full bg-slate-900 text-white flex items-center justify-center font-bold shrink-0 mt-1">2</div>
-                    <div>
-                        <h4 className="font-bold text-lg">Validation Qualité</h4>
-                        <p className="text-slate-500">Un expert Kilolab vérifie vos installations et vos standards.</p>
-                    </div>
-                </div>
-                <div className="flex gap-6 items-start">
-                    <div className="w-8 h-8 rounded-full bg-slate-900 text-white flex items-center justify-center font-bold shrink-0 mt-1">3</div>
-                    <div>
-                        <h4 className="font-bold text-lg">Activation</h4>
-                        <p className="text-slate-500">Vous recevez vos accès Pro et commencez à scanner les commandes.</p>
-                    </div>
-                </div>
-            </div>
-         </div>
       </div>
 
       <Footer />
