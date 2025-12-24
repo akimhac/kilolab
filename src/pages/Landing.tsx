@@ -9,17 +9,18 @@ export default function Landing() {
       <Navbar />
 
       {/* =========================================
-          1. HERO SECTION (Fidèle à ton image "towel")
+          1. HERO SECTION (Arrière-plan TEXTURE LINGE visible)
       ========================================= */}
       <div className="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden">
-        {/* Fond avec texture linge/serviettes */}
+        {/* IMAGE DE FOND : Texture de linge propre */}
         <div className="absolute inset-0 z-0">
             <img 
-                src="https://images.unsplash.com/photo-1629033486259-b14a09164286?q=80&w=2000&auto=format&fit=crop" 
-                className="w-full h-full object-cover opacity-20"
-                alt="Texture serviettes"
+                src="https://images.unsplash.com/photo-1517677208171-0bc5e2e3f603?q=80&w=2000&auto=format&fit=crop" 
+                className="w-full h-full object-cover opacity-30" // Opacité augmentée pour bien voir la texture
+                alt="Texture linge blanc"
             />
-            <div className="absolute inset-0 bg-gradient-to-b from-white via-white/50 to-white"></div>
+            {/* Dégradé blanc pour fondre le bas de l'image */}
+            <div className="absolute inset-0 bg-gradient-to-t from-white via-white/20 to-transparent"></div>
         </div>
 
         <div className="max-w-7xl mx-auto px-4 relative z-10 text-center">
@@ -36,9 +37,11 @@ export default function Landing() {
           </p>
           
           <div className="flex flex-col sm:flex-row justify-center gap-4">
+            {/* LIEN 1 : Vers la commande */}
             <Link to="/new-order" className="px-8 py-4 bg-teal-500 text-white rounded-full font-bold text-lg hover:bg-teal-400 transition shadow-xl shadow-teal-500/30 flex items-center justify-center gap-2">
               Me libérer de la corvée <ArrowRight size={20}/>
             </Link>
+            {/* LIEN 2 : Vers les tarifs (si la page existe, sinon vers new-order aussi) */}
             <Link to="/tarifs" className="px-8 py-4 bg-slate-900 text-white rounded-full font-bold text-lg hover:bg-slate-800 transition flex items-center justify-center">
               Voir les tarifs (3€/kg)
             </Link>
@@ -47,26 +50,28 @@ export default function Landing() {
       </div>
 
       {/* =========================================
-          2. HISTOIRE (Bali & Paris - Comme ta maquette)
+          2. HISTOIRE (Images BALI + MACHINES inclinées)
       ========================================= */}
-      <div className="py-20 px-4 bg-white">
-         <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-12 items-center">
-            {/* Images : Temple Bali + Machine */}
-            <div className="relative h-[400px] w-full flex items-center justify-center">
+      <div className="py-24 px-4 bg-white overflow-hidden">
+         <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-16 items-center">
+            {/* Montage photo incliné */}
+            <div className="relative h-[450px] w-full flex items-center justify-center scale-90 md:scale-100">
+                {/* Image Bali (Temple) */}
                 <img 
                     src="https://images.unsplash.com/photo-1555400038-63f5ba517a47?w=600&auto=format&fit=crop&q=60" 
-                    className="absolute left-0 top-10 w-2/3 h-64 object-cover rounded-2xl shadow-xl z-10 border-4 border-white rotate-[-6deg]"
-                    alt="Temple Bali"
+                    className="absolute left-4 top-0 w-[60%] h-72 object-cover rounded-3xl shadow-2xl z-10 border-4 border-white -rotate-6"
+                    alt="Bali Temple"
                 />
+                {/* Image Machines */}
                 <img 
                     src="https://images.unsplash.com/photo-1545173168-9f1947eebb8f?w=600&auto=format&fit=crop&q=60" 
-                    className="absolute right-0 bottom-10 w-2/3 h-64 object-cover rounded-2xl shadow-xl z-0 border-4 border-white rotate-[6deg]"
-                    alt="Machines à laver"
+                    className="absolute right-4 bottom-0 w-[60%] h-72 object-cover rounded-3xl shadow-2xl z-0 border-4 border-white rotate-6"
+                    alt="Laverie moderne"
                 />
             </div>
             
-            <div>
-                <div className="inline-block px-3 py-1 bg-teal-100 text-teal-800 rounded-lg font-bold text-xs mb-4 uppercase tracking-wider">NOTRE HISTOIRE</div>
+            <div className="relative z-10 md:pl-8">
+                <div className="inline-block px-3 py-1 bg-teal-100 text-teal-800 rounded-lg font-bold text-xs mb-6 uppercase tracking-wider">NOTRE HISTOIRE</div>
                 <h2 className="text-4xl font-black mb-6 text-slate-900 leading-tight">
                     De la douceur de Bali<br/>
                     à l'exigence de Paris.
@@ -75,35 +80,39 @@ export default function Landing() {
                     Là-bas, le pressing au poids est la norme : simple, direct, sans artifices. 
                     Nous avons eu le coup de foudre pour cette transparence radicale.
                 </p>
-                <div className="bg-slate-50 p-6 rounded-2xl border border-slate-100">
+                <div className="bg-slate-50 p-6 rounded-2xl border border-slate-100 mb-8">
                     <p className="text-lg text-slate-800 font-medium">
                         Kilolab importe ce concept en France. Fini le casse-tête des tarifs à la pièce.
                         <br/><span className="text-teal-600 font-black text-xl mt-2 block">Juste le poids du linge propre.</span>
                     </p>
                 </div>
+                 {/* LIEN PRO : Vers le formulaire partenaire */}
+                <Link to="/partner" className="inline-flex items-center font-bold text-slate-900 hover:text-teal-600 transition gap-2 underline underline-offset-4">
+                    Vous êtes un pressing ? Rejoignez-nous <ArrowRight size={18}/>
+                </Link>
             </div>
          </div>
       </div>
 
       {/* =========================================
-          3. COMPARATIF (Exactement ton screen : Card Noir à droite)
+          3. COMPARATIF (Carte noire à droite)
       ========================================= */}
       <div className="py-24 bg-slate-50 border-y border-slate-200">
         <div className="max-w-5xl mx-auto px-4 text-center">
             <div className="inline-flex items-center gap-2 px-4 py-2 bg-red-100 text-red-600 rounded-full font-bold text-sm mb-6 border border-red-200">
                 <AlertCircle size={16}/> Arrêtez de brûler votre argent
             </div>
-            <h2 className="text-4xl font-black mb-4 text-slate-900">
+            <h2 className="text-3xl md:text-4xl font-black mb-6 text-slate-900">
                 Le modèle traditionnel "à la pièce" est obsolète.
             </h2>
-            <p className="text-lg text-slate-500 mb-16">
-                Passez au modèle "au poids" et redonnez du pouvoir d'achat à votre foyer.
+            <p className="text-lg text-slate-500 mb-16 max-w-2xl mx-auto">
+                Passez au modèle "au poids". C'est mathématique : vous redonnez du pouvoir d'achat à votre foyer.
             </p>
 
-            <div className="grid md:grid-cols-2 gap-6 items-center">
+            <div className="grid md:grid-cols-2 gap-8 items-center">
                 
                 {/* Modèle Vieux (Blanc) */}
-                <div className="bg-white p-8 rounded-3xl shadow-sm border border-slate-200">
+                <div className="bg-white p-8 rounded-3xl shadow-sm border border-slate-200 scale-95 opacity-80 grayscale transition hover:grayscale-0 hover:opacity-100 hover:scale-100">
                     <div className="flex items-center gap-2 mb-6 text-red-500 font-bold bg-red-50 w-fit px-3 py-1 rounded-full text-sm">
                         <X size={16}/> Pressing Traditionnel
                     </div>
@@ -118,17 +127,17 @@ export default function Landing() {
                     </div>
                 </div>
 
-                {/* Modèle Kilolab (FONCÉ - Comme ton screen) */}
+                {/* Modèle Kilolab (FONCÉ - Le gagnant) */}
                 <div className="bg-slate-900 p-8 rounded-3xl shadow-2xl border-2 border-teal-500 relative transform md:scale-105 z-10 text-white">
-                    <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-teal-500 text-white text-xs font-bold px-4 py-1 rounded-full uppercase tracking-wider shadow-lg">
-                        La Méthode Kilolab
+                    <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-teal-500 text-white text-xs font-bold px-4 py-1 rounded-full uppercase tracking-wider shadow-lg flex items-center gap-1">
+                        <Check size={14}/> La Méthode Kilolab
                     </div>
                     
-                    <div className="flex items-center gap-2 mb-6 text-teal-400 font-bold w-fit text-lg">
-                        <Check size={20} className="bg-teal-500 text-slate-900 rounded-full p-0.5"/> Lavage au Kilo
+                    <div className="flex items-center gap-2 mb-8 text-teal-400 font-bold w-fit text-lg">
+                        Lavage au Kilo
                     </div>
 
-                    <ul className="space-y-4 text-left text-slate-300 font-medium text-sm">
+                    <ul className="space-y-5 text-left text-slate-300 font-medium text-sm">
                         <li className="flex justify-between border-b border-slate-700 pb-2">
                             <span>3 Chemises (0.6kg)</span> <span className="text-teal-400 font-bold">1.80€</span>
                         </li>
@@ -140,11 +149,12 @@ export default function Landing() {
                         </li>
                     </ul>
 
-                    <div className="mt-8 bg-slate-800 p-4 rounded-xl border border-slate-700">
-                        <p className="text-xs text-slate-400 font-bold uppercase mb-1">Total Kilolab</p>
-                        <div className="text-5xl font-black text-white">9.30€</div>
-                        <p className="text-sm text-teal-400 font-bold mt-2 flex items-center justify-center gap-1">
-                            ↘ Vous économisez 59.70€
+                    <div className="mt-10 bg-slate-800 p-5 rounded-2xl border border-slate-700 relative overflow-hidden">
+                        <div className="absolute inset-0 bg-teal-500 opacity-10 blur-xl"></div>
+                        <p className="text-xs text-slate-400 font-bold uppercase mb-1 relative z-10">Total Kilolab</p>
+                        <div className="text-5xl font-black text-white relative z-10">9.30€</div>
+                        <p className="text-sm text-teal-300 font-bold mt-3 flex items-center justify-center gap-1 relative z-10 bg-teal-900/50 py-1 rounded-lg">
+                            ↘ Vous économisez 59.70€ !
                         </p>
                     </div>
                 </div>
@@ -153,7 +163,7 @@ export default function Landing() {
       </div>
 
       {/* =========================================
-          4. RITUEL / ETAPES (Tes cercles exacts)
+          4. RITUEL (Icônes simples)
       ========================================= */}
       <div className="py-24 px-4">
         <div className="max-w-6xl mx-auto">
@@ -162,10 +172,10 @@ export default function Landing() {
                     ✨ Simple comme bonjour
                 </div>
                 <h2 className="text-4xl font-black text-slate-900">Votre nouveau rituel linge.</h2>
-                <p className="text-slate-500 mt-4 text-lg">Plus d'images floues. Juste un service efficace.</p>
+                <p className="text-slate-500 mt-4 text-lg max-w-md mx-auto">Fini le stress. Déposez, on s'occupe de tout, vous récupérez propre.</p>
             </div>
             
-            <div className="grid md:grid-cols-3 gap-8 relative items-start">
+            <div className="grid md:grid-cols-3 gap-12 relative items-start">
                 {/* Ligne connecteur */}
                 <div className="hidden md:block absolute top-24 left-[15%] right-[15%] h-0.5 bg-teal-100 z-0"></div>
 
@@ -175,12 +185,10 @@ export default function Landing() {
                         <MapPin className="text-teal-500" size={64} strokeWidth={1.5} />
                         <div className="absolute -bottom-4 w-10 h-10 bg-slate-900 text-white rounded-full flex items-center justify-center font-bold border-4 border-white">1</div>
                     </div>
-                    <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm w-full text-center hover:shadow-md transition">
-                        <h3 className="text-xl font-bold mb-2 text-slate-900">Localisez & Déposez</h3>
-                        <p className="text-slate-500 text-sm leading-relaxed">
-                            Trouvez le pressing partenaire sur la carte interactive. Déposez votre sac directement au comptoir.
-                        </p>
-                    </div>
+                    <h3 className="text-xl font-bold mb-2 text-slate-900">Localisez & Déposez</h3>
+                    <p className="text-slate-500 text-sm leading-relaxed text-center px-4">
+                        Trouvez le pressing partenaire le plus proche. Déposez votre sac au comptoir en 2 min.
+                    </p>
                 </div>
 
                 {/* ETAPE 2 */}
@@ -189,12 +197,10 @@ export default function Landing() {
                         <Scale className="text-teal-500" size={64} strokeWidth={1.5} />
                         <div className="absolute -bottom-4 w-10 h-10 bg-slate-900 text-white rounded-full flex items-center justify-center font-bold border-4 border-white">2</div>
                     </div>
-                    <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm w-full text-center hover:shadow-md transition">
-                        <h3 className="text-xl font-bold mb-2 text-slate-900">Pesée & Traitement</h3>
-                        <p className="text-slate-500 text-sm leading-relaxed">
-                            Pesée transparente devant vous. Votre linge est ensuite lavé, séché et plié par des experts.
-                        </p>
-                    </div>
+                    <h3 className="text-xl font-bold mb-2 text-slate-900">Pesée Transparente</h3>
+                    <p className="text-slate-500 text-sm leading-relaxed text-center px-4">
+                        Le partenaire pèse devant vous. Prix fixe au kilo, validé instantanément.
+                    </p>
                 </div>
 
                 {/* ETAPE 3 */}
@@ -203,19 +209,18 @@ export default function Landing() {
                         <Package className="text-teal-500" size={64} strokeWidth={1.5} />
                         <div className="absolute -bottom-4 w-10 h-10 bg-slate-900 text-white rounded-full flex items-center justify-center font-bold border-4 border-white">3</div>
                     </div>
-                    <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm w-full text-center hover:shadow-md transition">
-                        <h3 className="text-xl font-bold mb-2 text-slate-900">Retrait Flash</h3>
-                        <p className="text-slate-500 text-sm leading-relaxed">
-                            Recevez une notif SMS. Scannez votre QR Code pour récupérer votre linge propre en 30 secondes.
-                        </p>
-                    </div>
+                    <h3 className="text-xl font-bold mb-2 text-slate-900">Retrait Flash</h3>
+                    <p className="text-slate-500 text-sm leading-relaxed text-center px-4">
+                        48h plus tard, notif SMS. Récupérez votre linge propre et plié en 30 secondes chrono.
+                    </p>
                 </div>
 
             </div>
             
-            <div className="mt-16 text-center">
-                 <Link to="/new-order" className="inline-flex items-center gap-2 px-8 py-4 bg-teal-600 text-white rounded-full font-bold text-lg hover:bg-teal-500 transition shadow-lg shadow-teal-500/30">
-                    Trouver un pressing <ArrowRight size={20}/>
+            <div className="mt-20 text-center">
+                 {/* LIEN FINAL : Vers la commande */}
+                 <Link to="/new-order" className="inline-flex items-center gap-2 px-8 py-4 bg-teal-600 text-white rounded-full font-bold text-lg hover:bg-teal-500 transition shadow-lg shadow-teal-500/30 animate-bounce-slow">
+                    Trouver un pressing maintenant <ArrowRight size={20}/>
                  </Link>
             </div>
         </div>
