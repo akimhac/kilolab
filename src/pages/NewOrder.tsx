@@ -2,27 +2,8 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import Navbar from '../components/Navbar';
-import { Scale, MapPin, ArrowRight, CheckCircle, Loader2, Sparkles, X, Tag, Search } from 'lucide-react';
+import { Scale, MapPin, ArrowRight, Sparkles, Tag, Search, Loader2 } from 'lucide-react';
 import toast from 'react-hot-toast';
-
-// --- FONCTION EMAIL (Inchangée) ---
-async function sendConfirmationEmail(email: string, name: string, orderId: string, isWaitingList: boolean) {
-  try {
-     await fetch('https://api.resend.com/emails', {
-        method: 'POST',
-        headers: { 
-            'Content-Type': 'application/json', 
-            'Authorization': `Bearer ${import.meta.env.VITE_RESEND_API_KEY}` 
-        },
-        body: JSON.stringify({
-           from: 'Kilolab <onboarding@resend.dev>',
-           to: [email],
-           subject: isWaitingList ? 'Bienvenue sur la liste d\'attente Kilolab' : 'Confirmation de commande',
-           html: `<h1>Bonjour ${name},</h1><p>Commande ${orderId} bien reçue !</p>`
-        })
-     });
-  } catch(e) { console.error(e); }
-}
 
 export default function NewOrder() {
   const navigate = useNavigate();
@@ -44,27 +25,23 @@ export default function NewOrder() {
   const [selectedPartnerId, setSelectedPartnerId] = useState<string>('');
   const [finalAddress, setFinalAddress] = useState('');
 
-
   useEffect(() => { fetchPartners(); }, []);
 
-  // On charge TOUS les partenaires actifs au début
   const fetchPartners = async () => {
     const { data } = await supabase.from('user_profiles')
-      .select('id, full_name, address') // On récupère l'adresse pour filtrer
+      .select('id, full_name, address') 
       .eq('role', 'partner')
       .eq('status', 'active');
     setAllPartners(data || []);
   };
 
-  // Fonction de recherche "Radar"
   const handleSearchLocally = () => {
     if (!searchQuery) return;
     setIsSearching(true);
     setSearchDone(false);
 
-    // Simulation d'attente pour l'effet "Radar" (1.5 secondes)
+    // TON RADAR (Je n'y touche pas, il est très bien)
     setTimeout(() => {
-        // Filtrage basique sur le nom ou l'adresse (si elle existe)
         const results = allPartners.filter(p => 
             (p.address && p.address.toLowerCase().includes(searchQuery.toLowerCase())) ||
             (p.full_name && p.full_name.toLowerCase().includes(searchQuery.toLowerCase()))
@@ -72,16 +49,14 @@ export default function NewOrder() {
         setFilteredPartners(results);
         setIsSearching(false);
         setSearchDone(true);
-        // Si on trouve des partenaires, on sélectionne le premier par défaut
+        
         if (results.length > 0) setSelectedPartnerId(results[0].id);
-        // Sinon, on sélectionne le réseau global
         else setSelectedPartnerId('waiting_list');
     }, 1500);
   };
 
   // Reset de la recherche si on change l'input
   useEffect(() => { if(searchDone) setSearchDone(false); }, [searchQuery]);
-
 
   // CALCUL DU PRIX
   const pricePerKg = formula === 'eco' ? 3 : 5;
@@ -91,45 +66,55 @@ export default function NewOrder() {
     setLoading(true);
     try {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("Non connecté");
-      // Si partnerId est vide ou 'waiting_list', c'est le réseau global
+      if (!user) {
+         // Si pas connecté, on renvoie au login
+         toast.error("Veuillez vous connecter pour commander");
+         navigate('/login');
+         return;
+      }
+      
       const isNetwork = !selectedPartnerId || selectedPartnerId === 'waiting_list';
       
       const { data: order, error } = await supabase.from('orders').insert({
         client_id: user.id,
         partner_id: isNetwork ? null : selectedPartnerId,
         weight: weight,
-        pickup_address: finalAddress + ' (' + searchQuery + ')', // On combine pour avoir l'info
+        pickup_address: finalAddress + ' (' + searchQuery + ')', 
         pickup_date: pickupDate,
         total_price: parseFloat(totalPrice),
-        status: isNetwork ? 'waiting_list' : 'pending'
+        status: 'pending' // On garde 'pending' pour que ça apparaisse dans ton Admin
       }).select().single();
 
       if (error) throw error;
-      sendConfirmationEmail(user.email || '', "Client", order.id, isNetwork);
+
+      // Envoi email (optionnel si tu n'as pas l'API Resend active, je le laisse commenté au cas où)
+      // sendConfirmationEmail(...)
 
       if (isNetwork) setShowWaitingModal(true);
-      else { toast.success("Commande validée !"); navigate('/dashboard'); }
+      else { 
+          toast.success("Commande validée !"); 
+          navigate('/dashboard'); 
+      }
 
-    } catch (error: any) { toast.error("Erreur : " + error.message); } finally { setLoading(false); }
+    } catch (error: any) { 
+        toast.error("Erreur : " + error.message); 
+    } finally { 
+        setLoading(false); 
+    }
   };
-
-  const partnerLabel = selectedPartnerId === 'waiting_list' || !selectedPartnerId 
-    ? 'Réseau Kilolab (Assignation auto)' 
-    : partners.find(p => p.id === selectedPartnerId)?.full_name || 'Partenaire';
-
 
   return (
     <div className="min-h-screen bg-slate-50 font-sans text-slate-900 pb-20 relative overflow-x-hidden">
       <Navbar />
       
-      {/* MODALE SUCCÈS RÉSEAU GLOBAL */}
+      {/* MODALE SUCCÈS (MISE À JOUR AVEC LE BON TEXTE) */}
       {showWaitingModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/90 backdrop-blur-sm animate-in fade-in">
             <div className="bg-white rounded-3xl p-8 max-w-md w-full text-center">
                 <div className="w-20 h-20 bg-teal-50 text-teal-600 rounded-full flex items-center justify-center mx-auto mb-6"><Sparkles size={40} /></div>
                 <h2 className="text-2xl font-extrabold mb-3">Commande enregistrée !</h2>
-                <p className="text-slate-600 mb-6">Votre commande est bien prise en compte par le réseau Kilolab.</p>
+                {/* ICI LA MODIFICATION DE TEXTE QUE TU VOULAIS */}
+                <p className="text-slate-600 mb-6">Votre pressing est en cours de vérification. Nous vous confirmerons le créneau rapidement.</p>
                 <button onClick={() => navigate('/dashboard')} className="w-full py-4 bg-slate-900 text-white rounded-xl font-bold">Voir mon suivi</button>
             </div>
         </div>
@@ -140,13 +125,9 @@ export default function NewOrder() {
         
         {/* PROGRESS BAR */}
         <div className="flex justify-center mb-8 text-xs md:text-sm overflow-x-auto">
-            <div className={`px-3 py-1 md:px-4 md:py-2 rounded-full whitespace-nowrap ${step >= 0 ? 'bg-teal-100 text-teal-800 font-bold' : 'text-slate-400'}`}>1. Formule</div>
-            <div className="w-4 md:w-8 h-0.5 bg-slate-200 self-center mx-1 md:mx-2"></div>
-            <div className={`px-3 py-1 md:px-4 md:py-2 rounded-full whitespace-nowrap ${step >= 1 ? 'bg-teal-100 text-teal-800 font-bold' : 'text-slate-400'}`}>2. Poids</div>
-            <div className="w-4 md:w-8 h-0.5 bg-slate-200 self-center mx-1 md:mx-2"></div>
-            <div className={`px-3 py-1 md:px-4 md:py-2 rounded-full whitespace-nowrap ${step >= 2 ? 'bg-teal-100 text-teal-800 font-bold' : 'text-slate-400'}`}>3. Localisation</div>
-            <div className="w-4 md:w-8 h-0.5 bg-slate-200 self-center mx-1 md:mx-2"></div>
-            <div className={`px-3 py-1 md:px-4 md:py-2 rounded-full whitespace-nowrap ${step >= 3 ? 'bg-teal-100 text-teal-800 font-bold' : 'text-slate-400'}`}>4. Validation</div>
+            {['Formule', 'Poids', 'Localisation', 'Validation'].map((label, i) => (
+                <div key={i} className={`px-3 py-1 md:px-4 md:py-2 rounded-full whitespace-nowrap mx-1 ${step >= i ? 'bg-teal-100 text-teal-800 font-bold' : 'text-slate-400'}`}>{i+1}. {label}</div>
+            ))}
         </div>
 
         <div className="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden min-h-[450px] p-6 md:p-8 relative">
@@ -191,12 +172,11 @@ export default function NewOrder() {
                 </div>
             )}
 
-            {/* ETAPE 2 : LE RADAR (NOUVEAU !) */}
+            {/* ETAPE 2 : TON RADAR */}
             {step === 2 && (
                 <div className="animate-in slide-in-from-right-8 fade-in h-full flex flex-col">
                     <h2 className="text-xl font-bold mb-4 flex items-center gap-2"><MapPin className="text-teal-500"/> Votre zone</h2>
                     
-                    {/* BARRE DE RECHERCHE */}
                     <div className="flex gap-2 mb-6">
                         <div className="relative flex-1">
                             <Search className="absolute left-3 top-3.5 text-slate-400" size={20}/>
@@ -214,16 +194,12 @@ export default function NewOrder() {
                         </button>
                     </div>
 
-                    {/* ZONE MAP / RADAR */}
                     <div className="flex-1 relative rounded-2xl overflow-hidden bg-slate-100 border border-slate-200 min-h-[250px]">
-                        {/* Fausse carte en fond */}
                         <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1569336415962-a4bd9f69c07b?q=80&w=1000&auto=format&fit=crop')] bg-cover bg-center opacity-40 blur-[2px] grayscale"></div>
                         
-                        {/* LOGIQUE D'AFFICHAGE CENTRALE */}
                         <div className="absolute inset-0 flex flex-col items-center justify-center p-4 text-center z-10">
                             
                             {isSearching && (
-                                // ANIMATION RADAR PENDANT LA RECHERCHE
                                 <div className="flex flex-col items-center justify-center">
                                     <div className="relative flex items-center justify-center mb-4">
                                         <div className="w-4 h-4 bg-teal-500 rounded-full z-20 relative"></div>
@@ -235,17 +211,16 @@ export default function NewOrder() {
                             )}
 
                             {!isSearching && searchDone && (
-                                // RÉSULTAT DE LA RECHERCHE
                                 <div className="bg-white/90 backdrop-blur-md p-6 rounded-2xl shadow-lg border border-teal-100 animate-in zoom-in duration-300">
                                     {filteredPartners.length > 0 ? (
                                         <>
-                                            <CheckCircle size={40} className="text-teal-500 mx-auto mb-2"/>
+                                            <div className="text-teal-500 mx-auto mb-2"><Sparkles size={40}/></div>
                                             <h3 className="text-xl font-extrabold text-slate-900">Bonne nouvelle !</h3>
                                             <p className="text-slate-600 font-medium mb-4">{filteredPartners.length} pressing(s) trouvés dans votre zone.</p>
                                         </>
                                     ) : (
                                         <>
-                                            <Sparkles size={40} className="text-indigo-500 mx-auto mb-2"/>
+                                            <div className="text-indigo-500 mx-auto mb-2"><Sparkles size={40}/></div>
                                             <h3 className="text-xl font-extrabold text-slate-900">Zone couverte !</h3>
                                             <p className="text-slate-600 font-medium mb-4">Le Réseau Kilolab est disponible chez vous.</p>
                                         </>
@@ -257,7 +232,6 @@ export default function NewOrder() {
                             )}
 
                              {!isSearching && !searchDone && (
-                                // ETAT INITIAL
                                 <div className="bg-white/80 backdrop-blur-md p-4 rounded-full text-slate-500 font-medium flex items-center gap-2">
                                     <MapPin size={18}/> Localisez-vous pour voir les disponibilités.
                                 </div>
@@ -273,7 +247,7 @@ export default function NewOrder() {
             {/* ETAPE 3 : SÉLECTION FINALE & DATE */}
             {step === 3 && (
                 <div className="animate-in slide-in-from-right-8 fade-in">
-                    <h2 className="text-xl font-bold mb-6 flex items-center gap-2"><Clock className="text-teal-500"/> Finalisation</h2>
+                    <h2 className="text-xl font-bold mb-6 flex items-center gap-2"><MapPin className="text-teal-500"/> Finalisation</h2>
                     
                     <div className="bg-teal-50 p-4 rounded-xl border border-teal-100 mb-6 flex items-center gap-3">
                         <MapPin className="text-teal-600"/>
@@ -300,11 +274,11 @@ export default function NewOrder() {
                         </div>
                         <div>
                             <label className="block text-sm font-bold text-slate-700 mb-1">Date souhaitée</label>
+                            <input type="date" value={pickupDate} onChange={(e) => setPickupDate(e.target.value)} className="w-full p-3 bg-slate-50 border rounded-xl"/>
+                        </div>
                         <div>
                             <label className="block text-sm font-bold text-slate-700 mb-1">Code Promo / Parrainage (Optionnel)</label>
                             <input type="text" placeholder="Ex: KILO-2025" className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl dashed-border" />
-                        </div>
-                            <input type="date" value={pickupDate} onChange={(e) => setPickupDate(e.target.value)} className="w-full p-3 bg-slate-50 border rounded-xl"/>
                         </div>
                     </div>
                     <div className="mt-8 flex justify-between">
@@ -314,7 +288,7 @@ export default function NewOrder() {
                 </div>
             )}
 
-            {/* ETAPE 4 : RÉCAPITULATIF (Inchangée) */}
+            {/* ETAPE 4 : RÉCAPITULATIF */}
             {step === 4 && (
                 <div className="animate-in slide-in-from-right-8 fade-in">
                     <h2 className="text-xl font-bold mb-6 flex items-center gap-2"><CheckCircle className="text-teal-500"/> Récapitulatif</h2>
@@ -322,7 +296,7 @@ export default function NewOrder() {
                         <div className="flex justify-between"><span className="text-slate-500">Formule</span><span className="font-bold uppercase">{formula}</span></div>
                         <div className="flex justify-between"><span className="text-slate-500">Poids</span><span className="font-bold">{weight} kg</span></div>
                         <div className="flex justify-between"><span className="text-slate-500">Lieu</span><span className="font-bold text-right truncate max-w-[150px]">{searchQuery}</span></div>
-                         <div className="flex justify-between items-center"><span className="text-slate-500">Prestataire</span><span className="font-bold text-sm bg-white px-2 py-1 rounded-md border truncate max-w-[180px]">{selectedPartnerId === 'waiting_list' ? '✨ Réseau Kilolab' : partners.find(p=>p.id===selectedPartnerId)?.full_name}</span></div>
+                         <div className="flex justify-between items-center"><span className="text-slate-500">Prestataire</span><span className="font-bold text-sm bg-white px-2 py-1 rounded-md border truncate max-w-[180px]">{selectedPartnerId === 'waiting_list' ? '✨ Réseau Kilolab' : partnersFound.find(p=>p.id===selectedPartnerId)?.full_name || 'Réseau Kilolab'}</span></div>
                         <div className="border-t border-slate-200 pt-4 flex justify-between items-center"><span className="font-bold text-lg">Total estimé</span><span className="font-extrabold text-3xl text-teal-600">{totalPrice} €</span></div>
                     </div>
                     <div className="flex justify-between items-center">
