@@ -37,11 +37,11 @@ export default function Landing() {
           </p>
           
           <div className="flex flex-col sm:flex-row justify-center gap-4">
-            {/* LIEN 1 : Vers la commande */}
+            {/* LIEN 1 : Vers la commande (TEST CLIENT) */}
             <Link to="/new-order" className="px-8 py-4 bg-teal-500 text-white rounded-full font-bold text-lg hover:bg-teal-400 transition shadow-xl shadow-teal-500/30 flex items-center justify-center gap-2">
               Me libérer de la corvée <ArrowRight size={20}/>
             </Link>
-            {/* LIEN 2 : Vers les tarifs (si la page existe, sinon vers new-order aussi) */}
+            {/* LIEN 2 : Vers les tarifs */}
             <Link to="/tarifs" className="px-8 py-4 bg-slate-900 text-white rounded-full font-bold text-lg hover:bg-slate-800 transition flex items-center justify-center">
               Voir les tarifs (3€/kg)
             </Link>
@@ -54,7 +54,7 @@ export default function Landing() {
       ========================================= */}
       <div className="py-24 px-4 bg-white overflow-hidden">
          <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-16 items-center">
-            {/* Montage photo incliné */}
+            {/* Montage photo incliné comme sur ton screen */}
             <div className="relative h-[450px] w-full flex items-center justify-center scale-90 md:scale-100">
                 {/* Image Bali (Temple) */}
                 <img 
@@ -86,7 +86,7 @@ export default function Landing() {
                         <br/><span className="text-teal-600 font-black text-xl mt-2 block">Juste le poids du linge propre.</span>
                     </p>
                 </div>
-                 {/* LIEN PRO : Vers le formulaire partenaire */}
+                 {/* LIEN PRO : Vers le formulaire partenaire (TEST PARTENAIRE) */}
                 <Link to="/partner" className="inline-flex items-center font-bold text-slate-900 hover:text-teal-600 transition gap-2 underline underline-offset-4">
                     Vous êtes un pressing ? Rejoignez-nous <ArrowRight size={18}/>
                 </Link>
