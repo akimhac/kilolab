@@ -9,23 +9,25 @@ export default function Landing() {
       <Navbar />
 
       {/* =========================================
-          1. HERO SECTION (CELLE DU CERCLE ROUGE : IMAGE FOND + TEXTE BLANC)
+          1. HERO SECTION (CORRIGÉE : L'image devrait s'afficher maintenant)
       ========================================= */}
-      <div className="relative h-[90vh] min-h-[600px] flex items-center justify-center overflow-hidden">
+      <div className="relative h-[90vh] min-h-[600px] flex items-center justify-center overflow-hidden bg-slate-900">
         
-        {/* IMAGE DE FOND : Gros plan linge plié/chaud (Style Pulls/Mailles) */}
-        <div className="absolute inset-0 z-0">
-            <img 
-                src="https://images.unsplash.com/photo-1489274495757-95c7c83700c0?q=80&w=2000&auto=format&fit=crop" 
-                className="w-full h-full object-cover"
-                alt="Pile de linge propre et doux"
-            />
-            {/* Voile noir pour que le texte blanc soit lisible */}
-            <div className="absolute inset-0 bg-black/50"></div>
-            {/* Dégradé bas pour transition douce vers la suite */}
-            <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-slate-50 to-transparent"></div>
-        </div>
+        {/* --- COUCHE 1 : L'IMAGE DE FOND (Tout au fond, z-0) --- */}
+        <img 
+            src="https://images.unsplash.com/photo-1489274495757-95c7c83700c0?q=80&w=2000&auto=format&fit=crop" 
+            className="absolute inset-0 w-full h-full object-cover z-0"
+            alt="Pile de linge propre et doux"
+        />
 
+        {/* --- COUCHE 2 : LES FILTRES (Au-dessus de l'image, z-1) --- */}
+        {/* Voile noir sombre pour que le texte blanc ressorte bien */}
+        <div className="absolute inset-0 bg-black/60 z-1"></div>
+        {/* Dégradé en bas pour la transition avec la section suivante */}
+        <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-slate-50 to-transparent z-1"></div>
+
+
+        {/* --- COUCHE 3 : LE CONTENU TEXTE (Au-dessus de tout, z-10) --- */}
         <div className="max-w-7xl mx-auto px-4 relative z-10 text-center text-white mt-16">
           {/* Badge Blanc translucide */}
           <div className="inline-block px-4 py-2 bg-white/20 backdrop-blur-md text-white rounded-full text-sm font-bold mb-6 border border-white/30 shadow-lg">
