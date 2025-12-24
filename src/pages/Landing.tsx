@@ -9,40 +9,46 @@ export default function Landing() {
       <Navbar />
 
       {/* =========================================
-          1. HERO SECTION (Arrière-plan TEXTURE LINGE visible)
+          1. HERO SECTION (VERSION PREMIUM AVEC IMAGE DE FOND)
       ========================================= */}
-      <div className="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden">
-        {/* IMAGE DE FOND : Texture de linge propre */}
+      <div className="relative h-[90vh] min-h-[600px] flex items-center justify-center overflow-hidden">
+        
+        {/* IMAGE DE FOND : Gros plan linge plié/chaud (Style Pulls/Serviettes) */}
         <div className="absolute inset-0 z-0">
             <img 
-                src="https://images.unsplash.com/photo-1517677208171-0bc5e2e3f603?q=80&w=2000&auto=format&fit=crop" 
-                className="w-full h-full object-cover opacity-30" // Opacité augmentée pour bien voir la texture
-                alt="Texture linge blanc"
+                src="https://images.unsplash.com/photo-1489274495757-95c7c83700c0?q=80&w=2000&auto=format&fit=crop" 
+                className="w-full h-full object-cover"
+                alt="Pile de linge propre et doux"
             />
-            {/* Dégradé blanc pour fondre le bas de l'image */}
-            <div className="absolute inset-0 bg-gradient-to-t from-white via-white/20 to-transparent"></div>
+            {/* Voile noir pour que le texte reste lisible */}
+            <div className="absolute inset-0 bg-black/50"></div>
+            {/* Dégradé bas pour transition douce vers le blanc */}
+            <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-white to-transparent"></div>
         </div>
 
-        <div className="max-w-7xl mx-auto px-4 relative z-10 text-center">
-          <div className="inline-block px-4 py-2 bg-teal-50 text-teal-700 rounded-full text-sm font-bold mb-6 border border-teal-100 shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 relative z-10 text-center text-white mt-16">
+          <div className="inline-block px-4 py-2 bg-white/20 backdrop-blur-md text-white rounded-full text-sm font-bold mb-6 border border-white/30 shadow-lg animate-fade-in-up">
             ✨ Le nouveau standard du pressing
           </div>
-          <h1 className="text-5xl md:text-7xl font-black mb-6 tracking-tight leading-tight text-slate-900">
+          
+          <h1 className="text-5xl md:text-8xl font-black mb-8 tracking-tight leading-tight drop-shadow-lg">
             Votre temps est précieux.<br/>
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-500 to-emerald-600">Pas votre lessive.</span>
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-200 to-emerald-400">Pas votre lessive.</span>
           </h1>
-          <p className="text-xl text-slate-500 max-w-2xl mx-auto mb-10 leading-relaxed">
+          
+          <p className="text-xl md:text-2xl text-slate-100 max-w-2xl mx-auto mb-12 leading-relaxed drop-shadow-md font-medium">
             Confiez-nous votre linge <strong>au kilo</strong>. Nous le lavons, séchons et plions pour vous. 
-            Moins cher qu'un café par jour.
+            <br/>Moins cher qu'un café par jour.
           </p>
           
-          <div className="flex flex-col sm:flex-row justify-center gap-4">
-            {/* LIEN 1 : Vers la commande (TEST CLIENT) */}
-            <Link to="/new-order" className="px-8 py-4 bg-teal-500 text-white rounded-full font-bold text-lg hover:bg-teal-400 transition shadow-xl shadow-teal-500/30 flex items-center justify-center gap-2">
-              Me libérer de la corvée <ArrowRight size={20}/>
+          <div className="flex flex-col sm:flex-row justify-center gap-6">
+            {/* BOUTON 1 : ACTION PRINCIPALE */}
+            <Link to="/new-order" className="px-10 py-5 bg-teal-500 text-white rounded-full font-bold text-xl hover:bg-teal-400 transition shadow-2xl shadow-teal-500/50 flex items-center justify-center gap-3 transform hover:scale-105 duration-200">
+              Me libérer de la corvée <ArrowRight size={24}/>
             </Link>
-            {/* LIEN 2 : Vers les tarifs */}
-            <Link to="/tarifs" className="px-8 py-4 bg-slate-900 text-white rounded-full font-bold text-lg hover:bg-slate-800 transition flex items-center justify-center">
+            
+            {/* BOUTON 2 : SECONDAIRE */}
+            <Link to="/tarifs" className="px-10 py-5 bg-white/10 backdrop-blur-md text-white border-2 border-white/30 rounded-full font-bold text-xl hover:bg-white hover:text-slate-900 transition flex items-center justify-center">
               Voir les tarifs (3€/kg)
             </Link>
           </div>
@@ -50,22 +56,22 @@ export default function Landing() {
       </div>
 
       {/* =========================================
-          2. HISTOIRE (Images BALI + MACHINES inclinées)
+          2. HISTOIRE (Bali & Paris - Images Inclinées)
       ========================================= */}
       <div className="py-24 px-4 bg-white overflow-hidden">
          <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-16 items-center">
-            {/* Montage photo incliné comme sur ton screen */}
+            {/* Montage photo incliné */}
             <div className="relative h-[450px] w-full flex items-center justify-center scale-90 md:scale-100">
                 {/* Image Bali (Temple) */}
                 <img 
-                    src="https://images.unsplash.com/photo-1555400038-63f5ba517a47?w=600&auto=format&fit=crop&q=60" 
-                    className="absolute left-4 top-0 w-[60%] h-72 object-cover rounded-3xl shadow-2xl z-10 border-4 border-white -rotate-6"
-                    alt="Bali Temple"
+                    src="https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=600&auto=format&fit=crop&q=60" 
+                    className="absolute left-4 top-0 w-[60%] h-72 object-cover rounded-3xl shadow-2xl z-10 border-4 border-white -rotate-6 transition hover:rotate-0 duration-500"
+                    alt="Bali Lifestyle"
                 />
                 {/* Image Machines */}
                 <img 
                     src="https://images.unsplash.com/photo-1545173168-9f1947eebb8f?w=600&auto=format&fit=crop&q=60" 
-                    className="absolute right-4 bottom-0 w-[60%] h-72 object-cover rounded-3xl shadow-2xl z-0 border-4 border-white rotate-6"
+                    className="absolute right-4 bottom-0 w-[60%] h-72 object-cover rounded-3xl shadow-2xl z-0 border-4 border-white rotate-6 transition hover:rotate-0 duration-500"
                     alt="Laverie moderne"
                 />
             </div>
@@ -86,7 +92,6 @@ export default function Landing() {
                         <br/><span className="text-teal-600 font-black text-xl mt-2 block">Juste le poids du linge propre.</span>
                     </p>
                 </div>
-                 {/* LIEN PRO : Vers le formulaire partenaire (TEST PARTENAIRE) */}
                 <Link to="/partner" className="inline-flex items-center font-bold text-slate-900 hover:text-teal-600 transition gap-2 underline underline-offset-4">
                     Vous êtes un pressing ? Rejoignez-nous <ArrowRight size={18}/>
                 </Link>
@@ -218,7 +223,6 @@ export default function Landing() {
             </div>
             
             <div className="mt-20 text-center">
-                 {/* LIEN FINAL : Vers la commande */}
                  <Link to="/new-order" className="inline-flex items-center gap-2 px-8 py-4 bg-teal-600 text-white rounded-full font-bold text-lg hover:bg-teal-500 transition shadow-lg shadow-teal-500/30 animate-bounce-slow">
                     Trouver un pressing maintenant <ArrowRight size={20}/>
                  </Link>
