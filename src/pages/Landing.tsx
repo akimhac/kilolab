@@ -9,7 +9,7 @@ export default function Landing() {
       <Navbar />
 
       {/* =========================================
-          1. HERO SECTION (VERSION PREMIUM AVEC IMAGE DE FOND)
+          1. HERO SECTION (STYLE PREMIUM : IMAGE FOND + TEXTE BLANC)
       ========================================= */}
       <div className="relative h-[90vh] min-h-[600px] flex items-center justify-center overflow-hidden">
         
@@ -20,18 +20,18 @@ export default function Landing() {
                 className="w-full h-full object-cover"
                 alt="Pile de linge propre et doux"
             />
-            {/* Voile noir pour que le texte reste lisible */}
+            {/* Voile noir pour que le texte blanc soit lisible */}
             <div className="absolute inset-0 bg-black/50"></div>
             {/* Dégradé bas pour transition douce vers le blanc */}
             <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-white to-transparent"></div>
         </div>
 
         <div className="max-w-7xl mx-auto px-4 relative z-10 text-center text-white mt-16">
-          <div className="inline-block px-4 py-2 bg-white/20 backdrop-blur-md text-white rounded-full text-sm font-bold mb-6 border border-white/30 shadow-lg animate-fade-in-up">
+          <div className="inline-block px-4 py-2 bg-white/20 backdrop-blur-md text-white rounded-full text-sm font-bold mb-6 border border-white/30 shadow-lg">
             ✨ Le nouveau standard du pressing
           </div>
           
-          <h1 className="text-5xl md:text-8xl font-black mb-8 tracking-tight leading-tight drop-shadow-lg">
+          <h1 className="text-5xl md:text-8xl font-black mb-8 tracking-tight leading-tight drop-shadow-lg text-white">
             Votre temps est précieux.<br/>
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-200 to-emerald-400">Pas votre lessive.</span>
           </h1>
@@ -42,12 +42,12 @@ export default function Landing() {
           </p>
           
           <div className="flex flex-col sm:flex-row justify-center gap-6">
-            {/* BOUTON 1 : ACTION PRINCIPALE */}
+            {/* BOUTON 1 : ACTION PRINCIPALE -> Vers Commande */}
             <Link to="/new-order" className="px-10 py-5 bg-teal-500 text-white rounded-full font-bold text-xl hover:bg-teal-400 transition shadow-2xl shadow-teal-500/50 flex items-center justify-center gap-3 transform hover:scale-105 duration-200">
               Me libérer de la corvée <ArrowRight size={24}/>
             </Link>
             
-            {/* BOUTON 2 : SECONDAIRE */}
+            {/* BOUTON 2 : SECONDAIRE -> Vers Tarifs */}
             <Link to="/tarifs" className="px-10 py-5 bg-white/10 backdrop-blur-md text-white border-2 border-white/30 rounded-full font-bold text-xl hover:bg-white hover:text-slate-900 transition flex items-center justify-center">
               Voir les tarifs (3€/kg)
             </Link>
@@ -64,7 +64,7 @@ export default function Landing() {
             <div className="relative h-[450px] w-full flex items-center justify-center scale-90 md:scale-100">
                 {/* Image Bali (Temple) */}
                 <img 
-                    src="https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=600&auto=format&fit=crop&q=60" 
+                    src="https://images.unsplash.com/photo-1555400038-63f5ba517a47?w=600&auto=format&fit=crop&q=60" 
                     className="absolute left-4 top-0 w-[60%] h-72 object-cover rounded-3xl shadow-2xl z-10 border-4 border-white -rotate-6 transition hover:rotate-0 duration-500"
                     alt="Bali Lifestyle"
                 />
@@ -92,6 +92,7 @@ export default function Landing() {
                         <br/><span className="text-teal-600 font-black text-xl mt-2 block">Juste le poids du linge propre.</span>
                     </p>
                 </div>
+                {/* LIEN PRO : Vers Partenaire */}
                 <Link to="/partner" className="inline-flex items-center font-bold text-slate-900 hover:text-teal-600 transition gap-2 underline underline-offset-4">
                     Vous êtes un pressing ? Rejoignez-nous <ArrowRight size={18}/>
                 </Link>
@@ -100,7 +101,7 @@ export default function Landing() {
       </div>
 
       {/* =========================================
-          3. COMPARATIF (Carte noire à droite)
+          3. COMPARATIF (Carte noire à droite, Prix 9.30€)
       ========================================= */}
       <div className="py-24 bg-slate-50 border-y border-slate-200">
         <div className="max-w-5xl mx-auto px-4 text-center">
@@ -132,7 +133,7 @@ export default function Landing() {
                     </div>
                 </div>
 
-                {/* Modèle Kilolab (FONCÉ - Le gagnant) */}
+                {/* Modèle Kilolab (FONCÉ - Le gagnant - 9.30€) */}
                 <div className="bg-slate-900 p-8 rounded-3xl shadow-2xl border-2 border-teal-500 relative transform md:scale-105 z-10 text-white">
                     <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-teal-500 text-white text-xs font-bold px-4 py-1 rounded-full uppercase tracking-wider shadow-lg flex items-center gap-1">
                         <Check size={14}/> La Méthode Kilolab
@@ -168,7 +169,7 @@ export default function Landing() {
       </div>
 
       {/* =========================================
-          4. RITUEL (Icônes simples)
+          4. RITUEL (Icônes simples : Map, Scale, Package)
       ========================================= */}
       <div className="py-24 px-4">
         <div className="max-w-6xl mx-auto">
@@ -223,6 +224,7 @@ export default function Landing() {
             </div>
             
             <div className="mt-20 text-center">
+                 {/* LIEN FINAL : Vers Commande */}
                  <Link to="/new-order" className="inline-flex items-center gap-2 px-8 py-4 bg-teal-600 text-white rounded-full font-bold text-lg hover:bg-teal-500 transition shadow-lg shadow-teal-500/30 animate-bounce-slow">
                     Trouver un pressing maintenant <ArrowRight size={20}/>
                  </Link>
