@@ -17,10 +17,12 @@ export default function Landing() {
         <div className="absolute inset-0 z-0">
             <img 
                 src="https://images.unsplash.com/photo-1489274495757-95c7c83700c0?q=80&w=2000&auto=format&fit=crop" 
-                className="w-full h-full object-cover brightness-50"
+                className="w-full h-full object-cover"
                 alt="Pile de linge propre et doux"
             />
-            {/* Dégradé bas uniquement */}
+            {/* Voile LÉGER pour que le texte soit lisible MAIS qu'on voie l'image */}
+            <div className="absolute inset-0 bg-slate-900/40"></div>
+            {/* Dégradé bas */}
             <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-white to-transparent"></div>
         </div>
 
