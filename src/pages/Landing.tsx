@@ -10,23 +10,23 @@ return (
 
 ```
   {/* =========================================
-      1. HERO SECTION - IMAGE DE FOND FIXÉE
+      1. HERO SECTION - OPTIMISÉ
   ========================================= */}
-  <div className="relative h-screen min-h-[700px] flex items-center justify-center overflow-hidden bg-slate-600">
+  <div className="relative h-screen min-h-[700px] flex items-center justify-center overflow-hidden">
     
-    {/* Image de fond - URL alternative plus fiable */}
+    {/* Image de fond - Performance optimisée */}
     <img 
-      src="https://images.unsplash.com/photo-1582735689369-4fe89db7114c?q=80&w=2400&auto=format&fit=crop&ixlib=rb-4.0.3" 
+      src="https://images.unsplash.com/photo-1489274495757-95c7c83700c0?q=80&w=2400&auto=format&fit=crop" 
       className="absolute inset-0 w-full h-full object-cover"
-      alt="Linge propre et soigné"
+      alt="Pile de linge propre et plié avec soin"
       loading="eager"
     />
 
     {/* Overlay Pro (Dégradé pour lisibilité) */}
     <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/50 to-slate-900/70"></div>
     
-    {/* Badge */}
-    <div className="absolute top-24 sm:top-32 left-1/2 -translate-x-1/2 z-20 w-full text-center">
+    {/* Badge - Animation fade-in */}
+    <div className="absolute top-24 sm:top-32 left-1/2 -translate-x-1/2 z-20 w-full text-center animate-fade-in">
       <div className="inline-flex items-center gap-2 px-4 sm:px-5 py-2 sm:py-2.5 bg-teal-500/20 backdrop-blur-md text-white rounded-full text-xs sm:text-sm font-bold border border-teal-400/30 shadow-xl">
         ✨ Le nouveau standard du pressing
       </div>
@@ -34,17 +34,17 @@ return (
 
     {/* Contenu principal - Responsive amélioré */}
     <div className="relative z-20 max-w-5xl mx-auto px-4 sm:px-6 text-center pt-16 sm:pt-20">
-      <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-black text-white mb-6 sm:mb-8 leading-[1.1] tracking-tight drop-shadow-lg">
+      <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-black text-white mb-6 sm:mb-8 leading-[1.1] tracking-tight drop-shadow-lg animate-slide-up">
         Votre temps est précieux.<br/>
         <span className="text-teal-400">Pas votre lessive.</span>
       </h1>
       
-      <p className="text-lg sm:text-xl md:text-2xl text-white/90 max-w-3xl mx-auto mb-10 sm:mb-12 leading-relaxed font-light drop-shadow-md">
+      <p className="text-lg sm:text-xl md:text-2xl text-white/90 max-w-3xl mx-auto mb-10 sm:mb-12 leading-relaxed font-light drop-shadow-md animate-slide-up-delay">
         Confiez-nous votre linge <strong className="font-bold text-white">au kilo</strong>. Nous le lavons, séchons et<br className="hidden md:block"/>
         plions pour vous. Moins cher qu'un café par jour.
       </p>
       
-      <div className="flex flex-col sm:flex-row gap-4 sm:gap-5 justify-center">
+      <div className="flex flex-col sm:flex-row gap-4 sm:gap-5 justify-center animate-slide-up-delay-2">
         <Link 
           to="/new-order"
           aria-label="Créer une nouvelle commande de pressing au kilo" 
