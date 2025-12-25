@@ -189,15 +189,16 @@ export default function Landing() {
             
             {/* GAUCHE : Images Simples et Robustes */}
             <div className="relative h-[450px] w-full flex items-center justify-center scale-95">
-                {/* Image Temple */}
+                {/* Image 1 : Temple de Bali (Celle de gauche) */}
                 <img 
                     src="https://images.unsplash.com/photo-1555400038-63f5ba517a47?w=600&auto=format&fit=crop&q=60" 
                     className="absolute left-4 top-0 w-[60%] h-72 object-cover rounded-3xl shadow-2xl z-10 border-4 border-white -rotate-6 transition hover:rotate-0 duration-500"
                     alt="Temple de Bali"
                 />
-                {/* Image Machines */}
+                
+                {/* Image 2 : Laverie (Celle de droite) - LIEN CORRIGÉ */}
                 <img 
-                    src="https://images.unsplash.com/photo-1545173168-9f1947eebb8f?w=600&auto=format&fit=crop&q=60" 
+                    src="https://images.unsplash.com/photo-1517677208171-0bc12dd223eb?w=600&auto=format&fit=crop&q=60" 
                     className="absolute right-4 bottom-0 w-[60%] h-72 object-cover rounded-3xl shadow-2xl z-0 border-4 border-white rotate-6 transition hover:rotate-0 duration-500"
                     alt="Laverie Moderne"
                 />
