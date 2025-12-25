@@ -9,37 +9,36 @@ export default function Landing() {
       <Navbar />
 
       {/* =========================================
-          1. HERO SECTION (CORRIGÉE : Image forcée en arrière-plan)
+          1. HERO SECTION (SIMPLIFIÉE & ROBUSTE)
       ========================================= */}
-      <div className="relative h-[90vh] min-h-[600px] flex items-center justify-center overflow-hidden">
+      <div className="relative h-[90vh] min-h-[600px] flex items-center justify-center overflow-hidden bg-slate-900">
         
-        {/* COUCHE 1 : L'IMAGE (Z-0) */}
-        <div className="absolute inset-0 z-0">
-            <img 
-                src="https://images.unsplash.com/photo-1489274495757-95c7c83700c0?q=80&w=2000&auto=format&fit=crop" 
-                className="w-full h-full object-cover"
-                alt="Pile de linge propre et doux"
-            />
-        </div>
+        {/* 1. L'IMAGE (Tout au fond car en premier dans le code) */}
+        <img 
+            src="https://images.unsplash.com/photo-1489274495757-95c7c83700c0?q=80&w=2000&auto=format&fit=crop" 
+            className="absolute inset-0 w-full h-full object-cover opacity-90"
+            alt="Pile de linge propre et doux"
+            loading="eager" // Force le chargement immédiat
+        />
 
-        {/* COUCHE 2 : LES FILTRES (Z-1) */}
-        {/* Voile noir pour lisibilité du texte */}
-        <div className="absolute inset-0 bg-black/50 z-1"></div>
-        {/* Dégradé bas vers le blanc pour la transition douce */}
-        <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-white to-transparent z-1"></div>
+        {/* 2. LE VOILE NOIR (Juste par-dessus l'image) */}
+        <div className="absolute inset-0 bg-black/50"></div>
 
-        {/* COUCHE 3 : LE CONTENU (Z-10) */}
+        {/* 3. LE DÉGRADÉ BAS (Pour la transition douce vers le blanc) */}
+        <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-white to-transparent"></div>
+
+        {/* 4. LE CONTENU (Au-dessus de tout grâce à relative z-10) */}
         <div className="max-w-7xl mx-auto px-4 relative z-10 text-center text-white mt-16">
           <div className="inline-block px-4 py-2 bg-white/20 backdrop-blur-md text-white rounded-full text-sm font-bold mb-6 border border-white/30 shadow-lg">
             ✨ Le nouveau standard du pressing
           </div>
           
-          <h1 className="text-5xl md:text-8xl font-black mb-8 tracking-tight leading-tight drop-shadow-lg text-white">
+          <h1 className="text-5xl md:text-8xl font-black mb-8 tracking-tight leading-tight drop-shadow-2xl text-white">
             Votre temps est précieux.<br/>
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-200 to-emerald-400">Pas votre lessive.</span>
           </h1>
           
-          <p className="text-xl md:text-2xl text-slate-100 max-w-2xl mx-auto mb-12 leading-relaxed drop-shadow-md font-medium">
+          <p className="text-xl md:text-2xl text-slate-100 max-w-2xl mx-auto mb-12 leading-relaxed drop-shadow-lg font-medium">
             Confiez-nous votre linge <strong>au kilo</strong>. Nous le lavons, séchons et plions pour vous. 
             <br/>Moins cher qu'un café par jour.
           </p>
@@ -57,7 +56,7 @@ export default function Landing() {
       </div>
 
       {/* =========================================
-          2. LE RITUEL (ICONES SIMPLES)
+          2. LE RITUEL
       ========================================= */}
       <div className="py-24 px-4 bg-white">
         <div className="max-w-6xl mx-auto">
@@ -70,9 +69,10 @@ export default function Landing() {
             </div>
             
             <div className="grid md:grid-cols-3 gap-12 relative items-start">
-                {/* Ligne connecteur (visible sur desktop uniquement) */}
+                {/* Ligne connecteur */}
                 <div className="hidden md:block absolute top-24 left-[15%] right-[15%] h-0.5 bg-teal-100 z-0"></div>
 
+                {/* ETAPE 1 */}
                 <div className="flex flex-col items-center relative z-10 group">
                     <div className="w-48 h-48 rounded-full bg-white border-4 border-teal-50 shadow-xl flex items-center justify-center mb-8 transition transform group-hover:scale-105">
                         <MapPin className="text-teal-500" size={64} strokeWidth={1.5} />
@@ -84,6 +84,7 @@ export default function Landing() {
                     </p>
                 </div>
 
+                {/* ETAPE 2 */}
                 <div className="flex flex-col items-center relative z-10 group">
                     <div className="w-48 h-48 rounded-full bg-white border-4 border-teal-50 shadow-xl flex items-center justify-center mb-8 transition transform group-hover:scale-105">
                         <Scale className="text-teal-500" size={64} strokeWidth={1.5} />
@@ -95,6 +96,7 @@ export default function Landing() {
                     </p>
                 </div>
 
+                {/* ETAPE 3 */}
                 <div className="flex flex-col items-center relative z-10 group">
                     <div className="w-48 h-48 rounded-full bg-white border-4 border-teal-50 shadow-xl flex items-center justify-center mb-8 transition transform group-hover:scale-105">
                         <Package className="text-teal-500" size={64} strokeWidth={1.5} />
@@ -116,7 +118,7 @@ export default function Landing() {
       </div>
 
       {/* =========================================
-          3. COMPARATIF PRIX (CARTE NOIRE 9.30€)
+          3. COMPARATIF PRIX
       ========================================= */}
       <div className="py-24 bg-slate-50 border-y border-slate-200">
         <div className="max-w-5xl mx-auto px-4 text-center">
@@ -147,7 +149,7 @@ export default function Landing() {
                     </div>
                 </div>
 
-                {/* Modèle Kilolab (FONCÉ) */}
+                {/* Modèle Kilolab */}
                 <div className="bg-slate-900 p-8 rounded-3xl shadow-2xl border-2 border-teal-500 relative transform md:scale-105 z-10 text-white">
                     <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-teal-500 text-white text-xs font-bold px-4 py-1 rounded-full uppercase tracking-wider shadow-lg flex items-center gap-1">
                         <Check size={14}/> La Méthode Kilolab
@@ -180,27 +182,28 @@ export default function Landing() {
       </div>
 
       {/* =========================================
-          4. NOTRE HISTOIRE (BALI IMAGES INCLINÉES)
+          4. NOTRE HISTOIRE
       ========================================= */}
       <div className="py-24 px-4 bg-white overflow-hidden">
          <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-16 items-center">
             
-            {/* BLOC IMAGE ROBUSTE (2 images inclinées) */}
+            {/* GAUCHE : Images Simples et Robustes */}
             <div className="relative h-[450px] w-full flex items-center justify-center scale-95">
                 {/* Image Temple */}
                 <img 
                     src="https://images.unsplash.com/photo-1555400038-63f5ba517a47?w=600&auto=format&fit=crop&q=60" 
-                    className="absolute left-4 top-0 w-[60%] h-72 object-cover rounded-3xl shadow-2xl z-10 border-4 border-white -rotate-6 hover:rotate-0 transition duration-500"
-                    alt="Bali Temple"
+                    className="absolute left-4 top-0 w-[60%] h-72 object-cover rounded-3xl shadow-2xl z-10 border-4 border-white -rotate-6 transition hover:rotate-0 duration-500"
+                    alt="Temple de Bali"
                 />
                 {/* Image Machines */}
                 <img 
                     src="https://images.unsplash.com/photo-1545173168-9f1947eebb8f?w=600&auto=format&fit=crop&q=60" 
-                    className="absolute right-4 bottom-0 w-[60%] h-72 object-cover rounded-3xl shadow-2xl z-0 border-4 border-white rotate-6 hover:rotate-0 transition duration-500"
+                    className="absolute right-4 bottom-0 w-[60%] h-72 object-cover rounded-3xl shadow-2xl z-0 border-4 border-white rotate-6 transition hover:rotate-0 duration-500"
                     alt="Laverie Moderne"
                 />
             </div>
             
+            {/* DROITE : Texte */}
             <div className="relative z-10 md:pl-12">
                 <div className="inline-block px-3 py-1 bg-teal-100 text-teal-800 rounded-lg font-bold text-xs mb-6 uppercase tracking-wider">NOTRE HISTOIRE</div>
                 <h2 className="text-4xl font-black mb-6 text-slate-900 leading-tight">
