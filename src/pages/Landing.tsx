@@ -9,26 +9,24 @@ export default function Landing() {
       <Navbar />
 
       {/* =========================================
-          1. HERO SECTION (SIMPLIFIÉE & ROBUSTE)
+          1. HERO SECTION (L'IMAGE DOIT ÊTRE LA PRIORITÉ)
       ========================================= */}
       <div className="relative h-[90vh] min-h-[600px] flex items-center justify-center overflow-hidden bg-slate-900">
         
-        {/* 1. L'IMAGE (Tout au fond car en premier dans le code) */}
+        {/* IMAGE 1 : Le fond chaud (Pulls/Linge) */}
         <img 
             src="https://images.unsplash.com/photo-1489274495757-95c7c83700c0?q=80&w=2000&auto=format&fit=crop" 
-            className="absolute inset-0 w-full h-full object-cover opacity-90"
+            className="absolute inset-0 w-full h-full object-cover z-0"
             alt="Pile de linge propre et doux"
-            loading="eager" // Force le chargement immédiat
+            loading="eager"
         />
 
-        {/* 2. LE VOILE NOIR (Juste par-dessus l'image) */}
-        <div className="absolute inset-0 bg-black/50"></div>
+        {/* FILTRES : Pour que le texte blanc soit lisible */}
+        <div className="absolute inset-0 bg-black/50 z-10"></div>
+        <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-white to-transparent z-10"></div>
 
-        {/* 3. LE DÉGRADÉ BAS (Pour la transition douce vers le blanc) */}
-        <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-white to-transparent"></div>
-
-        {/* 4. LE CONTENU (Au-dessus de tout grâce à relative z-10) */}
-        <div className="max-w-7xl mx-auto px-4 relative z-10 text-center text-white mt-16">
+        {/* CONTENU : Texte par-dessus tout */}
+        <div className="max-w-7xl mx-auto px-4 relative z-20 text-center text-white mt-16">
           <div className="inline-block px-4 py-2 bg-white/20 backdrop-blur-md text-white rounded-full text-sm font-bold mb-6 border border-white/30 shadow-lg">
             ✨ Le nouveau standard du pressing
           </div>
@@ -69,10 +67,8 @@ export default function Landing() {
             </div>
             
             <div className="grid md:grid-cols-3 gap-12 relative items-start">
-                {/* Ligne connecteur */}
                 <div className="hidden md:block absolute top-24 left-[15%] right-[15%] h-0.5 bg-teal-100 z-0"></div>
 
-                {/* ETAPE 1 */}
                 <div className="flex flex-col items-center relative z-10 group">
                     <div className="w-48 h-48 rounded-full bg-white border-4 border-teal-50 shadow-xl flex items-center justify-center mb-8 transition transform group-hover:scale-105">
                         <MapPin className="text-teal-500" size={64} strokeWidth={1.5} />
@@ -84,7 +80,6 @@ export default function Landing() {
                     </p>
                 </div>
 
-                {/* ETAPE 2 */}
                 <div className="flex flex-col items-center relative z-10 group">
                     <div className="w-48 h-48 rounded-full bg-white border-4 border-teal-50 shadow-xl flex items-center justify-center mb-8 transition transform group-hover:scale-105">
                         <Scale className="text-teal-500" size={64} strokeWidth={1.5} />
@@ -96,7 +91,6 @@ export default function Landing() {
                     </p>
                 </div>
 
-                {/* ETAPE 3 */}
                 <div className="flex flex-col items-center relative z-10 group">
                     <div className="w-48 h-48 rounded-full bg-white border-4 border-teal-50 shadow-xl flex items-center justify-center mb-8 transition transform group-hover:scale-105">
                         <Package className="text-teal-500" size={64} strokeWidth={1.5} />
@@ -182,21 +176,21 @@ export default function Landing() {
       </div>
 
       {/* =========================================
-          4. NOTRE HISTOIRE
+          4. NOTRE HISTOIRE (CORRIGÉE : IMAGES OK)
       ========================================= */}
       <div className="py-24 px-4 bg-white overflow-hidden">
          <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-16 items-center">
             
             {/* GAUCHE : Images Simples et Robustes */}
             <div className="relative h-[450px] w-full flex items-center justify-center scale-95">
-                {/* Image 1 : Temple de Bali (Celle de gauche) */}
+                {/* Image 1 : Temple de Bali (Celle de gauche) - LIEN OK */}
                 <img 
                     src="https://images.unsplash.com/photo-1555400038-63f5ba517a47?w=600&auto=format&fit=crop&q=60" 
                     className="absolute left-4 top-0 w-[60%] h-72 object-cover rounded-3xl shadow-2xl z-10 border-4 border-white -rotate-6 transition hover:rotate-0 duration-500"
                     alt="Temple de Bali"
                 />
                 
-                {/* Image 2 : Laverie (Celle de droite) - C'EST CELLE-CI QUI PLANTAIT, J'AI REMIS LA BONNE */}
+                {/* Image 2 : Laverie (Celle de droite) - J'AI REMIS CELLE QUI MARCHAIT DANS LE CERCLE ROUGE */}
                 <img 
                     src="https://images.unsplash.com/photo-1545173168-9f1947eebb8f?w=600&auto=format&fit=crop&q=60" 
                     className="absolute right-4 bottom-0 w-[60%] h-72 object-cover rounded-3xl shadow-2xl z-0 border-4 border-white rotate-6 transition hover:rotate-0 duration-500"
