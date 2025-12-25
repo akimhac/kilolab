@@ -9,11 +9,11 @@ export default function Landing() {
       <Navbar />
 
       {/* =========================================
-          1. HERO SECTION
+          1. HERO SECTION (AVEC IMAGE PILE DE LINGE)
       ========================================= */}
       <div className="relative h-[90vh] min-h-[600px] flex items-center justify-center overflow-hidden bg-slate-900">
         
-        {/* IMAGE DE FOND : Pile de linge plié */}
+        {/* IMAGE DE FOND : PILE DE LINGE PLIÉ */}
         <div className="absolute inset-0 z-0">
             <img 
                 src="https://images.unsplash.com/photo-1489274495757-95c7c83700c0?q=80&w=2000&auto=format&fit=crop" 
@@ -174,23 +174,32 @@ export default function Landing() {
       </div>
 
       {/* =========================================
-          4. NOTRE HISTOIRE (BALI + IMAGES)
+          4. NOTRE HISTOIRE (BALI + 2 IMAGES INCLINÉES)
       ========================================= */}
       <div className="py-24 px-4 bg-white overflow-hidden">
          <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-16 items-center">
-            {/* GAUCHE : Images superposées */}
+            {/* GAUCHE : 2 images inclinées + pile de linge en fond */}
             <div className="relative h-[500px] w-full flex items-center justify-center">
-                {/* Image Temple Bali */}
+                {/* IMAGE FOND : Pile de linge (floutée) */}
+                <div className="absolute inset-0 flex items-center justify-center">
+                    <img 
+                        src="https://images.unsplash.com/photo-1489274495757-95c7c83700c0?w=800&auto=format&fit=crop&q=60" 
+                        className="w-[85%] h-[400px] object-cover rounded-3xl shadow-xl opacity-20 blur-[2px]"
+                        alt="Pile de linge propre en arrière-plan"
+                    />
+                </div>
+                
+                {/* IMAGE 1 : Temple Bali (gauche, -6deg) */}
                 <img 
                     src="https://images.unsplash.com/photo-1555400038-63f5ba517a47?w=600&auto=format&fit=crop&q=60" 
-                    className="absolute left-0 top-0 w-[55%] h-80 object-cover rounded-3xl shadow-2xl z-10 border-4 border-white -rotate-6 hover:rotate-0 transition duration-500"
+                    className="absolute left-0 top-8 w-[52%] h-72 object-cover rounded-3xl shadow-2xl z-10 border-4 border-white -rotate-6 hover:rotate-0 transition duration-500"
                     alt="Temple de Bali"
                 />
                 
-                {/* Image Machines Laverie */}
+                {/* IMAGE 2 : Machines (droite, +6deg) */}
                 <img 
                     src="https://images.unsplash.com/photo-1545173168-9f1947eebb8f?w=600&auto=format&fit=crop&q=60" 
-                    className="absolute right-0 bottom-0 w-[55%] h-80 object-cover rounded-3xl shadow-2xl z-10 border-4 border-white rotate-6 hover:rotate-0 transition duration-500"
+                    className="absolute right-0 bottom-8 w-[52%] h-72 object-cover rounded-3xl shadow-2xl z-10 border-4 border-white rotate-6 hover:rotate-0 transition duration-500"
                     alt="Laverie Moderne"
                 />
             </div>
