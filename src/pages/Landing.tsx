@@ -9,9 +9,9 @@ export default function Landing() {
       <Navbar />
 
       {/* =========================================
-          1. HERO SECTION (AVEC IMAGE PILE DE LINGE)
+          1. HERO SECTION (AVEC IMAGE PILE DE LINGE VISIBLE)
       ========================================= */}
-      <div className="relative h-[90vh] min-h-[600px] flex items-center justify-center overflow-hidden bg-slate-900">
+      <div className="relative h-[90vh] min-h-[600px] flex items-center justify-center overflow-hidden">
         
         {/* IMAGE DE FOND : PILE DE LINGE PLIÉ */}
         <div className="absolute inset-0 z-0">
@@ -20,8 +20,10 @@ export default function Landing() {
                 className="w-full h-full object-cover"
                 alt="Pile de linge propre et doux"
             />
-            <div className="absolute inset-0 bg-black/50 z-1"></div>
-            <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-white to-transparent z-1"></div>
+            {/* Voile DÉGRADÉ pour voir l'image */}
+            <div className="absolute inset-0 bg-gradient-to-b from-slate-900/70 via-slate-900/60 to-slate-900/80"></div>
+            {/* Dégradé bas */}
+            <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-white to-transparent"></div>
         </div>
 
         <div className="max-w-7xl mx-auto px-4 relative z-10 text-center text-white mt-16">
@@ -174,17 +176,17 @@ export default function Landing() {
       </div>
 
       {/* =========================================
-          4. NOTRE HISTOIRE (BALI + 2 IMAGES INCLINÉES)
+          4. NOTRE HISTOIRE (IMAGES VISIBLES)
       ========================================= */}
       <div className="py-24 px-4 bg-white overflow-hidden">
          <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-16 items-center">
-            {/* GAUCHE : 2 images inclinées + pile de linge en fond */}
+            {/* GAUCHE : 3 images superposées TOUTES VISIBLES */}
             <div className="relative h-[500px] w-full flex items-center justify-center">
-                {/* IMAGE FOND : Pile de linge (floutée) */}
+                {/* IMAGE FOND : Pile de linge (BIEN VISIBLE) */}
                 <div className="absolute inset-0 flex items-center justify-center">
                     <img 
                         src="https://images.unsplash.com/photo-1489274495757-95c7c83700c0?w=800&auto=format&fit=crop&q=60" 
-                        className="w-[85%] h-[400px] object-cover rounded-3xl shadow-xl opacity-20 blur-[2px]"
+                        className="w-[90%] h-[420px] object-cover rounded-3xl shadow-xl opacity-30"
                         alt="Pile de linge propre en arrière-plan"
                     />
                 </div>
