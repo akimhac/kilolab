@@ -9,7 +9,7 @@ export default function Landing() {
       <Navbar />
 
       {/* =========================================
-          1. HERO SECTION (CELLE DU CERCLE ROUGE : IMAGE FOND + TEXTE BLANC)
+          1. HERO SECTION (PREMIUM & CHALEUREUX)
       ========================================= */}
       <div className="relative h-[90vh] min-h-[600px] flex items-center justify-center overflow-hidden bg-slate-900">
         
