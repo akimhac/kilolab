@@ -5,38 +5,41 @@ import { ArrowRight, Check, X, MapPin, Scale, Package, AlertCircle } from 'lucid
 
 export default function Landing() {
   return (
-    <div className="font-sans text-slate-900 bg-slate-50">
+    <div className="font-sans text-slate-900 bg-white">
       <Navbar />
 
       {/* =========================================
-          1. HERO SECTION (IMAGE BIEN VISIBLE)
+          1. HERO SECTION (CORRIGÉE : Image forcée en arrière-plan)
       ========================================= */}
       <div className="relative h-[90vh] min-h-[600px] flex items-center justify-center overflow-hidden">
         
-        {/* IMAGE DE FOND : PILE DE LINGE PLIÉ */}
+        {/* COUCHE 1 : L'IMAGE (Z-0) */}
         <div className="absolute inset-0 z-0">
             <img 
                 src="https://images.unsplash.com/photo-1489274495757-95c7c83700c0?q=80&w=2000&auto=format&fit=crop" 
                 className="w-full h-full object-cover"
                 alt="Pile de linge propre et doux"
             />
-            {/* Voile LÉGER pour que le texte soit lisible MAIS qu'on voie l'image */}
-            <div className="absolute inset-0 bg-slate-900/40"></div>
-            {/* Dégradé bas */}
-            <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-white to-transparent"></div>
         </div>
 
+        {/* COUCHE 2 : LES FILTRES (Z-1) */}
+        {/* Voile noir pour lisibilité du texte */}
+        <div className="absolute inset-0 bg-black/50 z-1"></div>
+        {/* Dégradé bas vers le blanc pour la transition douce */}
+        <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-white to-transparent z-1"></div>
+
+        {/* COUCHE 3 : LE CONTENU (Z-10) */}
         <div className="max-w-7xl mx-auto px-4 relative z-10 text-center text-white mt-16">
           <div className="inline-block px-4 py-2 bg-white/20 backdrop-blur-md text-white rounded-full text-sm font-bold mb-6 border border-white/30 shadow-lg">
             ✨ Le nouveau standard du pressing
           </div>
           
-          <h1 className="text-5xl md:text-8xl font-black mb-8 tracking-tight leading-tight drop-shadow-2xl text-white">
+          <h1 className="text-5xl md:text-8xl font-black mb-8 tracking-tight leading-tight drop-shadow-lg text-white">
             Votre temps est précieux.<br/>
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-200 to-emerald-400">Pas votre lessive.</span>
           </h1>
           
-          <p className="text-xl md:text-2xl text-white max-w-2xl mx-auto mb-12 leading-relaxed drop-shadow-2xl font-medium">
+          <p className="text-xl md:text-2xl text-slate-100 max-w-2xl mx-auto mb-12 leading-relaxed drop-shadow-md font-medium">
             Confiez-nous votre linge <strong>au kilo</strong>. Nous le lavons, séchons et plions pour vous. 
             <br/>Moins cher qu'un café par jour.
           </p>
@@ -54,7 +57,7 @@ export default function Landing() {
       </div>
 
       {/* =========================================
-          2. LE RITUEL (3 ÉTAPES)
+          2. LE RITUEL (ICONES SIMPLES)
       ========================================= */}
       <div className="py-24 px-4 bg-white">
         <div className="max-w-6xl mx-auto">
@@ -67,6 +70,7 @@ export default function Landing() {
             </div>
             
             <div className="grid md:grid-cols-3 gap-12 relative items-start">
+                {/* Ligne connecteur (visible sur desktop uniquement) */}
                 <div className="hidden md:block absolute top-24 left-[15%] right-[15%] h-0.5 bg-teal-100 z-0"></div>
 
                 <div className="flex flex-col items-center relative z-10 group">
@@ -112,7 +116,7 @@ export default function Landing() {
       </div>
 
       {/* =========================================
-          3. COMPARATIF PRIX
+          3. COMPARATIF PRIX (CARTE NOIRE 9.30€)
       ========================================= */}
       <div className="py-24 bg-slate-50 border-y border-slate-200">
         <div className="max-w-5xl mx-auto px-4 text-center">
@@ -127,7 +131,7 @@ export default function Landing() {
             </p>
 
             <div className="grid md:grid-cols-2 gap-8 items-center">
-                {/* Pressing Traditionnel */}
+                {/* Modèle Vieux */}
                 <div className="bg-white p-8 rounded-3xl shadow-sm border border-slate-200 scale-95 opacity-80 grayscale transition hover:grayscale-0 hover:opacity-100 hover:scale-100">
                     <div className="flex items-center gap-2 mb-6 text-red-500 font-bold bg-red-50 w-fit px-3 py-1 rounded-full text-sm">
                         <X size={16}/> Pressing Traditionnel
@@ -143,7 +147,7 @@ export default function Landing() {
                     </div>
                 </div>
 
-                {/* Kilolab */}
+                {/* Modèle Kilolab (FONCÉ) */}
                 <div className="bg-slate-900 p-8 rounded-3xl shadow-2xl border-2 border-teal-500 relative transform md:scale-105 z-10 text-white">
                     <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-teal-500 text-white text-xs font-bold px-4 py-1 rounded-full uppercase tracking-wider shadow-lg flex items-center gap-1">
                         <Check size={14}/> La Méthode Kilolab
@@ -176,42 +180,32 @@ export default function Landing() {
       </div>
 
       {/* =========================================
-          4. NOTRE HISTOIRE (IMAGES VISIBLES)
+          4. NOTRE HISTOIRE (BALI IMAGES INCLINÉES)
       ========================================= */}
       <div className="py-24 px-4 bg-white overflow-hidden">
          <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-16 items-center">
-            {/* GAUCHE : 3 images superposées TOUTES VISIBLES */}
-            <div className="relative h-[500px] w-full flex items-center justify-center">
-                {/* IMAGE FOND : Pile de linge (TRÈS VISIBLE) */}
-                <div className="absolute inset-0 flex items-center justify-center">
-                    <img 
-                        src="https://images.unsplash.com/photo-1489274495757-95c7c83700c0?w=800&auto=format&fit=crop&q=60" 
-                        className="w-[95%] h-[450px] object-cover rounded-3xl shadow-2xl opacity-40"
-                        alt="Pile de linge propre en arrière-plan"
-                    />
-                </div>
-                
-                {/* IMAGE 1 : Temple Bali (gauche, -6deg) */}
+            
+            {/* BLOC IMAGE ROBUSTE (2 images inclinées) */}
+            <div className="relative h-[450px] w-full flex items-center justify-center scale-95">
+                {/* Image Temple */}
                 <img 
                     src="https://images.unsplash.com/photo-1555400038-63f5ba517a47?w=600&auto=format&fit=crop&q=60" 
-                    className="absolute left-0 top-8 w-[50%] h-72 object-cover rounded-3xl shadow-2xl z-10 border-4 border-white -rotate-6 hover:rotate-0 transition duration-500"
-                    alt="Temple de Bali"
+                    className="absolute left-4 top-0 w-[60%] h-72 object-cover rounded-3xl shadow-2xl z-10 border-4 border-white -rotate-6 hover:rotate-0 transition duration-500"
+                    alt="Bali Temple"
                 />
-                
-                {/* IMAGE 2 : Machines (droite, +6deg) */}
+                {/* Image Machines */}
                 <img 
                     src="https://images.unsplash.com/photo-1545173168-9f1947eebb8f?w=600&auto=format&fit=crop&q=60" 
-                    className="absolute right-0 bottom-8 w-[50%] h-72 object-cover rounded-3xl shadow-2xl z-10 border-4 border-white rotate-6 hover:rotate-0 transition duration-500"
+                    className="absolute right-4 bottom-0 w-[60%] h-72 object-cover rounded-3xl shadow-2xl z-0 border-4 border-white rotate-6 hover:rotate-0 transition duration-500"
                     alt="Laverie Moderne"
                 />
             </div>
             
-            {/* DROITE : Texte */}
             <div className="relative z-10 md:pl-12">
                 <div className="inline-block px-3 py-1 bg-teal-100 text-teal-800 rounded-lg font-bold text-xs mb-6 uppercase tracking-wider">NOTRE HISTOIRE</div>
                 <h2 className="text-4xl font-black mb-6 text-slate-900 leading-tight">
                     De la douceur de Bali<br/>
-                    à l'exigence de la métropole.
+                    à l'exigence de Paris.
                 </h2>
                 <p className="text-lg text-slate-600 mb-6 leading-relaxed">
                     Là-bas, le pressing au poids est la norme : simple, direct, sans artifices. 
