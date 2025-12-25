@@ -9,7 +9,7 @@ export default function Landing() {
       <Navbar />
 
       {/* =========================================
-          1. HERO SECTION (AVEC IMAGE PILE DE LINGE VISIBLE)
+          1. HERO SECTION (IMAGE BIEN VISIBLE)
       ========================================= */}
       <div className="relative h-[90vh] min-h-[600px] flex items-center justify-center overflow-hidden">
         
@@ -17,12 +17,10 @@ export default function Landing() {
         <div className="absolute inset-0 z-0">
             <img 
                 src="https://images.unsplash.com/photo-1489274495757-95c7c83700c0?q=80&w=2000&auto=format&fit=crop" 
-                className="w-full h-full object-cover"
+                className="w-full h-full object-cover brightness-50"
                 alt="Pile de linge propre et doux"
             />
-            {/* Voile DÉGRADÉ pour voir l'image */}
-            <div className="absolute inset-0 bg-gradient-to-b from-slate-900/70 via-slate-900/60 to-slate-900/80"></div>
-            {/* Dégradé bas */}
+            {/* Dégradé bas uniquement */}
             <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-white to-transparent"></div>
         </div>
 
@@ -31,12 +29,12 @@ export default function Landing() {
             ✨ Le nouveau standard du pressing
           </div>
           
-          <h1 className="text-5xl md:text-8xl font-black mb-8 tracking-tight leading-tight drop-shadow-lg text-white">
+          <h1 className="text-5xl md:text-8xl font-black mb-8 tracking-tight leading-tight drop-shadow-2xl text-white">
             Votre temps est précieux.<br/>
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-200 to-emerald-400">Pas votre lessive.</span>
           </h1>
           
-          <p className="text-xl md:text-2xl text-slate-100 max-w-2xl mx-auto mb-12 leading-relaxed drop-shadow-md font-medium">
+          <p className="text-xl md:text-2xl text-white max-w-2xl mx-auto mb-12 leading-relaxed drop-shadow-2xl font-medium">
             Confiez-nous votre linge <strong>au kilo</strong>. Nous le lavons, séchons et plions pour vous. 
             <br/>Moins cher qu'un café par jour.
           </p>
@@ -182,11 +180,11 @@ export default function Landing() {
          <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-16 items-center">
             {/* GAUCHE : 3 images superposées TOUTES VISIBLES */}
             <div className="relative h-[500px] w-full flex items-center justify-center">
-                {/* IMAGE FOND : Pile de linge (BIEN VISIBLE) */}
+                {/* IMAGE FOND : Pile de linge (TRÈS VISIBLE) */}
                 <div className="absolute inset-0 flex items-center justify-center">
                     <img 
                         src="https://images.unsplash.com/photo-1489274495757-95c7c83700c0?w=800&auto=format&fit=crop&q=60" 
-                        className="w-[90%] h-[420px] object-cover rounded-3xl shadow-xl opacity-30"
+                        className="w-[95%] h-[450px] object-cover rounded-3xl shadow-2xl opacity-40"
                         alt="Pile de linge propre en arrière-plan"
                     />
                 </div>
@@ -194,14 +192,14 @@ export default function Landing() {
                 {/* IMAGE 1 : Temple Bali (gauche, -6deg) */}
                 <img 
                     src="https://images.unsplash.com/photo-1555400038-63f5ba517a47?w=600&auto=format&fit=crop&q=60" 
-                    className="absolute left-0 top-8 w-[52%] h-72 object-cover rounded-3xl shadow-2xl z-10 border-4 border-white -rotate-6 hover:rotate-0 transition duration-500"
+                    className="absolute left-0 top-8 w-[50%] h-72 object-cover rounded-3xl shadow-2xl z-10 border-4 border-white -rotate-6 hover:rotate-0 transition duration-500"
                     alt="Temple de Bali"
                 />
                 
                 {/* IMAGE 2 : Machines (droite, +6deg) */}
                 <img 
                     src="https://images.unsplash.com/photo-1545173168-9f1947eebb8f?w=600&auto=format&fit=crop&q=60" 
-                    className="absolute right-0 bottom-8 w-[52%] h-72 object-cover rounded-3xl shadow-2xl z-10 border-4 border-white rotate-6 hover:rotate-0 transition duration-500"
+                    className="absolute right-0 bottom-8 w-[50%] h-72 object-cover rounded-3xl shadow-2xl z-10 border-4 border-white rotate-6 hover:rotate-0 transition duration-500"
                     alt="Laverie Moderne"
                 />
             </div>
