@@ -196,9 +196,9 @@ export default function Landing() {
                     alt="Temple de Bali"
                 />
                 
-                {/* Image 2 : Laverie (Celle de droite) - LIEN CORRIGÉ */}
+                {/* Image 2 : Laverie (Celle de droite) - C'EST CELLE-CI QUI PLANTAIT, J'AI REMIS LA BONNE */}
                 <img 
-                    src="https://images.unsplash.com/photo-1517677208171-0bc12dd223eb?w=600&auto=format&fit=crop&q=60" 
+                    src="https://images.unsplash.com/photo-1545173168-9f1947eebb8f?w=600&auto=format&fit=crop&q=60" 
                     className="absolute right-4 bottom-0 w-[60%] h-72 object-cover rounded-3xl shadow-2xl z-0 border-4 border-white rotate-6 transition hover:rotate-0 duration-500"
                     alt="Laverie Moderne"
                 />
