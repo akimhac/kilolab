@@ -1,44 +1,56 @@
-import { useState } from 'react';
 import Navbar from '../components/Navbar';
-import { Gift, Copy, CheckCircle } from 'lucide-react';
+import { Copy, Gift, Share2, Star } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 export default function Referral() {
-  const [copied, setCopied] = useState(false);
-  const code = "KILO-PROMO-2024";
+  const code = "KILO-AKIM"; // À dynamiser plus tard avec le nom du user
 
-  const copyToClipboard = () => {
-    navigator.clipboard.writeText(`Rejoins Kilolab avec ${code} et gagne 5€ ! https://kilolab.fr`);
-    setCopied(true);
-    toast.success('Copié !');
-    setTimeout(() => setCopied(false), 2000);
+  const copyCode = () => {
+    navigator.clipboard.writeText(code);
+    toast.success("Code copié !");
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 font-sans text-slate-900 pb-20">
+    <div className="min-h-screen bg-slate-50 font-sans text-slate-900">
       <Navbar />
-      <div className="pt-32 max-w-4xl mx-auto px-4">
-        <div className="bg-gradient-to-br from-indigo-600 to-purple-700 rounded-3xl p-8 md:p-12 text-white text-center shadow-xl mb-12 relative overflow-hidden">
-            <div className="relative z-10">
-                <div className="w-20 h-20 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center mx-auto mb-6">
-                    <Gift size={40} className="text-white"/>
-                </div>
-                <h1 className="text-3xl md:text-5xl font-extrabold mb-4">Offrez 5€, Recevez 5€</h1>
-                <p className="text-indigo-100 text-lg max-w-xl mx-auto">
-                    Invitez vos amis à découvrir Kilolab. Ils gagnent 5€ sur leur première commande.
-                </p>
+      
+      <div className="pt-32 px-4 max-w-2xl mx-auto text-center">
+        
+        <div className="w-20 h-20 bg-yellow-100 text-yellow-600 rounded-full flex items-center justify-center mx-auto mb-6 animate-bounce">
+            <Gift size={40}/>
+        </div>
+
+        <h1 className="text-4xl font-black mb-4">Invitez un ami,<br/>Gagnez du linge propre.</h1>
+        <p className="text-slate-500 text-lg mb-10 max-w-md mx-auto">
+            Offrez <span className="font-bold text-slate-900">10€</span> à vos amis sur leur première commande.
+            Recevez <span className="font-bold text-slate-900">10€</span> dès qu'ils commandent.
+        </p>
+
+        <div className="bg-white p-2 rounded-2xl shadow-xl border border-slate-100 flex items-center justify-between max-w-sm mx-auto mb-12">
+            <div className="px-6 font-mono font-black text-2xl tracking-widest text-slate-900">{code}</div>
+            <button onClick={copyCode} className="bg-slate-900 text-white px-6 py-3 rounded-xl font-bold hover:bg-slate-800 transition flex gap-2">
+                <Copy size={18}/> Copier
+            </button>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-left">
+            <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+                <div className="bg-blue-50 w-10 h-10 rounded-lg flex items-center justify-center text-blue-600 mb-3"><Share2 size={20}/></div>
+                <h3 className="font-bold">1. Partagez</h3>
+                <p className="text-xs text-slate-500">Envoyez votre lien unique à vos proches.</p>
+            </div>
+            <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+                <div className="bg-green-50 w-10 h-10 rounded-lg flex items-center justify-center text-green-600 mb-3"><Star size={20}/></div>
+                <h3 className="font-bold">2. Ils commandent</h3>
+                <p className="text-xs text-slate-500">Ils profitent de 10€ de réduction immédiate.</p>
+            </div>
+            <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+                <div className="bg-yellow-50 w-10 h-10 rounded-lg flex items-center justify-center text-yellow-600 mb-3"><Gift size={20}/></div>
+                <h3 className="font-bold">3. Vous gagnez</h3>
+                <p className="text-xs text-slate-500">Vos crédits sont ajoutés automatiquement.</p>
             </div>
         </div>
 
-        <div className="bg-white rounded-3xl p-8 shadow-sm border border-slate-200 text-center max-w-md mx-auto">
-            <h2 className="font-bold mb-6 text-xl">Votre code parrain unique</h2>
-            <div onClick={copyToClipboard} className="bg-slate-100 p-6 rounded-2xl border-2 border-dashed border-slate-300 font-mono text-3xl font-bold cursor-pointer hover:bg-slate-200 transition text-slate-700 select-all">
-                {code}
-            </div>
-            <button onClick={copyToClipboard} className="mt-6 w-full py-3 bg-slate-900 text-white font-bold rounded-xl flex items-center justify-center gap-2 hover:bg-slate-800 transition">
-                {copied ? <><CheckCircle size={18}/> Copié</> : <><Copy size={18}/> Copier le code</>}
-            </button>
-        </div>
       </div>
     </div>
   );
