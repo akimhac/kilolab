@@ -22,6 +22,7 @@ export default function Footer() {
           <ul className="space-y-4 text-sm">
             <li><Link to="/" className="hover:text-white">Accueil</Link></li>
             <li><Link to="/tarifs" className="hover:text-white">Tarifs</Link></li>
+            {/* LIEN CORRIGÉ */}
             <li><Link to="/partner" className="hover:text-white">Espace Pro</Link></li>
           </ul>
         </div>
