@@ -1,7 +1,7 @@
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import { useState } from 'react';
-import { Building2, User, Mail, Link as LinkIcon, CheckCircle, Loader2, Upload, FileText } from 'lucide-react';
+import { Building2, User, Mail, Link as LinkIcon, CheckCircle, Loader2, Upload, FileText, Phone, MapPin } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
@@ -13,16 +13,15 @@ export default function BecomePartner() {
   const [file, setFile] = useState<File | null>(null);
   
   const [formData, setFormData] = useState({
-    companyName: '',
+    company_name: '',
     siret: '',
-    fullName: '',
+    full_name: '',
     email: '',
     phone: '',
     linkedin: '',
     address: ''
   });
 
-  // Gestion du fichier sélectionné
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       setFile(e.target.files[0]);
@@ -30,25 +29,21 @@ export default function BecomePartner() {
     }
   };
 
-  // Fonction d'upload vers Supabase Storage
   const uploadKbis = async (fileToUpload: File) => {
     try {
       const fileExt = fileToUpload.name.split('.').pop();
       const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
       const filePath = `kbis/${fileName}`;
 
-      // Envoi vers le bucket 'documents' (que tu dois créer)
       const { error } = await supabase.storage
         .from('documents')
         .upload(filePath, fileToUpload);
 
       if (error) throw error;
-      
-      // On retourne l'URL publique ou le chemin
       return filePath;
     } catch (error) {
       console.error('Upload error:', error);
-      toast.error("Erreur lors de l'envoi du fichier");
+      // On continue même si l'upload échoue pour ne pas bloquer le lead
       return null;
     }
   };
@@ -59,30 +54,31 @@ export default function BecomePartner() {
 
     try {
       let kbisPath = null;
-      
-      // 1. Si un fichier est présent, on l'upload d'abord
       if (file) {
         kbisPath = await uploadKbis(file);
-        if (!kbisPath) {
-            setLoading(false);
-            return; // On arrête si l'upload échoue
-        }
       }
 
-      // 2. Simulation d'enregistrement en base de données
-      // (Dans la V2, on insérera ici dans une table 'partner_applications')
-      console.log("Dossier envoyé :", { ...formData, kbisPath });
+      // INSERTION RÉELLE DANS SUPABASE
+      const { error } = await supabase.from('partners').insert({
+        company_name: formData.company_name,
+        siret: formData.siret,
+        address: formData.address,
+        contact_name: formData.full_name,
+        email: formData.email,
+        phone: formData.phone,
+        status: 'pending',
+        // kbis_url: kbisPath // Décommente si tu as la colonne kbis_url
+      });
 
-      // Petit délai pour l'effet UX
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      if (error) throw error;
 
-      setLoading(false);
       setStep(2);
       toast.success("Candidature envoyée avec succès !");
 
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
-      toast.error("Erreur technique. Réessayez.");
+      toast.error("Erreur : " + error.message);
+    } finally {
       setLoading(false);
     }
   };
@@ -112,7 +108,7 @@ export default function BecomePartner() {
                             <div>
                                 <label className="block text-sm font-bold mb-1">Nom de la société</label>
                                 <input required type="text" placeholder="Pressing des Lices..." className="w-full p-3 bg-slate-50 border rounded-xl"
-                                    value={formData.companyName} onChange={e => setFormData({...formData, companyName: e.target.value})} />
+                                    value={formData.company_name} onChange={e => setFormData({...formData, company_name: e.target.value})} />
                             </div>
                             <div>
                                 <label className="block text-sm font-bold mb-1">SIRET</label>
@@ -127,7 +123,7 @@ export default function BecomePartner() {
                         </div>
                     </div>
 
-                    {/* SECTION DOCUMENTS (NOUVEAU) */}
+                    {/* SECTION DOCUMENTS */}
                     <div className="space-y-4 bg-slate-50 p-4 rounded-xl border border-slate-200">
                         <label className="block text-sm font-bold mb-1 flex justify-between">
                             <span>Extrait Kbis (PDF/JPG)</span>
@@ -136,7 +132,6 @@ export default function BecomePartner() {
                         <div className="relative border-2 border-dashed border-slate-300 rounded-xl p-6 text-center hover:bg-white transition cursor-pointer group">
                             <input 
                                 type="file" 
-                                required
                                 accept=".pdf,.jpg,.png,.jpeg" 
                                 onChange={handleFileChange}
                                 className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
@@ -166,7 +161,7 @@ export default function BecomePartner() {
                                 <div className="relative">
                                     <User className="absolute left-3 top-3.5 text-slate-400" size={18}/>
                                     <input required type="text" placeholder="Jean Dupont" className="w-full pl-10 p-3 bg-slate-50 border rounded-xl"
-                                        value={formData.fullName} onChange={e => setFormData({...formData, fullName: e.target.value})} />
+                                        value={formData.full_name} onChange={e => setFormData({...formData, full_name: e.target.value})} />
                                 </div>
                             </div>
                             <div>
@@ -179,11 +174,11 @@ export default function BecomePartner() {
                             </div>
                         </div>
                         <div>
-                            <label className="block text-sm font-bold mb-1">Lien LinkedIn (Optionnel)</label>
+                            <label className="block text-sm font-bold mb-1">Téléphone</label>
                             <div className="relative">
-                                <LinkIcon className="absolute left-3 top-3.5 text-slate-400" size={18}/>
-                                <input type="url" placeholder="https://linkedin.com/in/..." className="w-full pl-10 p-3 bg-slate-50 border rounded-xl"
-                                    value={formData.linkedin} onChange={e => setFormData({...formData, linkedin: e.target.value})} />
+                                <Phone className="absolute left-3 top-3.5 text-slate-400" size={18}/>
+                                <input required type="tel" placeholder="06 12 34 56 78" className="w-full pl-10 p-3 bg-slate-50 border rounded-xl"
+                                    value={formData.phone} onChange={e => setFormData({...formData, phone: e.target.value})} />
                             </div>
                         </div>
                     </div>
