@@ -6,7 +6,7 @@ export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
 
-  // On cache la navbar sur certaines pages si nécessaire, sinon on laisse tout le temps
+  // On cache la navbar sur certaines pages si nécessaire
   const isDashboard = location.pathname.includes('/dashboard') || location.pathname.includes('/partner-app');
 
   return (
@@ -31,8 +31,7 @@ export default function Navbar() {
               Tarifs
             </Link>
             
-            {/* --- C'EST ICI QUE C'ÉTAIT L'ERREUR --- */}
-            {/* Avant c'était peut-être /partner-app, maintenant c'est /partner */}
+            {/* LIEN CORRIGÉ VERS LA PAGE MARKETING B2B */}
             <Link to="/partner" className="text-sm font-bold text-teal-600 bg-teal-50 px-4 py-2 rounded-full hover:bg-teal-100 transition-colors">
               Espace Pro B2B
             </Link>
@@ -69,6 +68,7 @@ export default function Navbar() {
             <Link to="/tarifs" onClick={() => setIsOpen(false)} className="text-lg font-bold text-slate-600 py-2">
               Tarifs
             </Link>
+            {/* LIEN CORRIGÉ MOBILE */}
             <Link to="/partner" onClick={() => setIsOpen(false)} className="text-lg font-bold text-teal-600 py-2">
               Devenir Partenaire
             </Link>
