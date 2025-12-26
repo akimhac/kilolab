@@ -31,7 +31,7 @@ export default function Navbar() {
               Tarifs
             </Link>
             
-            {/* LIEN CORRIGÉ VERS LA PAGE MARKETING B2B */}
+            {/* LIEN VERS LA PAGE DE VENTE B2B (PUBLIC) */}
             <Link to="/partner" className="text-sm font-bold text-teal-600 bg-teal-50 px-4 py-2 rounded-full hover:bg-teal-100 transition-colors">
               Espace Pro B2B
             </Link>
@@ -68,7 +68,6 @@ export default function Navbar() {
             <Link to="/tarifs" onClick={() => setIsOpen(false)} className="text-lg font-bold text-slate-600 py-2">
               Tarifs
             </Link>
-            {/* LIEN CORRIGÉ MOBILE */}
             <Link to="/partner" onClick={() => setIsOpen(false)} className="text-lg font-bold text-teal-600 py-2">
               Devenir Partenaire
             </Link>
