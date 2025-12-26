@@ -24,7 +24,7 @@ export default function Login() {
     if (session) {
       // Déjà connecté ? On regarde qui c'est pour l'envoyer au bon endroit
       const { data: profile } = await supabase
-        .from('profiles')
+        .from('user_profiles')
         .select('role')
         .eq('id', session.user.id)
         .single();
@@ -54,7 +54,7 @@ export default function Login() {
           password
         });
         if (error) throw error;
-        toast.success('Compte créé ! Vérifiez vos emails.');
+        toast.success('Compte créé ! Vérifiez vos emails (et vos spams 📧).');
       } else {
         // 🔐 CONNEXION avec redirection intelligente
         const { data, error } = await supabase.auth.signInWithPassword({ 
@@ -67,7 +67,7 @@ export default function Login() {
         
         // 🎯 REDIRECTION INTELLIGENTE selon le rôle
         const { data: profile } = await supabase
-          .from('profiles')
+          .from('user_profiles')
           .select('role')
           .eq('id', data.user.id)
           .single();
