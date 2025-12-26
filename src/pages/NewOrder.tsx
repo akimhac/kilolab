@@ -35,7 +35,6 @@ export default function NewOrder() {
   useEffect(() => {
     if (pickupDate) {
         const day = new Date(pickupDate).getDay();
-        // 0 = Dimanche, 6 = Samedi
         const weekend = day === 0 || day === 6;
         setIsWeekend(weekend);
         if (weekend) toast("Majoration Week-end (+5€) appliquée", { icon: '📅' });
@@ -55,7 +54,6 @@ export default function NewOrder() {
     setIsSearching(true);
     setSearchDone(false);
 
-    // TON RADAR
     setTimeout(() => {
         const results = allPartners.filter(p => 
             (p.address && p.address.toLowerCase().includes(searchQuery.toLowerCase())) ||
@@ -72,7 +70,6 @@ export default function NewOrder() {
 
   useEffect(() => { if(searchDone) setSearchDone(false); }, [searchQuery]);
 
-  // CALCUL DU PRIX
   const basePrice = formula === 'eco' ? 3 : 5;
   let total = weight * basePrice;
   if (isWeekend) total += 5; 
@@ -90,20 +87,19 @@ export default function NewOrder() {
       
       const isNetwork = !selectedPartnerId || selectedPartnerId === 'waiting_list';
       
-      // --- CORRECTION DU BUG DE DATE ---
-      // On envoie seulement la date brute (YYYY-MM-DD) dans la colonne 'pickup_date'
-      // On ajoute l'info du créneau (Midi, Soir) dans l'adresse pour que le livreur le voie
+      // --- LA CORRECTION EST ICI ---
+      // On combine l'adresse avec le créneau pour que le livreur sache quand venir
       const fullAddressInfo = `${finalAddress} (${searchQuery}) - Créneau : ${pickupSlot}`;
 
       const { error } = await supabase.from('orders').insert({
         client_id: user.id,
         partner_id: isNetwork ? null : selectedPartnerId,
         weight: weight,
-        pickup_address: fullAddressInfo, // On met le créneau ici
-        pickup_date: pickupDate, // JUSTE LA DATE !
+        pickup_address: fullAddressInfo, // On inclut le créneau ici
+        pickup_date: pickupDate,         // ON ENVOIE JUSTE LA DATE (YYYY-MM-DD)
         total_price: parseFloat(totalPrice),
         status: 'pending',
-        formula: formula // On garde la formule
+        formula: formula
       });
 
       if (error) throw error;
@@ -125,7 +121,6 @@ export default function NewOrder() {
     <div className="min-h-screen bg-slate-50 font-sans text-slate-900 pb-20 relative overflow-x-hidden">
       <Navbar />
       
-      {/* MODALE SUCCÈS */}
       {showWaitingModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/90 backdrop-blur-sm animate-in fade-in">
             <div className="bg-white rounded-3xl p-8 max-w-md w-full text-center">
@@ -140,7 +135,6 @@ export default function NewOrder() {
       <div className="pt-32 max-w-3xl mx-auto px-4 w-full">
         <h1 className="text-3xl font-bold mb-8 text-center">Nouvelle Commande</h1>
         
-        {/* PROGRESS BAR */}
         <div className="flex justify-center mb-8 text-xs md:text-sm overflow-x-auto">
             {['Formule', 'Poids', 'Localisation', 'Date', 'Validation'].map((label, i) => (
                 <div key={i} className={`px-3 py-1 md:px-4 md:py-2 rounded-full whitespace-nowrap mx-1 ${step >= i ? 'bg-teal-100 text-teal-800 font-bold' : 'text-slate-400'}`}>{i+1}. {label}</div>
@@ -149,7 +143,6 @@ export default function NewOrder() {
 
         <div className="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden min-h-[450px] p-6 md:p-8 relative">
             
-            {/* ETAPE 0 : CHOIX FORMULE */}
             {step === 0 && (
                 <div className="animate-in slide-in-from-right-8 fade-in">
                     <h2 className="text-xl font-bold mb-6 flex items-center gap-2"><Tag className="text-teal-500"/> Votre formule</h2>
@@ -169,7 +162,6 @@ export default function NewOrder() {
                 </div>
             )}
 
-            {/* ETAPE 1 : POIDS */}
             {step === 1 && (
                 <div className="animate-in slide-in-from-right-8 fade-in text-center">
                     <h2 className="text-xl font-bold mb-6 flex items-center gap-2 justify-center"><Scale className="text-teal-500"/> Volume ({formula === 'eco' ? 'Éco' : 'Express'})</h2>
@@ -185,7 +177,6 @@ export default function NewOrder() {
                 </div>
             )}
 
-            {/* ETAPE 2 : RADAR */}
             {step === 2 && (
                 <div className="animate-in slide-in-from-right-8 fade-in h-full flex flex-col">
                     <h2 className="text-xl font-bold mb-4 flex items-center gap-2"><MapPin className="text-teal-500"/> Votre zone</h2>
@@ -235,7 +226,6 @@ export default function NewOrder() {
                 </div>
             )}
 
-            {/* ETAPE 3 : DATE & CRÉNEAU */}
             {step === 3 && (
                 <div className="animate-in slide-in-from-right-8 fade-in">
                     <h2 className="text-xl font-bold mb-6 flex items-center gap-2"><CalendarIcon className="text-teal-500"/> Date de dépôt</h2>
@@ -279,7 +269,6 @@ export default function NewOrder() {
                 </div>
             )}
 
-            {/* ETAPE 4 : RÉCAPITULATIF */}
             {step === 4 && (
                 <div className="animate-in slide-in-from-right-8 fade-in">
                     <h2 className="text-xl font-bold mb-6 flex items-center gap-2"><CheckCircle className="text-teal-500"/> Récapitulatif</h2>
