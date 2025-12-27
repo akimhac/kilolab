@@ -25,7 +25,6 @@ fetchData();
 
 const fetchData = async () => {
 try {
-// Récupérer toutes les commandes
 const { data: ordersData, error: ordersError } = await supabase
 .from(‘orders’)
 .select(’*’)
@@ -34,7 +33,6 @@ const { data: ordersData, error: ordersError } = await supabase
 ```
   if (ordersError) throw ordersError;
 
-  // Récupérer tous les partenaires
   const { data: partnersData, error: partnersError } = await supabase
     .from('partners')
     .select('*')
@@ -44,11 +42,9 @@ const { data: ordersData, error: ordersError } = await supabase
 
   setOrders(ordersData || []);
   
-  // Calculer les stats par partenaire depuis les commandes
   const partnerStatsMap = new Map();
   
   (ordersData || []).forEach((order: any) => {
-    // partner_id est TEXT dans orders
     if (order.partner_id && order.status === 'completed') {
       if (!partnerStatsMap.has(order.partner_id)) {
         partnerStatsMap.set(order.partner_id, {
@@ -62,7 +58,6 @@ const { data: ordersData, error: ordersError } = await supabase
     }
   });
 
-  // Fusionner avec les données partenaires
   const partnersWithStats = (partnersData || []).map((partner: any) => {
     const stats = partnerStatsMap.get(partner.id) || { totalOrders: 0, totalRevenue: 0 };
     return {
@@ -86,7 +81,6 @@ const { data: ordersData, error: ordersError } = await supabase
 
 };
 
-// Filtrer les commandes selon la période
 const filteredOrdersByTime = useMemo(() => {
 if (timeRange === ‘all’) return orders;
 
@@ -101,7 +95,6 @@ return orders.filter(o => new Date(o.created_at) >= cutoffDate);
 
 }, [orders, timeRange]);
 
-// Statistiques avancées avec croissance
 const stats = useMemo(() => {
 const completed = filteredOrdersByTime.filter(o => o.status === ‘completed’);
 const totalRevenue = completed.reduce((sum, o) => sum + parseFloat(o.total_price || 0), 0);
@@ -110,7 +103,6 @@ const averageOrderValue = completed.length > 0 ? totalRevenue / completed.length
 const pending = filteredOrdersByTime.filter(o => o.status === ‘pending’).length;
 
 ```
-// Calcul croissance
 const periodDays = timeRange === 'all' ? 90 : parseInt(timeRange);
 const previousPeriodStart = new Date();
 previousPeriodStart.setDate(previousPeriodStart.getDate() - periodDays * 2);
@@ -139,7 +131,6 @@ return {
 
 }, [filteredOrdersByTime, orders, timeRange]);
 
-// Données graphiques mensuels
 const monthlyData = useMemo(() => {
 const months: { [key: string]: { month: string; revenue: number; orders: number } } = {};
 
@@ -167,30 +158,25 @@ return Object.values(months)
 
 }, [filteredOrdersByTime]);
 
-// Extraction de ville depuis pickup_address
 const extractCity = (address: string): string => {
 if (!address) return ‘Non spécifié’;
 
 ```
-// Pattern : "adresse, CODE_POSTAL VILLE"
 const parts = address.split(',');
 if (parts.length > 1) {
   const lastPart = parts[parts.length - 1].trim();
-  // Extraire après le code postal (5 chiffres)
   const match = lastPart.match(/\d{5}\s+(.+)/);
   if (match && match[1]) {
     return match[1].trim();
   }
 }
 
-// Fallback: prendre le dernier mot
 const words = address.split(' ');
 return words[words.length - 1] || 'Non spécifié';
 ```
 
 };
 
-// Données par ville
 const cityData = useMemo(() => {
 const cities: { [key: string]: { name: string; value: number; orders: number } } = {};
 
@@ -214,7 +200,6 @@ return Object.values(cities)
 
 }, [filteredOrdersByTime]);
 
-// Statuts des commandes
 const statusData = useMemo(() => {
 const statusLabels: any = {
 ‘pending’: ‘En attente’,
@@ -323,7 +308,6 @@ return (
 ```
   <div className="pt-32 px-4 max-w-7xl mx-auto">
     
-    {/* HEADER */}
     <div className="mb-8">
       <div className="flex justify-between items-center mb-6">
         <div>
@@ -338,7 +322,6 @@ return (
         </button>
       </div>
 
-      {/* Filtres période */}
       <div className="flex gap-2 mb-6 flex-wrap">
         {(['7d', '30d', '90d', 'all'] as const).map((range) => (
           <button
@@ -355,7 +338,6 @@ return (
         ))}
       </div>
 
-      {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <StatCard
           title="Chiffre d'affaires"
@@ -383,7 +365,6 @@ return (
       </div>
     </div>
 
-    {/* TABS NAVIGATION */}
     <div className="bg-white rounded-2xl shadow-sm border border-slate-100 mb-8">
       <div className="flex border-b border-slate-100 overflow-x-auto">
         {(['overview', 'partners', 'cities', 'orders'] as const).map((tab) => (
@@ -404,11 +385,9 @@ return (
       </div>
 
       <div className="p-6">
-        {/* OVERVIEW TAB */}
         {activeTab === 'overview' && (
           <div className="space-y-8">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {/* Évolution CA */}
               <div>
                 <h3 className="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
                   <TrendingUp className="text-teal-600" size={20} />
@@ -429,7 +408,6 @@ return (
                 </ResponsiveContainer>
               </div>
 
-              {/* Commandes mensuelles */}
               <div>
                 <h3 className="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
                   <Package className="text-blue-600" size={20} />
@@ -451,7 +429,6 @@ return (
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {/* Répartition statuts */}
               <div>
                 <h3 className="text-lg font-bold text-slate-900 mb-4">Répartition des commandes</h3>
                 <ResponsiveContainer width="100%" height={300}>
@@ -475,7 +452,6 @@ return (
                 </ResponsiveContainer>
               </div>
 
-              {/* Top 5 villes */}
               <div>
                 <h3 className="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
                   <MapPin className="text-purple-600" size={20} />
@@ -498,7 +474,6 @@ return (
           </div>
         )}
 
-        {/* PARTNERS TAB */}
         {activeTab === 'partners' && (
           <div>
             <div className="flex justify-between items-center mb-6 flex-wrap gap-4">
@@ -567,7 +542,6 @@ return (
           </div>
         )}
 
-        {/* CITIES TAB */}
         {activeTab === 'cities' && (
           <div>
             <h3 className="text-lg font-bold text-slate-900 mb-6">Statistiques par ville</h3>
@@ -604,7 +578,6 @@ return (
           </div>
         )}
 
-        {/* ORDERS TAB */}
         {activeTab === 'orders' && (
           <div>
             <div className="flex justify-between items-center mb-4">
