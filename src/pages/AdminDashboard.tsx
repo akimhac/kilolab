@@ -1,23 +1,23 @@
-import { useEffect, useState, useMemo } from “react”;
-import { supabase } from “../lib/supabase”;
-import Navbar from “../components/Navbar”;
+import { useEffect, useState, useMemo } from “react";
+import { supabase } from “../lib/supabase";
+import Navbar from “../components/Navbar";
 import {
 Users, ShoppingBag, DollarSign, CheckCircle, Search, Download,
 TrendingUp, TrendingDown, MapPin, Package, Loader2, Eye
-} from “lucide-react”;
+} from “lucide-react";
 import {
 LineChart, Line, BarChart, Bar, PieChart, Pie, Cell,
 XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer
-} from “recharts”;
-import toast from “react-hot-toast”;
+} from “recharts";
+import toast from “react-hot-toast";
 
 export default function AdminDashboard() {
 const [orders, setOrders] = useState<any[]>([]);
 const [partners, setPartners] = useState<any[]>([]);
 const [loading, setLoading] = useState(true);
-const [timeRange, setTimeRange] = useState<“7d” | “30d” | “90d” | “all”>(“30d”);
-const [activeTab, setActiveTab] = useState<“overview” | “partners” | “cities” | “orders”>(“overview”);
-const [searchTerm, setSearchTerm] = useState(””);
+const [timeRange, setTimeRange] = useState<“7d" | “30d" | “90d" | “all">(“30d");
+const [activeTab, setActiveTab] = useState<“overview" | “partners" | “cities" | “orders">(“overview");
+const [searchTerm, setSearchTerm] = useState("");
 
 useEffect(() => {
 fetchData();
@@ -26,9 +26,9 @@ fetchData();
 const fetchData = async () => {
 try {
 const { data: ordersData, error: ordersError } = await supabase
-.from(“orders”)
-.select(”*”)
-.order(“created_at”, { ascending: false });
+.from(“orders")
+.select("*")
+.order(“created_at", { ascending: false });
 
 ```
   if (ordersError) throw ordersError;
@@ -82,7 +82,7 @@ const { data: ordersData, error: ordersError } = await supabase
 };
 
 const filteredOrdersByTime = useMemo(() => {
-if (timeRange === “all”) return orders;
+if (timeRange === “all") return orders;
 
 ```
 const daysMap = { "7d": 7, "30d": 30, "90d": 90 };
@@ -96,10 +96,10 @@ return orders.filter(o => new Date(o.created_at) >= cutoffDate);
 }, [orders, timeRange]);
 
 const stats = useMemo(() => {
-const completed = filteredOrdersByTime.filter(o => o.status === “completed”);
+const completed = filteredOrdersByTime.filter(o => o.status === “completed");
 const totalRevenue = completed.reduce((sum, o) => sum + parseFloat(o.total_price || 0), 0);
 const activePartners = new Set(completed.map(o => o.partner_id).filter(Boolean)).size;
-const pending = filteredOrdersByTime.filter(o => o.status === “pending”).length;
+const pending = filteredOrdersByTime.filter(o => o.status === “pending").length;
 
 ```
 const periodDays = timeRange === "all" ? 90 : parseInt(timeRange);
@@ -157,7 +157,7 @@ return Object.values(months)
 }, [filteredOrdersByTime]);
 
 const extractCity = (address: string): string => {
-if (!address) return “Non spécifié”;
+if (!address) return “Non spécifié";
 
 ```
 const parts = address.split(",");
@@ -200,12 +200,12 @@ return Object.values(cities)
 
 const statusData = useMemo(() => {
 const statusLabels: any = {
-“pending”: “En attente”,
-“assigned”: “Assigné”,
-“in_progress”: “En cours”,
-“ready”: “Prêt”,
-“completed”: “Terminé”,
-“cancelled”: “Annulé”
+“pending": “En attente",
+“assigned": “Assigné",
+“in_progress": “En cours",
+“ready": “Prêt",
+“completed": “Terminé",
+“cancelled": “Annulé"
 };
 
 ```
@@ -267,13 +267,13 @@ p.city.toLowerCase().includes(searchTerm.toLowerCase())
 }, [partners, searchTerm]);
 
 const handleExportCSV = () => {
-const csvHeader = “Date,ID Commande,Client,Montant,Poids,Statut\n”;
+const csvHeader = “Date,ID Commande,Client,Montant,Poids,Statut\n";
 const csvData = filteredOrdersByTime
 .slice(0, 100)
 .map(o =>
 `${new Date(o.created_at).toLocaleDateString()},${o.id.slice(0, 8)},${o.pickup_address || "N/A"},${o.total_price},${o.weight},${o.status}`
 )
-.join(”\n”);
+.join("\n");
 
 ```
 const blob = new Blob([csvHeader + csvData], { type: "text/csv;charset=utf-8;" });
