@@ -1,19 +1,19 @@
-import { useEffect, useState } from “react”;
-import Navbar from “../components/Navbar”;
-import { Copy, Gift, Share2, Star, Users, TrendingUp, Loader2 } from “lucide-react”;
-import toast from “react-hot-toast”;
-import { supabase } from “../lib/supabase”;
+import { useEffect, useState } from “react";
+import Navbar from “../components/Navbar";
+import { Copy, Gift, Share2, Star, Users, TrendingUp, Loader2 } from “lucide-react";
+import toast from “react-hot-toast";
+import { supabase } from “../lib/supabase";
 
 export default function Referral() {
 const [loading, setLoading] = useState(true);
-const [referralCode, setReferralCode] = useState(””);
+const [referralCode, setReferralCode] = useState("");
 const [stats, setStats] = useState({
 totalReferrals: 0,
 pendingReferrals: 0,
 earnedCredits: 0
 });
 const [recentReferrals, setRecentReferrals] = useState<any[]>([]);
-const [userName, setUserName] = useState(””);
+const [userName, setUserName] = useState("");
 
 useEffect(() => {
 loadReferralData();
@@ -83,8 +83,8 @@ const { data: { user } } = await supabase.auth.getUser();
 
 const generateReferralCode = (name: string): string => {
 const cleanName = name
-.split(”@”)[0]
-.replace(/[^a-zA-Z]/g, “”)
+.split("@")[0]
+.replace(/[^a-zA-Z]/g, “")
 .toUpperCase()
 .slice(0, 6);
 
@@ -98,9 +98,9 @@ return `KILO-${cleanName}${randomNum}`;
 const createReferralCode = async (userId: string, code: string) => {
 try {
 const { error } = await supabase
-.from(“user_profiles”)
+.from(“user_profiles")
 .update({ referral_code: code })
-.eq(“id”, userId);
+.eq(“id", userId);
 
 ```
   if (error) {
@@ -115,7 +115,7 @@ const { error } = await supabase
 
 const copyCode = () => {
 navigator.clipboard.writeText(referralCode);
-toast.success(“Code copié !”);
+toast.success(“Code copié !");
 };
 
 const shareCode = async () => {
