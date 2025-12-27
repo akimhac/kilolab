@@ -1,23 +1,23 @@
-import { useEffect, useState, useMemo } from ‘react’;
-import { supabase } from ‘../lib/supabase’;
-import Navbar from ‘../components/Navbar’;
+import { useEffect, useState, useMemo } from “react”;
+import { supabase } from “../lib/supabase”;
+import Navbar from “../components/Navbar”;
 import {
 Users, ShoppingBag, DollarSign, CheckCircle, Search, Download,
 TrendingUp, TrendingDown, MapPin, Package, Loader2, Eye
-} from ‘lucide-react’;
+} from “lucide-react”;
 import {
 LineChart, Line, BarChart, Bar, PieChart, Pie, Cell,
 XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer
-} from ‘recharts’;
-import toast from ‘react-hot-toast’;
+} from “recharts”;
+import toast from “react-hot-toast”;
 
 export default function AdminDashboard() {
 const [orders, setOrders] = useState<any[]>([]);
 const [partners, setPartners] = useState<any[]>([]);
 const [loading, setLoading] = useState(true);
-const [timeRange, setTimeRange] = useState<‘7d’ | ‘30d’ | ‘90d’ | ‘all’>(‘30d’);
-const [activeTab, setActiveTab] = useState<‘overview’ | ‘partners’ | ‘cities’ | ‘orders’>(‘overview’);
-const [searchTerm, setSearchTerm] = useState(’’);
+const [timeRange, setTimeRange] = useState<“7d” | “30d” | “90d” | “all”>(“30d”);
+const [activeTab, setActiveTab] = useState<“overview” | “partners” | “cities” | “orders”>(“overview”);
+const [searchTerm, setSearchTerm] = useState(””);
 
 useEffect(() => {
 fetchData();
@@ -26,17 +26,17 @@ fetchData();
 const fetchData = async () => {
 try {
 const { data: ordersData, error: ordersError } = await supabase
-.from(‘orders’)
-.select(’*’)
-.order(‘created_at’, { ascending: false });
+.from(“orders”)
+.select(”*”)
+.order(“created_at”, { ascending: false });
 
 ```
   if (ordersError) throw ordersError;
 
   const { data: partnersData, error: partnersError } = await supabase
-    .from('partners')
-    .select('*')
-    .eq('is_active', true);
+    .from("partners")
+    .select("*")
+    .eq("is_active", true);
 
   if (partnersError) throw partnersError;
 
@@ -45,7 +45,7 @@ const { data: ordersData, error: ordersError } = await supabase
   const partnerStatsMap = new Map();
   
   (ordersData || []).forEach((order: any) => {
-    if (order.partner_id && order.status === 'completed') {
+    if (order.partner_id && order.status === "completed") {
       if (!partnerStatsMap.has(order.partner_id)) {
         partnerStatsMap.set(order.partner_id, {
           totalOrders: 0,
@@ -63,7 +63,7 @@ const { data: ordersData, error: ordersError } = await supabase
     return {
       id: partner.id,
       name: partner.company_name || partner.name || `Partenaire ${partner.id.slice(0, 6)}`,
-      city: partner.city || 'Non spécifié',
+      city: partner.city || "Non spécifié",
       totalOrders: stats.totalOrders,
       totalRevenue: parseFloat(stats.totalRevenue.toFixed(2)),
       rating: partner.average_rating || 4.5,
@@ -82,10 +82,10 @@ const { data: ordersData, error: ordersError } = await supabase
 };
 
 const filteredOrdersByTime = useMemo(() => {
-if (timeRange === ‘all’) return orders;
+if (timeRange === “all”) return orders;
 
 ```
-const daysMap = { '7d': 7, '30d': 30, '90d': 90 };
+const daysMap = { "7d": 7, "30d": 30, "90d": 90 };
 const days = daysMap[timeRange];
 const cutoffDate = new Date();
 cutoffDate.setDate(cutoffDate.getDate() - days);
@@ -96,14 +96,13 @@ return orders.filter(o => new Date(o.created_at) >= cutoffDate);
 }, [orders, timeRange]);
 
 const stats = useMemo(() => {
-const completed = filteredOrdersByTime.filter(o => o.status === ‘completed’);
+const completed = filteredOrdersByTime.filter(o => o.status === “completed”);
 const totalRevenue = completed.reduce((sum, o) => sum + parseFloat(o.total_price || 0), 0);
 const activePartners = new Set(completed.map(o => o.partner_id).filter(Boolean)).size;
-const averageOrderValue = completed.length > 0 ? totalRevenue / completed.length : 0;
-const pending = filteredOrdersByTime.filter(o => o.status === ‘pending’).length;
+const pending = filteredOrdersByTime.filter(o => o.status === “pending”).length;
 
 ```
-const periodDays = timeRange === 'all' ? 90 : parseInt(timeRange);
+const periodDays = timeRange === "all" ? 90 : parseInt(timeRange);
 const previousPeriodStart = new Date();
 previousPeriodStart.setDate(previousPeriodStart.getDate() - periodDays * 2);
 const previousPeriodEnd = new Date();
@@ -111,7 +110,7 @@ previousPeriodEnd.setDate(previousPeriodEnd.getDate() - periodDays);
 
 const previousOrders = orders.filter(o => {
   const date = new Date(o.created_at);
-  return date >= previousPeriodStart && date < previousPeriodEnd && o.status === 'completed';
+  return date >= previousPeriodStart && date < previousPeriodEnd && o.status === "completed";
 });
 
 const previousRevenue = previousOrders.reduce((sum, o) => sum + parseFloat(o.total_price || 0), 0);
@@ -122,7 +121,6 @@ return {
   totalRevenue,
   totalOrders: filteredOrdersByTime.length,
   activePartners,
-  averageOrderValue,
   pending,
   revenueGrowth,
   ordersGrowth,
@@ -136,11 +134,11 @@ const months: { [key: string]: { month: string; revenue: number; orders: number 
 
 ```
 filteredOrdersByTime
-  .filter(o => o.status === 'completed')
+  .filter(o => o.status === "completed")
   .forEach(order => {
     const date = new Date(order.created_at);
-    const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
-    const monthName = date.toLocaleDateString('fr-FR', { month: 'short', year: '2-digit' });
+    const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
+    const monthName = date.toLocaleDateString("fr-FR", { month: "short", year: "2-digit" });
     
     if (!months[monthKey]) {
       months[monthKey] = { month: monthName, revenue: 0, orders: 0 };
@@ -159,10 +157,10 @@ return Object.values(months)
 }, [filteredOrdersByTime]);
 
 const extractCity = (address: string): string => {
-if (!address) return ‘Non spécifié’;
+if (!address) return “Non spécifié”;
 
 ```
-const parts = address.split(',');
+const parts = address.split(",");
 if (parts.length > 1) {
   const lastPart = parts[parts.length - 1].trim();
   const match = lastPart.match(/\d{5}\s+(.+)/);
@@ -171,8 +169,8 @@ if (parts.length > 1) {
   }
 }
 
-const words = address.split(' ');
-return words[words.length - 1] || 'Non spécifié';
+const words = address.split(" ");
+return words[words.length - 1] || "Non spécifié";
 ```
 
 };
@@ -182,7 +180,7 @@ const cities: { [key: string]: { name: string; value: number; orders: number } }
 
 ```
 filteredOrdersByTime
-  .filter(o => o.status === 'completed')
+  .filter(o => o.status === "completed")
   .forEach(order => {
     const city = extractCity(order.pickup_address);
     
@@ -202,12 +200,12 @@ return Object.values(cities)
 
 const statusData = useMemo(() => {
 const statusLabels: any = {
-‘pending’: ‘En attente’,
-‘assigned’: ‘Assigné’,
-‘in_progress’: ‘En cours’,
-‘ready’: ‘Prêt’,
-‘completed’: ‘Terminé’,
-‘cancelled’: ‘Annulé’
+“pending”: “En attente”,
+“assigned”: “Assigné”,
+“in_progress”: “En cours”,
+“ready”: “Prêt”,
+“completed”: “Terminé”,
+“cancelled”: “Annulé”
 };
 
 ```
@@ -218,18 +216,18 @@ filteredOrdersByTime.forEach(o => {
 });
 
 const colors: any = {
-  'Terminé': '#10b981',
-  'En cours': '#3b82f6',
-  'En attente': '#f59e0b',
-  'Assigné': '#8b5cf6',
-  'Prêt': '#6366f1',
-  'Annulé': '#ef4444'
+  "Terminé": "#10b981",
+  "En cours": "#3b82f6",
+  "En attente": "#f59e0b",
+  "Assigné": "#8b5cf6",
+  "Prêt": "#6366f1",
+  "Annulé": "#ef4444"
 };
 
 return Object.entries(statuses).map(([name, value]) => ({
   name,
   value,
-  color: colors[name] || '#64748b'
+  color: colors[name] || "#64748b"
 }));
 ```
 
@@ -248,7 +246,7 @@ suffix?: string;
 {icon}
 </div>
 {trend !== undefined && (
-<div className={`flex items-center gap-1 text-sm font-semibold ${trend >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+<div className={`flex items-center gap-1 text-sm font-semibold ${trend >= 0 ? "text-green-600" : "text-red-600"}`}>
 {trend >= 0 ? <TrendingUp size={16} /> : <TrendingDown size={16} />}
 {Math.abs(trend).toFixed(1)}%
 </div>
@@ -269,23 +267,23 @@ p.city.toLowerCase().includes(searchTerm.toLowerCase())
 }, [partners, searchTerm]);
 
 const handleExportCSV = () => {
-const csvHeader = ‘Date,ID Commande,Client,Montant,Poids,Statut\n’;
+const csvHeader = “Date,ID Commande,Client,Montant,Poids,Statut\n”;
 const csvData = filteredOrdersByTime
 .slice(0, 100)
 .map(o =>
-`${new Date(o.created_at).toLocaleDateString()},${o.id.slice(0, 8)},${o.pickup_address || 'N/A'},${o.total_price},${o.weight},${o.status}`
+`${new Date(o.created_at).toLocaleDateString()},${o.id.slice(0, 8)},${o.pickup_address || "N/A"},${o.total_price},${o.weight},${o.status}`
 )
-.join(’\n’);
+.join(”\n”);
 
 ```
-const blob = new Blob([csvHeader + csvData], { type: 'text/csv;charset=utf-8;' });
+const blob = new Blob([csvHeader + csvData], { type: "text/csv;charset=utf-8;" });
 const url = URL.createObjectURL(blob);
-const link = document.createElement('a');
+const link = document.createElement("a");
 link.href = url;
-link.download = `kilolab-admin-export-${new Date().toISOString().split('T')[0]}.csv`;
+link.download = `kilolab-admin-export-${new Date().toISOString().split("T")[0]}.csv`;
 link.click();
 URL.revokeObjectURL(url);
-toast.success('Export CSV réussi !');
+toast.success("Export CSV réussi !");
 ```
 
 };
@@ -311,8 +309,8 @@ return (
     <div className="mb-8">
       <div className="flex justify-between items-center mb-6">
         <div>
-          <h1 className="text-3xl font-black mb-2">Dashboard Admin Kilolab 👑</h1>
-          <p className="text-slate-600">Vue d'ensemble de la plateforme</p>
+          <h1 className="text-3xl font-black mb-2">Dashboard Admin Kilolab</h1>
+          <p className="text-slate-600">Vue d ensemble de la plateforme</p>
         </div>
         <button 
           onClick={() => window.location.reload()} 
@@ -323,24 +321,24 @@ return (
       </div>
 
       <div className="flex gap-2 mb-6 flex-wrap">
-        {(['7d', '30d', '90d', 'all'] as const).map((range) => (
+        {(["7d", "30d", "90d", "all"] as const).map((range) => (
           <button
             key={range}
             onClick={() => setTimeRange(range)}
             className={`px-4 py-2 rounded-lg font-medium transition ${
               timeRange === range
-                ? 'bg-teal-600 text-white shadow-md'
-                : 'bg-white text-slate-600 hover:bg-slate-50'
+                ? "bg-teal-600 text-white shadow-md"
+                : "bg-white text-slate-600 hover:bg-slate-50"
             }`}
           >
-            {range === '7d' ? '7 jours' : range === '30d' ? '30 jours' : range === '90d' ? '90 jours' : 'Tout'}
+            {range === "7d" ? "7 jours" : range === "30d" ? "30 jours" : range === "90d" ? "90 jours" : "Tout"}
           </button>
         ))}
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <StatCard
-          title="Chiffre d'affaires"
+          title="Chiffre d affaires"
           value={stats.totalRevenue.toFixed(2)}
           suffix=" €"
           icon={<DollarSign size={24} />}
@@ -367,25 +365,25 @@ return (
 
     <div className="bg-white rounded-2xl shadow-sm border border-slate-100 mb-8">
       <div className="flex border-b border-slate-100 overflow-x-auto">
-        {(['overview', 'partners', 'cities', 'orders'] as const).map((tab) => (
+        {(["overview", "partners", "cities", "orders"] as const).map((tab) => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
             className={`px-6 py-4 font-medium transition whitespace-nowrap ${
               activeTab === tab
-                ? 'text-teal-600 border-b-2 border-teal-600'
-                : 'text-slate-500 hover:text-slate-700'
+                ? "text-teal-600 border-b-2 border-teal-600"
+                : "text-slate-500 hover:text-slate-700"
             }`}
           >
-            {tab === 'overview' ? 'Vue d\'ensemble' : 
-             tab === 'partners' ? 'Partenaires' :
-             tab === 'cities' ? 'Villes' : 'Commandes'}
+            {tab === "overview" ? "Vue d ensemble" : 
+             tab === "partners" ? "Partenaires" :
+             tab === "cities" ? "Villes" : "Commandes"}
           </button>
         ))}
       </div>
 
       <div className="p-6">
-        {activeTab === 'overview' && (
+        {activeTab === "overview" && (
           <div className="space-y-8">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <div>
@@ -398,12 +396,9 @@ return (
                     <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
                     <XAxis dataKey="month" stroke="#64748b" fontSize={12} />
                     <YAxis stroke="#64748b" fontSize={12} />
-                    <Tooltip 
-                      contentStyle={{ backgroundColor: '#fff', border: '1px solid #e2e8f0', borderRadius: '8px' }}
-                      formatter={(value: number) => [`${value.toFixed(2)} €`, 'CA']}
-                    />
+                    <Tooltip />
                     <Legend />
-                    <Line type="monotone" dataKey="revenue" stroke="#14b8a6" strokeWidth={3} name="CA (€)" dot={{ r: 4 }} />
+                    <Line type="monotone" dataKey="revenue" stroke="#14b8a6" strokeWidth={3} name="CA" dot={{ r: 4 }} />
                   </LineChart>
                 </ResponsiveContainer>
               </div>
@@ -418,9 +413,7 @@ return (
                     <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
                     <XAxis dataKey="month" stroke="#64748b" fontSize={12} />
                     <YAxis stroke="#64748b" fontSize={12} />
-                    <Tooltip 
-                      contentStyle={{ backgroundColor: '#fff', border: '1px solid #e2e8f0', borderRadius: '8px' }}
-                    />
+                    <Tooltip />
                     <Legend />
                     <Bar dataKey="orders" fill="#3b82f6" name="Commandes" radius={[8, 8, 0, 0]} />
                   </BarChart>
@@ -455,18 +448,15 @@ return (
               <div>
                 <h3 className="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
                   <MapPin className="text-purple-600" size={20} />
-                  Top 5 villes (CA)
+                  Top 5 villes
                 </h3>
                 <ResponsiveContainer width="100%" height={300}>
                   <BarChart data={cityData.slice(0, 5)} layout="vertical">
                     <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
                     <XAxis type="number" stroke="#64748b" fontSize={12} />
                     <YAxis dataKey="name" type="category" stroke="#64748b" fontSize={12} width={100} />
-                    <Tooltip 
-                      contentStyle={{ backgroundColor: '#fff', border: '1px solid #e2e8f0', borderRadius: '8px' }}
-                      formatter={(value: number) => [`${value.toFixed(2)} €`, 'CA']}
-                    />
-                    <Bar dataKey="value" fill="#8b5cf6" name="CA (€)" radius={[0, 8, 8, 0]} />
+                    <Tooltip />
+                    <Bar dataKey="value" fill="#8b5cf6" name="CA" radius={[0, 8, 8, 0]} />
                   </BarChart>
                 </ResponsiveContainer>
               </div>
@@ -474,7 +464,7 @@ return (
           </div>
         )}
 
-        {activeTab === 'partners' && (
+        {activeTab === "partners" && (
           <div>
             <div className="flex justify-between items-center mb-6 flex-wrap gap-4">
               <h3 className="text-lg font-bold text-slate-900">Liste des partenaires ({partners.length})</h3>
@@ -542,7 +532,7 @@ return (
           </div>
         )}
 
-        {activeTab === 'cities' && (
+        {activeTab === "cities" && (
           <div>
             <h3 className="text-lg font-bold text-slate-900 mb-6">Statistiques par ville</h3>
             {cityData.length === 0 ? (
@@ -578,7 +568,7 @@ return (
           </div>
         )}
 
-        {activeTab === 'orders' && (
+        {activeTab === "orders" && (
           <div>
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-lg font-bold text-slate-900">Toutes les commandes ({filteredOrdersByTime.length})</h3>
@@ -596,8 +586,8 @@ return (
                   <tr>
                     <th className="p-4">ID</th>
                     <th className="p-4">Date</th>
-                    <th className="p-4">Client / Adresse</th>
-                    <th className="p-4">Poids / Prix</th>
+                    <th className="p-4">Client</th>
+                    <th className="p-4">Poids</th>
                     <th className="p-4">Statut</th>
                     <th className="p-4 text-right">Actions</th>
                   </tr>
@@ -607,24 +597,20 @@ return (
                     <tr key={order.id} className="hover:bg-slate-50 transition">
                       <td className="p-4 font-mono font-bold">#{order.id.toString().slice(0,6)}</td>
                       <td className="p-4 text-slate-500">
-                        {new Date(order.created_at).toLocaleDateString('fr-FR')}
-                        <div className="text-xs">{new Date(order.created_at).toLocaleTimeString('fr-FR')}</div>
+                        {new Date(order.created_at).toLocaleDateString("fr-FR")}
                       </td>
                       <td className="p-4">
                         <div className="font-bold text-slate-900 truncate max-w-xs">{order.pickup_address || "Adresse inconnue"}</div>
-                        <div className="text-xs text-slate-400">ID Client: {order.client_id?.slice(0,8)}</div>
                       </td>
                       <td className="p-4">
-                        <span className="font-bold">{order.weight || '?'} kg</span>
-                        <span className="text-slate-400 mx-2">|</span>
-                        <span className="text-teal-600 font-bold">{order.total_price || '?'} €</span>
+                        <span className="font-bold">{order.weight || "?"} kg</span>
                       </td>
                       <td className="p-4">
                         <span className={`px-2 py-1 rounded-full text-xs font-bold uppercase 
-                          ${order.status === 'pending' ? 'bg-orange-100 text-orange-700' : 
-                            order.status === 'completed' ? 'bg-green-100 text-green-700' : 
-                            order.status === 'in_progress' ? 'bg-blue-100 text-blue-700' : 
-                            'bg-slate-100'}`}>
+                          ${order.status === "pending" ? "bg-orange-100 text-orange-700" : 
+                            order.status === "completed" ? "bg-green-100 text-green-700" : 
+                            order.status === "in_progress" ? "bg-blue-100 text-blue-700" : 
+                            "bg-slate-100"}`}>
                           {order.status}
                         </span>
                       </td>
