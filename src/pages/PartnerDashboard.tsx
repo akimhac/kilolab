@@ -1,27 +1,27 @@
-import { useEffect, useState, useMemo } from ‘react’;
-import { supabase } from ‘../lib/supabase’;
-import Navbar from ‘../components/Navbar’;
-import OrderTicket from ‘../components/OrderTicket’;
+import { useEffect, useState, useMemo } from “react”;
+import { supabase } from “../lib/supabase”;
+import Navbar from “../components/Navbar”;
+import OrderTicket from “../components/OrderTicket”;
 import {
 Package, DollarSign, Filter, Printer, X, Loader2, UserPlus,
 TrendingUp, TrendingDown, Calendar, BarChart3, Download
-} from ‘lucide-react’;
+} from “lucide-react”;
 import {
 LineChart, Line, BarChart, Bar, PieChart, Pie, Cell,
 XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer
-} from ‘recharts’;
-import toast from ‘react-hot-toast’;
+} from “recharts”;
+import toast from “react-hot-toast”;
 
 export default function PartnerDashboard() {
 const [orders, setOrders] = useState<any[]>([]);
 const [availableOrders, setAvailableOrders] = useState<any[]>([]);
 const [stats, setStats] = useState({ total: 0, pending: 0, revenue: 0 });
 const [loading, setLoading] = useState(true);
-const [filter, setFilter] = useState(‘all’);
-const [timeRange, setTimeRange] = useState<‘7d’ | ‘30d’ | ‘90d’ | ‘all’>(‘30d’);
+const [filter, setFilter] = useState(“all”);
+const [timeRange, setTimeRange] = useState<“7d” | “30d” | “90d” | “all”>(“30d”);
 const [selectedOrder, setSelectedOrder] = useState<any>(null);
-const [userId, setUserId] = useState<string>(’’);
-const [partnerId, setPartnerId] = useState<string>(’’);
+const [userId, setUserId] = useState<string>(””);
+const [partnerId, setPartnerId] = useState<string>(””);
 const [showAnalytics, setShowAnalytics] = useState(false);
 
 useEffect(() => {
@@ -40,9 +40,9 @@ return;
 setUserId(user.id);
 
 const { data: partnerData, error: partnerError } = await supabase
-  .from('partners')
-  .select('id')
-  .eq('user_id', user.id)
+  .from("partners")
+  .select("id")
+  .eq("user_id", user.id)
   .single();
 
 if (partnerError || !partnerData) {
@@ -63,17 +63,17 @@ setLoading(true);
 
 ```
 const { data: myOrders, error: myError } = await supabase
-  .from('orders')
-  .select('*')
-  .eq('partner_id', pId)
-  .order('created_at', { ascending: false });
+  .from("orders")
+  .select("*")
+  .eq("partner_id", pId)
+  .order("created_at", { ascending: false });
 
 const { data: available, error: availError } = await supabase
-  .from('orders')
-  .select('*')
-  .is('partner_id', null)
-  .eq('status', 'pending')
-  .order('pickup_date', { ascending: true });
+  .from("orders")
+  .select("*")
+  .is("partner_id", null)
+  .eq("status", "pending")
+  .order("pickup_date", { ascending: true });
 
 if (myError) {
   console.error("Erreur fetch myOrders:", myError);
@@ -96,10 +96,10 @@ setLoading(false);
 
 const calculateStats = (data: any[]) => {
 const revenue = data.reduce((acc, order) => {
-return acc + (order.status === ‘completed’ ? parseFloat(order.total_price || 0) : 0);
+return acc + (order.status === “completed” ? parseFloat(order.total_price || 0) : 0);
 }, 0);
 const pending = data.filter(o =>
-o.status !== ‘completed’ && o.status !== ‘cancelled’
+o.status !== “completed” && o.status !== “cancelled”
 ).length;
 
 ```
@@ -113,10 +113,10 @@ setStats({
 };
 
 const filteredOrdersByTime = useMemo(() => {
-if (timeRange === ‘all’) return orders;
+if (timeRange === “all”) return orders;
 
 ```
-const daysMap = { '7d': 7, '30d': 30, '90d': 90 };
+const daysMap = { "7d": 7, "30d": 30, "90d": 90 };
 const days = daysMap[timeRange];
 const cutoffDate = new Date();
 cutoffDate.setDate(cutoffDate.getDate() - days);
@@ -127,12 +127,12 @@ return orders.filter(o => new Date(o.created_at) >= cutoffDate);
 }, [orders, timeRange]);
 
 const advancedStats = useMemo(() => {
-const completed = filteredOrdersByTime.filter(o => o.status === ‘completed’);
+const completed = filteredOrdersByTime.filter(o => o.status === “completed”);
 const totalRevenue = completed.reduce((sum, o) => sum + parseFloat(o.total_price || 0), 0);
 const averageOrderValue = completed.length > 0 ? totalRevenue / completed.length : 0;
 
 ```
-const periodDays = timeRange === 'all' ? 90 : parseInt(timeRange);
+const periodDays = timeRange === "all" ? 90 : parseInt(timeRange);
 const previousPeriodStart = new Date();
 previousPeriodStart.setDate(previousPeriodStart.getDate() - periodDays * 2);
 const previousPeriodEnd = new Date();
@@ -144,7 +144,7 @@ const previousOrders = orders.filter(o => {
 });
 
 const previousRevenue = previousOrders
-  .filter(o => o.status === 'completed')
+  .filter(o => o.status === "completed")
   .reduce((sum, o) => sum + parseFloat(o.total_price || 0), 0);
 
 const revenueGrowth = previousRevenue > 0 
@@ -172,16 +172,16 @@ const dayMap = new Map<string, number>();
 
 ```
 filteredOrdersByTime
-  .filter(o => o.status === 'completed')
+  .filter(o => o.status === "completed")
   .forEach(order => {
-    const date = new Date(order.created_at).toISOString().split('T')[0];
+    const date = new Date(order.created_at).toISOString().split("T")[0];
     dayMap.set(date, (dayMap.get(date) || 0) + parseFloat(order.total_price || 0));
   });
 
 return Array.from(dayMap.entries())
   .sort((a, b) => a[0].localeCompare(b[0]))
   .map(([date, revenue]) => ({
-    date: new Date(date).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' }),
+    date: new Date(date).toLocaleDateString("fr-FR", { day: "2-digit", month: "short" }),
     revenue: parseFloat(revenue.toFixed(2)),
   }));
 ```
@@ -191,12 +191,12 @@ return Array.from(dayMap.entries())
 const ordersByStatus = useMemo(() => {
 const statusMap = new Map<string, number>();
 const statusLabels: any = {
-‘pending’: ‘En attente’,
-‘assigned’: ‘Assigné’,
-‘in_progress’: ‘En cours’,
-‘ready’: ‘Prêt’,
-‘completed’: ‘Terminé’,
-‘cancelled’: ‘Annulé’
+“pending”: “En attente”,
+“assigned”: “Assigné”,
+“in_progress”: “En cours”,
+“ready”: “Prêt”,
+“completed”: “Terminé”,
+“cancelled”: “Annulé”
 };
 
 ```
@@ -218,16 +218,16 @@ const dayMap = new Map<string, number>();
 
 ```
 filteredOrdersByTime
-  .filter(o => o.status === 'completed')
+  .filter(o => o.status === "completed")
   .forEach(order => {
-    const date = new Date(order.created_at).toISOString().split('T')[0];
+    const date = new Date(order.created_at).toISOString().split("T")[0];
     dayMap.set(date, (dayMap.get(date) || 0) + parseFloat(order.weight || 0));
   });
 
 return Array.from(dayMap.entries())
   .sort((a, b) => a[0].localeCompare(b[0]))
   .map(([date, weight]) => ({
-    date: new Date(date).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' }),
+    date: new Date(date).toLocaleDateString("fr-FR", { day: "2-digit", month: "short" }),
     weight: parseFloat(weight.toFixed(2)),
   }));
 ```
@@ -236,14 +236,14 @@ return Array.from(dayMap.entries())
 
 const takeOrder = async (orderId: string) => {
 const { error } = await supabase
-.from(‘orders’)
+.from(“orders”)
 .update({
 partner_id: partnerId,
-status: ‘assigned’,
+status: “assigned”,
 updated_at: new Date().toISOString()
 })
-.eq(‘id’, orderId)
-.is(‘partner_id’, null);
+.eq(“id”, orderId)
+.is(“partner_id”, null);
 
 ```
 if (error) {
@@ -264,25 +264,25 @@ updated_at: new Date().toISOString()
 };
 
 ```
-if (newStatus === 'completed') {
+if (newStatus === "completed") {
   updates.completed_at = new Date().toISOString();
 }
 
 const { error } = await supabase
-  .from('orders')
+  .from("orders")
   .update(updates)
-  .eq('id', orderId)
-  .eq('partner_id', partnerId);
+  .eq("id", orderId)
+  .eq("partner_id", partnerId);
 
 if (error) {
   toast.error("Erreur lors de la mise à jour");
   console.error(error);
 } else {
   const statusLabels: any = {
-    'assigned': 'Assignée',
-    'in_progress': 'En cours',
-    'ready': 'Prête',
-    'completed': 'Terminée'
+    "assigned": "Assignée",
+    "in_progress": "En cours",
+    "ready": "Prête",
+    "completed": "Terminée"
   };
   toast.success(`Commande ${statusLabels[newStatus] || newStatus}`);
   
@@ -302,30 +302,30 @@ window.print();
 };
 
 const handleExport = () => {
-const csvHeader = ‘Date,Commandes,Revenus,Poids\n’;
+const csvHeader = “Date,Commandes,Revenus,Poids\n”;
 const csvData = revenueByDay.map((item, idx) => {
 const weight = weightByDay[idx]?.weight || 0;
 return `${item.date},${ordersByStatus.reduce((sum, s) => sum + s.value, 0)},${item.revenue},${weight}`;
-}).join(’\n’);
+}).join(”\n”);
 
 ```
-const blob = new Blob([csvHeader + csvData], { type: 'text/csv;charset=utf-8;' });
+const blob = new Blob([csvHeader + csvData], { type: "text/csv;charset=utf-8;" });
 const url = URL.createObjectURL(blob);
-const link = document.createElement('a');
+const link = document.createElement("a");
 link.href = url;
-link.download = `kilolab-export-${new Date().toISOString().split('T')[0]}.csv`;
+link.download = `kilolab-export-${new Date().toISOString().split("T")[0]}.csv`;
 link.click();
 URL.revokeObjectURL(url);
-toast.success('Export CSV réussi !');
+toast.success("Export CSV réussi !");
 ```
 
 };
 
-const filteredOrders = filter === ‘all’
+const filteredOrders = filter === “all”
 ? orders
 : orders.filter(o => o.status === filter);
 
-const COLORS = [’#14b8a6’, ‘#3b82f6’, ‘#f59e0b’, ‘#10b981’, ‘#8b5cf6’, ‘#ef4444’];
+const COLORS = [”#14b8a6”, “#3b82f6”, “#f59e0b”, “#10b981”, “#8b5cf6”, “#ef4444”];
 
 if (loading) {
 return (
@@ -352,35 +352,35 @@ return (
           onClick={() => setShowAnalytics(!showAnalytics)}
           className={`px-6 py-3 rounded-xl font-bold flex items-center gap-2 transition-all ${
             showAnalytics 
-              ? 'bg-teal-600 text-white shadow-lg shadow-teal-600/30' 
-              : 'bg-white text-slate-700 border border-slate-200 hover:border-teal-600'
+              ? "bg-teal-600 text-white shadow-lg shadow-teal-600/30" 
+              : "bg-white text-slate-700 border border-slate-200 hover:border-teal-600"
           }`}
         >
           <BarChart3 size={20} />
-          {showAnalytics ? 'Vue Simple' : 'Analytics'}
+          {showAnalytics ? "Vue Simple" : "Analytics"}
         </button>
       </div>
-      
+
       {showAnalytics && (
         <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-4 mb-6">
           <div className="flex flex-wrap gap-2">
-            {(['7d', '30d', '90d', 'all'] as const).map((range) => (
+            {(["7d", "30d", "90d", "all"] as const).map((range) => (
               <button
                 key={range}
                 onClick={() => setTimeRange(range)}
                 className={`px-4 py-2 rounded-lg font-medium transition-all ${
                   timeRange === range
-                    ? 'bg-teal-600 text-white shadow-md'
-                    : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                    ? "bg-teal-600 text-white shadow-md"
+                    : "bg-slate-100 text-slate-700 hover:bg-slate-200"
                 }`}
               >
-                {range === 'all' ? 'Tout' : range === '7d' ? '7 jours' : range === '30d' ? '30 jours' : '90 jours'}
+                {range === "all" ? "Tout" : range === "7d" ? "7 jours" : range === "30d" ? "30 jours" : "90 jours"}
               </button>
             ))}
           </div>
         </div>
       )}
-      
+
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
           <div className="flex items-center justify-between mb-4">
@@ -389,7 +389,7 @@ return (
             </div>
             {showAnalytics && advancedStats.ordersGrowth !== 0 && (
               <div className={`flex items-center text-sm font-medium ${
-                advancedStats.ordersGrowth >= 0 ? 'text-green-600' : 'text-red-600'
+                advancedStats.ordersGrowth >= 0 ? "text-green-600" : "text-red-600"
               }`}>
                 {advancedStats.ordersGrowth >= 0 ? <TrendingUp size={16} /> : <TrendingDown size={16} />}
                 <span className="ml-1">{Math.abs(advancedStats.ordersGrowth).toFixed(1)}%</span>
@@ -407,7 +407,7 @@ return (
             </div>
             {showAnalytics && advancedStats.revenueGrowth !== 0 && (
               <div className={`flex items-center text-sm font-medium ${
-                advancedStats.revenueGrowth >= 0 ? 'text-green-600' : 'text-red-600'
+                advancedStats.revenueGrowth >= 0 ? "text-green-600" : "text-red-600"
               }`}>
                 {advancedStats.revenueGrowth >= 0 ? <TrendingUp size={16} /> : <TrendingDown size={16} />}
                 <span className="ml-1">{Math.abs(advancedStats.revenueGrowth).toFixed(1)}%</span>
@@ -466,19 +466,19 @@ return (
                 <YAxis stroke="#64748b" fontSize={12} />
                 <Tooltip 
                   contentStyle={{ 
-                    backgroundColor: '#fff', 
-                    border: '1px solid #e2e8f0', 
-                    borderRadius: '8px',
-                    fontSize: '12px'
+                    backgroundColor: "#fff", 
+                    border: "1px solid #e2e8f0", 
+                    borderRadius: "8px",
+                    fontSize: "12px"
                   }}
-                  formatter={(value: number) => [`${value.toFixed(2)} €`, 'CA']}
+                  formatter={(value: number) => [`${value.toFixed(2)} €`, "CA"]}
                 />
                 <Line 
                   type="monotone" 
                   dataKey="revenue" 
                   stroke="#14b8a6" 
                   strokeWidth={3} 
-                  dot={{ fill: '#14b8a6', r: 4 }} 
+                  dot={{ fill: "#14b8a6", r: 4 }} 
                 />
               </LineChart>
             </ResponsiveContainer>
@@ -520,12 +520,12 @@ return (
               <YAxis stroke="#64748b" fontSize={12} />
               <Tooltip 
                 contentStyle={{ 
-                  backgroundColor: '#fff', 
-                  border: '1px solid #e2e8f0', 
-                  borderRadius: '8px',
-                  fontSize: '12px'
+                  backgroundColor: "#fff", 
+                  border: "1px solid #e2e8f0", 
+                  borderRadius: "8px",
+                  fontSize: "12px"
                 }}
-                formatter={(value: number) => [`${value.toFixed(2)} kg`, 'Poids']}
+                formatter={(value: number) => [`${value.toFixed(2)} kg`, "Poids"]}
               />
               <Bar dataKey="weight" fill="#f59e0b" radius={[8, 8, 0, 0]} />
             </BarChart>
@@ -541,7 +541,7 @@ return (
             <p className="text-green-600 text-sm font-bold mb-1">Poids total traité</p>
             <p className="text-2xl font-black text-green-900">
               {filteredOrdersByTime
-                .filter(o => o.status === 'completed')
+                .filter(o => o.status === "completed")
                 .reduce((sum, o) => sum + parseFloat(o.weight || 0), 0)
                 .toFixed(2)} kg
             </p>
@@ -584,14 +584,14 @@ return (
               <div className="space-y-2 mb-3">
                 <div className="flex justify-between text-sm">
                   <span className="text-slate-500">Poids</span>
-                  <span className="font-bold">{order.weight || '?'} kg</span>
+                  <span className="font-bold">{order.weight || "?"} kg</span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-slate-500">Montant</span>
-                  <span className="font-bold text-teal-600">{order.total_price || '?'} €</span>
+                  <span className="font-bold text-teal-600">{order.total_price || "?"} €</span>
                 </div>
                 <div className="text-xs text-slate-400 truncate">
-                  📍 {order.pickup_address || 'Adresse non spécifiée'}
+                  📍 {order.pickup_address || "Adresse non spécifiée"}
                 </div>
               </div>
 
@@ -614,19 +614,19 @@ return (
         </h2>
         <div className="flex bg-slate-100 p-1 rounded-xl overflow-x-auto">
           {[
-            { key: 'all', label: 'Tout' },
-            { key: 'assigned', label: 'Assigné' },
-            { key: 'in_progress', label: 'En cours' },
-            { key: 'ready', label: 'Prêt' },
-            { key: 'completed', label: 'Terminé' }
+            { key: "all", label: "Tout" },
+            { key: "assigned", label: "Assigné" },
+            { key: "in_progress", label: "En cours" },
+            { key: "ready", label: "Prêt" },
+            { key: "completed", label: "Terminé" }
           ].map(f => (
             <button 
               key={f.key}
               onClick={() => setFilter(f.key)}
               className={`px-4 py-2 rounded-lg text-sm font-bold transition whitespace-nowrap ${
                 filter === f.key 
-                  ? 'bg-white shadow-sm text-slate-900' 
-                  : 'text-slate-500 hover:text-slate-700'
+                  ? "bg-white shadow-sm text-slate-900" 
+                  : "text-slate-500 hover:text-slate-700"
               }`}
             >
               {f.label}
@@ -670,10 +670,10 @@ return (
                 </td>
                 <td className="p-6">
                   <div className="font-bold">
-                    {order.weight ? `${order.weight} kg` : '- kg'}
+                    {order.weight ? `${order.weight} kg` : "- kg"}
                   </div>
                   <div className="text-xs text-teal-600 font-bold">
-                    {order.total_price ? `${order.total_price} €` : '- €'}
+                    {order.total_price ? `${order.total_price} €` : "- €"}
                   </div>
                   <div className="text-xs text-slate-400 mt-1">
                     {order.items || "Standard"}
@@ -681,20 +681,20 @@ return (
                 </td>
                 <td className="p-6">
                   <div className="text-sm font-medium truncate max-w-xs">
-                    📍 {order.pickup_address || 'Non spécifié'}
+                    📍 {order.pickup_address || "Non spécifié"}
                   </div>
                 </td>
                 <td className="p-6">
                   <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase 
-                    ${order.status === 'assigned' ? 'bg-yellow-100 text-yellow-700' : 
-                      order.status === 'in_progress' ? 'bg-blue-100 text-blue-700' : 
-                      order.status === 'ready' ? 'bg-purple-100 text-purple-700' : 
-                      order.status === 'completed' ? 'bg-green-100 text-green-700' : 
-                      'bg-slate-100'}`}>
-                    {order.status === 'assigned' ? 'Assigné' : 
-                     order.status === 'in_progress' ? 'Lavage' : 
-                     order.status === 'ready' ? 'Prêt' : 
-                     order.status === 'completed' ? 'Terminé' : order.status}
+                    ${order.status === "assigned" ? "bg-yellow-100 text-yellow-700" : 
+                      order.status === "in_progress" ? "bg-blue-100 text-blue-700" : 
+                      order.status === "ready" ? "bg-purple-100 text-purple-700" : 
+                      order.status === "completed" ? "bg-green-100 text-green-700" : 
+                      "bg-slate-100"}`}>
+                    {order.status === "assigned" ? "Assigné" : 
+                     order.status === "in_progress" ? "Lavage" : 
+                     order.status === "ready" ? "Prêt" : 
+                     order.status === "completed" ? "Terminé" : order.status}
                   </span>
                 </td>
                 <td className="p-6 text-right flex justify-end gap-2">
@@ -706,25 +706,25 @@ return (
                     <Printer size={18}/>
                   </button>
 
-                  {order.status === 'assigned' && (
+                  {order.status === "assigned" && (
                     <button 
-                      onClick={() => updateStatus(order.id, 'in_progress')} 
+                      onClick={() => updateStatus(order.id, "in_progress")} 
                       className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-bold shadow-md hover:bg-blue-500 transition"
                     >
                       Démarrer
                     </button>
                   )}
-                  {order.status === 'in_progress' && (
+                  {order.status === "in_progress" && (
                     <button 
-                      onClick={() => updateStatus(order.id, 'ready')} 
+                      onClick={() => updateStatus(order.id, "ready")} 
                       className="bg-purple-600 text-white px-4 py-2 rounded-lg text-sm font-bold shadow-md hover:bg-purple-500 transition"
                     >
                       Prêt
                     </button>
                   )}
-                  {order.status === 'ready' && (
+                  {order.status === "ready" && (
                     <button 
-                      onClick={() => updateStatus(order.id, 'completed')} 
+                      onClick={() => updateStatus(order.id, "completed")} 
                       className="bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-bold shadow-md hover:bg-green-500 transition"
                     >
                       Terminer
