@@ -1,12 +1,12 @@
 import { useEffect, useState, useMemo } from “react";
-import { supabase } from “../lib/supabase";
-import Navbar from “../components/Navbar";
+import { supabase } from "../lib/supabase";
+import Navbar from "../components/Navbar";
 import {
 Package, Clock, CheckCircle, ArrowRight, MapPin, Loader2, Plus, Gift,
 TrendingUp, Droplet, Home, UserCheck, Award, BarChart3, DollarSign, X
-} from “lucide-react";
-import { Link, useNavigate } from “react-router-dom";
-import toast from “react-hot-toast";
+} from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 
 // ========================================
 // GRAPHIQUES SVG MAISON (pas de dépendance)
@@ -23,12 +23,12 @@ const points = data.map((point, i) => {
 const x = padding + (i / Math.max(data.length - 1, 1)) * (width - 2 * padding);
 const y = height - padding - (point.value / maxValue) * (height - 2 * padding);
 return `${x},${y}`;
-}).join(" “);
+}).join(" ");
 
 return (
-<svg width=“100%" height={height} viewBox={`0 0 ${width} ${height}`} className=“overflow-visible">
-<line x1={padding} y1={padding} x2={padding} y2={height - padding} stroke="#e2e8f0" strokeWidth=“2"/>
-<line x1={padding} y1={height - padding} x2={width - padding} y2={height - padding} stroke="#e2e8f0" strokeWidth=“2"/>
+<svg width="100%" height={height} viewBox={`0 0 ${width} ${height}`} className="overflow-visible">
+<line x1={padding} y1={padding} x2={padding} y2={height - padding} stroke="#e2e8f0" strokeWidth="2"/>
+<line x1={padding} y1={height - padding} x2={width - padding} y2={height - padding} stroke="#e2e8f0" strokeWidth="2"/>
 <polyline points={points} fill="none" stroke="#14b8a6" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
 {data.map((point, i) => {
 const x = padding + (i / Math.max(data.length - 1, 1)) * (width - 2 * padding);
@@ -36,7 +36,7 @@ const y = height - padding - (point.value / maxValue) * (height - 2 * padding);
 return (
 <g key={i}>
 <circle cx={x} cy={y} r="5" fill="#14b8a6" stroke="white" strokeWidth="2"/>
-<text x={x} y={height - 10} textAnchor=“middle" fontSize=“10" fill="#64748b">{point.date}</text>
+<text x={x} y={height - 10} textAnchor="middle" fontSize="10" fill="#64748b">{point.date}</text>
 </g>
 );
 })}
@@ -57,7 +57,7 @@ return (
 </div>
 <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
 <div
-className=“h-full transition-all duration-500 rounded-full"
+className="h-full transition-all duration-500 rounded-full"
 style={{ width: `${(item.value / maxValue) * 100}%`, backgroundColor: item.color }}
 />
 </div>
@@ -74,7 +74,7 @@ const [loading, setLoading] = useState(true);
 const [user, setUser] = useState<any>(null);
 const [showAnalytics, setShowAnalytics] = useState(false);
 const [searchTerm, setSearchTerm] = useState("");
-const [filterPeriod, setFilterPeriod] = useState<“all" | “30d" | “90d">(“all");
+const [filterPeriod, setFilterPeriod] = useState<"all" | "30d" | "90d">("all");
 
 useEffect(() => {
 fetchData();
@@ -144,7 +144,7 @@ setLoading(false);
 // STATISTIQUES AVANCÉES
 // ========================================
 const clientStats = useMemo(() => {
-const completed = orders.filter(o => o.status === “completed");
+const completed = orders.filter(o => o.status === "completed");
 const totalSpent = completed.reduce((sum, o) => sum + parseFloat(o.total_price || 0), 0);
 const totalKg = completed.reduce((sum, o) => sum + parseFloat(o.weight || 0), 0);
 const avgOrderValue = completed.length > 0 ? totalSpent / completed.length : 0;
@@ -165,16 +165,16 @@ return {
 
 const loyaltyLevel = useMemo(() => {
 const count = clientStats.completedOrders;
-if (count >= 20) return { level: “Platine 💎", color: “purple", progress: 100, next: “Max" };
-if (count >= 10) return { level: “Gold 🏆", color: “yellow", progress: (count / 20) * 100, next: “20 pour Platine" };
-if (count >= 5) return { level: “Silver 🥈", color: “slate", progress: (count / 10) * 100, next: “10 pour Gold" };
-return { level: “Bronze 🥉", color: “orange", progress: (count / 5) * 100, next: “5 pour Silver" };
+if (count >= 20) return { level: "Platine 💎", color: "purple", progress: 100, next: "Max" };
+if (count >= 10) return { level: "Gold 🏆", color: "yellow", progress: (count / 20) * 100, next: "20 pour Platine" };
+if (count >= 5) return { level: "Silver 🥈", color: "slate", progress: (count / 10) * 100, next: "10 pour Gold" };
+return { level: "Bronze 🥉", color: "orange", progress: (count / 5) * 100, next: "5 pour Silver" };
 }, [clientStats]);
 
 const monthlySpending = useMemo(() => {
 const monthMap = new Map<string, number>();
-orders.filter(o => o.status === “completed").forEach(order => {
-const month = new Date(order.created_at).toLocaleDateString(“fr-FR", { month: “short" });
+orders.filter(o => o.status === "completed").forEach(order => {
+const month = new Date(order.created_at).toLocaleDateString("fr-FR", { month: "short" });
 monthMap.set(month, (monthMap.get(month) || 0) + parseFloat(order.total_price || 0));
 });
 return Array.from(monthMap.entries()).slice(-6).map(([date, value]) => ({ date, value: parseFloat(value.toFixed(2)) }));
@@ -183,23 +183,23 @@ return Array.from(monthMap.entries()).slice(-6).map(([date, value]) => ({ date, 
 const formulaDistribution = useMemo(() => {
 const formulaMap = new Map<string, number>();
 orders.forEach(order => {
-const formula = order.formula || “Eco";
+const formula = order.formula || "Eco";
 formulaMap.set(formula, (formulaMap.get(formula) || 0) + 1);
 });
-const colors: any = { “Eco": “#14b8a6", “Express": “#f59e0b", “Premium": “#8b5cf6" };
-return Array.from(formulaMap.entries()).map(([label, value]) => ({ label, value, color: colors[label] || “#64748b" }));
+const colors: any = { "Eco": "#14b8a6", "Express": "#f59e0b", "Premium": "#8b5cf6" };
+return Array.from(formulaMap.entries()).map(([label, value]) => ({ label, value, color: colors[label] || "#64748b" }));
 }, [orders]);
 
 const filteredPastOrders = useMemo(() => {
-let filtered = orders.filter(o => o.status === “completed" || o.status === “cancelled");
+let filtered = orders.filter(o => o.status === "completed" || o.status === "cancelled");
 if (searchTerm) {
 filtered = filtered.filter(order =>
 order.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
 order.pickup_address?.toLowerCase().includes(searchTerm.toLowerCase())
 );
 }
-if (filterPeriod !== “all") {
-const days = filterPeriod === “30d" ? 30 : 90;
+if (filterPeriod !== "all") {
+const days = filterPeriod === "30d" ? 30 : 90;
 const cutoffDate = new Date();
 cutoffDate.setDate(cutoffDate.getDate() - days);
 filtered = filtered.filter(o => new Date(o.created_at) >= cutoffDate);
@@ -207,13 +207,13 @@ filtered = filtered.filter(o => new Date(o.created_at) >= cutoffDate);
 return filtered;
 }, [orders, searchTerm, filterPeriod]);
 
-const activeOrder = orders.find(o => o.status !== “completed" && o.status !== “cancelled");
+const activeOrder = orders.find(o => o.status !== "completed" && o.status !== "cancelled");
 const orderSteps = [
-{ key: “pending", label: “Reçu", icon: Package },
-{ key: “assigned", label: “Assigné", icon: UserCheck },
-{ key: “in_progress", label: “Lavage", icon: Droplet },
-{ key: “ready", label: “Prêt", icon: CheckCircle },
-{ key: “completed", label: “Livré", icon: Home }
+{ key: "pending", label: "Reçu", icon: Package },
+{ key: "assigned", label: "Assigné", icon: UserCheck },
+{ key: "in_progress", label: "Lavage", icon: Droplet },
+{ key: "ready", label: "Prêt", icon: CheckCircle },
+{ key: "completed", label: "Livré", icon: Home }
 ];
 const currentStepIndex = orderSteps.findIndex(s => s.key === activeOrder?.status);
 
