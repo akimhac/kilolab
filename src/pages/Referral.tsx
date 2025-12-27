@@ -1,4 +1,4 @@
-import { useEffect, useState } from “react”;
+import { useEffect, useState } from 'react';
 import Navbar from “../components/Navbar”;
 import { Copy, Gift, Share2, Star, Users, TrendingUp, Loader2 } from “lucide-react”;
 import toast from “react-hot-toast”;
