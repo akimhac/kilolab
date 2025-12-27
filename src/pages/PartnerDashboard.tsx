@@ -4,7 +4,7 @@ import Navbar from '../components/Navbar';
 import OrderTicket from '../components/OrderTicket';
 import { 
   Package, DollarSign, Filter, Printer, X, Loader2, UserPlus, 
-  TrendingUp, TrendingDown, Calendar, Clock, BarChart3, PieChart as PieChartIcon 
+  TrendingUp, TrendingDown, Calendar, BarChart3, Download
 } from 'lucide-react';
 import { 
   LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, 
@@ -260,6 +260,23 @@ export default function PartnerDashboard() {
     window.print();
   };
 
+  const handleExport = () => {
+    const csvHeader = 'Date,Commandes,Revenus,Poids\n';
+    const csvData = revenueByDay.map((item, idx) => {
+      const weight = weightByDay[idx]?.weight || 0;
+      return `${item.date},${ordersByStatus.reduce((sum, s) => sum + s.value, 0)},${item.revenue},${weight}`;
+    }).join('\n');
+    
+    const blob = new Blob([csvHeader + csvData], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `kilolab-export-${new Date().toISOString().split('T')[0]}.csv`;
+    link.click();
+    URL.revokeObjectURL(url);
+    toast.success('Export CSV réussi !');
+  };
+
   const filteredOrders = filter === 'all' 
     ? orders 
     : orders.filter(o => o.status === filter);
@@ -371,7 +388,7 @@ export default function PartnerDashboard() {
               <p className="text-3xl font-black">{availableOrders.length}</p>
             </div>
 
-            {/* CARTE 4 : PANIER MOYEN (nouvelle) */}
+            {/* CARTE 4 : PANIER MOYEN */}
             <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
               <div className="flex items-center justify-between mb-4">
                 <div className="bg-purple-100 p-4 rounded-xl text-purple-600">
@@ -393,10 +410,19 @@ export default function PartnerDashboard() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {/* Évolution du CA */}
               <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
-                <h3 className="font-bold text-lg mb-4 flex items-center gap-2">
-                  <TrendingUp className="text-teal-600" size={20} />
-                  Évolution du CA
-                </h3>
+                <div className="flex justify-between items-center mb-4">
+                  <h3 className="font-bold text-lg flex items-center gap-2">
+                    <TrendingUp className="text-teal-600" size={20} />
+                    Évolution du CA
+                  </h3>
+                  <button 
+                    onClick={handleExport}
+                    className="text-sm px-3 py-1 bg-slate-100 hover:bg-slate-200 rounded-lg flex items-center gap-1 transition"
+                  >
+                    <Download size={14} />
+                    Export
+                  </button>
+                </div>
                 <ResponsiveContainer width="100%" height={250}>
                   <LineChart data={revenueByDay}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
@@ -424,10 +450,7 @@ export default function PartnerDashboard() {
 
               {/* Répartition par statut */}
               <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
-                <h3 className="font-bold text-lg mb-4 flex items-center gap-2">
-                  <PieChartIcon className="text-blue-600" size={20} />
-                  Répartition des commandes
-                </h3>
+                <h3 className="font-bold text-lg mb-4">Répartition des commandes</h3>
                 <ResponsiveContainer width="100%" height={250}>
                   <PieChart>
                     <Pie
