@@ -1,27 +1,27 @@
-import { useEffect, useState, useMemo } from “react”;
-import { supabase } from “../lib/supabase”;
-import Navbar from “../components/Navbar”;
-import OrderTicket from “../components/OrderTicket”;
+import { useEffect, useState, useMemo } from “react";
+import { supabase } from “../lib/supabase";
+import Navbar from “../components/Navbar";
+import OrderTicket from “../components/OrderTicket";
 import {
 Package, DollarSign, Filter, Printer, X, Loader2, UserPlus,
 TrendingUp, TrendingDown, Calendar, BarChart3, Download
-} from “lucide-react”;
+} from “lucide-react";
 import {
 LineChart, Line, BarChart, Bar, PieChart, Pie, Cell,
 XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer
-} from “recharts”;
-import toast from “react-hot-toast”;
+} from “recharts";
+import toast from “react-hot-toast";
 
 export default function PartnerDashboard() {
 const [orders, setOrders] = useState<any[]>([]);
 const [availableOrders, setAvailableOrders] = useState<any[]>([]);
 const [stats, setStats] = useState({ total: 0, pending: 0, revenue: 0 });
 const [loading, setLoading] = useState(true);
-const [filter, setFilter] = useState(“all”);
-const [timeRange, setTimeRange] = useState<“7d” | “30d” | “90d” | “all”>(“30d”);
+const [filter, setFilter] = useState(“all");
+const [timeRange, setTimeRange] = useState<“7d" | “30d" | “90d" | “all">(“30d");
 const [selectedOrder, setSelectedOrder] = useState<any>(null);
-const [userId, setUserId] = useState<string>(””);
-const [partnerId, setPartnerId] = useState<string>(””);
+const [userId, setUserId] = useState<string>("");
+const [partnerId, setPartnerId] = useState<string>("");
 const [showAnalytics, setShowAnalytics] = useState(false);
 
 useEffect(() => {
@@ -31,7 +31,7 @@ initDashboard();
 const initDashboard = async () => {
 const { data: { user } } = await supabase.auth.getUser();
 if (!user) {
-toast.error(“Vous devez être connecté.”);
+toast.error(“Vous devez être connecté.");
 setLoading(false);
 return;
 }
@@ -96,10 +96,10 @@ setLoading(false);
 
 const calculateStats = (data: any[]) => {
 const revenue = data.reduce((acc, order) => {
-return acc + (order.status === “completed” ? parseFloat(order.total_price || 0) : 0);
+return acc + (order.status === “completed" ? parseFloat(order.total_price || 0) : 0);
 }, 0);
 const pending = data.filter(o =>
-o.status !== “completed” && o.status !== “cancelled”
+o.status !== “completed" && o.status !== “cancelled"
 ).length;
 
 ```
@@ -113,7 +113,7 @@ setStats({
 };
 
 const filteredOrdersByTime = useMemo(() => {
-if (timeRange === “all”) return orders;
+if (timeRange === “all") return orders;
 
 ```
 const daysMap = { "7d": 7, "30d": 30, "90d": 90 };
@@ -127,7 +127,7 @@ return orders.filter(o => new Date(o.created_at) >= cutoffDate);
 }, [orders, timeRange]);
 
 const advancedStats = useMemo(() => {
-const completed = filteredOrdersByTime.filter(o => o.status === “completed”);
+const completed = filteredOrdersByTime.filter(o => o.status === “completed");
 const totalRevenue = completed.reduce((sum, o) => sum + parseFloat(o.total_price || 0), 0);
 const averageOrderValue = completed.length > 0 ? totalRevenue / completed.length : 0;
 
@@ -191,12 +191,12 @@ return Array.from(dayMap.entries())
 const ordersByStatus = useMemo(() => {
 const statusMap = new Map<string, number>();
 const statusLabels: any = {
-“pending”: “En attente”,
-“assigned”: “Assigné”,
-“in_progress”: “En cours”,
-“ready”: “Prêt”,
-“completed”: “Terminé”,
-“cancelled”: “Annulé”
+“pending": “En attente",
+“assigned": “Assigné",
+“in_progress": “En cours",
+“ready": “Prêt",
+“completed": “Terminé",
+“cancelled": “Annulé"
 };
 
 ```
@@ -236,14 +236,14 @@ return Array.from(dayMap.entries())
 
 const takeOrder = async (orderId: string) => {
 const { error } = await supabase
-.from(“orders”)
+.from(“orders")
 .update({
 partner_id: partnerId,
-status: “assigned”,
+status: “assigned",
 updated_at: new Date().toISOString()
 })
-.eq(“id”, orderId)
-.is(“partner_id”, null);
+.eq(“id", orderId)
+.is(“partner_id", null);
 
 ```
 if (error) {
@@ -302,11 +302,11 @@ window.print();
 };
 
 const handleExport = () => {
-const csvHeader = “Date,Commandes,Revenus,Poids\n”;
+const csvHeader = “Date,Commandes,Revenus,Poids\n";
 const csvData = revenueByDay.map((item, idx) => {
 const weight = weightByDay[idx]?.weight || 0;
 return `${item.date},${ordersByStatus.reduce((sum, s) => sum + s.value, 0)},${item.revenue},${weight}`;
-}).join(”\n”);
+}).join("\n");
 
 ```
 const blob = new Blob([csvHeader + csvData], { type: "text/csv;charset=utf-8;" });
@@ -321,11 +321,11 @@ toast.success("Export CSV réussi !");
 
 };
 
-const filteredOrders = filter === “all”
+const filteredOrders = filter === “all"
 ? orders
 : orders.filter(o => o.status === filter);
 
-const COLORS = [”#14b8a6”, “#3b82f6”, “#f59e0b”, “#10b981”, “#8b5cf6”, “#ef4444”];
+const COLORS = ["#14b8a6", “#3b82f6", “#f59e0b", “#10b981", “#8b5cf6", “#ef4444"];
 
 if (loading) {
 return (
