@@ -39,7 +39,6 @@ return;
 ```
 setUserId(user.id);
 
-// Récupérer l'ID du partenaire depuis la table partners
 const { data: partnerData, error: partnerError } = await supabase
   .from('partners')
   .select('id')
@@ -63,14 +62,12 @@ const fetchOrders = async (pId: string) => {
 setLoading(true);
 
 ```
-// Mes commandes (partner_id est TEXT, pas UUID)
 const { data: myOrders, error: myError } = await supabase
   .from('orders')
   .select('*')
   .eq('partner_id', pId)
   .order('created_at', { ascending: false });
 
-// Commandes disponibles (partner_id null)
 const { data: available, error: availError } = await supabase
   .from('orders')
   .select('*')
@@ -115,7 +112,6 @@ setStats({
 
 };
 
-// Filtrer les commandes selon la période
 const filteredOrdersByTime = useMemo(() => {
 if (timeRange === ‘all’) return orders;
 
@@ -130,14 +126,12 @@ return orders.filter(o => new Date(o.created_at) >= cutoffDate);
 
 }, [orders, timeRange]);
 
-// Statistiques avancées avec croissance
 const advancedStats = useMemo(() => {
 const completed = filteredOrdersByTime.filter(o => o.status === ‘completed’);
 const totalRevenue = completed.reduce((sum, o) => sum + parseFloat(o.total_price || 0), 0);
 const averageOrderValue = completed.length > 0 ? totalRevenue / completed.length : 0;
 
 ```
-// Calculer la croissance
 const periodDays = timeRange === 'all' ? 90 : parseInt(timeRange);
 const previousPeriodStart = new Date();
 previousPeriodStart.setDate(previousPeriodStart.getDate() - periodDays * 2);
@@ -173,7 +167,6 @@ return {
 
 }, [filteredOrdersByTime, orders, timeRange]);
 
-// Données pour graphique CA par jour
 const revenueByDay = useMemo(() => {
 const dayMap = new Map<string, number>();
 
@@ -195,7 +188,6 @@ return Array.from(dayMap.entries())
 
 }, [filteredOrdersByTime]);
 
-// Répartition par statut
 const ordersByStatus = useMemo(() => {
 const statusMap = new Map<string, number>();
 const statusLabels: any = {
@@ -221,7 +213,6 @@ return Array.from(statusMap.entries()).map(([name, value]) => ({
 
 }, [filteredOrdersByTime]);
 
-// Évolution du poids traité
 const weightByDay = useMemo(() => {
 const dayMap = new Map<string, number>();
 
@@ -244,7 +235,6 @@ return Array.from(dayMap.entries())
 }, [filteredOrdersByTime]);
 
 const takeOrder = async (orderId: string) => {
-// partner_id est TEXT, pas UUID
 const { error } = await supabase
 .from(‘orders’)
 .update({
@@ -352,7 +342,6 @@ return (
 ```
   <div className="pt-32 px-4 max-w-7xl mx-auto">
     
-    {/* HEADER & STATS */}
     <div className="mb-10">
       <div className="flex justify-between items-center mb-8">
         <div>
@@ -372,7 +361,6 @@ return (
         </button>
       </div>
       
-      {/* Sélecteur de période */}
       {showAnalytics && (
         <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-4 mb-6">
           <div className="flex flex-wrap gap-2">
@@ -394,7 +382,6 @@ return (
       )}
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {/* CARTE 1 : À TRAITER */}
         <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
           <div className="flex items-center justify-between mb-4">
             <div className="bg-orange-100 p-4 rounded-xl text-orange-600">
@@ -413,7 +400,6 @@ return (
           <p className="text-3xl font-black">{stats.pending}</p>
         </div>
 
-        {/* CARTE 2 : CA RÉALISÉ */}
         <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
           <div className="flex items-center justify-between mb-4">
             <div className="bg-green-100 p-4 rounded-xl text-green-600">
@@ -432,7 +418,6 @@ return (
           <p className="text-3xl font-black">{showAnalytics ? advancedStats.totalRevenue.toFixed(2) : stats.revenue} €</p>
         </div>
 
-        {/* CARTE 3 : COMMANDES DISPONIBLES */}
         <div className="bg-gradient-to-br from-teal-500 to-teal-600 p-6 rounded-2xl shadow-lg shadow-teal-500/20 text-white">
           <div className="flex items-center justify-between mb-4">
             <div className="bg-white/20 p-4 rounded-xl">
@@ -443,7 +428,6 @@ return (
           <p className="text-3xl font-black">{availableOrders.length}</p>
         </div>
 
-        {/* CARTE 4 : PANIER MOYEN */}
         <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
           <div className="flex items-center justify-between mb-4">
             <div className="bg-purple-100 p-4 rounded-xl text-purple-600">
@@ -458,12 +442,9 @@ return (
       </div>
     </div>
 
-    {/* SECTION ANALYTICS */}
     {showAnalytics && (
       <div className="mb-8 space-y-6">
-        {/* Graphiques */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Évolution du CA */}
           <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
             <div className="flex justify-between items-center mb-4">
               <h3 className="font-bold text-lg flex items-center gap-2">
@@ -503,7 +484,6 @@ return (
             </ResponsiveContainer>
           </div>
 
-          {/* Répartition par statut */}
           <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
             <h3 className="font-bold text-lg mb-4">Répartition des commandes</h3>
             <ResponsiveContainer width="100%" height={250}>
@@ -528,7 +508,6 @@ return (
           </div>
         </div>
 
-        {/* Poids traité */}
         <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
           <h3 className="font-bold text-lg mb-4 flex items-center gap-2">
             <Package className="text-orange-600" size={20} />
@@ -553,7 +532,6 @@ return (
           </ResponsiveContainer>
         </div>
 
-        {/* Stats rapides */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-4 border border-blue-200">
             <p className="text-blue-600 text-sm font-bold mb-1">Commandes terminées</p>
@@ -580,7 +558,6 @@ return (
       </div>
     )}
 
-    {/* COMMANDES DISPONIBLES */}
     {availableOrders.length > 0 && (
       <div className="bg-gradient-to-br from-teal-50 to-blue-50 rounded-3xl p-6 mb-8 border border-teal-200">
         <h2 className="font-bold text-xl mb-4 flex items-center gap-2">
@@ -630,7 +607,6 @@ return (
       </div>
     )}
 
-    {/* TABLEAU MES COMMANDES */}
     <div className="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden">
       <div className="p-6 border-b border-slate-100 flex flex-col md:flex-row justify-between items-center gap-4">
         <h2 className="font-bold text-xl flex items-center gap-2">
@@ -763,7 +739,6 @@ return (
     </div>
   </div>
 
-  {/* MODALE IMPRESSION */}
   {selectedOrder && (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
       <div className="bg-white rounded-2xl max-w-md w-full overflow-hidden shadow-2xl">
