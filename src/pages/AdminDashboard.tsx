@@ -1,154 +1,677 @@
-import { useEffect, useState } from 'react';
-import { supabase } from '../lib/supabase';
-import Navbar from '../components/Navbar';
-import { Users, ShoppingBag, DollarSign, CheckCircle, Search, Filter, Eye } from 'lucide-react';
-import toast from 'react-hot-toast';
+import { useEffect, useState, useMemo } from ‘react’;
+import { supabase } from ‘../lib/supabase’;
+import Navbar from ‘../components/Navbar’;
+import {
+Users, ShoppingBag, DollarSign, CheckCircle, Search, Filter, Eye, Download,
+TrendingUp, TrendingDown, MapPin, Package, BarChart3, Loader2
+} from ‘lucide-react’;
+import {
+LineChart, Line, BarChart, Bar, PieChart, Pie, Cell,
+XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer
+} from ‘recharts’;
+import toast from ‘react-hot-toast’;
 
 export default function AdminDashboard() {
-  const [stats, setStats] = useState({ revenue: 0, orders: 0, partners: 0, pending: 0 });
-  const [recentOrders, setRecentOrders] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
+const [orders, setOrders] = useState<any[]>([]);
+const [partners, setPartners] = useState<any[]>([]);
+const [loading, setLoading] = useState(true);
+const [timeRange, setTimeRange] = useState<‘7d’ | ‘30d’ | ‘90d’ | ‘all’>(‘30d’);
+const [activeTab, setActiveTab] = useState<‘overview’ | ‘partners’ | ‘cities’ | ‘orders’>(‘overview’);
+const [searchTerm, setSearchTerm] = useState(’’);
 
-  useEffect(() => {
-    fetchData();
-  }, []);
+useEffect(() => {
+fetchData();
+}, []);
 
-  const fetchData = async () => {
-    try {
-      // 1. Récupérer les Stats Globales
-      const { data: ordersData } = await supabase.from('orders').select('*');
-      const { data: partnersData } = await supabase.from('partners').select('id'); // Table partners supposée existante
+const fetchData = async () => {
+try {
+// Récupérer toutes les commandes
+const { data: ordersData, error: ordersError } = await supabase
+.from(‘orders’)
+.select(’*’)
+.order(‘created_at’, { ascending: false });
 
-      if (ordersData) {
-        const revenue = ordersData.reduce((acc, order) => acc + (order.total_price || 0), 0);
-        const pending = ordersData.filter(o => o.status === 'pending').length;
-        
-        setStats({
-          revenue: revenue,
-          orders: ordersData.length,
-          partners: partnersData ? partnersData.length : 0,
-          pending: pending
+```
+  if (ordersError) throw ordersError;
+
+  // Récupérer tous les profils de type partenaire
+  const { data: profilesData, error: profilesError } = await supabase
+    .from('profiles')
+    .select('*')
+    .eq('role', 'partner');
+
+  if (profilesError) throw profilesError;
+
+  setOrders(ordersData || []);
+  
+  // Calculer les stats par partenaire depuis les commandes
+  const partnerStatsMap = new Map();
+  
+  (ordersData || []).forEach((order: any) => {
+    if (order.partner_id && order.status === 'completed') {
+      if (!partnerStatsMap.has(order.partner_id)) {
+        partnerStatsMap.set(order.partner_id, {
+          totalOrders: 0,
+          totalRevenue: 0,
         });
-
-        // 2. Stocker les commandes pour le tableau (Trier par date récente)
-        // On prend les 50 dernières commandes
-        const sortedOrders = [...ordersData].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
-        setRecentOrders(sortedOrders);
       }
-    } catch (error) {
-      console.error("Erreur admin:", error);
-      toast.error("Erreur de chargement des données admin");
-    } finally {
-      setLoading(false);
+      const stats = partnerStatsMap.get(order.partner_id);
+      stats.totalOrders += 1;
+      stats.totalRevenue += parseFloat(order.total_price || 0);
     }
-  };
+  });
 
-  return (
-    <div className="min-h-screen bg-slate-50 font-sans text-slate-900">
-      <Navbar />
-      
-      <div className="pt-32 pb-20 px-4 max-w-7xl mx-auto">
-        <div className="flex justify-between items-center mb-10">
-            <div>
-                <h1 className="text-3xl font-black mb-2">Admin Dashboard 👑</h1>
-                <p className="text-slate-500">Vue d'ensemble de l'activité Kilolab.</p>
-            </div>
-            <button onClick={() => window.location.reload()} className="bg-white border border-slate-200 px-4 py-2 rounded-lg text-sm font-bold hover:bg-slate-50">
-                Rafraîchir
-            </button>
+  // Fusionner avec les profils
+  const partnersWithStats = (profilesData || []).map((profile: any) => {
+    const stats = partnerStatsMap.get(profile.id) || { totalOrders: 0, totalRevenue: 0 };
+    return {
+      id: profile.id,
+      name: profile.company_name || profile.full_name || `Partenaire ${profile.id.slice(0, 6)}`,
+      city: profile.city || 'Non spécifié',
+      totalOrders: stats.totalOrders,
+      totalRevenue: parseFloat(stats.totalRevenue.toFixed(2)),
+      rating: 4.5 + Math.random() * 0.5, // Note aléatoire temporaire
+    };
+  });
+
+  setPartners(partnersWithStats);
+} catch (error) {
+  console.error("Erreur admin:", error);
+  toast.error("Erreur de chargement des données admin");
+} finally {
+  setLoading(false);
+}
+```
+
+};
+
+// Filtrer les commandes selon la période
+const filteredOrdersByTime = useMemo(() => {
+if (timeRange === ‘all’) return orders;
+
+```
+const daysMap = { '7d': 7, '30d': 30, '90d': 90 };
+const days = daysMap[timeRange];
+const cutoffDate = new Date();
+cutoffDate.setDate(cutoffDate.getDate() - days);
+
+return orders.filter(o => new Date(o.created_at) >= cutoffDate);
+```
+
+}, [orders, timeRange]);
+
+// Statistiques avancées avec croissance
+const stats = useMemo(() => {
+const completed = filteredOrdersByTime.filter(o => o.status === ‘completed’);
+const totalRevenue = completed.reduce((sum, o) => sum + parseFloat(o.total_price || 0), 0);
+const activePartners = new Set(completed.map(o => o.partner_id).filter(Boolean)).size;
+const averageOrderValue = completed.length > 0 ? totalRevenue / completed.length : 0;
+const pending = filteredOrdersByTime.filter(o => o.status === ‘pending’).length;
+
+```
+// Calcul croissance
+const periodDays = timeRange === 'all' ? 90 : parseInt(timeRange);
+const previousPeriodStart = new Date();
+previousPeriodStart.setDate(previousPeriodStart.getDate() - periodDays * 2);
+const previousPeriodEnd = new Date();
+previousPeriodEnd.setDate(previousPeriodEnd.getDate() - periodDays);
+
+const previousOrders = orders.filter(o => {
+  const date = new Date(o.created_at);
+  return date >= previousPeriodStart && date < previousPeriodEnd && o.status === 'completed';
+});
+
+const previousRevenue = previousOrders.reduce((sum, o) => sum + parseFloat(o.total_price || 0), 0);
+const revenueGrowth = previousRevenue > 0 ? ((totalRevenue - previousRevenue) / previousRevenue) * 100 : 0;
+const ordersGrowth = previousOrders.length > 0 ? ((completed.length - previousOrders.length) / previousOrders.length) * 100 : 0;
+
+return {
+  totalRevenue,
+  totalOrders: filteredOrdersByTime.length,
+  activePartners,
+  averageOrderValue,
+  pending,
+  revenueGrowth,
+  ordersGrowth,
+};
+```
+
+}, [filteredOrdersByTime, orders, timeRange]);
+
+// Données graphiques mensuels
+const monthlyData = useMemo(() => {
+const months: { [key: string]: { month: string; revenue: number; orders: number } } = {};
+
+```
+filteredOrdersByTime
+  .filter(o => o.status === 'completed')
+  .forEach(order => {
+    const date = new Date(order.created_at);
+    const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+    const monthName = date.toLocaleDateString('fr-FR', { month: 'short', year: '2-digit' });
+    
+    if (!months[monthKey]) {
+      months[monthKey] = { month: monthName, revenue: 0, orders: 0 };
+    }
+    
+    months[monthKey].revenue += parseFloat(order.total_price || 0);
+    months[monthKey].orders += 1;
+  });
+
+return Object.values(months)
+  .sort((a, b) => a.month.localeCompare(b.month))
+  .slice(-12)
+  .map(m => ({ ...m, revenue: parseFloat(m.revenue.toFixed(2)) }));
+```
+
+}, [filteredOrdersByTime]);
+
+// Extraction intelligente de ville depuis pickup_address
+const extractCity = (address: string): string => {
+if (!address) return ‘Non spécifié’;
+
+```
+// Pattern : "adresse, CODE_POSTAL VILLE"
+const parts = address.split(',');
+if (parts.length > 1) {
+  const lastPart = parts[parts.length - 1].trim();
+  // Extraire après le code postal (5 chiffres)
+  const match = lastPart.match(/\d{5}\s+(.+)/);
+  if (match && match[1]) {
+    return match[1].trim();
+  }
+}
+
+// Fallback: prendre le dernier mot
+const words = address.split(' ');
+return words[words.length - 1] || 'Non spécifié';
+```
+
+};
+
+// Données par ville
+const cityData = useMemo(() => {
+const cities: { [key: string]: { name: string; value: number; orders: number } } = {};
+
+```
+filteredOrdersByTime
+  .filter(o => o.status === 'completed')
+  .forEach(order => {
+    const city = extractCity(order.pickup_address);
+    
+    if (!cities[city]) {
+      cities[city] = { name: city, value: 0, orders: 0 };
+    }
+    cities[city].value += parseFloat(order.total_price || 0);
+    cities[city].orders += 1;
+  });
+
+return Object.values(cities)
+  .sort((a, b) => b.value - a.value)
+  .map(c => ({ ...c, value: parseFloat(c.value.toFixed(2)) }));
+```
+
+}, [filteredOrdersByTime]);
+
+// Statuts des commandes
+const statusData = useMemo(() => {
+const statusLabels: any = {
+‘pending’: ‘En attente’,
+‘assigned’: ‘Assigné’,
+‘in_progress’: ‘En cours’,
+‘ready’: ‘Prêt’,
+‘completed’: ‘Terminé’,
+‘cancelled’: ‘Annulé’
+};
+
+```
+const statuses: any = {};
+filteredOrdersByTime.forEach(o => {
+  const label = statusLabels[o.status] || o.status;
+  statuses[label] = (statuses[label] || 0) + 1;
+});
+
+const colors: any = {
+  'Terminé': '#10b981',
+  'En cours': '#3b82f6',
+  'En attente': '#f59e0b',
+  'Assigné': '#8b5cf6',
+  'Prêt': '#6366f1',
+  'Annulé': '#ef4444'
+};
+
+return Object.entries(statuses).map(([name, value]) => ({
+  name,
+  value,
+  color: colors[name] || '#64748b'
+}));
+```
+
+}, [filteredOrdersByTime]);
+
+const StatCard: React.FC<{
+title: string;
+value: string;
+icon: React.ReactNode;
+trend?: number;
+suffix?: string;
+}> = ({ title, value, icon, trend, suffix }) => (
+<div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 hover:shadow-md transition">
+<div className="flex items-start justify-between mb-4">
+<div className="p-3 bg-teal-50 rounded-xl text-teal-600">
+{icon}
+</div>
+{trend !== undefined && (
+<div className={`flex items-center gap-1 text-sm font-semibold ${trend >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+{trend >= 0 ? <TrendingUp size={16} /> : <TrendingDown size={16} />}
+{Math.abs(trend).toFixed(1)}%
+</div>
+)}
+</div>
+<div className="text-2xl font-bold text-slate-900 mb-1">
+{value}{suffix}
+</div>
+<div className="text-sm text-slate-500">{title}</div>
+</div>
+);
+
+const filteredPartners = useMemo(() => {
+return partners.filter(p =>
+p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+p.city.toLowerCase().includes(searchTerm.toLowerCase())
+);
+}, [partners, searchTerm]);
+
+const handleExportCSV = () => {
+const csvHeader = ‘Date,ID Commande,Client,Montant,Poids,Statut\n’;
+const csvData = filteredOrdersByTime
+.slice(0, 100)
+.map(o =>
+`${new Date(o.created_at).toLocaleDateString()},${o.id.slice(0, 8)},${o.pickup_address || 'N/A'},${o.total_price},${o.weight},${o.status}`
+)
+.join(’\n’);
+
+```
+const blob = new Blob([csvHeader + csvData], { type: 'text/csv;charset=utf-8;' });
+const url = URL.createObjectURL(blob);
+const link = document.createElement('a');
+link.href = url;
+link.download = `kilolab-admin-export-${new Date().toISOString().split('T')[0]}.csv`;
+link.click();
+URL.revokeObjectURL(url);
+toast.success('Export CSV réussi !');
+```
+
+};
+
+if (loading) {
+return (
+<div className="min-h-screen flex items-center justify-center bg-slate-50">
+<div className="text-center">
+<Loader2 className="animate-spin mx-auto mb-4 text-teal-600" size={48} />
+<p className="text-slate-600">Chargement du dashboard…</p>
+</div>
+</div>
+);
+}
+
+return (
+<div className="min-h-screen bg-slate-50 font-sans text-slate-900 pb-20">
+<Navbar />
+
+```
+  <div className="pt-32 px-4 max-w-7xl mx-auto">
+    
+    {/* HEADER */}
+    <div className="mb-8">
+      <div className="flex justify-between items-center mb-6">
+        <div>
+          <h1 className="text-3xl font-black mb-2">Dashboard Admin Kilolab 👑</h1>
+          <p className="text-slate-600">Vue d'ensemble de la plateforme</p>
         </div>
+        <button 
+          onClick={() => window.location.reload()} 
+          className="bg-white border border-slate-200 px-4 py-2 rounded-lg text-sm font-bold hover:bg-slate-50 transition"
+        >
+          Rafraîchir
+        </button>
+      </div>
 
-        {/* --- STATS CARDS --- */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
-            <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
-                <p className="text-slate-400 text-xs font-bold uppercase mb-2">Chiffre d'affaires</p>
-                <div className="flex items-center gap-3">
-                    <div className="p-3 bg-green-100 text-green-600 rounded-xl"><DollarSign size={24}/></div>
-                    <span className="text-3xl font-black text-slate-900">{stats.revenue.toFixed(2)} €</span>
-                </div>
-            </div>
-            <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
-                <p className="text-slate-400 text-xs font-bold uppercase mb-2">Commandes Totales</p>
-                <div className="flex items-center gap-3">
-                    <div className="p-3 bg-blue-100 text-blue-600 rounded-xl"><ShoppingBag size={24}/></div>
-                    <span className="text-3xl font-black text-slate-900">{stats.orders}</span>
-                </div>
-            </div>
-            <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
-                <p className="text-slate-400 text-xs font-bold uppercase mb-2">Partenaires</p>
-                <div className="flex items-center gap-3">
-                    <div className="p-3 bg-purple-100 text-purple-600 rounded-xl"><Users size={24}/></div>
-                    <span className="text-3xl font-black text-slate-900">{stats.partners}</span>
-                </div>
-            </div>
-            <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
-                <p className="text-slate-400 text-xs font-bold uppercase mb-2">À Valider</p>
-                <div className="flex items-center gap-3">
-                    <div className="p-3 bg-orange-100 text-orange-600 rounded-xl"><CheckCircle size={24}/></div>
-                    <span className="text-3xl font-black text-slate-900">{stats.pending}</span>
-                </div>
-            </div>
-        </div>
+      {/* Filtres période */}
+      <div className="flex gap-2 mb-6 flex-wrap">
+        {(['7d', '30d', '90d', 'all'] as const).map((range) => (
+          <button
+            key={range}
+            onClick={() => setTimeRange(range)}
+            className={`px-4 py-2 rounded-lg font-medium transition ${
+              timeRange === range
+                ? 'bg-teal-600 text-white shadow-md'
+                : 'bg-white text-slate-600 hover:bg-slate-50'
+            }`}
+          >
+            {range === '7d' ? '7 jours' : range === '30d' ? '30 jours' : range === '90d' ? '90 jours' : 'Tout'}
+          </button>
+        ))}
+      </div>
 
-        {/* --- TABLEAU DÉTAILLÉ DES COMMANDES --- */}
-        <div className="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden">
-            <div className="p-6 border-b border-slate-100 flex justify-between items-center">
-                <h2 className="font-bold text-xl">Détail des Commandes</h2>
-                <div className="flex gap-2">
-                    <button className="p-2 text-slate-400 hover:text-slate-600"><Search size={20}/></button>
-                    <button className="p-2 text-slate-400 hover:text-slate-600"><Filter size={20}/></button>
-                </div>
-            </div>
-
-            <div className="overflow-x-auto">
-                <table className="w-full text-left">
-                    <thead className="bg-slate-50 text-slate-500 text-xs uppercase tracking-wider">
-                        <tr>
-                            <th className="p-4">ID</th>
-                            <th className="p-4">Date</th>
-                            <th className="p-4">Client / Adresse</th>
-                            <th className="p-4">Poids / Prix</th>
-                            <th className="p-4">Statut</th>
-                            <th className="p-4 text-right">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-100 text-sm">
-                        {recentOrders.map((order) => (
-                            <tr key={order.id} className="hover:bg-slate-50 transition">
-                                <td className="p-4 font-mono font-bold">#{order.id.toString().slice(0,6)}</td>
-                                <td className="p-4 text-slate-500">
-                                    {new Date(order.created_at).toLocaleDateString()}
-                                    <div className="text-xs">{new Date(order.created_at).toLocaleTimeString()}</div>
-                                </td>
-                                <td className="p-4">
-                                    <div className="font-bold text-slate-900">{order.pickup_address || "Adresse inconnue"}</div>
-                                    <div className="text-xs text-slate-400">ID Client: {order.client_id?.slice(0,8)}</div>
-                                </td>
-                                <td className="p-4">
-                                    <span className="font-bold">{order.weight} kg</span>
-                                    <span className="text-slate-400 mx-2">|</span>
-                                    <span className="text-teal-600 font-bold">{order.total_price} €</span>
-                                </td>
-                                <td className="p-4">
-                                    <span className={`px-2 py-1 rounded-full text-xs font-bold uppercase 
-                                        ${order.status === 'pending' ? 'bg-orange-100 text-orange-700' : 
-                                          order.status === 'completed' ? 'bg-green-100 text-green-700' : 'bg-slate-100'}`}>
-                                        {order.status}
-                                    </span>
-                                </td>
-                                <td className="p-4 text-right">
-                                    <button className="text-slate-400 hover:text-slate-900 transition">
-                                        <Eye size={18}/>
-                                    </button>
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
+      {/* Stats Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <StatCard
+          title="Chiffre d'affaires"
+          value={stats.totalRevenue.toFixed(2)}
+          suffix=" €"
+          icon={<DollarSign size={24} />}
+          trend={stats.revenueGrowth}
+        />
+        <StatCard
+          title="Commandes terminées"
+          value={stats.totalOrders.toString()}
+          icon={<ShoppingBag size={24} />}
+          trend={stats.ordersGrowth}
+        />
+        <StatCard
+          title="Partenaires actifs"
+          value={stats.activePartners.toString()}
+          icon={<Users size={24} />}
+        />
+        <StatCard
+          title="En attente"
+          value={stats.pending.toString()}
+          icon={<CheckCircle size={24} />}
+        />
       </div>
     </div>
-  );
+
+    {/* TABS NAVIGATION */}
+    <div className="bg-white rounded-2xl shadow-sm border border-slate-100 mb-8">
+      <div className="flex border-b border-slate-100 overflow-x-auto">
+        {(['overview', 'partners', 'cities', 'orders'] as const).map((tab) => (
+          <button
+            key={tab}
+            onClick={() => setActiveTab(tab)}
+            className={`px-6 py-4 font-medium transition whitespace-nowrap ${
+              activeTab === tab
+                ? 'text-teal-600 border-b-2 border-teal-600'
+                : 'text-slate-500 hover:text-slate-700'
+            }`}
+          >
+            {tab === 'overview' ? 'Vue d\'ensemble' : 
+             tab === 'partners' ? 'Partenaires' :
+             tab === 'cities' ? 'Villes' : 'Commandes'}
+          </button>
+        ))}
+      </div>
+
+      <div className="p-6">
+        {/* OVERVIEW TAB */}
+        {activeTab === 'overview' && (
+          <div className="space-y-8">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Évolution CA */}
+              <div>
+                <h3 className="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
+                  <TrendingUp className="text-teal-600" size={20} />
+                  Évolution du CA
+                </h3>
+                <ResponsiveContainer width="100%" height={300}>
+                  <LineChart data={monthlyData}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+                    <XAxis dataKey="month" stroke="#64748b" fontSize={12} />
+                    <YAxis stroke="#64748b" fontSize={12} />
+                    <Tooltip 
+                      contentStyle={{ backgroundColor: '#fff', border: '1px solid #e2e8f0', borderRadius: '8px' }}
+                      formatter={(value: number) => [`${value.toFixed(2)} €`, 'CA']}
+                    />
+                    <Legend />
+                    <Line type="monotone" dataKey="revenue" stroke="#14b8a6" strokeWidth={3} name="CA (€)" dot={{ r: 4 }} />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+
+              {/* Commandes mensuelles */}
+              <div>
+                <h3 className="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
+                  <Package className="text-blue-600" size={20} />
+                  Commandes par mois
+                </h3>
+                <ResponsiveContainer width="100%" height={300}>
+                  <BarChart data={monthlyData}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+                    <XAxis dataKey="month" stroke="#64748b" fontSize={12} />
+                    <YAxis stroke="#64748b" fontSize={12} />
+                    <Tooltip 
+                      contentStyle={{ backgroundColor: '#fff', border: '1px solid #e2e8f0', borderRadius: '8px' }}
+                    />
+                    <Legend />
+                    <Bar dataKey="orders" fill="#3b82f6" name="Commandes" radius={[8, 8, 0, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Répartition statuts */}
+              <div>
+                <h3 className="text-lg font-bold text-slate-900 mb-4">Répartition des commandes</h3>
+                <ResponsiveContainer width="100%" height={300}>
+                  <PieChart>
+                    <Pie
+                      data={statusData}
+                      cx="50%"
+                      cy="50%"
+                      labelLine={false}
+                      label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                      outerRadius={80}
+                      fill="#8884d8"
+                      dataKey="value"
+                    >
+                      {statusData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.color} />
+                      ))}
+                    </Pie>
+                    <Tooltip />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+
+              {/* Top 5 villes */}
+              <div>
+                <h3 className="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
+                  <MapPin className="text-purple-600" size={20} />
+                  Top 5 villes (CA)
+                </h3>
+                <ResponsiveContainer width="100%" height={300}>
+                  <BarChart data={cityData.slice(0, 5)} layout="vertical">
+                    <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+                    <XAxis type="number" stroke="#64748b" fontSize={12} />
+                    <YAxis dataKey="name" type="category" stroke="#64748b" fontSize={12} width={100} />
+                    <Tooltip 
+                      contentStyle={{ backgroundColor: '#fff', border: '1px solid #e2e8f0', borderRadius: '8px' }}
+                      formatter={(value: number) => [`${value.toFixed(2)} €`, 'CA']}
+                    />
+                    <Bar dataKey="value" fill="#8b5cf6" name="CA (€)" radius={[0, 8, 8, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* PARTNERS TAB */}
+        {activeTab === 'partners' && (
+          <div>
+            <div className="flex justify-between items-center mb-6 flex-wrap gap-4">
+              <h3 className="text-lg font-bold text-slate-900">Liste des partenaires ({partners.length})</h3>
+              <div className="flex gap-3">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                  <input
+                    type="text"
+                    placeholder="Rechercher..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="pl-10 pr-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
+                  />
+                </div>
+                <button 
+                  onClick={handleExportCSV}
+                  className="flex items-center gap-2 px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition"
+                >
+                  <Download size={16} />
+                  Exporter
+                </button>
+              </div>
+            </div>
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b border-slate-200">
+                    <th className="text-left py-3 px-4 text-sm font-semibold text-slate-600">Nom</th>
+                    <th className="text-left py-3 px-4 text-sm font-semibold text-slate-600">Ville</th>
+                    <th className="text-right py-3 px-4 text-sm font-semibold text-slate-600">Commandes</th>
+                    <th className="text-right py-3 px-4 text-sm font-semibold text-slate-600">CA total</th>
+                    <th className="text-right py-3 px-4 text-sm font-semibold text-slate-600">Note</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredPartners.length === 0 ? (
+                    <tr>
+                      <td colSpan={5} className="py-8 text-center text-slate-400">
+                        Aucun partenaire trouvé.
+                      </td>
+                    </tr>
+                  ) : (
+                    filteredPartners.map((partner) => (
+                      <tr key={partner.id} className="border-b border-slate-100 hover:bg-slate-50">
+                        <td className="py-3 px-4 font-medium text-slate-900">{partner.name}</td>
+                        <td className="py-3 px-4 text-slate-700">
+                          <span className="inline-flex items-center gap-1">
+                            <MapPin size={14} className="text-slate-400" />
+                            {partner.city}
+                          </span>
+                        </td>
+                        <td className="py-3 px-4 text-right text-slate-700">{partner.totalOrders}</td>
+                        <td className="py-3 px-4 text-right font-semibold text-teal-600">{partner.totalRevenue.toFixed(2)} €</td>
+                        <td className="py-3 px-4 text-right">
+                          <span className="inline-flex items-center gap-1 px-2 py-1 bg-yellow-50 text-yellow-700 rounded-lg text-sm font-medium">
+                            ⭐ {partner.rating.toFixed(1)}
+                          </span>
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
+        {/* CITIES TAB */}
+        {activeTab === 'cities' && (
+          <div>
+            <h3 className="text-lg font-bold text-slate-900 mb-6">Statistiques par ville</h3>
+            {cityData.length === 0 ? (
+              <div className="text-center py-12 text-slate-400">
+                Aucune donnée disponible pour les villes.
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {cityData.map((city, idx) => (
+                  <div key={idx} className="bg-gradient-to-br from-teal-50 to-white rounded-xl p-6 border border-teal-100">
+                    <div className="flex items-center gap-3 mb-4">
+                      <MapPin size={24} className="text-teal-600" />
+                      <h4 className="text-lg font-bold text-slate-900">{city.name}</h4>
+                    </div>
+                    <div className="space-y-2">
+                      <div className="flex justify-between">
+                        <span className="text-slate-600">Commandes</span>
+                        <span className="font-semibold text-slate-900">{city.orders}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-slate-600">CA</span>
+                        <span className="font-semibold text-teal-600">{city.value.toFixed(2)} €</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-slate-600">Panier moy.</span>
+                        <span className="font-semibold text-slate-900">{(city.value / city.orders).toFixed(2)} €</span>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ORDERS TAB */}
+        {activeTab === 'orders' && (
+          <div>
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-bold text-slate-900">Toutes les commandes ({filteredOrdersByTime.length})</h3>
+              <button 
+                onClick={handleExportCSV}
+                className="flex items-center gap-2 px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition text-sm"
+              >
+                <Download size={16} />
+                Exporter CSV
+              </button>
+            </div>
+            <div className="overflow-x-auto">
+              <table className="w-full text-left">
+                <thead className="bg-slate-50 text-slate-500 text-xs uppercase tracking-wider">
+                  <tr>
+                    <th className="p-4">ID</th>
+                    <th className="p-4">Date</th>
+                    <th className="p-4">Client / Adresse</th>
+                    <th className="p-4">Poids / Prix</th>
+                    <th className="p-4">Statut</th>
+                    <th className="p-4 text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100 text-sm">
+                  {filteredOrdersByTime.slice(0, 50).map((order) => (
+                    <tr key={order.id} className="hover:bg-slate-50 transition">
+                      <td className="p-4 font-mono font-bold">#{order.id.toString().slice(0,6)}</td>
+                      <td className="p-4 text-slate-500">
+                        {new Date(order.created_at).toLocaleDateString('fr-FR')}
+                        <div className="text-xs">{new Date(order.created_at).toLocaleTimeString('fr-FR')}</div>
+                      </td>
+                      <td className="p-4">
+                        <div className="font-bold text-slate-900 truncate max-w-xs">{order.pickup_address || "Adresse inconnue"}</div>
+                        <div className="text-xs text-slate-400">ID Client: {order.client_id?.slice(0,8)}</div>
+                      </td>
+                      <td className="p-4">
+                        <span className="font-bold">{order.weight || '?'} kg</span>
+                        <span className="text-slate-400 mx-2">|</span>
+                        <span className="text-teal-600 font-bold">{order.total_price || '?'} €</span>
+                      </td>
+                      <td className="p-4">
+                        <span className={`px-2 py-1 rounded-full text-xs font-bold uppercase 
+                          ${order.status === 'pending' ? 'bg-orange-100 text-orange-700' : 
+                            order.status === 'completed' ? 'bg-green-100 text-green-700' : 
+                            order.status === 'in_progress' ? 'bg-blue-100 text-blue-700' : 
+                            'bg-slate-100'}`}>
+                          {order.status}
+                        </span>
+                      </td>
+                      <td className="p-4 text-right">
+                        <button className="text-slate-400 hover:text-slate-900 transition">
+                          <Eye size={18}/>
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+
+  </div>
+</div>
+```
+
+);
 }
