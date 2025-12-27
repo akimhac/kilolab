@@ -2,8 +2,8 @@ import { useEffect, useState, useMemo } from ‘react’;
 import { supabase } from ‘../lib/supabase’;
 import Navbar from ‘../components/Navbar’;
 import {
-Users, ShoppingBag, DollarSign, CheckCircle, Search, Filter, Eye, Download,
-TrendingUp, TrendingDown, MapPin, Package, BarChart3, Loader2
+Users, ShoppingBag, DollarSign, CheckCircle, Search, Download,
+TrendingUp, TrendingDown, MapPin, Package, Loader2, Eye
 } from ‘lucide-react’;
 import {
 LineChart, Line, BarChart, Bar, PieChart, Pie, Cell,
@@ -34,13 +34,13 @@ const { data: ordersData, error: ordersError } = await supabase
 ```
   if (ordersError) throw ordersError;
 
-  // Récupérer tous les profils de type partenaire
-  const { data: profilesData, error: profilesError } = await supabase
-    .from('profiles')
+  // Récupérer tous les partenaires
+  const { data: partnersData, error: partnersError } = await supabase
+    .from('partners')
     .select('*')
-    .eq('role', 'partner');
+    .eq('is_active', true);
 
-  if (profilesError) throw profilesError;
+  if (partnersError) throw partnersError;
 
   setOrders(ordersData || []);
   
@@ -48,6 +48,7 @@ const { data: ordersData, error: ordersError } = await supabase
   const partnerStatsMap = new Map();
   
   (ordersData || []).forEach((order: any) => {
+    // partner_id est TEXT dans orders
     if (order.partner_id && order.status === 'completed') {
       if (!partnerStatsMap.has(order.partner_id)) {
         partnerStatsMap.set(order.partner_id, {
@@ -61,16 +62,16 @@ const { data: ordersData, error: ordersError } = await supabase
     }
   });
 
-  // Fusionner avec les profils
-  const partnersWithStats = (profilesData || []).map((profile: any) => {
-    const stats = partnerStatsMap.get(profile.id) || { totalOrders: 0, totalRevenue: 0 };
+  // Fusionner avec les données partenaires
+  const partnersWithStats = (partnersData || []).map((partner: any) => {
+    const stats = partnerStatsMap.get(partner.id) || { totalOrders: 0, totalRevenue: 0 };
     return {
-      id: profile.id,
-      name: profile.company_name || profile.full_name || `Partenaire ${profile.id.slice(0, 6)}`,
-      city: profile.city || 'Non spécifié',
+      id: partner.id,
+      name: partner.company_name || partner.name || `Partenaire ${partner.id.slice(0, 6)}`,
+      city: partner.city || 'Non spécifié',
       totalOrders: stats.totalOrders,
       totalRevenue: parseFloat(stats.totalRevenue.toFixed(2)),
-      rating: 4.5 + Math.random() * 0.5, // Note aléatoire temporaire
+      rating: partner.average_rating || 4.5,
     };
   });
 
@@ -166,7 +167,7 @@ return Object.values(months)
 
 }, [filteredOrdersByTime]);
 
-// Extraction intelligente de ville depuis pickup_address
+// Extraction de ville depuis pickup_address
 const extractCity = (address: string): string => {
 if (!address) return ‘Non spécifié’;
 
