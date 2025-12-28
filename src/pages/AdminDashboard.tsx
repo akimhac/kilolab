@@ -1,23 +1,28 @@
 import { useEffect, useState, useMemo } from "react";
 import { supabase } from "../lib/supabase";
 import Navbar from "../components/Navbar";
-import {
-  Users, ShoppingBag, DollarSign, CheckCircle, Search, Download,
-  TrendingUp, TrendingDown, MapPin, Package, Loader2, Eye
+import { 
+  Users, ShoppingBag, DollarSign, Search, Download,
+  TrendingUp, TrendingDown, MapPin, Package, Loader2, Eye,
+  MessageSquare, Mail, Trash2, Send, Database
 } from "lucide-react";
-import {
-  LineChart, Line, BarChart, Bar, PieChart, Pie, Cell,
-  XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer
+import { 
+  LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, 
+  XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer 
 } from "recharts";
 import toast from "react-hot-toast";
 
 export default function AdminDashboard() {
   const [orders, setOrders] = useState<any[]>([]);
   const [partners, setPartners] = useState<any[]>([]);
+  const [messages, setMessages] = useState<any[]>([]);
+  const [users, setUsers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [timeRange, setTimeRange] = useState<"7d" | "30d" | "90d" | "all">("30d");
-  const [activeTab, setActiveTab] = useState<"overview" | "partners" | "cities" | "orders">("overview");
+  const [activeTab, setActiveTab] = useState<"overview" | "partners" | "cities" | "orders" | "messages" | "users">("overview");
   const [searchTerm, setSearchTerm] = useState("");
+  const [selectedMessage, setSelectedMessage] = useState<any>(null);
+  const [replyText, setReplyText] = useState("");
 
   useEffect(() => {
     fetchData();
@@ -39,7 +44,23 @@ export default function AdminDashboard() {
 
       if (partnersError) throw partnersError;
 
+      const { data: messagesData, error: messagesError } = await supabase
+        .from("contact_messages")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+      if (messagesError) throw messagesError;
+
+      const { data: usersData, error: usersError } = await supabase
+        .from("user_profiles")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+      if (usersError) console.error("Users error:", usersError);
+
       setOrders(ordersData || []);
+      setMessages(messagesData || []);
+      setUsers(usersData || []);
       
       const partnerStatsMap = new Map();
       
@@ -80,12 +101,12 @@ export default function AdminDashboard() {
 
   const filteredOrdersByTime = useMemo(() => {
     if (timeRange === "all") return orders;
-
+    
     const daysMap = { "7d": 7, "30d": 30, "90d": 90 };
     const days = daysMap[timeRange];
     const cutoffDate = new Date();
     cutoffDate.setDate(cutoffDate.getDate() - days);
-
+    
     return orders.filter(o => new Date(o.created_at) >= cutoffDate);
   }, [orders, timeRange]);
 
@@ -94,18 +115,20 @@ export default function AdminDashboard() {
     const totalRevenue = completed.reduce((sum, o) => sum + parseFloat(o.total_price || 0), 0);
     const activePartners = new Set(completed.map(o => o.partner_id).filter(Boolean)).size;
     const pending = filteredOrdersByTime.filter(o => o.status === "pending").length;
+    const newMessages = messages.filter(m => !m.read).length;
+    const totalUsers = users.length;
 
     const periodDays = timeRange === "all" ? 90 : parseInt(timeRange);
     const previousPeriodStart = new Date();
     previousPeriodStart.setDate(previousPeriodStart.getDate() - periodDays * 2);
     const previousPeriodEnd = new Date();
     previousPeriodEnd.setDate(previousPeriodEnd.getDate() - periodDays);
-
+    
     const previousOrders = orders.filter(o => {
       const date = new Date(o.created_at);
       return date >= previousPeriodStart && date < previousPeriodEnd && o.status === "completed";
     });
-
+    
     const previousRevenue = previousOrders.reduce((sum, o) => sum + parseFloat(o.total_price || 0), 0);
     const revenueGrowth = previousRevenue > 0 ? ((totalRevenue - previousRevenue) / previousRevenue) * 100 : 0;
     const ordersGrowth = previousOrders.length > 0 ? ((completed.length - previousOrders.length) / previousOrders.length) * 100 : 0;
@@ -115,14 +138,16 @@ export default function AdminDashboard() {
       totalOrders: filteredOrdersByTime.length,
       activePartners,
       pending,
+      newMessages,
+      totalUsers,
       revenueGrowth,
       ordersGrowth,
     };
-  }, [filteredOrdersByTime, orders, timeRange]);
+  }, [filteredOrdersByTime, orders, timeRange, messages, users]);
 
   const monthlyData = useMemo(() => {
     const months: { [key: string]: { month: string; revenue: number; orders: number } } = {};
-
+    
     filteredOrdersByTime
       .filter(o => o.status === "completed")
       .forEach(order => {
@@ -146,7 +171,7 @@ export default function AdminDashboard() {
 
   const extractCity = (address: string): string => {
     if (!address) return "Non spécifié";
-
+    
     const parts = address.split(",");
     if (parts.length > 1) {
       const lastPart = parts[parts.length - 1].trim();
@@ -155,14 +180,14 @@ export default function AdminDashboard() {
         return match[1].trim();
       }
     }
-
+    
     const words = address.split(" ");
     return words[words.length - 1] || "Non spécifié";
   };
 
   const cityData = useMemo(() => {
     const cities: { [key: string]: { name: string; value: number; orders: number } } = {};
-
+    
     filteredOrdersByTime
       .filter(o => o.status === "completed")
       .forEach(order => {
@@ -189,13 +214,13 @@ export default function AdminDashboard() {
       "completed": "Terminé",
       "cancelled": "Annulé"
     };
-
+    
     const statuses: any = {};
     filteredOrdersByTime.forEach(o => {
       const label = statusLabels[o.status] || o.status;
       statuses[label] = (statuses[label] || 0) + 1;
     });
-
+    
     const colors: any = {
       "Terminé": "#10b981",
       "En cours": "#3b82f6",
@@ -212,14 +237,70 @@ export default function AdminDashboard() {
     }));
   }, [filteredOrdersByTime]);
 
-  const StatCard: React.FC<{
-    title: string;
-    value: string;
-    icon: React.ReactNode;
+  const markMessageAsRead = async (messageId: string) => {
+    const { error } = await supabase
+      .from("contact_messages")
+      .update({ read: true })
+      .eq("id", messageId);
+
+    if (!error) {
+      setMessages(messages.map(m => m.id === messageId ? { ...m, read: true } : m));
+    }
+  };
+
+  // 📧 NOUVELLE FONCTION - Répondre avec email automatique
+  const handleReplyInApp = async (message: any) => {
+    if (!replyText.trim()) {
+      toast.error("Écris une réponse avant d'envoyer");
+      return;
+    }
+
+    try {
+      const { error } = await supabase
+        .from("support_responses")
+        .insert({
+          message_id: message.id,
+          response: replyText,
+          admin_email: "admin@kilolab.fr"
+        });
+
+      if (error) throw error;
+
+      toast.success("✅ Email envoyé au client !");
+      setReplyText("");
+      setSelectedMessage(null);
+      markMessageAsRead(message.id);
+    } catch (error: any) {
+      console.error(error);
+      toast.error("❌ Erreur d'envoi : " + error.message);
+    }
+  };
+
+  const deleteMessage = async (messageId: string) => {
+    if (!confirm("Supprimer ce message ?")) return;
+    
+    const { error } = await supabase
+      .from("contact_messages")
+      .delete()
+      .eq("id", messageId);
+
+    if (!error) {
+      setMessages(messages.filter(m => m.id !== messageId));
+      toast.success("Message supprimé");
+    } else {
+      toast.error("Erreur de suppression");
+    }
+  };
+
+  const StatCard: React.FC<{ 
+    title: string; 
+    value: string; 
+    icon: React.ReactNode; 
     trend?: number;
     suffix?: string;
-  }> = ({ title, value, icon, trend, suffix }) => (
-    <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 hover:shadow-md transition">
+    badge?: number;
+  }> = ({ title, value, icon, trend, suffix, badge }) => (
+    <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 hover:shadow-md transition relative">
       <div className="flex items-start justify-between mb-4">
         <div className="p-3 bg-teal-50 rounded-xl text-teal-600">
           {icon}
@@ -228,6 +309,11 @@ export default function AdminDashboard() {
           <div className={`flex items-center gap-1 text-sm font-semibold ${trend >= 0 ? "text-green-600" : "text-red-600"}`}>
             {trend >= 0 ? <TrendingUp size={16} /> : <TrendingDown size={16} />}
             {Math.abs(trend).toFixed(1)}%
+          </div>
+        )}
+        {badge !== undefined && badge > 0 && (
+          <div className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center">
+            {badge}
           </div>
         )}
       </div>
@@ -239,7 +325,7 @@ export default function AdminDashboard() {
   );
 
   const filteredPartners = useMemo(() => {
-    return partners.filter(p =>
+    return partners.filter(p => 
       p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       p.city.toLowerCase().includes(searchTerm.toLowerCase())
     );
@@ -249,11 +335,11 @@ export default function AdminDashboard() {
     const csvHeader = "Date,ID Commande,Client,Montant,Poids,Statut\n";
     const csvData = filteredOrdersByTime
       .slice(0, 100)
-      .map(o =>
+      .map(o => 
         `${new Date(o.created_at).toLocaleDateString()},${o.id.slice(0, 8)},${o.pickup_address || "N/A"},${o.total_price},${o.weight},${o.status}`
       )
       .join("\n");
-
+    
     const blob = new Blob([csvHeader + csvData], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
@@ -278,21 +364,30 @@ export default function AdminDashboard() {
   return (
     <div className="min-h-screen bg-slate-50 font-sans text-slate-900 pb-20">
       <Navbar />
-
+      
       <div className="pt-32 px-4 max-w-7xl mx-auto">
         
         <div className="mb-8">
           <div className="flex justify-between items-center mb-6">
             <div>
-              <h1 className="text-3xl font-black mb-2">Dashboard Admin Kilolab</h1>
+              <h1 className="text-3xl font-black mb-2">Dashboard Admin Kilolab 👑</h1>
               <p className="text-slate-600">Vue d'ensemble de la plateforme</p>
             </div>
-            <button 
-              onClick={() => window.location.reload()} 
-              className="bg-white border border-slate-200 px-4 py-2 rounded-lg text-sm font-bold hover:bg-slate-50 transition"
-            >
-              Rafraîchir
-            </button>
+            <div className="flex gap-3">
+              <button 
+                onClick={() => window.open("https://supabase.com/dashboard/project/dhecegehcjelbxydeolg", "_blank")} 
+                className="bg-white border border-slate-200 px-4 py-2 rounded-lg text-sm font-bold hover:bg-slate-50 transition flex items-center gap-2"
+              >
+                <Database size={16} />
+                Ouvrir Supabase
+              </button>
+              <button 
+                onClick={() => window.location.reload()} 
+                className="bg-white border border-slate-200 px-4 py-2 rounded-lg text-sm font-bold hover:bg-slate-50 transition"
+              >
+                Rafraîchir
+              </button>
+            </div>
           </div>
 
           <div className="flex gap-2 mb-6 flex-wrap">
@@ -326,21 +421,22 @@ export default function AdminDashboard() {
               trend={stats.ordersGrowth}
             />
             <StatCard
-              title="Partenaires actifs"
-              value={stats.activePartners.toString()}
+              title="Utilisateurs inscrits"
+              value={stats.totalUsers.toString()}
               icon={<Users size={24} />}
             />
             <StatCard
-              title="En attente"
-              value={stats.pending.toString()}
-              icon={<CheckCircle size={24} />}
+              title="Messages non lus"
+              value={stats.newMessages.toString()}
+              icon={<MessageSquare size={24} />}
+              badge={stats.newMessages}
             />
           </div>
         </div>
 
         <div className="bg-white rounded-2xl shadow-sm border border-slate-100 mb-8">
           <div className="flex border-b border-slate-100 overflow-x-auto">
-            {(["overview", "partners", "cities", "orders"] as const).map((tab) => (
+            {(["overview", "messages", "users", "partners", "cities", "orders"] as const).map((tab) => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
@@ -351,6 +447,8 @@ export default function AdminDashboard() {
                 }`}
               >
                 {tab === "overview" ? "Vue d'ensemble" : 
+                 tab === "messages" ? `Messages (${stats.newMessages})` :
+                 tab === "users" ? "Utilisateurs" :
                  tab === "partners" ? "Partenaires" :
                  tab === "cities" ? "Villes" : "Commandes"}
               </button>
@@ -411,7 +509,7 @@ export default function AdminDashboard() {
                           fill="#8884d8"
                           dataKey="value"
                         >
-                          {statusData.map((entry: any, index: number) => (
+                          {statusData.map((entry, index) => (
                             <Cell key={`cell-${index}`} fill={entry.color} />
                           ))}
                         </Pie>
@@ -436,6 +534,143 @@ export default function AdminDashboard() {
                     </ResponsiveContainer>
                   </div>
                 </div>
+              </div>
+            )}
+
+            {activeTab === "messages" && (
+              <div>
+                <h3 className="text-lg font-bold text-slate-900 mb-6">Messages clients ({messages.length})</h3>
+                {messages.length === 0 ? (
+                  <div className="text-center py-12 text-slate-400">
+                    Aucun message reçu.
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {messages.map((message) => (
+                      <div 
+                        key={message.id} 
+                        className={`border rounded-xl p-4 transition hover:shadow-md ${
+                          message.read ? "bg-white border-slate-200" : "bg-teal-50 border-teal-200"
+                        }`}
+                      >
+                        <div className="flex justify-between items-start mb-3">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-3 mb-2">
+                              <h4 className="font-bold text-slate-900">{message.subject || "Sans objet"}</h4>
+                              {!message.read && (
+                                <span className="px-2 py-1 bg-red-100 text-red-700 rounded-full text-xs font-bold">
+                                  NOUVEAU
+                                </span>
+                              )}
+                            </div>
+                            <p className="text-sm text-slate-600 mb-2">
+                              <Mail size={14} className="inline mr-1" />
+                              {message.email}
+                            </p>
+                            <p className="text-sm text-slate-500">
+                              {new Date(message.created_at).toLocaleDateString("fr-FR", {
+                                day: "numeric",
+                                month: "long",
+                                year: "numeric",
+                                hour: "2-digit",
+                                minute: "2-digit"
+                              })}
+                            </p>
+                          </div>
+                          <div className="flex gap-2">
+                            <button
+                              onClick={() => setSelectedMessage(selectedMessage?.id === message.id ? null : message)}
+                              className="px-3 py-2 bg-teal-600 text-white rounded-lg text-sm font-bold hover:bg-teal-700 transition flex items-center gap-2"
+                            >
+                              <Send size={14} />
+                              Répondre
+                            </button>
+                            <button
+                              onClick={() => deleteMessage(message.id)}
+                              className="px-3 py-2 bg-red-100 text-red-700 rounded-lg text-sm font-bold hover:bg-red-200 transition"
+                            >
+                              <Trash2 size={14} />
+                            </button>
+                          </div>
+                        </div>
+                        
+                        <div className="bg-slate-50 rounded-lg p-4 text-sm text-slate-700 mb-3">
+                          {message.message}
+                        </div>
+
+                        {/* 📧 ZONE DE RÉPONSE AVEC EMAIL AUTO */}
+                        {selectedMessage?.id === message.id && (
+                          <div className="mt-4 border-t border-slate-200 pt-4">
+                            <label className="block text-sm font-bold text-slate-700 mb-2">
+                              Votre réponse (sera envoyée automatiquement par email)
+                            </label>
+                            <textarea
+                              value={replyText}
+                              onChange={(e) => setReplyText(e.target.value)}
+                              placeholder="Écris ta réponse ici..."
+                              rows={4}
+                              className="w-full border border-slate-300 rounded-lg p-3 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
+                            />
+                            <div className="flex gap-2 mt-3">
+                              <button
+                                onClick={() => handleReplyInApp(message)}
+                                className="px-4 py-2 bg-teal-600 text-white rounded-lg text-sm font-bold hover:bg-teal-700 transition flex items-center gap-2"
+                              >
+                                <Send size={14} />
+                                Envoyer l'email
+                              </button>
+                              <button
+                                onClick={() => {
+                                  setSelectedMessage(null);
+                                  setReplyText("");
+                                }}
+                                className="px-4 py-2 bg-slate-100 text-slate-700 rounded-lg text-sm font-bold hover:bg-slate-200 transition"
+                              >
+                                Annuler
+                              </button>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {activeTab === "users" && (
+              <div>
+                <h3 className="text-lg font-bold text-slate-900 mb-6">Utilisateurs inscrits ({users.length})</h3>
+                {users.length === 0 ? (
+                  <div className="text-center py-12 text-slate-400">
+                    Aucun utilisateur inscrit.
+                  </div>
+                ) : (
+                  <div className="overflow-x-auto">
+                    <table className="w-full">
+                      <thead>
+                        <tr className="border-b border-slate-200">
+                          <th className="text-left py-3 px-4 text-sm font-semibold text-slate-600">Nom</th>
+                          <th className="text-left py-3 px-4 text-sm font-semibold text-slate-600">Email</th>
+                          <th className="text-left py-3 px-4 text-sm font-semibold text-slate-600">Téléphone</th>
+                          <th className="text-left py-3 px-4 text-sm font-semibold text-slate-600">Inscription</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {users.map((user) => (
+                          <tr key={user.id} className="border-b border-slate-100 hover:bg-slate-50">
+                            <td className="py-3 px-4 font-medium text-slate-900">{user.full_name || "Non renseigné"}</td>
+                            <td className="py-3 px-4 text-slate-700">{user.email || "N/A"}</td>
+                            <td className="py-3 px-4 text-slate-700">{user.phone || "N/A"}</td>
+                            <td className="py-3 px-4 text-slate-500 text-sm">
+                              {new Date(user.created_at).toLocaleDateString("fr-FR")}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
               </div>
             )}
 
