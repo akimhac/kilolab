@@ -4,6 +4,7 @@ import { supabase } from '../lib/supabase';
 import Navbar from '../components/Navbar';
 import { Scale, MapPin, ArrowRight, Sparkles, Tag, Search, Loader2, Calendar as CalendarIcon, Info, CheckCircle } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { analytics } from '../lib/analytics'; // 📊 Import Analytics
 
 export default function NewOrder() {
   const navigate = useNavigate();
@@ -73,10 +74,12 @@ export default function NewOrder() {
   const basePrice = formula === 'eco' ? 3 : 5;
   let total = weight * basePrice;
   if (isWeekend) total += 5; 
-  const totalPrice = total.toFixed(2);
+  const totalPrice = parseFloat(total.toFixed(2)); // Conversion en nombre pour analytics
 
   const handleSubmit = async () => {
+    analytics.orderStarted(); // 📊 Track début de commande
     setLoading(true);
+    
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
@@ -93,18 +96,24 @@ export default function NewOrder() {
       // 🔥 On met le créneau dans l'adresse pour ne rien perdre
       const fullAddressInfo = `${finalAddress} (${searchQuery}) - Créneau : ${pickupSlot}`;
 
-      const { error } = await supabase.from('orders').insert({
+      const { data: order, error } = await supabase.from('orders').insert({
         client_id: user.id,
         partner_id: isNetwork ? null : selectedPartnerId,
         weight: weight,
         pickup_address: fullAddressInfo, // Créneau inclus ici
         pickup_date: cleanDate,          // Date propre YYYY-MM-DD
-        total_price: parseFloat(totalPrice),
+        total_price: totalPrice,
         status: 'pending',
         formula: formula
-      });
+      })
+      .select() // Important pour récupérer l'ID de la commande créée
+      .single();
 
       if (error) throw error;
+
+      if (order) {
+        analytics.orderCompleted(order.id, totalPrice); // 📊 Track succès
+      }
 
       if (isNetwork) setShowWaitingModal(true);
       else { 
@@ -377,7 +386,7 @@ export default function NewOrder() {
                 )}
                 <div className="border-t border-slate-200 pt-4 mt-2 flex justify-between items-center">
                   <span className="font-bold text-lg">Total estimé</span>
-                  <span className="font-extrabold text-3xl text-teal-600">{totalPrice} €</span>
+                  <span className="font-extrabold text-3xl text-teal-600">{totalPrice.toFixed(2)} €</span>
                 </div>
               </div>
               <div className="flex justify-between items-center">
