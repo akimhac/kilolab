@@ -1,10 +1,36 @@
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import { useState } from 'react';
-import { Building2, User, Mail, Link as LinkIcon, CheckCircle, Loader2, Upload, FileText, Phone, MapPin } from 'lucide-react';
+import { Building2, User, Mail, CheckCircle, Loader2, Upload, FileText, Phone } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
+
+// ✅ 1. FONCTION DE GÉOCODAGE (Nominatim OpenStreetMap)
+const geocodeAddress = async (address: string) => {
+  try {
+    // On ajoute "France" pour aider la précision
+    const query = `${address}, France`;
+    
+    const response = await fetch(
+      `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&countrycodes=fr`
+    );
+    
+    const results = await response.json();
+    
+    if (results && results.length > 0) {
+      return {
+        latitude: parseFloat(results[0].lat),
+        longitude: parseFloat(results[0].lon)
+      };
+    }
+    
+    return null;
+  } catch (error) {
+    console.error('Erreur géocodage:', error);
+    return null;
+  }
+};
 
 export default function BecomePartner() {
   const navigate = useNavigate();
@@ -18,8 +44,8 @@ export default function BecomePartner() {
     full_name: '',
     email: '',
     phone: '',
-    linkedin: '',
-    address: ''
+    address: '',
+    city: '' // J'ai ajouté city pour être plus précis si besoin, sinon on extrait de l'adresse
   });
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -43,7 +69,6 @@ export default function BecomePartner() {
       return filePath;
     } catch (error) {
       console.error('Upload error:', error);
-      // On continue même si l'upload échoue pour ne pas bloquer le lead
       return null;
     }
   };
@@ -53,21 +78,36 @@ export default function BecomePartner() {
     setLoading(true);
 
     try {
+      // ✅ 2. GÉOCODAGE DE L'ADRESSE
+      toast.loading("Vérification de l'adresse...", { id: 'geo' });
+      const coordinates = await geocodeAddress(`${formData.address} ${formData.city}`);
+      
+      if (!coordinates) {
+        toast.error("Adresse introuvable. Veuillez vérifier.", { id: 'geo' });
+        setLoading(false);
+        return;
+      }
+      toast.success("Adresse validée !", { id: 'geo' });
+
+      // 3. UPLOAD KBIS (Optionnel)
       let kbisPath = null;
       if (file) {
         kbisPath = await uploadKbis(file);
       }
 
-      // INSERTION RÉELLE DANS SUPABASE
+      // ✅ 4. INSERTION DANS SUPABASE AVEC LAT/LON
       const { error } = await supabase.from('partners').insert({
         company_name: formData.company_name,
         siret: formData.siret,
         address: formData.address,
+        city: formData.city || 'Non spécifié', // Assure-toi d'avoir cette colonne ou retire-la
         contact_name: formData.full_name,
         email: formData.email,
         phone: formData.phone,
         status: 'pending',
-        // kbis_url: kbisPath // Décommente si tu as la colonne kbis_url
+        latitude: coordinates.latitude,   // 📍 GPS
+        longitude: coordinates.longitude, // 📍 GPS
+        // kbis_url: kbisPath 
       });
 
       if (error) throw error;
@@ -116,10 +156,17 @@ export default function BecomePartner() {
                                     value={formData.siret} onChange={e => setFormData({...formData, siret: e.target.value})} />
                             </div>
                         </div>
-                        <div>
-                            <label className="block text-sm font-bold mb-1">Adresse complète</label>
-                            <input required type="text" placeholder="12 Rue de la Paix, 75000 Paris" className="w-full p-3 bg-slate-50 border rounded-xl"
-                                value={formData.address} onChange={e => setFormData({...formData, address: e.target.value})} />
+                        <div className="grid md:grid-cols-3 gap-4">
+                            <div className="md:col-span-2">
+                                <label className="block text-sm font-bold mb-1">Adresse (Numéro et Rue)</label>
+                                <input required type="text" placeholder="12 Rue de la Paix" className="w-full p-3 bg-slate-50 border rounded-xl"
+                                    value={formData.address} onChange={e => setFormData({...formData, address: e.target.value})} />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-bold mb-1">Ville</label>
+                                <input required type="text" placeholder="Paris" className="w-full p-3 bg-slate-50 border rounded-xl"
+                                    value={formData.city} onChange={e => setFormData({...formData, city: e.target.value})} />
+                            </div>
                         </div>
                     </div>
 
