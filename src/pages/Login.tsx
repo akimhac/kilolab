@@ -4,6 +4,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import toast from 'react-hot-toast';
 import { Mail, Lock, ArrowRight, Loader2 } from 'lucide-react';
+import { analytics } from "../lib/analytics";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -13,7 +14,7 @@ export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  // 🔥 VÉRIFICATION AUTO AU CHARGEMENT (évite le flash du formulaire)
+  // 🔥 VÉRIFICATION AUTO AU CHARGEMENT
   useEffect(() => {
     checkSession();
   }, []);
@@ -22,7 +23,6 @@ export default function Login() {
     const { data: { session } } = await supabase.auth.getSession();
     
     if (session) {
-      // Déjà connecté ? On regarde qui c'est pour l'envoyer au bon endroit
       const { data: profile } = await supabase
         .from('user_profiles')
         .select('role')
@@ -37,7 +37,6 @@ export default function Login() {
         navigate('/dashboard');
       }
     } else {
-      // Pas connecté ? On affiche le formulaire
       setPageLoading(false);
     }
   };
@@ -48,24 +47,33 @@ export default function Login() {
 
     try {
       if (isSignUp) {
+        // 📊 TRACK DÉBUT INSCRIPTION
+        analytics.signupStarted();
+        
         // 📝 INSCRIPTION
         const { error } = await supabase.auth.signUp({ 
           email, 
           password
         });
+        
         if (error) throw error;
+        
+        // 📊 TRACK SUCCÈS INSCRIPTION
+        analytics.signupCompleted("email");
+        
         toast.success('Compte créé ! Vérifiez vos emails (et vos spams 📧).');
       } else {
-        // 🔐 CONNEXION avec redirection intelligente
+        // 🔐 CONNEXION
         const { data, error } = await supabase.auth.signInWithPassword({ 
           email, 
           password 
         });
+        
         if (error) throw error;
         
         toast.success('Connexion réussie !');
         
-        // 🎯 REDIRECTION INTELLIGENTE selon le rôle
+        // 🎯 REDIRECTION selon le rôle
         const { data: profile } = await supabase
           .from('user_profiles')
           .select('role')
@@ -87,7 +95,7 @@ export default function Login() {
     }
   };
 
-  // 🎨 LOADER pendant la vérification de session
+  // 🎨 LOADER
   if (pageLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-50">
