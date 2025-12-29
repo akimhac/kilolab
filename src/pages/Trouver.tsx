@@ -1,69 +1,93 @@
-import Navbar from '../components/Navbar';
-import Footer from '../components/Footer';
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { MapPin, Search, ArrowRight, Star } from 'lucide-react';
+import { useState, useEffect } from "react";
+import { supabase } from "../lib/supabase";
+import { getUserLocation, findNearbyPartners } from "../lib/geolocation";
+import { MapPin, Loader2 } from "lucide-react";
+import toast from "react-hot-toast";
 
-export default function Trouver() {
-  const navigate = useNavigate();
-  const [city, setCity] = useState('');
+export default function TrouverOptimized() {
+  const [partners, setPartners] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [userLocation, setUserLocation] = useState<{ lat: number; lon: number } | null>(null);
 
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    // On redirige vers la commande avec la ville pré-remplie (si on voulait complexifier)
-    // Pour l'instant on envoie vers le new order classique
-    navigate('/new-order');
+  useEffect(() => {
+    loadPartners();
+  }, []);
+
+  const loadPartners = async () => {
+    try {
+      setLoading(true);
+
+      // 1️⃣ Demande la géolocalisation
+      const position = await getUserLocation();
+      const { latitude, longitude } = position.coords;
+
+      setUserLocation({ lat: latitude, lon: longitude });
+
+      // 2️⃣ Cherche les partenaires proches
+      const nearbyPartners = await findNearbyPartners(latitude, longitude, 15);
+
+      if (nearbyPartners && nearbyPartners.length > 0) {
+        setPartners(nearbyPartners);
+        toast.success(`${nearbyPartners.length} partenaires trouvés à proximité`);
+      } else {
+        // Fallback : charge tous les partenaires
+        await loadAllPartners();
+      }
+    } catch (error: any) {
+      console.error("Erreur géolocalisation:", error);
+      toast.error("Impossible de vous géolocaliser");
+      // Fallback : charge tous les partenaires
+      await loadAllPartners();
+    } finally {
+      setLoading(false);
+    }
   };
 
+  const loadAllPartners = async () => {
+    const { data } = await supabase
+      .from("partners")
+      .select("*")
+      .eq("is_active", true);
+
+    if (data) {
+      setPartners(data);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Loader2 className="animate-spin text-teal-600" size={48} />
+      </div>
+    );
+  }
+
   return (
-    <div className="min-h-screen bg-slate-50 font-sans text-slate-900">
-      <Navbar />
-      
-      {/* HERO RECHERCHE */}
-      <div className="pt-32 pb-20 px-4 bg-white border-b border-slate-100">
-        <div className="max-w-4xl mx-auto text-center">
-            <h1 className="text-4xl font-black mb-6">Trouvez un artisan près de chez vous</h1>
-            <p className="text-slate-500 text-lg mb-8">Saisissez votre ville pour voir les disponibilités.</p>
-            
-            <form onSubmit={handleSearch} className="relative max-w-xl mx-auto">
-                <div className="flex items-center bg-white border-2 border-slate-200 rounded-2xl p-2 shadow-lg focus-within:border-teal-500 transition">
-                    <MapPin className="ml-4 text-slate-400" size={24}/>
-                    <input 
-                        type="text" 
-                        placeholder="Ex: Paris, Lille, Maubeuge..." 
-                        className="flex-1 p-3 outline-none font-bold text-lg text-slate-800 placeholder:font-normal"
-                        value={city}
-                        onChange={(e) => setCity(e.target.value)}
-                    />
-                    <button type="submit" className="bg-slate-900 text-white p-4 rounded-xl hover:bg-teal-500 transition">
-                        <Search size={24}/>
-                    </button>
-                </div>
-            </form>
-        </div>
-      </div>
+    <div className="min-h-screen bg-slate-50 p-8">
+      <h1 className="text-3xl font-bold mb-6">Partenaires proches</h1>
 
-      {/* LISTE DES VILLES POPULAIRES (Fake pour le SEO/Design) */}
-      <div className="py-16 px-4 max-w-6xl mx-auto">
-        <h2 className="text-2xl font-bold mb-8">Zones populaires</h2>
-        <div className="grid md:grid-cols-3 gap-6">
-            {['Paris', 'Lille', 'Maubeuge', 'Valenciennes', 'Lyon', 'Bordeaux'].map((ville) => (
-                <div key={ville} onClick={() => navigate('/new-order')} className="group bg-white p-6 rounded-2xl border border-slate-100 hover:border-teal-500 cursor-pointer transition shadow-sm hover:shadow-md">
-                    <div className="flex justify-between items-center mb-2">
-                        <h3 className="font-bold text-lg">{ville}</h3>
-                        <ArrowRight size={20} className="text-slate-300 group-hover:text-teal-500 transition"/>
-                    </div>
-                    <div className="flex items-center gap-1 text-sm text-slate-500">
-                        <Star size={14} className="fill-yellow-400 text-yellow-400"/>
-                        <span className="font-bold text-slate-900">4.9</span>
-                        <span>(Partenaires vérifiés)</span>
-                    </div>
-                </div>
-            ))}
-        </div>
-      </div>
+      {userLocation && (
+        <p className="text-slate-600 mb-6">
+          📍 Position : {userLocation.lat.toFixed(4)}, {userLocation.lon.toFixed(4)}
+        </p>
+      )}
 
-      <Footer />
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {partners.map((partner) => (
+          <div key={partner.id} className="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
+            <h3 className="text-lg font-bold mb-2">{partner.company_name}</h3>
+            <p className="text-slate-600 mb-2 flex items-center gap-2">
+              <MapPin size={16} />
+              {partner.city}
+            </p>
+            {partner.distance_km && (
+              <p className="text-teal-600 font-semibold">
+                📍 {partner.distance_km} km
+              </p>
+            )}
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
