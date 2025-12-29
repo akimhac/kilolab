@@ -3,6 +3,7 @@ import { supabase } from "../lib/supabase";
 import { getUserLocation, findNearbyPartners } from "../lib/geolocation";
 import { MapPin, Loader2 } from "lucide-react";
 import toast from "react-hot-toast";
+import { analytics } from "../lib/analytics"; // 📊 Import Analytics
 
 export default function TrouverOptimized() {
   const [partners, setPartners] = useState<any[]>([]);
@@ -54,6 +55,13 @@ export default function TrouverOptimized() {
     }
   };
 
+  // 📊 Fonction de tracking
+  const handleSelectPartner = (partner: any) => {
+    analytics.partnerSelected(partner.id, partner.city); 
+    // Ici tu pourrais ajouter une navigation, ex: navigate('/new-order')
+    toast.success(`Sélection : ${partner.company_name}`);
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -74,7 +82,11 @@ export default function TrouverOptimized() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {partners.map((partner) => (
-          <div key={partner.id} className="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
+          <div 
+            key={partner.id} 
+            onClick={() => handleSelectPartner(partner)} // 👈 Ajout du click
+            className="bg-white p-6 rounded-xl shadow-sm border border-slate-100 cursor-pointer hover:border-teal-500 hover:shadow-md transition"
+          >
             <h3 className="text-lg font-bold mb-2">{partner.company_name}</h3>
             <p className="text-slate-600 mb-2 flex items-center gap-2">
               <MapPin size={16} />
