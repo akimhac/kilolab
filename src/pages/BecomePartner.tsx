@@ -6,14 +6,13 @@ import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 
-// ✅ 1. FONCTION DE GÉOCODAGE (Nominatim OpenStreetMap)
-const geocodeAddress = async (address: string) => {
+// ✅ GÉOCODAGE
+const geocodeAddress = async (address: string, city: string) => {
   try {
-    // On ajoute "France" pour aider la précision
-    const query = `${address}, France`;
+    const query = `${address}, ${city}, France`;
     
     const response = await fetch(
-      `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&countrycodes=fr`
+      `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&countrycodes=fr&limit=1`
     );
     
     const results = await response.json();
@@ -21,7 +20,8 @@ const geocodeAddress = async (address: string) => {
     if (results && results.length > 0) {
       return {
         latitude: parseFloat(results[0].lat),
-        longitude: parseFloat(results[0].lon)
+        longitude: parseFloat(results[0].lon),
+        displayName: results[0].display_name // Pour confirmer l'adresse
       };
     }
     
@@ -45,12 +45,21 @@ export default function BecomePartner() {
     email: '',
     phone: '',
     address: '',
-    city: '' // J'ai ajouté city pour être plus précis si besoin, sinon on extrait de l'adresse
+    city: '',
+    postal_code: '' // Ajouté pour plus de précision
   });
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
-      setFile(e.target.files[0]);
+      const selectedFile = e.target.files[0];
+      
+      // Vérification taille (5 Mo max)
+      if (selectedFile.size > 5 * 1024 * 1024) {
+        toast.error("Le fichier est trop volumineux (5 Mo max)");
+        return;
+      }
+      
+      setFile(selectedFile);
       toast.success("Fichier Kbis ajouté !");
     }
   };
@@ -78,46 +87,69 @@ export default function BecomePartner() {
     setLoading(true);
 
     try {
-      // ✅ 2. GÉOCODAGE DE L'ADRESSE
-      toast.loading("Vérification de l'adresse...", { id: 'geo' });
-      const coordinates = await geocodeAddress(`${formData.address} ${formData.city}`);
-      
-      if (!coordinates) {
-        toast.error("Adresse introuvable. Veuillez vérifier.", { id: 'geo' });
+      // ✅ 1. VALIDATION BASIQUE
+      if (!file) {
+        toast.error("Le Kbis est obligatoire");
         setLoading(false);
         return;
       }
-      toast.success("Adresse validée !", { id: 'geo' });
 
-      // 3. UPLOAD KBIS (Optionnel)
-      let kbisPath = null;
-      if (file) {
-        kbisPath = await uploadKbis(file);
+      // ✅ 2. GÉOCODAGE DE L'ADRESSE
+      toast.loading("Vérification de l'adresse...", { id: 'geo' });
+      const coordinates = await geocodeAddress(
+        `${formData.address}`,
+        `${formData.postal_code} ${formData.city}`
+      );
+      
+      if (!coordinates) {
+        toast.error("Adresse introuvable. Vérifiez votre saisie.", { id: 'geo' });
+        setLoading(false);
+        return;
       }
+      
+      // Affiche l'adresse trouvée pour confirmation
+      console.log('📍 Adresse géocodée:', coordinates.displayName);
+      toast.success(`Adresse validée : ${coordinates.latitude.toFixed(4)}, ${coordinates.longitude.toFixed(4)}`, { id: 'geo' });
 
-      // ✅ 4. INSERTION DANS SUPABASE AVEC LAT/LON
+      // ✅ 3. UPLOAD KBIS
+      toast.loading("Upload du Kbis...", { id: 'upload' });
+      const kbisPath = await uploadKbis(file);
+      
+      if (!kbisPath) {
+        toast.error("Erreur lors de l'upload du Kbis", { id: 'upload' });
+        setLoading(false);
+        return;
+      }
+      toast.success("Kbis uploadé !", { id: 'upload' });
+
+      // ✅ 4. INSERTION DANS SUPABASE
+      toast.loading("Envoi de la candidature...", { id: 'submit' });
+      
+      // Combine adresse complète pour la colonne "address"
+      const fullAddress = `${formData.address}, ${formData.postal_code} ${formData.city}`;
+      
       const { error } = await supabase.from('partners').insert({
         company_name: formData.company_name,
         siret: formData.siret,
-        address: formData.address,
-        city: formData.city || 'Non spécifié', // Assure-toi d'avoir cette colonne ou retire-la
+        address: fullAddress, // Adresse complète
         contact_name: formData.full_name,
         email: formData.email,
         phone: formData.phone,
         status: 'pending',
+        is_active: false,
         latitude: coordinates.latitude,   // 📍 GPS
         longitude: coordinates.longitude, // 📍 GPS
-        // kbis_url: kbisPath 
+        kbis_url: kbisPath 
       });
 
       if (error) throw error;
 
+      toast.success("Candidature envoyée avec succès !", { id: 'submit' });
       setStep(2);
-      toast.success("Candidature envoyée avec succès !");
 
     } catch (error: any) {
-      console.error(error);
-      toast.error("Erreur : " + error.message);
+      console.error('Erreur inscription partenaire:', error);
+      toast.error(`Erreur : ${error.message}`);
     } finally {
       setLoading(false);
     }
@@ -156,11 +188,16 @@ export default function BecomePartner() {
                                     value={formData.siret} onChange={e => setFormData({...formData, siret: e.target.value})} />
                             </div>
                         </div>
-                        <div className="grid md:grid-cols-3 gap-4">
-                            <div className="md:col-span-2">
-                                <label className="block text-sm font-bold mb-1">Adresse (Numéro et Rue)</label>
-                                <input required type="text" placeholder="12 Rue de la Paix" className="w-full p-3 bg-slate-50 border rounded-xl"
-                                    value={formData.address} onChange={e => setFormData({...formData, address: e.target.value})} />
+                        <div>
+                            <label className="block text-sm font-bold mb-1">Adresse complète (Numéro et Rue)</label>
+                            <input required type="text" placeholder="12 Rue de la Paix" className="w-full p-3 bg-slate-50 border rounded-xl"
+                                value={formData.address} onChange={e => setFormData({...formData, address: e.target.value})} />
+                        </div>
+                        <div className="grid md:grid-cols-2 gap-4">
+                            <div>
+                                <label className="block text-sm font-bold mb-1">Code postal</label>
+                                <input required type="text" placeholder="75001" className="w-full p-3 bg-slate-50 border rounded-xl"
+                                    value={formData.postal_code} onChange={e => setFormData({...formData, postal_code: e.target.value})} />
                             </div>
                             <div>
                                 <label className="block text-sm font-bold mb-1">Ville</label>
@@ -174,7 +211,7 @@ export default function BecomePartner() {
                     <div className="space-y-4 bg-slate-50 p-4 rounded-xl border border-slate-200">
                         <label className="block text-sm font-bold mb-1 flex justify-between">
                             <span>Extrait Kbis (PDF/JPG)</span>
-                            <span className="text-teal-600 text-xs">Obligatoire</span>
+                            <span className="text-red-600 text-xs">* Obligatoire</span>
                         </label>
                         <div className="relative border-2 border-dashed border-slate-300 rounded-xl p-6 text-center hover:bg-white transition cursor-pointer group">
                             <input 
@@ -186,14 +223,15 @@ export default function BecomePartner() {
                             {file ? (
                                 <div className="flex flex-col items-center justify-center gap-2 text-teal-600 font-bold">
                                     <FileText size={32}/> 
-                                    <span>{file.name}</span>
+                                    <span className="text-sm">{file.name}</span>
+                                    <span className="text-xs text-slate-400">({(file.size / 1024 / 1024).toFixed(2)} Mo)</span>
                                     <span className="text-xs text-slate-400 bg-white px-2 py-1 rounded border">Changer</span>
                                 </div>
                             ) : (
                                 <div className="text-slate-400 group-hover:text-slate-600 transition">
                                     <Upload size={32} className="mx-auto mb-2"/>
                                     <span className="font-bold">Cliquez pour ajouter votre Kbis</span>
-                                    <p className="text-xs mt-1">Max 5 Mo</p>
+                                    <p className="text-xs mt-1">PDF, JPG ou PNG - Max 5 Mo</p>
                                 </div>
                             )}
                         </div>
@@ -230,7 +268,7 @@ export default function BecomePartner() {
                         </div>
                     </div>
 
-                    <button disabled={loading} className="w-full py-4 bg-slate-900 text-white font-bold rounded-xl hover:bg-black transition flex justify-center items-center gap-2 shadow-lg">
+                    <button disabled={loading} className="w-full py-4 bg-slate-900 text-white font-bold rounded-xl hover:bg-black transition flex justify-center items-center gap-2 shadow-lg disabled:opacity-50">
                         {loading ? <Loader2 className="animate-spin"/> : "Envoyer ma candidature"}
                     </button>
                 </form>
@@ -243,7 +281,7 @@ export default function BecomePartner() {
                 <h2 className="text-3xl font-black mb-4">Dossier reçu !</h2>
                 <p className="text-slate-500 text-lg mb-8">
                     Notre équipe conformité examine votre Kbis.<br/>
-                    Vous recevrez une réponse sous 24h.
+                    Vous recevrez une réponse sous 24h par email.
                 </p>
                 <button onClick={() => navigate('/')} className="px-8 py-3 border-2 border-slate-200 rounded-xl font-bold hover:border-slate-900 transition">
                     Retour à l'accueil
