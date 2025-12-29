@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import Navbar from '../components/Navbar';
-import { Scale, MapPin, ArrowRight, Sparkles, Tag, Search, Loader2, Calendar as CalendarIcon, Info, CheckCircle } from 'lucide-react';
+import { Scale, MapPin, ArrowRight, Sparkles, Tag, Search, Loader2, Calendar as CalendarIcon, Info, CheckCircle, CreditCard } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { analytics } from '../lib/analytics'; // 📊 Import Analytics
 
@@ -74,10 +74,44 @@ export default function NewOrder() {
   const basePrice = formula === 'eco' ? 3 : 5;
   let total = weight * basePrice;
   if (isWeekend) total += 5; 
-  const totalPrice = parseFloat(total.toFixed(2)); // Conversion en nombre pour analytics
+  const totalPrice = parseFloat(total.toFixed(2));
+
+  // 💳 FONCTION DE PAIEMENT STRIPE
+  const handlePayment = async (orderId: string, email: string) => {
+    try {
+      toast.loading("Redirection vers le paiement...");
+      
+      // Appel à ta fonction Netlify (ou API Vercel)
+      const response = await fetch('/.netlify/functions/create-checkout-session', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          orderId: orderId,
+          amount: totalPrice,
+          email: email,
+          formula: formula
+        }),
+      });
+
+      const { url, error } = await response.json();
+
+      if (error) throw new Error(error);
+      if (url) {
+        window.location.href = url; // 🚀 Redirection vers Stripe
+      } else {
+        throw new Error("Pas d'URL de paiement reçue");
+      }
+
+    } catch (err: any) {
+      console.error("Erreur paiement:", err);
+      toast.dismiss();
+      toast.error("Erreur initialisation paiement. Veuillez réessayer.");
+      setLoading(false);
+    }
+  };
 
   const handleSubmit = async () => {
-    analytics.orderStarted(); // 📊 Track début de commande
+    analytics.orderStarted(); // 📊 Track début
     setLoading(true);
     
     try {
@@ -89,43 +123,37 @@ export default function NewOrder() {
       }
       
       const isNetwork = !selectedPartnerId || selectedPartnerId === 'waiting_list';
-      
-      // 🔥 FIX CRITIQUE : Nettoyage de la date
       const cleanDate = pickupDate || new Date().toISOString().split('T')[0];
-      
-      // 🔥 On met le créneau dans l'adresse pour ne rien perdre
       const fullAddressInfo = `${finalAddress} (${searchQuery}) - Créneau : ${pickupSlot}`;
 
+      // 1. Création de la commande en statut 'pending_payment'
       const { data: order, error } = await supabase.from('orders').insert({
         client_id: user.id,
         partner_id: isNetwork ? null : selectedPartnerId,
         weight: weight,
-        pickup_address: fullAddressInfo, // Créneau inclus ici
-        pickup_date: cleanDate,          // Date propre YYYY-MM-DD
+        pickup_address: fullAddressInfo,
+        pickup_date: cleanDate,
         total_price: totalPrice,
-        status: 'pending',
+        status: 'pending_payment', // ⚠️ On attend le paiement
         formula: formula
       })
-      .select() // Important pour récupérer l'ID de la commande créée
+      .select()
       .single();
 
       if (error) throw error;
 
+      // 2. Si succès, on lance le paiement
       if (order) {
-        analytics.orderCompleted(order.id, totalPrice); // 📊 Track succès
-      }
-
-      if (isNetwork) setShowWaitingModal(true);
-      else { 
-        toast.success('Commande validée !'); 
-        navigate('/dashboard'); 
+        analytics.orderCompleted(order.id, totalPrice); // 📊 Track création
+        
+        // Appel du paiement Stripe
+        await handlePayment(order.id, user.email || "");
       }
 
     } catch (error: any) { 
       console.error(error);
       toast.error('Erreur technique : ' + error.message); 
-    } finally { 
-      setLoading(false); 
+      setLoading(false);
     }
   };
 
@@ -133,6 +161,7 @@ export default function NewOrder() {
     <div className="min-h-screen bg-slate-50 font-sans text-slate-900 pb-20 relative overflow-x-hidden">
       <Navbar />
       
+      {/* Modal d'attente réseau (optionnel si paiement direct) */}
       {showWaitingModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/90 backdrop-blur-sm animate-in fade-in">
           <div className="bg-white rounded-3xl p-8 max-w-md w-full text-center">
@@ -152,7 +181,7 @@ export default function NewOrder() {
         <h1 className="text-3xl font-bold mb-8 text-center">Nouvelle Commande</h1>
         
         <div className="flex justify-center mb-8 text-xs md:text-sm overflow-x-auto">
-          {['Formule', 'Poids', 'Localisation', 'Date', 'Validation'].map((label, i) => (
+          {['Formule', 'Poids', 'Localisation', 'Date', 'Paiement'].map((label, i) => (
             <div key={i} className={`px-3 py-1 md:px-4 md:py-2 rounded-full whitespace-nowrap mx-1 ${step >= i ? 'bg-teal-100 text-teal-800 font-bold' : 'text-slate-400'}`}>
               {i+1}. {label}
             </div>
@@ -394,9 +423,16 @@ export default function NewOrder() {
                 <button 
                   onClick={handleSubmit} 
                   disabled={loading} 
-                  className="px-8 py-4 bg-teal-500 text-slate-900 rounded-xl font-bold hover:bg-teal-400 transition w-full ml-4 shadow-lg"
+                  className="px-8 py-4 bg-teal-500 text-slate-900 rounded-xl font-bold hover:bg-teal-400 transition w-full ml-4 shadow-lg flex items-center justify-center gap-2"
                 >
-                  {loading ? <Loader2 className="animate-spin mx-auto"/> : 'Valider la commande'}
+                  {loading ? (
+                    <Loader2 className="animate-spin"/> 
+                  ) : (
+                    <>
+                      <CreditCard size={20} />
+                      Payer et Valider
+                    </>
+                  )}
                 </button>
               </div>
             </div>
