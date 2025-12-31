@@ -4,7 +4,7 @@ import { Toaster } from 'react-hot-toast';
 import { Loader2 } from 'lucide-react';
 
 // ========================================
-// PAGES LÉGÈRES (chargées immédiatement)
+// PAGES CORE
 // ========================================
 import Landing from './pages/Landing';
 import Login from './pages/Login';
@@ -15,10 +15,17 @@ import UpdatePassword from './pages/UpdatePassword';
 // Legal
 import Legal from './pages/legal/Legal';
 import CGU from './pages/legal/CGU';
+import CGV from './pages/legal/CGV';
 import Privacy from './pages/legal/Privacy';
+import Cookies from './pages/legal/Cookies';
+
+// Info / SEO
+import FAQ from './pages/FAQ';
+import ForWho from './pages/ForWho';
+import Blog from './pages/Blog';
 
 // ========================================
-// PAGES LOURDES (lazy loading)
+// LAZY LOADING
 // ========================================
 const NewOrder = lazy(() => import('./pages/NewOrder'));
 const Tarifs = lazy(() => import('./pages/Tarifs'));
@@ -33,15 +40,20 @@ const AdminDashboard = lazy(() => import('./pages/AdminDashboard'));
 const PartnerLanding = lazy(() => import('./pages/PartnerLanding'));
 const BecomePartner = lazy(() => import('./pages/BecomePartner'));
 const PartnerGuide = lazy(() => import('./pages/PartnerGuide'));
+const PartnerPending = lazy(() => import('./pages/PartnerPending'));
+
+// Paiement
+const PaymentSuccess = lazy(() => import('./pages/PaymentSuccess'));
+const PaymentCancel = lazy(() => import('./pages/PaymentCancel'));
 
 // Autres
 const Referral = lazy(() => import('./pages/Referral'));
-const SecretAdmin = lazy(() => import('./pages/SecretAdmin'));
 const ScanQR = lazy(() => import('./pages/ScanQR'));
 const Settings = lazy(() => import('./pages/Settings'));
+const SecretAdmin = lazy(() => import('./pages/SecretAdmin'));
 
 // ========================================
-// COMPOSANT DE CHARGEMENT
+// LOADER
 // ========================================
 const PageLoader = () => (
   <div className="min-h-screen flex items-center justify-center bg-slate-50">
@@ -53,12 +65,12 @@ const PageLoader = () => (
 );
 
 // ========================================
-// APP PRINCIPAL
+// APP
 // ========================================
-function App() {
+export default function App() {
   return (
     <>
-      <Toaster 
+      <Toaster
         position="top-center"
         toastOptions={{
           duration: 3000,
@@ -66,10 +78,24 @@ function App() {
             background: '#0f172a',
             color: '#fff',
             fontWeight: '600',
+            borderRadius: '12px',
+            padding: '12px 20px',
+          },
+          success: {
+            iconTheme: {
+              primary: '#14b8a6',
+              secondary: '#fff',
+            },
+          },
+          error: {
+            iconTheme: {
+              primary: '#ef4444',
+              secondary: '#fff',
+            },
           },
         }}
       />
-      
+
       <Suspense fallback={<PageLoader />}>
         <Routes>
           {/* PUBLIC */}
@@ -77,38 +103,52 @@ function App() {
           <Route path="/new-order" element={<NewOrder />} />
           <Route path="/tarifs" element={<Tarifs />} />
           <Route path="/trouver" element={<Trouver />} />
-          <Route path="/login" element={<Login />} />
           <Route path="/contact" element={<Contact />} />
+          <Route path="/login" element={<Login />} />
+
+          {/* SEO / INFO */}
+          <Route path="/faq" element={<FAQ />} />
+          <Route path="/for-who" element={<ForWho />} />
+          <Route path="/blog" element={<Blog />} />
+
+          {/* AUTH */}
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/update-password" element={<UpdatePassword />} />
 
           {/* CLIENT */}
           <Route path="/dashboard" element={<ClientDashboard />} />
+          <Route path="/settings" element={<Settings />} />
           <Route path="/referral" element={<Referral />} />
-          
+
           {/* PARTENAIRES */}
           <Route path="/partner" element={<PartnerLanding />} />
           <Route path="/become-partner" element={<BecomePartner />} />
           <Route path="/partner-app" element={<PartnerDashboard />} />
           <Route path="/partner-guide" element={<PartnerGuide />} />
-          
+          <Route path="/partner-pending" element={<PartnerPending />} />
+
+          {/* PAIEMENT */}
+          <Route path="/payment-success" element={<PaymentSuccess />} />
+          <Route path="/payment-cancel" element={<PaymentCancel />} />
+
           {/* ADMIN */}
           <Route path="/admin-access" element={<SecretAdmin />} />
           <Route path="/admin-dashboard" element={<AdminDashboard />} />
 
           {/* OUTILS */}
           <Route path="/scan-qr" element={<ScanQR />} />
-          <Route path="/settings" element={<Settings />} />
-          <Route path="/forgot-password" element={<ForgotPassword />} />
-          <Route path="/update-password" element={<UpdatePassword />} />
 
           {/* LEGAL */}
           <Route path="/legal" element={<Legal />} />
           <Route path="/cgu" element={<CGU />} />
+          <Route path="/cgv" element={<CGV />} />
           <Route path="/privacy" element={<Privacy />} />
-          <Route path="/cookies" element={<Privacy />} />
+          <Route path="/cookies" element={<Cookies />} />
+
+          {/* FALLBACK */}
+          <Route path="*" element={<Landing />} />
         </Routes>
       </Suspense>
     </>
   );
 }
-
-export default App;
