@@ -1,10 +1,10 @@
 import { Link } from 'react-router-dom';
-import { Facebook, Instagram, MessageCircle, Lock } from 'lucide-react';
+import { Facebook, Instagram, MessageCircle, Lock, MapPin } from 'lucide-react';
 
 export default function Footer() {
   return (
-    <footer className="bg-slate-900 text-slate-300 py-16">
-      <div className="max-w-7xl mx-auto px-4 grid md:grid-cols-4 gap-12">
+    <footer className="bg-slate-900 text-slate-300 pt-16 pb-8">
+      <div className="max-w-7xl mx-auto px-4 grid md:grid-cols-4 gap-12 mb-12 border-b border-slate-800 pb-12">
         <div>
           <div className="flex items-center gap-2 mb-6">
             <div className="w-8 h-8 bg-teal-500 rounded-lg"></div>
@@ -46,6 +46,23 @@ export default function Footer() {
             </li>
           </ul>
         </div>
+      </div>
+
+      {/* --- NOUVELLE SECTION SEO (MAILLAGE INTERNE) --- */}
+      <div className="max-w-7xl mx-auto px-4 text-xs text-slate-600">
+        <p className="font-bold text-slate-500 mb-3 flex items-center gap-2 uppercase tracking-wider">
+            <MapPin size={12}/> Zones d'intervention principales
+        </p>
+        <div className="flex flex-wrap gap-x-6 gap-y-2">
+            <Link to="/pressing/lille" className="hover:text-teal-500 transition-colors">Pressing Lille</Link>
+            <Link to="/pressing/nantes" className="hover:text-teal-500 transition-colors">Blanchisserie Nantes</Link>
+            <Link to="/pressing/lyon" className="hover:text-teal-500 transition-colors">Pressing Lyon</Link>
+            <Link to="/pressing/bordeaux" className="hover:text-teal-500 transition-colors">Pressing Bordeaux</Link>
+            <Link to="/pressing/paris" className="hover:text-teal-500 transition-colors">Pressing Paris</Link>
+        </div>
+        <p className="mt-8 text-center text-slate-700">
+            © {new Date().getFullYear()} Kilolab SAS. Tous droits réservés.
+        </p>
       </div>
     </footer>
   );
