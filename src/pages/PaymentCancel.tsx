@@ -22,7 +22,7 @@ export default function PaymentCancel() {
 
           <div className="flex flex-col gap-3">
             <button
-              onClick={() => navigate('/partners-map')}
+              onClick={() => navigate('/dashboard')}
               className="w-full px-8 py-4 bg-gradient-to-r from-blue-600 to-cyan-600 text-white rounded-xl font-bold hover:shadow-xl transition"
             >
               Réessayer
