@@ -30,6 +30,14 @@ export default function PaymentSuccess() {
             Votre commande a été confirmée. Le pressing va prendre en charge votre linge.
           </p>
 
+          {orderId && (
+            <div className="bg-slate-50 rounded-xl p-4 mb-6">
+              <p className="text-sm text-slate-500 font-mono">
+                Commande #{orderId}
+              </p>
+            </div>
+          )}
+
           <div className="bg-green-50 rounded-xl p-4 mb-6">
             <p className="text-sm text-green-800 font-semibold">
               📧 Un email de confirmation vous a été envoyé
