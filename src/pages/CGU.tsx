@@ -3,28 +3,44 @@ import Footer from '../components/Footer';
 
 export default function CGU() {
   return (
-    <div className="min-h-screen bg-slate-950 text-white">
+    <div className="min-h-screen bg-slate-50 text-slate-900">
       <Navbar />
-      <div className="pt-32 pb-20 px-4 max-w-4xl mx-auto">
-        <h1 className="text-4xl font-bold mb-8">Conditions Générales d'Utilisation</h1>
-        <div className="prose prose-invert max-w-none space-y-6 text-slate-300">
-          <p className="text-slate-400">Dernière mise à jour : 15 décembre 2024</p>
-          
-          <h2 className="text-2xl font-bold text-white mt-8">1. Acceptation des CGU</h2>
-          <p>En utilisant la plateforme Kilolab, vous acceptez les présentes Conditions Générales d'Utilisation.</p>
-          
-          <h2 className="text-2xl font-bold text-white mt-8">2. Création de compte</h2>
-          <p>L'inscription sur Kilolab nécessite la création d'un compte avec une adresse email valide.</p>
-          
-          <h2 className="text-2xl font-bold text-white mt-8">3. Utilisation du service</h2>
-          <p>Vous vous engagez à utiliser le service conformément aux lois en vigueur et dans le respect des partenaires pressings.</p>
-          
-          <h2 className="text-2xl font-bold text-white mt-8">4. Responsabilités</h2>
-          <p>Kilolab agit en tant qu'intermédiaire entre les clients et les pressings partenaires. La qualité du service est assurée par les artisans partenaires.</p>
-          
-          <p className="text-slate-500 text-sm mt-12">Pour toute question : contact@kilolab.fr</p>
+
+      <div className="max-w-4xl mx-auto px-4 py-32">
+        <h1 className="text-4xl font-extrabold mb-8">Conditions Générales d’Utilisation</h1>
+
+        <div className="bg-white p-8 rounded-3xl shadow-sm border space-y-8 text-slate-700 leading-relaxed">
+
+          <section>
+            <h2 className="text-xl font-bold">1. Objet</h2>
+            <p>
+              Les présentes CGU ont pour objet de définir les conditions d’utilisation de la plateforme Kilolab,
+              permettant la mise en relation entre des clients et des pressings partenaires.
+            </p>
+          </section>
+
+          <section>
+            <h2 className="text-xl font-bold">2. Rôle de Kilolab</h2>
+            <p className="font-semibold">
+              Kilolab agit exclusivement en qualité d’intermédiaire technique et commercial.
+            </p>
+            <p className="mt-2">
+              Kilolab n’est pas partie au contrat de prestation de nettoyage conclu entre le Client
+              et le Partenaire Pressing. La prestation est réalisée sous la seule responsabilité du Partenaire.
+            </p>
+          </section>
+
+          <section>
+            <h2 className="text-xl font-bold">3. Responsabilités</h2>
+            <p>
+              Kilolab ne saurait être tenue responsable des dommages liés à l’exécution de la prestation
+              (perte, détérioration, retard). Kilolab s’engage toutefois à assister le Client en cas de litige.
+            </p>
+          </section>
+
         </div>
       </div>
+
       <Footer />
     </div>
   );
