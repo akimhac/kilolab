@@ -4,7 +4,7 @@ import Navbar from "../components/Navbar";
 import { 
   Users, ShoppingBag, DollarSign, Search, Download,
   TrendingUp, TrendingDown, MapPin, Package, Loader2, Eye,
-  MessageSquare, Mail, Trash2, Send, Database
+  MessageSquare, Mail, Trash2, Send, Database, AlertCircle, CheckCircle
 } from "lucide-react";
 import { 
   LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, 
@@ -23,6 +23,9 @@ export default function AdminDashboard() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedMessage, setSelectedMessage] = useState<any>(null);
   const [replyText, setReplyText] = useState("");
+  
+  // État pour l'assignation manuelle
+  const [selectedPartnerForAssign, setSelectedPartnerForAssign] = useState<string>("");
 
   useEffect(() => {
     fetchData();
@@ -32,7 +35,10 @@ export default function AdminDashboard() {
     try {
       const { data: ordersData, error: ordersError } = await supabase
         .from("orders")
-        .select("*")
+        .select(`
+            *,
+            partner:partners(company_name)
+        `)
         .order("created_at", { ascending: false });
 
       if (ordersError) throw ordersError;
@@ -248,7 +254,6 @@ export default function AdminDashboard() {
     }
   };
 
-  // 📧 NOUVELLE FONCTION - Répondre avec email automatique
   const handleReplyInApp = async (message: any) => {
     if (!replyText.trim()) {
       toast.error("Écris une réponse avant d'envoyer");
@@ -292,6 +297,26 @@ export default function AdminDashboard() {
     }
   };
 
+  // ✅ FONCTION D'ATTRIBUTION MANUELLE
+  const assignPartner = async (orderId: string) => {
+    if (!selectedPartnerForAssign) return toast.error("Veuillez choisir un partenaire !");
+    
+    try {
+        const { error } = await supabase
+            .from('orders')
+            .update({ partner_id: selectedPartnerForAssign })
+            .eq('id', orderId);
+
+        if (error) throw error;
+
+        toast.success("Commande attribuée avec succès !");
+        setSelectedPartnerForAssign("");
+        fetchData(); // Rafraîchir
+    } catch (error: any) {
+        toast.error("Erreur : " + error.message);
+    }
+  };
+
   const StatCard: React.FC<{ 
     title: string; 
     value: string; 
@@ -332,11 +357,11 @@ export default function AdminDashboard() {
   }, [partners, searchTerm]);
 
   const handleExportCSV = () => {
-    const csvHeader = "Date,ID Commande,Client,Montant,Poids,Statut\n";
+    const csvHeader = "Date,ID Commande,Client,Montant,Poids,Statut,Partenaire\n";
     const csvData = filteredOrdersByTime
       .slice(0, 100)
       .map(o => 
-        `${new Date(o.created_at).toLocaleDateString()},${o.id.slice(0, 8)},${o.pickup_address || "N/A"},${o.total_price},${o.weight},${o.status}`
+        `${new Date(o.created_at).toLocaleDateString()},${o.id.slice(0, 8)},${o.pickup_address || "N/A"},${o.total_price},${o.weight},${o.status},${o.partner?.company_name || 'Non attribué'}`
       )
       .join("\n");
     
@@ -799,6 +824,7 @@ export default function AdminDashboard() {
                         <th className="p-4">Client</th>
                         <th className="p-4">Poids</th>
                         <th className="p-4">Statut</th>
+                        <th className="p-4">Partenaire</th>
                         <th className="p-4 text-right">Actions</th>
                       </tr>
                     </thead>
@@ -818,11 +844,45 @@ export default function AdminDashboard() {
                           <td className="p-4">
                             <span className={`px-2 py-1 rounded-full text-xs font-bold uppercase 
                               ${order.status === "pending" ? "bg-orange-100 text-orange-700" : 
+                                order.status === "assigned" ? "bg-purple-100 text-purple-700" :
                                 order.status === "completed" ? "bg-green-100 text-green-700" : 
                                 order.status === "in_progress" ? "bg-blue-100 text-blue-700" : 
                                 "bg-slate-100"}`}>
                               {order.status}
                             </span>
+                          </td>
+                          <td className="p-4">
+                             {/* GESTION DE L'AFFICHAGE ET L'ATTRIBUTION PARTENAIRE */}
+                             {order.partner ? (
+                                <span className="font-bold text-slate-700 flex items-center gap-1">
+                                    <CheckCircle size={14} className="text-green-500"/>
+                                    {order.partner.company_name}
+                                </span>
+                             ) : order.status === 'assigned' ? (
+                                <div className="flex flex-col gap-2">
+                                    <span className="text-xs font-bold text-red-600 flex items-center gap-1 bg-red-50 px-2 py-1 rounded w-fit">
+                                        <AlertCircle size={12}/> À attribuer
+                                    </span>
+                                    <div className="flex gap-1">
+                                        <select 
+                                            className="text-xs border rounded p-1 w-32"
+                                            value={selectedPartnerForAssign}
+                                            onChange={(e) => setSelectedPartnerForAssign(e.target.value)}
+                                        >
+                                            <option value="">Choisir...</option>
+                                            {partners.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
+                                        </select>
+                                        <button 
+                                            onClick={() => assignPartner(order.id)}
+                                            className="bg-slate-900 text-white text-xs px-2 py-1 rounded hover:bg-black"
+                                        >
+                                            OK
+                                        </button>
+                                    </div>
+                                </div>
+                             ) : (
+                                <span className="text-slate-400 italic">En attente</span>
+                             )}
                           </td>
                           <td className="p-4 text-right">
                             <button className="text-slate-400 hover:text-slate-900 transition">
