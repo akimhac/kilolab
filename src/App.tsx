@@ -2,6 +2,7 @@ import { lazy, Suspense } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { Loader2 } from 'lucide-react';
+import { HelmetProvider } from 'react-helmet-async'; // ✅ AJOUT SEO
 
 // ========================================
 // PAGES CORE
@@ -30,6 +31,7 @@ import Blog from './pages/Blog';
 const NewOrder = lazy(() => import('./pages/NewOrder'));
 const Tarifs = lazy(() => import('./pages/Tarifs'));
 const Trouver = lazy(() => import('./pages/Trouver'));
+const CityLanding = lazy(() => import('./pages/CityLanding')); // ✅ AJOUT SEO
 
 // Dashboards
 const ClientDashboard = lazy(() => import('./pages/ClientDashboard'));
@@ -69,7 +71,7 @@ const PageLoader = () => (
 // ========================================
 export default function App() {
   return (
-    <>
+    <HelmetProvider> {/* ✅ AJOUT SEO : Wrapper obligatoire */}
       <Toaster
         position="top-center"
         toastOptions={{
@@ -105,6 +107,9 @@ export default function App() {
           <Route path="/trouver" element={<Trouver />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/login" element={<Login />} />
+          
+          {/* ✅ AJOUT SEO : Route dynamique villes */}
+          <Route path="/pressing/:city" element={<CityLanding />} />
 
           {/* SEO / INFO */}
           <Route path="/faq" element={<FAQ />} />
@@ -149,6 +154,6 @@ export default function App() {
           <Route path="*" element={<Landing />} />
         </Routes>
       </Suspense>
-    </>
+    </HelmetProvider>
   );
 }
