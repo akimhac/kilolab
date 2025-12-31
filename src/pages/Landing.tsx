@@ -252,6 +252,48 @@ export default function Landing() {
 
         </div>
       </section>
+{/* =========================================
+    LIENS NAVIGATION & LÉGAL (SEO)
+========================================= */}
+<div className="py-8 px-4 bg-white border-t border-slate-100">
+  <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-slate-500">
+    
+    {/* Liens Navigation */}
+    <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2">
+      <Link to="/faq" className="hover:text-teal-600 transition font-medium">
+        FAQ
+      </Link>
+      <Link to="/for-who" className="hover:text-teal-600 transition font-medium">
+        Comment ça marche
+      </Link>
+      <Link to="/tarifs" className="hover:text-teal-600 transition font-medium">
+        Tarifs
+      </Link>
+      <Link to="/contact" className="hover:text-teal-600 transition font-medium">
+        Contact
+      </Link>
+    </div>
+
+    {/* Liens Légal */}
+    <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2">
+      <Link to="/legal" className="hover:text-teal-600 transition font-medium">
+        Mentions légales
+      </Link>
+      <Link to="/cgu" className="hover:text-teal-600 transition font-medium">
+        CGU
+      </Link>
+      <Link to="/cgv" className="hover:text-teal-600 transition font-medium">
+        CGV
+      </Link>
+      <Link to="/privacy" className="hover:text-teal-600 transition font-medium">
+        Confidentialité
+      </Link>
+      <Link to="/cookies" className="hover:text-teal-600 transition font-medium">
+        Cookies
+      </Link>
+    </div>
+  </div>
+</div>
 
       <Footer />
     </div>
