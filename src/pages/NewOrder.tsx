@@ -126,7 +126,7 @@ export default function NewOrder() {
       const cleanDate = pickupDate || new Date().toISOString().split('T')[0];
       const fullAddressInfo = `${finalAddress} (${searchQuery}) - Créneau : ${pickupSlot}`;
 
-      // 1. Création de la commande en statut 'pending_payment'
+      // 1. Création de la commande en statut 'pending'
       const { data: order, error } = await supabase.from('orders').insert({
         client_id: user.id,
         partner_id: isNetwork ? null : selectedPartnerId,
@@ -134,7 +134,7 @@ export default function NewOrder() {
         pickup_address: fullAddressInfo,
         pickup_date: cleanDate,
         total_price: totalPrice,
-        status: 'pending_payment', // ⚠️ On attend le paiement
+        status: 'pending', // ⚠️ On attend le paiement
         formula: formula
       })
       .select()
