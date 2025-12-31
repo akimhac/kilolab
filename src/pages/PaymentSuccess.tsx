@@ -9,7 +9,7 @@ export default function PaymentSuccess() {
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      navigate('/client-dashboard');
+      navigate('/dashboard');
     }, 5000);
     return () => clearTimeout(timer);
   }, [navigate]);
@@ -37,7 +37,7 @@ export default function PaymentSuccess() {
           </div>
 
           <button
-            onClick={() => navigate('/client-dashboard')}
+            onClick={() => navigate('/dashboard')}
             className="w-full px-8 py-4 bg-gradient-to-r from-blue-600 to-cyan-600 text-white rounded-xl font-bold hover:shadow-xl transition flex items-center justify-center gap-2"
           >
             Voir mes commandes
