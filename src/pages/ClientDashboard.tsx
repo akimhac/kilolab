@@ -1,20 +1,19 @@
 import { useEffect, useState, useMemo } from "react";
 import { supabase } from "../lib/supabase";
 import Navbar from "../components/Navbar";
-import {
-  Package, Clock, CheckCircle, ArrowRight, MapPin, Loader2, Plus, Gift,
-  TrendingUp, Droplet, Home, UserCheck, Award, BarChart3, DollarSign, X
+import { 
+  Package, Clock, CheckCircle, ArrowRight, MapPin, Loader2, Plus, Gift, 
+  TrendingUp, Home, UserCheck, Award, BarChart3, DollarSign, Sparkles 
 } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 
 // ========================================
-// GRAPHIQUES SVG MAISON (pas de dépendance)
+// GRAPHIQUES SVG MAISON (Léger & Rapide)
 // ========================================
 function SimpleLineChart({ data }: { data: { date: string; value: number }[] }) {
   if (data.length === 0) return null;
-
-  // CORRECTION: Utilisation de "..." (3 points) et non "…" (caractère unique)
+  
   const maxValue = Math.max(...data.map(d => d.value), 1);
   const width = 400;
   const height = 150;
@@ -46,7 +45,6 @@ function SimpleLineChart({ data }: { data: { date: string; value: number }[] }) 
 }
 
 function MiniBarChart({ data }: { data: { label: string; value: number; color: string }[] }) {
-  // CORRECTION: Utilisation de "..." (3 points)
   const maxValue = Math.max(...data.map(d => d.value), 1);
 
   return (
@@ -58,8 +56,8 @@ function MiniBarChart({ data }: { data: { label: string; value: number; color: s
             <span className="font-bold text-slate-900">{item.value}</span>
           </div>
           <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
-            <div
-              className="h-full transition-all duration-500 rounded-full"
+            <div 
+              className="h-full transition-all duration-500 rounded-full" 
               style={{ width: `${(item.value / maxValue) * 100}%`, backgroundColor: item.color }}
             />
           </div>
@@ -75,43 +73,35 @@ export default function ClientDashboard() {
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState<any>(null);
   const [showAnalytics, setShowAnalytics] = useState(false);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [filterPeriod, setFilterPeriod] = useState<"all" | "30d" | "90d">("all");
-
+  
   useEffect(() => {
     fetchData();
   }, []);
 
-  // ========================================
-  // NOTIFICATIONS TEMPS RÉEL
-  // ========================================
+  // 🔔 ABONNEMENT TEMPS RÉEL
   useEffect(() => {
     if (!user) return;
 
-    // CORRECTION: Suppression des backticks ``` parasites ici
     const subscription = supabase
       .channel("client-orders")
-      .on("postgres_changes", {
-        event: "*",
-        schema: "public",
-        table: "orders",
-        filter: `client_id=eq.${user.id}`
+      .on("postgres_changes", { 
+        event: "*", 
+        schema: "public", 
+        table: "orders", 
+        filter: `client_id=eq.${user.id}` 
       }, (payload) => {
-        console.log("Order updated:", payload);
-        fetchData();
+        console.log("Mise à jour reçue:", payload);
+        fetchData(); 
         
         if (payload.eventType === "UPDATE") {
           const newStatus = (payload.new as any).status;
           const statusMessages: any = {
-            "assigned": "✅ Votre commande a été assignée à un partenaire !",
+            "assigned": "✅ Votre commande a été prise en charge !",
             "in_progress": "🧼 Votre linge est en cours de lavage !",
-            "ready": "🎉 Votre commande est prête pour la livraison !",
-            "completed": "✨ Commande livrée ! Merci de votre confiance."
+            "ready": "🎉 Votre commande est prête !",
+            "completed": "✨ Commande livrée ! Merci."
           };
-          
-          if (statusMessages[newStatus]) {
-            toast.success(statusMessages[newStatus], { duration: 5000 });
-          }
+          if (statusMessages[newStatus]) toast.success(statusMessages[newStatus], { duration: 5000 });
         }
       })
       .subscribe();
@@ -127,10 +117,9 @@ export default function ClientDashboard() {
     }
     setUser(user);
 
-    // CORRECTION: Suppression des backticks ``` parasites ici
     const { data } = await supabase
       .from("orders")
-      .select("*")
+      .select("*, partner:partners(company_name)") 
       .eq("client_id", user.id)
       .order("created_at", { ascending: false });
 
@@ -138,9 +127,7 @@ export default function ClientDashboard() {
     setLoading(false);
   };
 
-  // ========================================
-  // STATISTIQUES AVANCÉES
-  // ========================================
+  // 📊 STATS CALCULÉES
   const clientStats = useMemo(() => {
     const completed = orders.filter(o => o.status === "completed");
     const totalSpent = completed.reduce((sum, o) => sum + parseFloat(o.total_price || 0), 0);
@@ -148,24 +135,32 @@ export default function ClientDashboard() {
     const avgOrderValue = completed.length > 0 ? totalSpent / completed.length : 0;
     const co2Saved = (totalKg * 0.5).toFixed(1);
 
-    // CORRECTION: Suppression des backticks ``` parasites ici
-    return {
-      totalOrders: orders.length,
-      completedOrders: completed.length,
-      totalSpent,
-      totalKg,
+    return { 
+      totalOrders: orders.length, 
+      completedOrders: completed.length, 
+      totalSpent, 
+      totalKg, 
       avgOrderValue,
-      co2Saved
+      co2Saved 
     };
   }, [orders]);
 
   const loyaltyLevel = useMemo(() => {
     const count = clientStats.completedOrders;
-    if (count >= 20) return { level: "Platine 💎", color: "purple", progress: 100, next: "Max" };
-    if (count >= 10) return { level: "Gold 🏆", color: "yellow", progress: (count / 20) * 100, next: "20 pour Platine" };
-    if (count >= 5) return { level: "Silver 🥈", color: "slate", progress: (count / 10) * 100, next: "10 pour Gold" };
-    return { level: "Bronze 🥉", color: "orange", progress: (count / 5) * 100, next: "5 pour Silver" };
+    // On renvoie juste la clé de couleur, on gérera la classe CSS après
+    if (count >= 20) return { level: "Platine 💎", colorKey: "purple", progress: 100, next: "Max" };
+    if (count >= 10) return { level: "Gold 🏆", colorKey: "yellow", progress: (count / 20) * 100, next: "20 pour Platine" };
+    if (count >= 5) return { level: "Silver 🥈", colorKey: "slate", progress: (count / 10) * 100, next: "10 pour Gold" };
+    return { level: "Bronze 🥉", colorKey: "orange", progress: (count / 5) * 100, next: "5 pour Silver" };
   }, [clientStats]);
+
+  // ✅ CORRECTION TAILWIND : Mapping des couleurs explicite
+  const loyaltyBadgeClasses: Record<string, string> = {
+    purple: "bg-purple-100 text-purple-700",
+    yellow: "bg-yellow-100 text-yellow-700",
+    slate: "bg-slate-100 text-slate-700",
+    orange: "bg-orange-100 text-orange-700"
+  };
 
   const monthlySpending = useMemo(() => {
     const monthMap = new Map<string, number>();
@@ -186,31 +181,16 @@ export default function ClientDashboard() {
     return Array.from(formulaMap.entries()).map(([label, value]) => ({ label, value, color: colors[label] || "#64748b" }));
   }, [orders]);
 
-  const filteredPastOrders = useMemo(() => {
-    let filtered = orders.filter(o => o.status === "completed" || o.status === "cancelled");
-    if (searchTerm) {
-      filtered = filtered.filter(order =>
-        order.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        order.pickup_address?.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-    }
-    if (filterPeriod !== "all") {
-      const days = filterPeriod === "30d" ? 30 : 90;
-      const cutoffDate = new Date();
-      cutoffDate.setDate(cutoffDate.getDate() - days);
-      filtered = filtered.filter(o => new Date(o.created_at) >= cutoffDate);
-    }
-    return filtered;
-  }, [orders, searchTerm, filterPeriod]);
-
   const activeOrder = orders.find(o => o.status !== "completed" && o.status !== "cancelled");
-  // const orderSteps = [
-  //   { key: "pending", label: "Reçu", icon: Package },
-  //   { key: "assigned", label: "Assigné", icon: UserCheck },
-  //   { key: "in_progress", label: "Lavage", icon: Droplet },
-  //   { key: "ready", label: "Prêt", icon: CheckCircle },
-  //   { key: "completed", label: "Livré", icon: Home }
-  // ];
+  
+  // ✅ CORRECTION PROGRESS BAR : Map simple
+  const progressMap: Record<string, number> = {
+    pending: 20,
+    assigned: 40,
+    in_progress: 70,
+    ready: 100,
+    completed: 100
+  };
 
   if (loading) return (
     <div className="min-h-screen flex items-center justify-center bg-slate-50">
@@ -224,18 +204,19 @@ export default function ClientDashboard() {
 
       <div className="pt-32 px-4 max-w-6xl mx-auto">
         
+        {/* HEADER */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 gap-4">
           <div>
             <div className="flex items-center gap-3 mb-1">
               <h1 className="text-3xl font-black">Mon Espace Client 👋</h1>
-              <span className={`px-3 py-1 rounded-full text-xs font-bold bg-${loyaltyLevel.color}-100 text-${loyaltyLevel.color}-700`}>
+              <span className={`px-3 py-1 rounded-full text-xs font-bold ${loyaltyBadgeClasses[loyaltyLevel.colorKey]}`}>
                 {loyaltyLevel.level}
               </span>
             </div>
             <p className="text-slate-500">Suivez vos commandes en temps réel.</p>
           </div>
           <div className="flex gap-3">
-            <button
+            <button 
               onClick={() => setShowAnalytics(!showAnalytics)}
               className={`px-4 py-3 rounded-xl font-bold text-sm flex items-center gap-2 transition ${
                 showAnalytics ? "bg-teal-600 text-white shadow-lg shadow-teal-600/30" : "bg-white text-slate-700 border border-slate-200"
@@ -252,6 +233,7 @@ export default function ClientDashboard() {
           </div>
         </div>
 
+        {/* KPIs RAPIDES */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
           <div className="bg-white p-5 rounded-xl border border-slate-200 hover:shadow-md transition">
             <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mb-2">
@@ -283,24 +265,28 @@ export default function ClientDashboard() {
           </div>
         </div>
 
+        {/* ANALYTICS MODE */}
         {showAnalytics && (
-          <div className="mb-8 space-y-6">
-            <div className="bg-gradient-to-br from-purple-500 to-purple-600 p-6 rounded-2xl text-white shadow-xl">
-              <div className="flex items-center justify-between mb-4">
+          <div className="mb-8 space-y-6 animate-in fade-in slide-in-from-top-4">
+            {/* CARTE FIDÉLITÉ */}
+            <div className="bg-gradient-to-br from-purple-500 to-purple-600 p-6 rounded-2xl text-white shadow-xl relative overflow-hidden">
+              <div className="absolute top-0 right-0 p-32 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl"></div>
+              <div className="flex items-center justify-between mb-4 relative z-10">
                 <div>
                   <p className="text-purple-100 text-sm font-bold uppercase mb-1">Niveau de fidélité</p>
                   <p className="text-2xl font-black">{loyaltyLevel.level}</p>
                 </div>
                 <Award size={40} className="text-white/30"/>
               </div>
-              <div className="bg-white/20 rounded-full h-3 overflow-hidden mb-2">
+              <div className="bg-white/20 rounded-full h-3 overflow-hidden mb-2 relative z-10">
                 <div className="bg-white h-full transition-all duration-1000 rounded-full" style={{ width: `${loyaltyLevel.progress}%` }} />
               </div>
-              <p className="text-purple-100 text-sm">
+              <p className="text-purple-100 text-sm relative z-10">
                 {loyaltyLevel.next !== "Max" ? `Plus que ${loyaltyLevel.next}` : "🎉 Niveau maximum atteint !"}
               </p>
             </div>
 
+            {/* GRAPHIQUES */}
             <div className="grid md:grid-cols-2 gap-6">
               <div className="bg-white p-6 rounded-2xl border border-slate-200">
                 <h3 className="font-bold text-lg mb-4 flex items-center gap-2">
@@ -318,9 +304,10 @@ export default function ClientDashboard() {
               </div>
             </div>
 
+            {/* IMPACT ÉCO */}
             <div className="bg-gradient-to-br from-green-50 to-emerald-50 p-6 rounded-2xl border border-green-200">
               <div className="flex items-center gap-4">
-                <div className="w-16 h-16 bg-green-500 rounded-2xl flex items-center justify-center text-white text-2xl">🌱</div>
+                <div className="w-16 h-16 bg-green-500 rounded-2xl flex items-center justify-center text-white text-2xl shadow-lg shadow-green-200">🌱</div>
                 <div className="flex-1">
                   <p className="text-green-600 font-bold text-sm uppercase mb-1">Impact Environnemental</p>
                   <p className="text-2xl font-black text-green-900 mb-1">{clientStats.co2Saved} kg CO₂</p>
@@ -331,6 +318,7 @@ export default function ClientDashboard() {
           </div>
         )}
 
+        {/* COMMANDE ACTIVE */}
         {activeOrder ? (
           <div className="bg-white p-6 md:p-8 rounded-3xl shadow-xl shadow-teal-900/5 border border-teal-100 mb-12 relative overflow-hidden">
             <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-teal-400 to-blue-500"></div>
@@ -338,8 +326,12 @@ export default function ClientDashboard() {
             <div className="flex justify-between items-start mb-8">
               <div>
                 <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider mb-3 inline-block 
-                  ${activeOrder.status === "pending" ? "bg-yellow-100 text-yellow-700" : "bg-teal-100 text-teal-700"}`}>
-                  {activeOrder.status === "pending" ? "En attente" : activeOrder.status === "cleaning" ? "Nettoyage" : "Prêt"}
+                  ${activeOrder.status === "pending" ? "bg-yellow-100 text-yellow-700" : 
+                    activeOrder.status === "assigned" ? "bg-purple-100 text-purple-700" :
+                    "bg-teal-100 text-teal-700"}`}>
+                  {activeOrder.status === "pending" ? "En attente" : 
+                   activeOrder.status === "assigned" ? "Prise en charge" :
+                   activeOrder.status === "cleaning" ? "Nettoyage" : "Prêt"}
                 </span>
                 <h2 className="text-2xl font-black">Commande #{activeOrder.id.toString().slice(0,6)}</h2>
                 <p className="text-slate-400 text-sm mt-1">{new Date(activeOrder.created_at).toLocaleDateString()}</p>
@@ -350,23 +342,40 @@ export default function ClientDashboard() {
               </div>
             </div>
 
+            {/* BARRE DE PROGRESSION CORRIGÉE */}
             <div className="mb-8 relative">
               <div className="flex justify-between text-xs font-bold text-slate-400 mb-3 uppercase tracking-wide px-1">
                 <span className={activeOrder.status ? "text-teal-600" : ""}>Reçu</span>
-                <span className={activeOrder.status === "cleaning" || activeOrder.status === "ready" ? "text-teal-600" : ""}>Lavage</span>
+                <span className={activeOrder.status === "assigned" || activeOrder.status === "in_progress" || activeOrder.status === "ready" ? "text-teal-600" : ""}>Expert</span>
+                <span className={activeOrder.status === "in_progress" || activeOrder.status === "ready" ? "text-teal-600" : ""}>Lavage</span>
                 <span className={activeOrder.status === "ready" ? "text-teal-600" : ""}>Prêt</span>
               </div>
               <div className="h-3 bg-slate-100 rounded-full overflow-hidden">
                 <div 
                   className="h-full bg-teal-500 transition-all duration-1000 ease-out shadow-[0_0_10px_rgba(20,184,166,0.5)]"
-                  style={{ 
-                    width: activeOrder.status === "pending" ? "33%" : 
-                          activeOrder.status === "cleaning" ? "66%" : 
-                          activeOrder.status === "ready" ? "100%" : "5%" 
-                  }}
+                  style={{ width: `${progressMap[activeOrder.status] || 5}%` }}
                 ></div>
               </div>
             </div>
+
+            {/* ✅ PARTENAIRE ASSIGNÉ ? LE MODE CONCIERGE */}
+            {activeOrder.status === 'assigned' && !activeOrder.partner ? (
+                <div className="mb-6 bg-blue-50 border border-blue-100 p-4 rounded-xl flex items-start gap-3 animate-pulse">
+                    <Loader2 className="text-blue-500 animate-spin mt-1" size={20}/>
+                    <div>
+                        <p className="text-blue-800 font-bold text-sm">Recherche de l'expert en cours...</p>
+                        <p className="text-blue-600 text-xs">Nous sélectionnons le meilleur artisan disponible sur votre zone. Vous recevrez une notification dès validation.</p>
+                    </div>
+                </div>
+            ) : activeOrder.partner ? (
+                <div className="mb-6 bg-purple-50 border border-purple-100 p-4 rounded-xl flex items-center gap-3">
+                    <div className="bg-purple-100 p-2 rounded-lg text-purple-600"><UserCheck size={20}/></div>
+                    <div>
+                        <p className="text-purple-900 font-bold text-sm">Pris en charge par {activeOrder.partner.company_name}</p>
+                        <p className="text-purple-600 text-xs">Partenaire certifié Kilolab</p>
+                    </div>
+                </div>
+            ) : null}
 
             <div className="grid md:grid-cols-2 gap-4">
               <div className="flex items-center gap-4 text-sm text-slate-600 bg-slate-50 p-4 rounded-xl border border-slate-100">
@@ -396,6 +405,7 @@ export default function ClientDashboard() {
           </div>
         )}
 
+        {/* HISTORIQUE */}
         {orders.filter(o => o.status === "completed" || o.status === "cancelled").length > 0 && (
           <>
             <h3 className="font-bold text-xl mb-6 flex items-center gap-2"><Clock size={20}/> Historique</h3>
