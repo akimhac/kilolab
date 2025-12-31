@@ -1,0 +1,15 @@
+User-agent: *
+Allow: /
+
+# Pages privées - Ne pas indexer
+Disallow: /dashboard
+Disallow: /admin-dashboard
+Disallow: /partner-app
+Disallow: /settings
+Disallow: /new-order
+Disallow: /scan-qr
+Disallow: /payment-success
+Disallow: /payment-cancel
+
+# Sitemap
+Sitemap: https://kilolab.fr/sitemap.xml
