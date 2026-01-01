@@ -4,7 +4,7 @@ import { supabase } from '../lib/supabase';
 import Navbar from '../components/Navbar';
 import { Scale, MapPin, ArrowRight, Sparkles, Tag, Search, Loader2, Calendar as CalendarIcon, Info, CheckCircle, CreditCard } from 'lucide-react';
 import toast from 'react-hot-toast';
-import { analytics } from '../lib/analytics'; // 📊 Import Analytics
+// import { analytics } from '../lib/analytics'; // ⚠️ Décommente si tu as analytics configuré
 
 export default function NewOrder() {
   const navigate = useNavigate();
@@ -76,42 +76,41 @@ export default function NewOrder() {
   if (isWeekend) total += 5; 
   const totalPrice = parseFloat(total.toFixed(2));
 
-  // 💳 FONCTION DE PAIEMENT STRIPE
+  // 💳 FONCTION DE PAIEMENT CORRIGÉE (SUPABASE EDGE FUNCTION)
   const handlePayment = async (orderId: string, email: string) => {
     try {
-      toast.loading("Redirection vers le paiement...");
-      
-      // Appel à ta fonction Netlify (ou API Vercel)
-      const response = await fetch('/.netlify/functions/create-checkout-session', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          orderId: orderId,
-          amount: totalPrice,
-          email: email,
-          formula: formula
-        }),
+      toast.loading("Redirection vers le paiement...", { id: 'payment' });
+
+      // ✅ APPEL CORRIGÉ : Supabase Edge Function (fonctionne sur Vercel)
+      const { data, error } = await supabase.functions.invoke('create-checkout-session', {
+        body: { 
+          orderId: orderId, 
+          email: email
+        }
       });
 
-      const { url, error } = await response.json();
+      if (error) {
+        console.error("Erreur fonction Supabase:", error);
+        throw new Error("Impossible de contacter le serveur de paiement");
+      }
 
-      if (error) throw new Error(error);
-      if (url) {
-        window.location.href = url; // 🚀 Redirection vers Stripe
-      } else {
+      if (!data || !data.url) {
         throw new Error("Pas d'URL de paiement reçue");
       }
 
+      // 🚀 Redirection vers Stripe
+      window.location.href = data.url;
+
     } catch (err: any) {
       console.error("Erreur paiement:", err);
-      toast.dismiss();
-      toast.error("Erreur initialisation paiement. Veuillez réessayer.");
+      toast.dismiss('payment');
+      toast.error("Erreur : " + err.message);
       setLoading(false);
     }
   };
 
   const handleSubmit = async () => {
-    analytics.orderStarted(); // 📊 Track début
+    // analytics.orderStarted(); // 📊 Track début (Décommente si besoin)
     setLoading(true);
     
     try {
@@ -144,7 +143,7 @@ export default function NewOrder() {
 
       // 2. Si succès, on lance le paiement
       if (order) {
-        analytics.orderCompleted(order.id, totalPrice); // 📊 Track création
+        // analytics.orderCompleted(order.id, totalPrice); // 📊 Track création (Décommente si besoin)
         
         // Appel du paiement Stripe
         await handlePayment(order.id, user.email || "");
