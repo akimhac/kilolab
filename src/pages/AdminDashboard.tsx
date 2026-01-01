@@ -31,15 +31,18 @@ export default function AdminDashboard() {
 
   const fetchData = async () => {
     try {
-      // 1. Orders avec join sur partners
+      // 1. Orders avec syntaxe explicite pour la Foreign Key
       const { data: ordersData, error: ordersError } = await supabase
         .from("orders")
-        .select(`*, partner:partners(company_name)`)
+        .select(`
+          *,
+          partner:partners!orders_partner_id_fkey(company_name)
+        `)
         .order("created_at", { ascending: false });
 
       if (ordersError) {
         console.error("Orders error:", ordersError);
-        throw ordersError;
+        // On continue quand même pour afficher les autres données
       }
 
       // 2. Partners actifs
@@ -50,7 +53,6 @@ export default function AdminDashboard() {
 
       if (partnersError) {
         console.error("Partners error:", partnersError);
-        throw partnersError;
       }
 
       // 3. Messages de contact
@@ -61,7 +63,6 @@ export default function AdminDashboard() {
 
       if (messagesError) {
         console.error("Messages error:", messagesError);
-        // On ne throw pas pour ne pas bloquer tout le dashboard
       }
 
       // 4. Utilisateurs
@@ -119,7 +120,7 @@ export default function AdminDashboard() {
 
     } catch (error: any) {
       console.error("❌ Erreur admin:", error);
-      toast.error("Erreur de chargement: " + error.message);
+      toast.error("Erreur partielle: " + error.message);
     } finally {
       setLoading(false);
     }
@@ -142,7 +143,6 @@ export default function AdminDashboard() {
     const activePartners = new Set(completed.map(o => o.partner_id).filter(Boolean)).size;
     const pending = filteredOrdersByTime.filter(o => o.status === "pending").length;
 
-    // ✅ FIX : Vérifier que messages.read existe
     const newMessages = messages.filter(m => m.read === false).length;
 
     const totalUsers = users.length;
@@ -330,7 +330,7 @@ export default function AdminDashboard() {
     try {
       const { error } = await supabase
         .from('orders')
-        .update({ partner_id: selectedPartnerForAssign })
+        .update({ partner_id: selectedPartnerForAssign, status: 'assigned' })
         .eq('id', orderId);
 
       if (error) throw error;
