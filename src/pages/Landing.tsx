@@ -9,24 +9,22 @@ export default function Landing() {
       <Navbar />
 
       {/* =========================================
-          1. HERO SECTION - L'OPTION MARKETING GAGNANTE (OPTION 1)
+          1. HERO SECTION
       ========================================= */}
       <div className="relative h-screen min-h-[700px] flex items-center justify-center overflow-hidden">
         
-        {/* Image de fond : Linge plié dans un panier (Chaleureux & Premium) */}
+        {/* Image de fond */}
         <img 
           src="https://images.unsplash.com/photo-1582735689369-4fe89db7114c?q=80&w=2400&auto=format&fit=crop" 
           className="absolute inset-0 w-full h-full object-cover"
           alt="Panier de linge propre et plié"
           loading="eager"
-          // @ts-ignore
-          fetchpriority="high"
         />
 
-        {/* Overlay Pro (Dégradé pour lisibilité parfaite du texte blanc) */}
+        {/* Overlay */}
         <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/50 to-slate-900/80"></div>
         
-        {/* Badge - Animation fade-in */}
+        {/* Badge */}
         <div className="absolute top-24 sm:top-32 left-1/2 -translate-x-1/2 z-20 w-full text-center animate-fade-in px-4">
           <div className="inline-flex items-center gap-2 px-4 sm:px-5 py-2 sm:py-2.5 bg-teal-500/20 backdrop-blur-md text-white rounded-full text-xs sm:text-sm font-bold border border-teal-400/30 shadow-xl">
             ✨ Le nouveau standard du pressing
@@ -119,8 +117,9 @@ export default function Landing() {
             </div>
           </div>
           
+          {/* ✅ CORRECTION ICI : /trouver au lieu de /new-order */}
           <div className="mt-16 sm:mt-20 text-center">
-            <Link to="/new-order" className="inline-flex items-center gap-2 px-6 sm:px-8 py-3 sm:py-4 bg-teal-600 text-white rounded-full font-bold text-base sm:text-lg hover:bg-teal-500 transition-all shadow-lg shadow-teal-500/30 hover:scale-105 active:scale-95">
+            <Link to="/trouver" className="inline-flex items-center gap-2 px-6 sm:px-8 py-3 sm:py-4 bg-teal-600 text-white rounded-full font-bold text-base sm:text-lg hover:bg-teal-500 transition-all shadow-lg shadow-teal-500/30 hover:scale-105 active:scale-95">
               Trouver un pressing <ArrowRight size={18}/>
             </Link>
           </div>
@@ -207,7 +206,6 @@ export default function Landing() {
                 className="rounded-2xl sm:rounded-3xl shadow-xl object-cover h-40 sm:h-48 md:h-72 w-full mb-6 sm:mb-8 md:mb-12 transform -rotate-3 hover:rotate-0 transition-all duration-500 hover:shadow-2xl"
                 loading="lazy"
               />
-              {/* Image 2 : Machines modernes */}
               <img 
                 src="https://images.unsplash.com/photo-1604335399105-a0c585fd81a1?w=800&auto=format&fit=crop&q=80" 
                 alt="Linge propre et plié" 
@@ -215,7 +213,6 @@ export default function Landing() {
                 loading="lazy"
               />
             </div>
-            {/* Décoration d'arrière-plan */}
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-gradient-to-tr from-teal-50 to-indigo-50 rounded-full blur-3xl opacity-50 -z-10"></div>
           </div>
 
@@ -252,48 +249,51 @@ export default function Landing() {
 
         </div>
       </section>
-{/* =========================================
-    LIENS NAVIGATION & LÉGAL (SEO)
-========================================= */}
-<div className="py-8 px-4 bg-white border-t border-slate-100">
-  <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-slate-500">
-    
-    {/* Liens Navigation */}
-    <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2">
-      <Link to="/faq" className="hover:text-teal-600 transition font-medium">
-        FAQ
-      </Link>
-      <Link to="/for-who" className="hover:text-teal-600 transition font-medium">
-        Comment ça marche
-      </Link>
-      <Link to="/tarifs" className="hover:text-teal-600 transition font-medium">
-        Tarifs
-      </Link>
-      <Link to="/contact" className="hover:text-teal-600 transition font-medium">
-        Contact
-      </Link>
-    </div>
 
-    {/* Liens Légal */}
-    <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2">
-      <Link to="/legal" className="hover:text-teal-600 transition font-medium">
-        Mentions légales
-      </Link>
-      <Link to="/cgu" className="hover:text-teal-600 transition font-medium">
-        CGU
-      </Link>
-      <Link to="/cgv" className="hover:text-teal-600 transition font-medium">
-        CGV
-      </Link>
-      <Link to="/privacy" className="hover:text-teal-600 transition font-medium">
-        Confidentialité
-      </Link>
-      <Link to="/cookies" className="hover:text-teal-600 transition font-medium">
-        Cookies
-      </Link>
-    </div>
-  </div>
-</div>
+      {/* =========================================
+          LIENS NAVIGATION & LÉGAL (SEO)
+      ========================================= */}
+      <div className="py-8 px-4 bg-white border-t border-slate-100">
+        <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-slate-500">
+          
+          {/* Liens Navigation */}
+          <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2">
+            <Link to="/faq" className="hover:text-teal-600 transition font-medium">
+              FAQ
+            </Link>
+            <Link to="/for-who" className="hover:text-teal-600 transition font-medium">
+              Comment ça marche
+            </Link>
+            <Link to="/tarifs" className="hover:text-teal-600 transition font-medium">
+              Tarifs
+            </Link>
+            <Link to="/contact" className="hover:text-teal-600 transition font-medium">
+              Contact
+            </Link>
+          </div>
+
+          {/* Liens Légal */}
+          <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2">
+            <Link to="/legal" className="hover:text-teal-600 transition font-medium">
+              Mentions légales
+            </Link>
+            <Link to="/cgu" className="hover:text-teal-600 transition font-medium">
+              CGU
+            </Link>
+            <Link to="/cgv" className="hover:text-teal-600 transition font-medium">
+              CGV
+            </Link>
+            <Link to="/privacy" className="hover:text-teal-600 transition font-medium">
+              Confidentialité
+            </Link>
+            <Link to="/cookies" className="hover:text-teal-600 transition font-medium">
+              Cookies
+            </Link>
+          </div>
+        </div>
+      </div>
+
+      {/* ❌ BOUTON ADMIN SUPPRIMÉ - Pas besoin d'accès public */}
 
       <Footer />
     </div>
