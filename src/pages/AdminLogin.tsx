@@ -14,7 +14,6 @@ export default function AdminLogin() {
     setLoading(true);
 
     try {
-      // 1. Se connecter avec Supabase Auth
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
@@ -22,18 +21,15 @@ export default function AdminLogin() {
 
       if (error) throw error;
 
-      // 2. Vérifier si c'est un admin
       const adminStatus = await isAdmin();
 
       if (!adminStatus) {
-        // Pas admin → Déconnecter et refuser
         await supabase.auth.signOut();
         throw new Error('Accès refusé : compte non autorisé');
       }
 
-      // 3. Succès → Rediriger
       toast.success('✅ Connexion réussie !');
-      window.location.href = '/admin';
+      window.location.href = '/admin-dashboard';
 
     } catch (error: any) {
       console.error('Login error:', error);
