@@ -3,6 +3,7 @@ import { Routes, Route } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { Loader2 } from 'lucide-react';
 import { HelmetProvider } from 'react-helmet-async';
+import ProtectedAdminRoute from './components/ProtectedAdminRoute';
 
 // ========================================
 // PAGES CORE
@@ -38,7 +39,7 @@ const ClientDashboard = lazy(() => import('./pages/ClientDashboard'));
 const PartnerDashboard = lazy(() => import('./pages/PartnerDashboard'));
 const AdminDashboard = lazy(() => import('./pages/AdminDashboard'));
 
-// 🔐 ADMIN
+// Admin
 const AdminLogin = lazy(() => import('./pages/AdminLogin'));
 
 // Partenaires
@@ -136,10 +137,25 @@ export default function App() {
           <Route path="/payment-success" element={<PaymentSuccess />} />
           <Route path="/payment-cancel" element={<PaymentCancel />} />
 
-          {/* 🔐 ADMIN - NOUVELLES ROUTES */}
+          {/* 🔐 ADMIN - ROUTES PROTÉGÉES */}
           <Route path="/admin/login" element={<AdminLogin />} />
-          <Route path="/admin" element={<AdminDashboard />} />
-          <Route path="/admin-dashboard" element={<AdminDashboard />} />
+          
+          <Route
+            path="/admin"
+            element={
+              <ProtectedAdminRoute>
+                <AdminDashboard />
+              </ProtectedAdminRoute>
+            }
+          />
+          <Route
+            path="/admin-dashboard"
+            element={
+              <ProtectedAdminRoute>
+                <AdminDashboard />
+              </ProtectedAdminRoute>
+            }
+          />
 
           {/* OUTILS */}
           <Route path="/scan-qr" element={<ScanQR />} />
