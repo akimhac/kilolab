@@ -32,7 +32,7 @@ export default function AdminDashboard() {
 
   const fetchData = async () => {
     try {
-      // 1. Orders avec syntaxe explicite pour la Foreign Key
+      // 1. Orders
       const { data: ordersData, error: ordersError } = await supabase
         .from("orders")
         .select(`
@@ -43,16 +43,15 @@ export default function AdminDashboard() {
 
       if (ordersError) console.error("Orders error:", ordersError);
 
-      // 2. Partners actifs
+      // 2. Partners (TOUS les partenaires, même les non actifs)
       const { data: partnersData, error: partnersError } = await supabase
         .from("partners")
         .select("*")
-        .eq("is_active", true);
+        .order("created_at", { ascending: false }); // J'ai retiré le filtre .eq('is_active', true)
 
       if (partnersError) console.error("Partners error:", partnersError);
 
-      // 3. Messages de contact AVEC L'HISTORIQUE DES RÉPONSES
-      // MODIFICATION ICI : on ajoute support_responses(*)
+      // 3. Messages de contact AVEC L'HISTORIQUE
       const { data: messagesData, error: messagesError } = await supabase
         .from("contact_messages")
         .select("*, support_responses(*)")
@@ -96,6 +95,7 @@ export default function AdminDashboard() {
           id: partner.id,
           name: partner.company_name || partner.name || `Partenaire ${partner.id.slice(0, 6)}`,
           city: partner.city || "Non spécifié",
+          is_active: partner.is_active, // On garde l'info pour l'affichage
           totalOrders: stats.totalOrders,
           totalRevenue: parseFloat(stats.totalRevenue.toFixed(2)),
           rating: partner.average_rating || 4.5,
@@ -628,7 +628,7 @@ export default function AdminDashboard() {
                           {message.message}
                         </div>
 
-                        {/* --- NOUVEAU : Affichage de l'historique des réponses --- */}
+                        {/* Historique des réponses */}
                         {message.support_responses && message.support_responses.length > 0 && (
                           <div className="mb-4 pl-4 border-l-4 border-teal-200 space-y-3 bg-teal-50/50 p-3 rounded-r-lg">
                             <p className="text-xs font-bold text-teal-600 uppercase mb-2">Historique de vos réponses :</p>
@@ -750,6 +750,7 @@ export default function AdminDashboard() {
                   <table className="w-full">
                     <thead>
                       <tr className="border-b border-slate-200">
+                        <th className="text-left py-3 px-4 text-sm font-semibold text-slate-600">Statut</th>
                         <th className="text-left py-3 px-4 text-sm font-semibold text-slate-600">Nom</th>
                         <th className="text-left py-3 px-4 text-sm font-semibold text-slate-600">Ville</th>
                         <th className="text-right py-3 px-4 text-sm font-semibold text-slate-600">Commandes</th>
@@ -760,13 +761,24 @@ export default function AdminDashboard() {
                     <tbody>
                       {filteredPartners.length === 0 ? (
                         <tr>
-                          <td colSpan={5} className="py-8 text-center text-slate-400">
+                          <td colSpan={6} className="py-8 text-center text-slate-400">
                             Aucun partenaire trouvé.
                           </td>
                         </tr>
                       ) : (
                         filteredPartners.map((partner) => (
                           <tr key={partner.id} className="border-b border-slate-100 hover:bg-slate-50">
+                             <td className="py-3 px-4">
+                              {partner.is_active ? (
+                                <span className="px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs font-bold border border-green-200">
+                                  Actif
+                                </span>
+                              ) : (
+                                <span className="px-2 py-1 bg-orange-100 text-orange-700 rounded-full text-xs font-bold border border-orange-200">
+                                  En attente
+                                </span>
+                              )}
+                            </td>
                             <td className="py-3 px-4 font-medium text-slate-900">{partner.name}</td>
                             <td className="py-3 px-4 text-slate-700">
                               <span className="inline-flex items-center gap-1">
