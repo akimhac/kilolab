@@ -41,9 +41,7 @@ export default function AdminDashboard() {
         `)
         .order("created_at", { ascending: false });
 
-      if (ordersError) {
-        console.error("Orders error:", ordersError);
-      }
+      if (ordersError) console.error("Orders error:", ordersError);
 
       // 2. Partners actifs
       const { data: partnersData, error: partnersError } = await supabase
@@ -51,19 +49,16 @@ export default function AdminDashboard() {
         .select("*")
         .eq("is_active", true);
 
-      if (partnersError) {
-        console.error("Partners error:", partnersError);
-      }
+      if (partnersError) console.error("Partners error:", partnersError);
 
-      // 3. Messages de contact
+      // 3. Messages de contact AVEC L'HISTORIQUE DES RÉPONSES
+      // MODIFICATION ICI : on ajoute support_responses(*)
       const { data: messagesData, error: messagesError } = await supabase
         .from("contact_messages")
-        .select("*")
+        .select("*, support_responses(*)")
         .order("created_at", { ascending: false });
 
-      if (messagesError) {
-        console.error("Messages error:", messagesError);
-      }
+      if (messagesError) console.error("Messages error:", messagesError);
 
       // 4. Utilisateurs
       const { data: usersData, error: usersError } = await supabase
@@ -71,9 +66,7 @@ export default function AdminDashboard() {
         .select("*")
         .order("created_at", { ascending: false });
 
-      if (usersError) {
-        console.error("Users error:", usersError);
-      }
+      if (usersError) console.error("Users error:", usersError);
 
       // 5. Set states
       setOrders(ordersData || []);
@@ -111,13 +104,6 @@ export default function AdminDashboard() {
 
       setPartners(partnersWithStats);
 
-      console.log("✅ Données chargées:", {
-        orders: ordersData?.length,
-        partners: partnersData?.length,
-        messages: messagesData?.length,
-        users: usersData?.length
-      });
-
     } catch (error: any) {
       console.error("❌ Erreur admin:", error);
       toast.error("Erreur partielle: " + error.message);
@@ -142,9 +128,7 @@ export default function AdminDashboard() {
     const totalRevenue = completed.reduce((sum, o) => sum + parseFloat(o.total_price || 0), 0);
     const activePartners = new Set(completed.map(o => o.partner_id).filter(Boolean)).size;
     const pending = filteredOrdersByTime.filter(o => o.status === "pending").length;
-
     const newMessages = messages.filter(m => m.read === false).length;
-
     const totalUsers = users.length;
 
     const periodDays = timeRange === "all" ? 90 : parseInt(timeRange);
@@ -200,35 +184,26 @@ export default function AdminDashboard() {
 
   const extractCity = (address: string): string => {
     if (!address) return "Non spécifié";
-
     const parts = address.split(",");
     if (parts.length > 1) {
       const lastPart = parts[parts.length - 1].trim();
       const match = lastPart.match(/\d{5}\s+(.+)/);
-      if (match && match[1]) {
-        return match[1].trim();
-      }
+      if (match && match[1]) return match[1].trim();
     }
-
     const words = address.split(" ");
     return words[words.length - 1] || "Non spécifié";
   };
 
   const cityData = useMemo(() => {
     const cities: { [key: string]: { name: string; value: number; orders: number } } = {};
-
     filteredOrdersByTime
       .filter(o => o.status === "completed")
       .forEach(order => {
         const city = extractCity(order.pickup_address);
-
-        if (!cities[city]) {
-          cities[city] = { name: city, value: 0, orders: 0 };
-        }
+        if (!cities[city]) cities[city] = { name: city, value: 0, orders: 0 };
         cities[city].value += parseFloat(order.total_price || 0);
         cities[city].orders += 1;
       });
-
     return Object.values(cities)
       .sort((a, b) => b.value - a.value)
       .map(c => ({ ...c, value: parseFloat(c.value.toFixed(2)) }));
@@ -243,13 +218,11 @@ export default function AdminDashboard() {
       "completed": "Terminé",
       "cancelled": "Annulé"
     };
-
     const statuses: any = {};
     filteredOrdersByTime.forEach(o => {
       const label = statusLabels[o.status] || o.status;
       statuses[label] = (statuses[label] || 0) + 1;
     });
-
     const colors: any = {
       "Terminé": "#10b981",
       "En cours": "#3b82f6",
@@ -258,7 +231,6 @@ export default function AdminDashboard() {
       "Prêt": "#6366f1",
       "Annulé": "#ef4444"
     };
-
     return Object.entries(statuses).map(([name, value]) => ({
       name,
       value,
@@ -297,24 +269,25 @@ export default function AdminDashboard() {
 
       if (error) throw error;
 
-      toast.success("✅ Email envoyé au client !");
+      toast.success("✅ Réponse enregistrée ! L'email devrait partir.");
       setReplyText("");
       setSelectedMessage(null);
       markMessageAsRead(message.id);
+      
+      // Rafraîchir pour voir la réponse apparaître
+      fetchData();
     } catch (error: any) {
       console.error(error);
-      toast.error("❌ Erreur d'envoi : " + error.message);
+      toast.error("❌ Erreur d'enregistrement : " + error.message);
     }
   };
 
   const deleteMessage = async (messageId: string) => {
     if (!confirm("Supprimer ce message ?")) return;
-
     const { error } = await supabase
       .from("contact_messages")
       .delete()
       .eq("id", messageId);
-
     if (!error) {
       setMessages(messages.filter(m => m.id !== messageId));
       setSelectedMessage(null);
@@ -326,15 +299,12 @@ export default function AdminDashboard() {
 
   const assignPartner = async (orderId: string) => {
     if (!selectedPartnerForAssign) return toast.error("Veuillez choisir un partenaire !");
-
     try {
       const { error } = await supabase
         .from('orders')
         .update({ partner_id: selectedPartnerForAssign, status: 'assigned' })
         .eq('id', orderId);
-
       if (error) throw error;
-
       toast.success("Commande attribuée avec succès !");
       setSelectedPartnerForAssign("");
       fetchData();
@@ -447,8 +417,8 @@ export default function AdminDashboard() {
                 key={range}
                 onClick={() => setTimeRange(range)}
                 className={`px-4 py-2 rounded-lg font-medium transition ${timeRange === range
-                    ? "bg-teal-600 text-white shadow-md"
-                    : "bg-white text-slate-600 hover:bg-slate-50"
+                  ? "bg-teal-600 text-white shadow-md"
+                  : "bg-white text-slate-600 hover:bg-slate-50"
                   }`}
               >
                 {range === "7d" ? "7 jours" : range === "30d" ? "30 jours" : range === "90d" ? "90 jours" : "Tout"}
@@ -491,8 +461,8 @@ export default function AdminDashboard() {
                 key={tab}
                 onClick={() => setActiveTab(tab)}
                 className={`px-6 py-4 font-medium transition whitespace-nowrap ${activeTab === tab
-                    ? "text-teal-600 border-b-2 border-teal-600"
-                    : "text-slate-500 hover:text-slate-700"
+                  ? "text-teal-600 border-b-2 border-teal-600"
+                  : "text-slate-500 hover:text-slate-700"
                   }`}
               >
                 {tab === "overview" ? "Vue d'ensemble" :
@@ -657,6 +627,24 @@ export default function AdminDashboard() {
                         <div className="bg-slate-50 rounded-lg p-4 text-sm text-slate-700 mb-3 whitespace-pre-wrap">
                           {message.message}
                         </div>
+
+                        {/* --- NOUVEAU : Affichage de l'historique des réponses --- */}
+                        {message.support_responses && message.support_responses.length > 0 && (
+                          <div className="mb-4 pl-4 border-l-4 border-teal-200 space-y-3 bg-teal-50/50 p-3 rounded-r-lg">
+                            <p className="text-xs font-bold text-teal-600 uppercase mb-2">Historique de vos réponses :</p>
+                            {message.support_responses
+                              .sort((a:any, b:any) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime())
+                              .map((resp: any) => (
+                              <div key={resp.id} className="bg-white p-3 rounded-lg shadow-sm text-sm border border-teal-100">
+                                <div className="flex justify-between text-xs text-slate-400 mb-1">
+                                  <span className="font-bold text-teal-700">Vous (Admin)</span>
+                                  <span>{new Date(resp.created_at).toLocaleDateString("fr-FR")} à {new Date(resp.created_at).toLocaleTimeString("fr-FR", {hour: '2-digit', minute:'2-digit'})}</span>
+                                </div>
+                                <p className="text-slate-700 whitespace-pre-wrap">{resp.response}</p>
+                              </div>
+                            ))}
+                          </div>
+                        )}
 
                         {selectedMessage?.id === message.id && (
                           <div className="mt-4 border-t border-slate-200 pt-4">
