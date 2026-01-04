@@ -1,6 +1,6 @@
 # 🧺 KiloLab - Plateforme de Pressing Nouvelle Génération.
 
-KiloLab est une plateforme moderne de pressing en ligne connectant clients et blanchisseries partenaires. Dépôt, suivi en temps réel, emails automatiques, système d'avis, et programme de parrainage.
+KiloLab est une plateforme moderne de pressing en ligne connectant clients et blanchisseries partenaires. Dépôt, suivi en temps réel, emails automatiques, système d'avis, et programme de parrainage
 
 ![KiloLab Banner](https://images.unsplash.com/photo-1517677208171-0bc6725a3e60?w=1200&h=400&fit=crop)
 
