@@ -47,6 +47,7 @@ const PartnerLanding = lazy(() => import('./pages/PartnerLanding'));
 const BecomePartner = lazy(() => import('./pages/BecomePartner'));
 const PartnerGuide = lazy(() => import('./pages/PartnerGuide'));
 const PartnerPending = lazy(() => import('./pages/PartnerPending'));
+const PartnerTerms = lazy(() => import('./pages/PartnerTerms')); // 👈 AJOUTÉ ICI
 
 // Paiement
 const PaymentSuccess = lazy(() => import('./pages/PaymentSuccess'));
@@ -132,6 +133,7 @@ export default function App() {
           <Route path="/partner-app" element={<PartnerDashboard />} />
           <Route path="/partner-guide" element={<PartnerGuide />} />
           <Route path="/partner-pending" element={<PartnerPending />} />
+          <Route path="/partner-terms" element={<PartnerTerms />} /> {/* 👈 AJOUTÉ ICI */}
 
           {/* PAIEMENT */}
           <Route path="/payment-success" element={<PaymentSuccess />} />
