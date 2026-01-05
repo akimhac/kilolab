@@ -414,7 +414,7 @@ export default function BecomePartner() {
                 />
               </div>
               <label htmlFor="terms" className="text-sm text-slate-700 cursor-pointer">
-                Je certifie l'exactitude des informations fournies. J'accepte les <a href="#" className="font-bold text-teal-700 underline">Conditions Générales de Partenariat</a> et je valide le barème de <strong>commissions KiloLab (20%)</strong> appliqué sur chaque commande apportée. Je comprends que mes responsabilités (traitement du linge, délais) sont engagées.
+                Je certifie l'exactitude des informations fournies. J'accepte les <a href="/partner-terms" target="_blank" className="font-bold text-teal-700 underline">Conditions Générales de Partenariat</a> et je valide le barème de <strong>commissions KiloLab (20%)</strong> appliqué sur chaque commande apportée. Je comprends que mes responsabilités (traitement du linge, délais) sont engagées.
               </label>
             </div>
 
