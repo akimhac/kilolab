@@ -52,7 +52,7 @@ export default function PartnerPendingModal({ isOpen, onClose, partnerName }: Pr
             </li>
             <li className="flex items-center gap-2">
               <Gift className="w-4 h-4 flex-shrink-0" />
-              <span>Seulement 10% après</span>
+              <span>Seulement 20% après</span>
             </li>
           </ul>
         </div>
