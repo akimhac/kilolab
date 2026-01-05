@@ -47,7 +47,7 @@ const PartnerLanding = lazy(() => import('./pages/PartnerLanding'));
 const BecomePartner = lazy(() => import('./pages/BecomePartner'));
 const PartnerGuide = lazy(() => import('./pages/PartnerGuide'));
 const PartnerPending = lazy(() => import('./pages/PartnerPending'));
-const PartnerTerms = lazy(() => import('./pages/PartnerTerms')); // 👈 AJOUTÉ ICI
+const PartnerTerms = lazy(() => import('./pages/PartnerTerms'));
 
 // Paiement
 const PaymentSuccess = lazy(() => import('./pages/PaymentSuccess'));
@@ -104,7 +104,9 @@ export default function App() {
 
       <Suspense fallback={<PageLoader />}>
         <Routes>
-          {/* PUBLIC */}
+          {/* ========================================
+              PUBLIC
+          ======================================== */}
           <Route path="/" element={<Landing />} />
           <Route path="/new-order" element={<NewOrder />} />
           <Route path="/tarifs" element={<Tarifs />} />
@@ -113,33 +115,48 @@ export default function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/pressing/:city" element={<CityLanding />} />
 
-          {/* SEO / INFO */}
+          {/* ========================================
+              SEO / INFO
+          ======================================== */}
           <Route path="/faq" element={<FAQ />} />
           <Route path="/for-who" element={<ForWho />} />
           <Route path="/blog" element={<Blog />} />
 
-          {/* AUTH */}
+          {/* ========================================
+              AUTH & PASSWORD RESET
+          ======================================== */}
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/update-password" element={<UpdatePassword />} />
+          <Route path="/reset-password" element={<UpdatePassword />} />
 
-          {/* CLIENT */}
+          {/* ========================================
+              CLIENT
+          ======================================== */}
           <Route path="/dashboard" element={<ClientDashboard />} />
+          <Route path="/client-dashboard" element={<ClientDashboard />} />
           <Route path="/settings" element={<Settings />} />
           <Route path="/referral" element={<Referral />} />
 
-          {/* PARTENAIRES */}
+          {/* ========================================
+              PARTENAIRES
+          ======================================== */}
           <Route path="/partner" element={<PartnerLanding />} />
           <Route path="/become-partner" element={<BecomePartner />} />
+          <Route path="/partner-dashboard" element={<PartnerDashboard />} />
           <Route path="/partner-app" element={<PartnerDashboard />} />
           <Route path="/partner-guide" element={<PartnerGuide />} />
           <Route path="/partner-pending" element={<PartnerPending />} />
-          <Route path="/partner-terms" element={<PartnerTerms />} /> {/* 👈 AJOUTÉ ICI */}
+          <Route path="/partner-terms" element={<PartnerTerms />} />
 
-          {/* PAIEMENT */}
+          {/* ========================================
+              PAIEMENT
+          ======================================== */}
           <Route path="/payment-success" element={<PaymentSuccess />} />
           <Route path="/payment-cancel" element={<PaymentCancel />} />
 
-          {/* 🔐 ADMIN - ROUTES PROTÉGÉES */}
+          {/* ========================================
+              🔐 ADMIN - ROUTES PROTÉGÉES
+          ======================================== */}
           <Route path="/admin/login" element={<AdminLogin />} />
           
           <Route
@@ -150,6 +167,7 @@ export default function App() {
               </ProtectedAdminRoute>
             }
           />
+          
           <Route
             path="/admin-dashboard"
             element={
@@ -159,17 +177,23 @@ export default function App() {
             }
           />
 
-          {/* OUTILS */}
+          {/* ========================================
+              OUTILS
+          ======================================== */}
           <Route path="/scan-qr" element={<ScanQR />} />
 
-          {/* LEGAL */}
+          {/* ========================================
+              LEGAL
+          ======================================== */}
           <Route path="/legal" element={<Legal />} />
           <Route path="/cgu" element={<CGU />} />
           <Route path="/cgv" element={<CGV />} />
           <Route path="/privacy" element={<Privacy />} />
           <Route path="/cookies" element={<Cookies />} />
 
-          {/* FALLBACK */}
+          {/* ========================================
+              FALLBACK
+          ======================================== */}
           <Route path="*" element={<Landing />} />
         </Routes>
       </Suspense>
