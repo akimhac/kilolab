@@ -1,7 +1,7 @@
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import { useState } from 'react';
-import { Building2, User, Mail, Loader2, Upload, FileText, Phone } from 'lucide-react';
+import { Building2, User, Mail, Loader2, Upload, FileText, Phone, CheckSquare, MapPin } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
@@ -50,6 +50,7 @@ export default function BecomePartner() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [file, setFile] = useState<File | null>(null);
+  const [acceptTerms, setAcceptTerms] = useState(false);
   
   const [formData, setFormData] = useState({
     company_name: '',
@@ -120,7 +121,14 @@ export default function BecomePartner() {
     setLoading(true);
 
     try {
-      // ✅ 1. VALIDATION
+      // ✅ 0. VÉRIFICATION JURIDIQUE
+      if (!acceptTerms) {
+        toast.error("Vous devez accepter les conditions de commission.");
+        setLoading(false);
+        return;
+      }
+
+      // ✅ 1. VALIDATION FICHIER
       if (!file) {
         toast.error("Le Kbis est obligatoire");
         setLoading(false);
@@ -192,7 +200,7 @@ export default function BecomePartner() {
 
       toast.success("Candidature envoyée avec succès !", { id: 'submit' });
       
-      // ✅ 5. REDIRECTION VERS PAGE D'ATTENTE
+      // ✅ 5. REDIRECTION
       setTimeout(() => {
         navigate('/partner-pending');
       }, 1500);
@@ -392,6 +400,22 @@ export default function BecomePartner() {
                   />
                 </div>
               </div>
+            </div>
+
+            {/* --- VALIDATION JURIDIQUE ET COMMISSIONS --- */}
+            <div className="bg-blue-50 p-4 rounded-xl border border-blue-100 flex items-start gap-3">
+              <div className="pt-1">
+                <input 
+                  type="checkbox" 
+                  id="terms" 
+                  className="w-5 h-5 text-teal-600 rounded focus:ring-teal-500 cursor-pointer"
+                  checked={acceptTerms}
+                  onChange={(e) => setAcceptTerms(e.target.checked)}
+                />
+              </div>
+              <label htmlFor="terms" className="text-sm text-slate-700 cursor-pointer">
+                Je certifie l'exactitude des informations fournies. J'accepte les <a href="#" className="font-bold text-teal-700 underline">Conditions Générales de Partenariat</a> et je valide le barème de <strong>commissions KiloLab (20%)</strong> appliqué sur chaque commande apportée. Je comprends que mes responsabilités (traitement du linge, délais) sont engagées.
+              </label>
             </div>
 
             <button 
