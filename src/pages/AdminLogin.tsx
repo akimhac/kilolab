@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { supabase } from '../lib/supabase';
 import { useNavigate } from 'react-router-dom';
 import { Lock, Mail, Loader2, ShieldCheck } from 'lucide-react';
@@ -12,66 +12,53 @@ export default function AdminLogin() {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
 
-  // Vérifier si déjà connecté
-  useEffect(() => {
-    checkSession();
-  }, []);
-
-  const checkSession = async () => {
-    try {
-      const { data: { session } } = await supabase.auth.getSession();
-      
-      if (session?.user?.email && ADMIN_EMAILS.includes(session.user.email)) {
-        navigate('/admin');
-      }
-    } catch (error) {
-      console.error('Erreur session:', error);
-    }
-  };
-
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Vérifier que c'est un email admin
-    if (!ADMIN_EMAILS.includes(email)) {
-      toast.error('Accès réservé aux administrateurs');
+    // Vérifier que c'est un email admin AVANT de se connecter
+    if (!ADMIN_EMAILS.includes(email.toLowerCase().trim())) {
+      toast.error('⛔ Accès réservé aux administrateurs');
       return;
     }
 
     setLoading(true);
 
     try {
-      // Connexion Supabase
+      // Connexion simple sans toucher à user_profiles
       const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
+        email: email.trim(),
+        password: password,
       });
 
-      if (error) throw error;
-
-      if (!data.user) {
-        throw new Error('Connexion échouée');
+      if (error) {
+        if (error.message.includes('Invalid login credentials')) {
+          throw new Error('Email ou mot de passe incorrect');
+        } else if (error.message.includes('Email not confirmed')) {
+          throw new Error('Email non confirmé. Vérifiez votre boîte mail.');
+        } else {
+          throw error;
+        }
       }
 
-      // Vérifier que l'email est bien admin
-      if (!ADMIN_EMAILS.includes(data.user.email || '')) {
+      if (!data.session) {
+        throw new Error('Impossible de créer la session');
+      }
+
+      // Vérifier une dernière fois que c'est bien un admin
+      if (!ADMIN_EMAILS.includes(data.session.user.email || '')) {
         await supabase.auth.signOut();
-        throw new Error('Accès réservé aux administrateurs');
+        throw new Error('⛔ Accès refusé');
       }
 
-      toast.success('Connexion réussie !');
+      // Tout est OK !
+      toast.success('✅ Connexion réussie !');
+      
+      // Redirection immédiate
       navigate('/admin');
 
     } catch (error: any) {
-      console.error('Erreur login:', error);
-      
-      if (error.message?.includes('Invalid login credentials')) {
-        toast.error('Email ou mot de passe incorrect');
-      } else if (error.message?.includes('Email not confirmed')) {
-        toast.error('Veuillez confirmer votre email');
-      } else {
-        toast.error(error.message || 'Erreur de connexion');
-      }
+      console.error('❌ Erreur login:', error);
+      toast.error(error.message || 'Erreur de connexion');
     } finally {
       setLoading(false);
     }
@@ -82,7 +69,6 @@ export default function AdminLogin() {
       
       <div className="max-w-md w-full">
         
-        {/* Card */}
         <div className="bg-slate-800 rounded-2xl shadow-2xl border border-slate-700 overflow-hidden">
           
           {/* Header */}
@@ -115,6 +101,7 @@ export default function AdminLogin() {
                   onChange={(e) => setEmail(e.target.value)}
                   className="w-full pl-10 pr-4 py-3 bg-slate-700 border border-slate-600 rounded-xl text-white placeholder-slate-400 focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition"
                   placeholder="admin@kilolab.fr"
+                  autoComplete="email"
                 />
               </div>
             </div>
@@ -133,6 +120,7 @@ export default function AdminLogin() {
                   onChange={(e) => setPassword(e.target.value)}
                   className="w-full pl-10 pr-4 py-3 bg-slate-700 border border-slate-600 rounded-xl text-white placeholder-slate-400 focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition"
                   placeholder="••••••••"
+                  autoComplete="current-password"
                 />
               </div>
             </div>
@@ -156,14 +144,17 @@ export default function AdminLogin() {
               )}
             </button>
 
-            {/* Info */}
-            <div className="bg-slate-700/50 border border-slate-600 rounded-xl p-4 mt-6">
+          </form>
+
+          {/* Info */}
+          <div className="px-8 pb-8">
+            <div className="bg-slate-700/50 border border-slate-600 rounded-xl p-4">
               <p className="text-xs text-slate-400 text-center">
                 🔒 Connexion sécurisée réservée aux administrateurs Kilolab
               </p>
             </div>
+          </div>
 
-          </form>
         </div>
 
         {/* Footer */}
