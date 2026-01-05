@@ -79,7 +79,7 @@ export async function handler(event: any) {
       // Si le pressing a un compte Stripe Connect, split payment
       ...(partnerStripeAccountId && {
         payment_intent_data: {
-          application_fee_amount: Math.round(amount * 10), // 10% commission Kilolab
+          application_fee_amount: Math.round(amount * 0.20), // 20% commission Kilolab
           transfer_data: {
             destination: partnerStripeAccountId,
           },
