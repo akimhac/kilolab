@@ -1,9 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 
 const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY')
-
-// 👇 On envoie sur ton Gmail pour être sûr que tu le vois tout de suite
-const ADMIN_EMAIL = "akim.hachili@gmail.com" 
+const ADMIN_EMAIL = "akim.hachili@gmail.com" // Ton email perso pour les tests
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -24,31 +22,40 @@ serve(async (req) => {
     if (type === 'NEW_MESSAGE') {
       subject = `📩 Nouveau message de ${data.email}`
       htmlContent = `
-        <h2>Nouveau message reçu sur KiloLab !</h2>
+        <h2>Nouveau message reçu !</h2>
         <p><strong>De :</strong> ${data.email} (${data.name || 'Anonyme'})</p>
         <p><strong>Sujet :</strong> ${data.subject}</p>
-        <div style="background: #f9f9f9; padding: 15px; border-left: 4px solid #14b8a6; margin-top: 10px;">
+        <div style="background: #f9f9f9; padding: 15px; border-left: 4px solid #14b8a6;">
           ${data.message.replace(/\n/g, '<br>')}
         </div>
-        <br/>
-        <a href="https://kilolab.fr/admin" style="background-color: #14b8a6; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">Répondre depuis le Dashboard</a>
       `
     } 
-    // Cas 2 : Nouvelle Inscription
+    // Cas 2 : Nouvelle Inscription CLIENT
     else if (type === 'NEW_USER') {
       subject = `🚀 Nouvel inscrit : ${data.full_name || data.email}`
       htmlContent = `
         <h2>Un nouveau client vient de s'inscrire ! 🥳</h2>
+        <p><strong>Email :</strong> ${data.email}</p>
+        <p><strong>Nom :</strong> ${data.full_name || 'Non renseigné'}</p>
+      `
+    }
+    // Cas 3 : Nouvelle Candidature PARTENAIRE (Nouveau !)
+    else if (type === 'NEW_PARTNER') {
+      subject = `👔 Nouvelle demande Partenaire : ${data.company_name}`
+      htmlContent = `
+        <h2>Nouvelle candidature de pressing ! 🧺</h2>
         <ul>
+          <li><strong>Société :</strong> ${data.company_name}</li>
+          <li><strong>Gérant :</strong> ${data.contact_name}</li>
           <li><strong>Email :</strong> ${data.email}</li>
-          <li><strong>Nom :</strong> ${data.full_name || 'Non renseigné'}</li>
-          <li><strong>Téléphone :</strong> ${data.phone || 'Non renseigné'}</li>
-          <li><strong>Date :</strong> ${new Date().toLocaleString('fr-FR')}</li>
+          <li><strong>Téléphone :</strong> ${data.phone}</li>
+          <li><strong>Ville :</strong> ${data.city || 'Non renseignée'}</li>
         </ul>
+        <p>Connecte-toi à ton Admin pour valider son Kbis.</p>
       `
     }
 
-    console.log(`Envoi notification à ${ADMIN_EMAIL}`)
+    console.log(`Envoi notification (${type}) à ${ADMIN_EMAIL}`)
 
     const res = await fetch('https://api.resend.com/emails', {
       method: 'POST',
@@ -57,7 +64,7 @@ serve(async (req) => {
         'Authorization': `Bearer ${RESEND_API_KEY}`,
       },
       body: JSON.stringify({
-        from: 'KiloLab Notif <noreply@kilolab.fr>', // ✅ Ton vrai domaine validé
+        from: 'KiloLab Bot <noreply@kilolab.fr>',
         to: ADMIN_EMAIL,
         subject: subject,
         html: htmlContent,
@@ -70,7 +77,6 @@ serve(async (req) => {
     })
 
   } catch (error) {
-    console.error("Erreur:", error)
     return new Response(JSON.stringify({ error: error.message }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
