@@ -1,7 +1,9 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Facebook, Instagram, MessageCircle, MapPin } from 'lucide-react';
 
 export default function Footer() {
+  const navigate = useNavigate(); // 👈 Indispensable pour la redirection
+
   return (
     <footer className="bg-slate-900 text-slate-300 pt-16 pb-8">
       <div className="max-w-7xl mx-auto px-4 grid md:grid-cols-4 gap-12 mb-12 border-b border-slate-800 pb-12">
@@ -61,7 +63,7 @@ export default function Footer() {
           </ul>
         </div>
 
-        {/* Colonne 4 : Aide + Accès Admin Discret */}
+        {/* Colonne 4 : Aide */}
         <div>
           <h3 className="text-white font-bold mb-6">Aide</h3>
           <ul className="space-y-4 text-sm">
@@ -78,17 +80,7 @@ export default function Footer() {
                 Comment ça marche
               </Link>
             </li>
-            
-            {/* 🔐 ACCÈS ADMIN ULTRA-DISCRET (Logo point) */}
-            <li className="pt-8">
-              <Link 
-                to="/admin/login" 
-                className="inline-block w-2 h-2 bg-slate-800 hover:bg-teal-500 rounded-full transition-all duration-300"
-                aria-label="Administration"
-                title="Accès administrateur"
-              >
-              </Link>
-            </li>
+            {/* J'ai supprimé le point visible qui était ici */}
           </ul>
         </div>
       </div>
@@ -99,37 +91,30 @@ export default function Footer() {
           <MapPin size={12}/> Zones d'intervention principales
         </p>
         <div className="flex flex-wrap gap-x-6 gap-y-2">
-          <Link to="/pressing/lille" className="hover:text-teal-500 transition-colors">
-            Pressing Lille
-          </Link>
-          <Link to="/pressing/nantes" className="hover:text-teal-500 transition-colors">
-            Blanchisserie Nantes
-          </Link>
-          <Link to="/pressing/lyon" className="hover:text-teal-500 transition-colors">
-            Pressing Lyon
-          </Link>
-          <Link to="/pressing/bordeaux" className="hover:text-teal-500 transition-colors">
-            Pressing Bordeaux
-          </Link>
-          <Link to="/pressing/paris" className="hover:text-teal-500 transition-colors">
-            Pressing Paris
-          </Link>
-          <Link to="/pressing/marseille" className="hover:text-teal-500 transition-colors">
-            Pressing Marseille
-          </Link>
-          <Link to="/pressing/toulouse" className="hover:text-teal-500 transition-colors">
-            Pressing Toulouse
-          </Link>
-          <Link to="/pressing/nice" className="hover:text-teal-500 transition-colors">
-            Pressing Nice
-          </Link>
+          <Link to="/pressing/lille" className="hover:text-teal-500 transition-colors">Pressing Lille</Link>
+          <Link to="/pressing/nantes" className="hover:text-teal-500 transition-colors">Blanchisserie Nantes</Link>
+          <Link to="/pressing/lyon" className="hover:text-teal-500 transition-colors">Pressing Lyon</Link>
+          <Link to="/pressing/bordeaux" className="hover:text-teal-500 transition-colors">Pressing Bordeaux</Link>
+          <Link to="/pressing/paris" className="hover:text-teal-500 transition-colors">Pressing Paris</Link>
+          <Link to="/pressing/marseille" className="hover:text-teal-500 transition-colors">Pressing Marseille</Link>
+          <Link to="/pressing/toulouse" className="hover:text-teal-500 transition-colors">Pressing Toulouse</Link>
+          <Link to="/pressing/nice" className="hover:text-teal-500 transition-colors">Pressing Nice</Link>
         </div>
       </div>
 
-      {/* Copyright */}
+      {/* Copyright & Accès Secret */}
       <div className="max-w-7xl mx-auto px-4">
-        <p className="text-center text-slate-700 text-xs">
-          © {new Date().getFullYear()} Kilolab SAS. Tous droits réservés.
+        <p className="text-center text-slate-700 text-xs select-none">
+           {/* 👇 ZONE SECRÈTE START */}
+          <span 
+            onClick={() => navigate('/admin')} 
+            className="cursor-default hover:text-slate-600 transition-colors"
+            title=" " 
+          >
+            ©
+          </span>
+           {/* 👆 ZONE SECRÈTE END */}
+          {' '}{new Date().getFullYear()} Kilolab SAS. Tous droits réservés.
         </p>
       </div>
     </footer>
