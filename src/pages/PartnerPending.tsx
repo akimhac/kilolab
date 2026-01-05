@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import Navbar from '../components/Navbar';
-import { ShieldCheck, Clock, Phone, FileText } from 'lucide-react';
+import { ShieldCheck, Clock, Phone, FileText, CheckCircle2 } from 'lucide-react';
 
 export default function PartnerPending() {
   return (
@@ -26,17 +26,25 @@ export default function PartnerPending() {
             </h3>
             <ul className="space-y-4">
               <li className="flex items-start gap-3">
-                <div className="bg-white p-2 rounded-lg border border-slate-200 text-slate-600"><Phone size={18}/></div>
+                <div className="bg-white p-2 rounded-lg border border-slate-200 text-slate-600">
+                    <Phone size={18}/>
+                </div>
                 <div>
-                  <span className="block font-bold text-sm">Appel de vérification</span>
-                  <span className="text-sm text-slate-500">Notre équipe va vous contacter sous 24h sur le numéro fourni.</span>
+                  <span className="block font-bold text-sm">Étude du dossier</span>
+                  <span className="text-sm text-slate-500">
+                    Notre équipe va analyser votre candidature sous <strong className="text-teal-600">5 jours ouvrés</strong>.
+                  </span>
                 </div>
               </li>
               <li className="flex items-start gap-3">
-                <div className="bg-white p-2 rounded-lg border border-slate-200 text-slate-600"><FileText size={18}/></div>
+                <div className="bg-white p-2 rounded-lg border border-slate-200 text-green-600">
+                    <CheckCircle2 size={18}/>
+                </div>
                 <div>
-                  <span className="block font-bold text-sm">Document KBIS (Optionnel)</span>
-                  <span className="text-sm text-slate-500">Nous pourrions vous demander un extrait Kbis par email.</span>
+                  <span className="block font-bold text-sm">Document KBIS (Reçu)</span>
+                  <span className="text-sm text-slate-500">
+                    Nous avons bien reçu votre justificatif. Aucune autre action n'est requise.
+                  </span>
                 </div>
               </li>
             </ul>
