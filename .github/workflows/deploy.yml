@@ -1,8 +1,9 @@
 name: Deploy Functions
+
 on:
   push:
     branches:
-      - main # ou master, vérifie le nom de ta branche principale
+      - main
     paths:
       - 'supabase/functions/**' 
 
@@ -11,10 +12,10 @@ jobs:
     runs-on: ubuntu-latest
     env:
       SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
-      PROJECT_ID: dhecegehcjelbxydeolg
+      SUPABASE_PROJECT_ID: dhecegehcjelbxydeolg
     steps:
       - uses: actions/checkout@v3
       - uses: supabase/setup-cli@v1
         with:
           version: latest
-      - run: supabase functions deploy --no-verify-jwt
+      - run: supabase functions deploy --project-ref $SUPABASE_PROJECT_ID --no-verify-jwt
