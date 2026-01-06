@@ -3,20 +3,12 @@ import { Navigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { Loader2 } from 'lucide-react';
 
-interface ProtectedAdminRouteProps {
-  children: React.ReactNode;
-}
+const ADMIN_EMAILS = ['admin@kilolab.fr', 'contact@kilolab.fr', 'akim.hachili@gmail.com'];
 
-const ADMIN_EMAILS = [
-  'admin@kilolab.fr',
-  'contact@kilolab.fr',
-  'akim.hachili@gmail.com'
-];
-
-export default function ProtectedAdminRoute({ children }: ProtectedAdminRouteProps) {
+export default function ProtectedAdminRoute({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [isAdminUser, setIsAdminUser] = useState(false);
+  const [isAuth, setIsAuth] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
     checkAuth();
@@ -24,54 +16,34 @@ export default function ProtectedAdminRoute({ children }: ProtectedAdminRoutePro
 
   const checkAuth = async () => {
     try {
-      // 1. Vérifier si utilisateur connecté
       const { data: { session } } = await supabase.auth.getSession();
       
       if (!session) {
-        setIsAuthenticated(false);
         setLoading(false);
         return;
       }
 
-      setIsAuthenticated(true);
-
-      // 2. Vérifier si admin (SIMPLIFIÉ - SANS TOUCHER user_profiles)
-      const userEmail = session.user.email;
-      const adminStatus = userEmail ? ADMIN_EMAILS.includes(userEmail.toLowerCase()) : false;
-      
-      setIsAdminUser(adminStatus);
+      setIsAuth(true);
+      const email = session.user.email?.toLowerCase() || '';
+      setIsAdmin(ADMIN_EMAILS.includes(email));
       
     } catch (error) {
-      console.error('❌ Auth check error:', error);
-      setIsAuthenticated(false);
-      setIsAdminUser(false);
+      console.error('Auth error:', error);
     } finally {
       setLoading(false);
     }
   };
 
-  // Afficher loader pendant la vérification
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-50">
-        <div className="text-center">
-          <Loader2 className="animate-spin mx-auto mb-4 text-teal-600" size={48} />
-          <p className="text-slate-600 font-medium">Vérification des accès admin...</p>
-        </div>
+        <Loader2 className="animate-spin text-teal-600" size={48} />
       </div>
     );
   }
 
-  // Si pas connecté → Rediriger vers /admin/login
-  if (!isAuthenticated) {
-    return <Navigate to="/admin/login" replace />;
-  }
+  if (!isAuth) return <Navigate to="/admin/login" replace />;
+  if (!isAdmin) return <Navigate to="/" replace />;
 
-  // Si connecté mais pas admin → Rediriger vers home
-  if (!isAdminUser) {
-    return <Navigate to="/" replace />;
-  }
-
-  // Si tout est OK → Afficher la page
   return <>{children}</>;
 }
