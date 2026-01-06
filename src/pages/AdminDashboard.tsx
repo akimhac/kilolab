@@ -43,15 +43,15 @@ export default function AdminDashboard() {
 
       if (ordersError) console.error("Orders error:", ordersError);
 
-      // 2. Partners (TOUS les partenaires, même les non actifs)
+      // 2. Partners
       const { data: partnersData, error: partnersError } = await supabase
         .from("partners")
         .select("*")
-        .order("created_at", { ascending: false }); // J'ai retiré le filtre .eq('is_active', true)
+        .order("created_at", { ascending: false });
 
       if (partnersError) console.error("Partners error:", partnersError);
 
-      // 3. Messages de contact AVEC L'HISTORIQUE
+      // 3. Messages
       const { data: messagesData, error: messagesError } = await supabase
         .from("contact_messages")
         .select("*, support_responses(*)")
@@ -59,13 +59,13 @@ export default function AdminDashboard() {
 
       if (messagesError) console.error("Messages error:", messagesError);
 
-      // 4. Utilisateurs
-      const { data: usersData, error: usersError } = await supabase
-        .from("user_profiles")
-        .select("*")
-        .order("created_at", { ascending: false });
-
-      if (usersError) console.error("Users error:", usersError);
+      // 4. Utilisateurs - DÉSACTIVÉ TEMPORAIREMENT POUR ÉVITER LE CRASH
+      // const { data: usersData, error: usersError } = await supabase
+      //   .from("user_profiles")
+      //   .select("*")
+      //   .order("created_at", { ascending: false });
+      
+      const usersData: any[] = []; // On met vide pour l'instant
 
       // 5. Set states
       setOrders(ordersData || []);
@@ -95,7 +95,7 @@ export default function AdminDashboard() {
           id: partner.id,
           name: partner.company_name || partner.name || `Partenaire ${partner.id.slice(0, 6)}`,
           city: partner.city || "Non spécifié",
-          is_active: partner.is_active, // On garde l'info pour l'affichage
+          is_active: partner.is_active,
           totalOrders: stats.totalOrders,
           totalRevenue: parseFloat(stats.totalRevenue.toFixed(2)),
           rating: partner.average_rating || 4.5,
@@ -106,7 +106,7 @@ export default function AdminDashboard() {
 
     } catch (error: any) {
       console.error("❌ Erreur admin:", error);
-      toast.error("Erreur partielle: " + error.message);
+      // On ne toast pas l'erreur pour ne pas spammer l'admin si une table manque
     } finally {
       setLoading(false);
     }
@@ -269,16 +269,15 @@ export default function AdminDashboard() {
 
       if (error) throw error;
 
-      toast.success("✅ Réponse enregistrée ! L'email devrait partir.");
+      toast.success("✅ Réponse enregistrée !");
       setReplyText("");
       setSelectedMessage(null);
       markMessageAsRead(message.id);
       
-      // Rafraîchir pour voir la réponse apparaître
       fetchData();
     } catch (error: any) {
       console.error(error);
-      toast.error("❌ Erreur d'enregistrement : " + error.message);
+      toast.error("❌ Erreur : " + error.message);
     }
   };
 
@@ -371,6 +370,11 @@ export default function AdminDashboard() {
     toast.success("Export CSV réussi !");
   };
 
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    window.location.href = "/admin/login";
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-50">
@@ -403,10 +407,10 @@ export default function AdminDashboard() {
                 Ouvrir Supabase
               </button>
               <button
-                onClick={() => window.location.reload()}
-                className="bg-white border border-slate-200 px-4 py-2 rounded-lg text-sm font-bold hover:bg-slate-50 transition"
+                onClick={handleLogout}
+                className="bg-white border border-slate-200 px-4 py-2 rounded-lg text-sm font-bold hover:bg-slate-50 transition flex items-center gap-2 text-red-600"
               >
-                Rafraîchir
+                <LogOut size={16} /> Déconnexion
               </button>
             </div>
           </div>
@@ -628,7 +632,6 @@ export default function AdminDashboard() {
                           {message.message}
                         </div>
 
-                        {/* Historique des réponses */}
                         {message.support_responses && message.support_responses.length > 0 && (
                           <div className="mb-4 pl-4 border-l-4 border-teal-200 space-y-3 bg-teal-50/50 p-3 rounded-r-lg">
                             <p className="text-xs font-bold text-teal-600 uppercase mb-2">Historique de vos réponses :</p>
@@ -691,7 +694,8 @@ export default function AdminDashboard() {
                 {users.length === 0 ? (
                   <div className="text-center py-12 text-slate-400">
                     <Users size={48} className="mx-auto mb-3 opacity-30" />
-                    <p className="font-bold">Aucun utilisateur inscrit</p>
+                    <p className="font-bold">Aucun utilisateur trouvé</p>
+                    <p className="text-xs text-slate-400 mt-1">(La base de données utilisateur est désactivée temporairement)</p>
                   </div>
                 ) : (
                   <div className="overflow-x-auto">
