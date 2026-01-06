@@ -1,13 +1,15 @@
 import { supabase } from './supabase';
 
-// 👇 LA LISTE DE SÉCURITÉ (Indispensable pour contourner le bug BDD)
+// 👇 LISTE DE SÉCURITÉ : Seuls ces emails peuvent entrer.
 const ADMIN_EMAILS = ['admin@kilolab.fr', 'contact@kilolab.fr', 'akim.hachili@gmail.com'];
 
 export interface AdminUser {
   id: string;
+  user_id: string;
   email: string;
   full_name: string | null;
-  last_login?: string;
+  created_at: string;
+  last_login: string | null;
 }
 
 /**
@@ -16,10 +18,14 @@ export interface AdminUser {
 export const isAdmin = async (): Promise<boolean> => {
   try {
     const { data: { session } } = await supabase.auth.getSession();
+    
+    // Si pas connecté ou pas d'email -> Dehors
     if (!session?.user?.email) return false;
     
-    // Vérification via la liste en dur
-    return ADMIN_EMAILS.includes(session.user.email.toLowerCase());
+    // Vérification simple : est-ce que l'email est dans la liste ?
+    const email = session.user.email.toLowerCase().trim();
+    return ADMIN_EMAILS.includes(email);
+
   } catch (error) {
     console.error('Error checking admin status:', error);
     return false;
@@ -27,7 +33,7 @@ export const isAdmin = async (): Promise<boolean> => {
 };
 
 /**
- * Récupère les infos de l'admin (SIMULÉ POUR ÉVITER LE CRASH)
+ * Récupère les infos de l'admin (SIMULÉ POUR ÉVITER LE CRASH BDD)
  */
 export const getCurrentAdmin = async (): Promise<AdminUser | null> => {
   try {
@@ -35,17 +41,19 @@ export const getCurrentAdmin = async (): Promise<AdminUser | null> => {
     
     if (!user || !user.email) return null;
     
-    // Vérification liste
-    if (!ADMIN_EMAILS.includes(user.email.toLowerCase())) return null;
+    // Vérification de sécurité
+    if (!ADMIN_EMAILS.includes(user.email.toLowerCase().trim())) return null;
     
-    // On retourne un objet admin "virtuel"
+    // On renvoie un "faux" objet admin valide pour que le dashboard s'affiche
     return {
       id: user.id,
       user_id: user.id,
       email: user.email,
       full_name: 'Super Admin',
+      created_at: new Date().toISOString(),
       last_login: new Date().toISOString()
-    } as any;
+    };
+
   } catch (error) {
     console.error('Error getting current admin:', error);
     return null;
@@ -61,7 +69,7 @@ export const logoutAdmin = async (): Promise<void> => {
 };
 
 /**
- * Hook de protection
+ * Hook de protection - redirige si pas admin
  */
 export const requireAdmin = async (): Promise<boolean> => {
   const admin = await isAdmin();
