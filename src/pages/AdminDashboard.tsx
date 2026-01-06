@@ -59,13 +59,9 @@ export default function AdminDashboard() {
 
       if (messagesError) console.error("Messages error:", messagesError);
 
-      // 4. Utilisateurs - DÉSACTIVÉ TEMPORAIREMENT POUR ÉVITER LE CRASH
-      // const { data: usersData, error: usersError } = await supabase
-      //   .from("user_profiles")
-      //   .select("*")
-      //   .order("created_at", { ascending: false });
-      
-      const usersData: any[] = []; // On met vide pour l'instant
+      // 4. Utilisateurs - DÉSACTIVÉ (C'est ça qui faisait planter !)
+      // On met une liste vide pour ne pas casser le reste du code
+      const usersData: any[] = []; 
 
       // 5. Set states
       setOrders(ordersData || []);
@@ -106,7 +102,7 @@ export default function AdminDashboard() {
 
     } catch (error: any) {
       console.error("❌ Erreur admin:", error);
-      // On ne toast pas l'erreur pour ne pas spammer l'admin si une table manque
+      // On ne bloque plus l'interface même s'il y a une erreur
     } finally {
       setLoading(false);
     }
