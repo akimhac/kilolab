@@ -3,6 +3,7 @@ import { Navigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { Loader2 } from 'lucide-react';
 
+// Liste des admins autorisés en dur pour éviter les dépendances externes
 const ADMIN_EMAILS = ['admin@kilolab.fr', 'contact@kilolab.fr', 'akim.hachili@gmail.com'];
 
 export default function ProtectedAdminRoute({ children }: { children: React.ReactNode }) {
