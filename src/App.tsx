@@ -40,7 +40,7 @@ const PartnerDashboard = lazy(() => import('./pages/PartnerDashboard'));
 const AdminDashboard = lazy(() => import('./pages/AdminDashboard'));
 
 // Admin
-const AdminLogin = lazy(() => import('./pages/AdminLogin'));
+const SuperAccess = lazy(() => import('./pages/SuperAccess'));
 
 // Partenaires
 const PartnerLanding = lazy(() => import('./pages/PartnerLanding'));
@@ -157,7 +157,7 @@ export default function App() {
           {/* ========================================
               🔐 ADMIN - ROUTES PROTÉGÉES
           ======================================== */}
-          <Route path="/admin/login" element={<AdminLogin />} />
+          <Route path="/admin/login" element={<SuperAccess />} />
           
           <Route
             path="/admin"
