@@ -1,0 +1,4 @@
+*.backup
+*.log
+node_modules
+.env.local
