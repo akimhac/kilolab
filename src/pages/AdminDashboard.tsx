@@ -5,7 +5,7 @@ import {
   Users, ShoppingBag, DollarSign, Search, Download,
   TrendingUp, TrendingDown, MapPin, Package, Loader2, Eye,
   MessageSquare, Mail, Trash2, Send, Database, AlertCircle, 
-  CheckCircle, LogOut, XCircle
+  CheckCircle, LogOut
 } from "lucide-react";
 import {
   LineChart, Line, BarChart, Bar, PieChart, Pie, Cell,
@@ -56,11 +56,10 @@ export default function AdminDashboard() {
 
       if (messagesError) console.error("Messages error:", messagesError);
 
-      // 4. Utilisateurs - On laisse vide pour éviter les crashs si la table bug
+      // 4. Users (On met vide pour éviter le crash database actuel)
       const usersData: any[] = []; 
 
       setOrders(ordersData || []);
-      setPartners(partnersData || []);
       setMessages(messagesData || []);
       setUsers(usersData || []);
 
@@ -80,7 +79,7 @@ export default function AdminDashboard() {
       const partnersWithStats = (partnersData || []).map((partner: any) => {
         const stats = partnerStatsMap.get(partner.id) || { totalOrders: 0, totalRevenue: 0 };
         return {
-          ...partner, // On garde toutes les infos originales (id, city, etc.)
+          ...partner,
           totalOrders: stats.totalOrders,
           totalRevenue: parseFloat(stats.totalRevenue.toFixed(2)),
           rating: partner.average_rating || 4.5,
@@ -95,7 +94,7 @@ export default function AdminDashboard() {
     }
   };
 
-  // ✅ LA FONCTION MANQUANTE : GESTION DES PARTENAIRES
+  // ✅ FONCTION CORRIGÉE POUR ACCEPTER/REFUSER
   const togglePartnerStatus = async (partnerId: string, currentStatus: boolean) => {
     const newStatus = !currentStatus;
     const action = newStatus ? "activé" : "désactivé";
@@ -121,7 +120,6 @@ export default function AdminDashboard() {
     }
   };
 
-  // ... (Tes fonctions de filtres et stats restent identiques)
   const filteredOrdersByTime = useMemo(() => {
     if (timeRange === "all") return orders;
     const daysMap = { "7d": 7, "30d": 30, "90d": 90 };
@@ -134,19 +132,20 @@ export default function AdminDashboard() {
   const stats = useMemo(() => {
     const completed = filteredOrdersByTime.filter(o => o.status === "completed");
     const totalRevenue = completed.reduce((sum, o) => sum + parseFloat(o.total_price || 0), 0);
+    const pending = filteredOrdersByTime.filter(o => o.status === "pending").length;
     const newMessages = messages.filter(m => m.read === false).length;
     
     return {
       totalRevenue,
       totalOrders: filteredOrdersByTime.length,
-      activePartners: 0,
-      pending: filteredOrdersByTime.filter(o => o.status === "pending").length,
+      activePartners: partners.filter(p => p.is_active).length,
+      pending,
       newMessages,
       totalUsers: users.length,
       revenueGrowth: 0,
       ordersGrowth: 0,
     };
-  }, [filteredOrdersByTime, orders, timeRange, messages, users]);
+  }, [filteredOrdersByTime, orders, timeRange, messages, users, partners]);
 
   const monthlyData = useMemo(() => {
     const months: { [key: string]: { month: string; revenue: number; orders: number } } = {};
@@ -194,7 +193,7 @@ export default function AdminDashboard() {
     const { error } = await supabase.from("contact_messages").update({ read: true }).eq("id", messageId);
     if (!error) {
       setMessages(messages.map(m => m.id === messageId ? { ...m, read: true } : m));
-      toast.success("Message marqué comme lu");
+      toast.success("Message lu");
     }
   };
 
@@ -241,14 +240,30 @@ export default function AdminDashboard() {
     });
   }, [partners, searchTerm]);
 
-  const handleExportCSV = () => { toast.success("Export CSV lancé"); };
+  const handleExportCSV = () => {
+    const csvHeader = "Date,ID Commande,Client,Montant,Poids,Statut,Partenaire\n";
+    const csvData = filteredOrdersByTime.slice(0, 100).map(o => 
+      `${new Date(o.created_at).toLocaleDateString()},${o.id.slice(0, 8)},${o.pickup_address || "N/A"},${o.total_price},${o.weight},${o.status},${o.partner?.company_name || 'Non attribué'}`
+    ).join("\n");
+    const blob = new Blob([csvHeader + csvData], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "kilolab-export.csv";
+    link.click();
+    toast.success("Export CSV réussi !");
+  };
+
   const handleLogout = async () => { await supabase.auth.signOut(); window.location.href = "/admin/login"; };
 
-  const StatCard = ({ title, value, icon }: any) => (
-    <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
-        <div className="flex justify-between mb-2"><div className="p-2 bg-teal-50 text-teal-600 rounded-lg">{icon}</div></div>
-        <div className="text-2xl font-bold text-slate-900">{value}</div>
-        <div className="text-sm text-slate-500">{title}</div>
+  const StatCard = ({ title, value, icon, trend, suffix, badge }: any) => (
+    <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 relative">
+      <div className="flex justify-between mb-4">
+        <div className="p-3 bg-teal-50 rounded-xl text-teal-600">{icon}</div>
+        {badge > 0 && <div className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center">{badge}</div>}
+      </div>
+      <div className="text-2xl font-bold text-slate-900 mb-1">{value}{suffix}</div>
+      <div className="text-sm text-slate-500">{title}</div>
     </div>
   );
 
@@ -258,8 +273,6 @@ export default function AdminDashboard() {
     <div className="min-h-screen bg-slate-50 font-sans text-slate-900 pb-20">
       <Navbar />
       <div className="pt-32 px-4 max-w-7xl mx-auto">
-        
-        {/* Header & Stats */}
         <div className="mb-8">
             <div className="flex justify-between items-center mb-6">
                 <h1 className="text-3xl font-black mb-2">Dashboard Admin 👑</h1>
@@ -268,41 +281,48 @@ export default function AdminDashboard() {
                     <button onClick={handleLogout} className="text-red-600 bg-white border px-3 py-2 rounded-lg text-sm font-bold">Déconnexion</button>
                 </div>
             </div>
-            
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-                <StatCard title="Revenus" value={`${stats.totalRevenue} €`} icon={<DollarSign/>}/>
+                <StatCard title="Revenus" value={stats.totalRevenue.toFixed(2)} suffix=" €" icon={<DollarSign/>}/>
                 <StatCard title="Commandes" value={stats.totalOrders} icon={<ShoppingBag/>}/>
-                <StatCard title="Partenaires" value={partners.length} icon={<Users/>}/>
-                <StatCard title="Messages" value={stats.newMessages} icon={<MessageSquare/>}/>
+                <StatCard title="Partenaires Actifs" value={stats.activePartners} icon={<Users/>}/>
+                <StatCard title="Messages" value={stats.newMessages} icon={<MessageSquare/>} badge={stats.newMessages}/>
             </div>
         </div>
 
-        {/* Onglets */}
         <div className="bg-white rounded-2xl shadow-sm border border-slate-100 mb-8 overflow-hidden">
             <div className="flex border-b border-slate-100 overflow-x-auto">
-                {["overview", "partners", "orders", "messages"].map(tab => (
-                    <button 
-                        key={tab} 
-                        onClick={() => setActiveTab(tab as any)}
-                        className={`px-6 py-4 font-bold capitalize ${activeTab === tab ? "text-teal-600 border-b-2 border-teal-600" : "text-slate-500"}`}
-                    >
-                        {tab === 'partners' ? 'Partenaires' : tab}
-                    </button>
+                {["overview", "partners", "orders", "messages", "cities", "users"].map(tab => (
+                    <button key={tab} onClick={() => setActiveTab(tab as any)} className={`px-6 py-4 font-bold capitalize ${activeTab === tab ? "text-teal-600 border-b-2 border-teal-600" : "text-slate-500"}`}>{tab}</button>
                 ))}
             </div>
 
             <div className="p-6">
-                
-                {/* --- ONGLET PARTENAIRES CORRIGÉ --- */}
+                {/* --- ONGLET OVERVIEW --- */}
+                {activeTab === "overview" && (
+                    <div className="space-y-8">
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            <div>
+                                <h3 className="font-bold mb-4">Évolution du CA</h3>
+                                <ResponsiveContainer width="100%" height={300}>
+                                    <LineChart data={monthlyData}><CartesianGrid strokeDasharray="3 3"/><XAxis dataKey="month"/><YAxis/><Tooltip/><Line type="monotone" dataKey="revenue" stroke="#14b8a6"/></LineChart>
+                                </ResponsiveContainer>
+                            </div>
+                            <div>
+                                <h3 className="font-bold mb-4">Répartition</h3>
+                                <ResponsiveContainer width="100%" height={300}>
+                                    <PieChart><Pie data={statusData} cx="50%" cy="50%" outerRadius={80} fill="#8884d8" dataKey="value" label>{statusData.map((entry: any, index: number) => <Cell key={`cell-${index}`} fill={entry.color}/>)}</Pie><Tooltip/></PieChart>
+                                </ResponsiveContainer>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {/* --- ONGLET PARTENAIRES --- */}
                 {activeTab === "partners" && (
                     <div>
                         <div className="flex justify-between mb-6">
                             <h3 className="font-bold text-lg">Gestion des Partenaires ({filteredPartners.length})</h3>
-                            <input 
-                                type="text" placeholder="Rechercher..." 
-                                className="border rounded-lg px-4 py-2 text-sm w-64"
-                                value={searchTerm} onChange={e => setSearchTerm(e.target.value)}
-                            />
+                            <input type="text" placeholder="Rechercher..." className="border rounded-lg px-4 py-2 text-sm w-64" value={searchTerm} onChange={e => setSearchTerm(e.target.value)} />
                         </div>
                         <div className="overflow-x-auto">
                             <table className="w-full text-left">
@@ -327,21 +347,13 @@ export default function AdminDashboard() {
                                             <td className="p-4 font-bold text-slate-900">{partner.company_name || partner.name}</td>
                                             <td className="p-4 text-slate-500">{partner.city}</td>
                                             <td className="p-4 text-right font-mono font-medium">{partner.totalRevenue} €</td>
-                                            
-                                            {/* ✅ VOICI LA COLONNE QUI MANQUAIT : LES BOUTONS */}
                                             <td className="p-4 text-right">
                                                 {partner.is_active ? (
-                                                    <button 
-                                                        onClick={() => togglePartnerStatus(partner.id, true)}
-                                                        className="bg-red-50 text-red-600 px-3 py-2 rounded-lg text-xs font-bold hover:bg-red-100 border border-red-200 transition"
-                                                    >
+                                                    <button onClick={() => togglePartnerStatus(partner.id, true)} className="bg-red-50 text-red-600 px-3 py-2 rounded-lg text-xs font-bold hover:bg-red-100 border border-red-200 transition">
                                                         Désactiver
                                                     </button>
                                                 ) : (
-                                                    <button 
-                                                        onClick={() => togglePartnerStatus(partner.id, false)}
-                                                        className="bg-green-600 text-white px-4 py-2 rounded-lg text-xs font-bold hover:bg-green-700 transition shadow-sm shadow-green-200"
-                                                    >
+                                                    <button onClick={() => togglePartnerStatus(partner.id, false)} className="bg-green-600 text-white px-4 py-2 rounded-lg text-xs font-bold hover:bg-green-700 transition shadow-sm shadow-green-200">
                                                         Accepter
                                                     </button>
                                                 )}
@@ -354,10 +366,79 @@ export default function AdminDashboard() {
                     </div>
                 )}
 
-                {/* --- AUTRES ONGLETS (Simplifiés pour l'affichage, mais fonctionnels via fetchData) --- */}
-                {activeTab === "overview" && <div className="h-64 flex items-center justify-center text-slate-400">Graphiques (voir code complet)</div>}
-                {activeTab === "orders" && <div className="h-64 flex items-center justify-center text-slate-400">Commandes (voir code complet)</div>}
-                {activeTab === "messages" && <div className="h-64 flex items-center justify-center text-slate-400">Messages (voir code complet)</div>}
+                {/* --- ONGLET ORDERS --- */}
+                {activeTab === "orders" && (
+                    <div>
+                        <div className="flex justify-between items-center mb-4">
+                            <h3 className="text-lg font-bold">Commandes ({filteredOrdersByTime.length})</h3>
+                            <button onClick={handleExportCSV} className="flex items-center gap-2 px-4 py-2 bg-teal-600 text-white rounded-lg text-sm font-bold"><Download size={16}/> CSV</button>
+                        </div>
+                        <div className="overflow-x-auto">
+                            <table className="w-full text-left text-sm">
+                                <thead className="bg-slate-50 text-slate-500 uppercase font-bold text-xs">
+                                    <tr><th className="p-3">ID</th><th className="p-3">Date</th><th className="p-3">Client</th><th className="p-3">Statut</th><th className="p-3">Partenaire</th></tr>
+                                </thead>
+                                <tbody>
+                                    {filteredOrdersByTime.slice(0, 50).map(o => (
+                                        <tr key={o.id} className="border-b hover:bg-slate-50">
+                                            <td className="p-3 font-mono">#{o.id.slice(0,6)}</td>
+                                            <td className="p-3">{new Date(o.created_at).toLocaleDateString()}</td>
+                                            <td className="p-3 truncate max-w-xs">{o.pickup_address}</td>
+                                            <td className="p-3"><span className="px-2 py-1 bg-slate-100 rounded text-xs font-bold uppercase">{o.status}</span></td>
+                                            <td className="p-3">{o.partner ? o.partner.company_name : 
+                                                <div className="flex gap-1">
+                                                    <select className="border rounded text-xs p-1" onChange={(e) => setSelectedPartnerForAssign(e.target.value)}><option>Choisir...</option>{partners.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}</select>
+                                                    <button onClick={() => assignPartner(o.id)} className="bg-slate-900 text-white text-xs px-2 rounded">OK</button>
+                                                </div>
+                                            }</td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                )}
+
+                {/* --- ONGLET CITIES --- */}
+                {activeTab === "cities" && (
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        {cityData.map((city, idx) => (
+                            <div key={idx} className="p-4 border rounded-xl bg-slate-50">
+                                <h4 className="font-bold text-lg">{city.name}</h4>
+                                <div className="flex justify-between mt-2 text-sm text-slate-600"><span>CA: {city.value.toFixed(2)}€</span><span>Cmds: {city.orders}</span></div>
+                            </div>
+                        ))}
+                    </div>
+                )}
+
+                {/* --- ONGLET MESSAGES --- */}
+                {activeTab === "messages" && (
+                    <div className="space-y-4">
+                        {messages.map(m => (
+                            <div key={m.id} className={`p-4 border rounded-xl ${m.read ? 'bg-white' : 'bg-teal-50 border-teal-200'}`}>
+                                <div className="flex justify-between mb-2">
+                                    <h4 className="font-bold">{m.subject || "Sans objet"} <span className="text-xs font-normal text-slate-500">({m.email})</span></h4>
+                                    {!m.read && <button onClick={() => markMessageAsRead(m.id)} className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded font-bold">Marquer lu</button>}
+                                </div>
+                                <p className="text-sm text-slate-700 mb-3">{m.message}</p>
+                                {selectedMessage?.id === m.id ? (
+                                    <div className="mt-2">
+                                        <textarea className="w-full border p-2 rounded text-sm" rows={3} placeholder="Réponse..." value={replyText} onChange={e => setReplyText(e.target.value)}/>
+                                        <div className="flex gap-2 mt-2">
+                                            <button onClick={() => handleReplyInApp(m)} className="bg-teal-600 text-white px-3 py-1 rounded text-sm font-bold">Envoyer</button>
+                                            <button onClick={() => setSelectedMessage(null)} className="bg-slate-200 px-3 py-1 rounded text-sm">Annuler</button>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <button onClick={() => setSelectedMessage(m)} className="text-teal-600 text-sm font-bold hover:underline">Répondre</button>
+                                )}
+                            </div>
+                        ))}
+                    </div>
+                )}
+
+                {/* --- ONGLET USERS --- */}
+                {activeTab === "users" && <div className="text-center py-10 text-slate-400">Gestion utilisateurs désactivée temporairement</div>}
 
             </div>
         </div>
