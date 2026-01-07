@@ -3,8 +3,8 @@ import { supabase } from "../lib/supabase";
 import Navbar from "../components/Navbar";
 import {
   Users, ShoppingBag, DollarSign, Search, Download,
-  TrendingUp, MapPin, MessageSquare, Mail, Trash2, Send, Database, AlertCircle, 
-  CheckCircle, LogOut, XCircle
+  TrendingUp, MapPin, Loader2, MessageSquare, Mail, Trash2, Send, 
+  Database, AlertCircle, CheckCircle, LogOut, XCircle
 } from "lucide-react";
 import {
   LineChart, Line, PieChart, Pie, Cell,
@@ -101,17 +101,74 @@ export default function AdminDashboard() {
       if (error) throw error;
 
       setPartners(partners.map(p => p.id === partnerId ? { ...p, is_active: newStatus } : p));
-      toast.success(`Partenaire ${newStatus ? 'activé' : 'désactivé'} !`, { id: toastId });
+      toast.success(`✅ Partenaire ${newStatus ? 'activé' : 'désactivé'} !`, { id: toastId });
+      
+      // Envoyer email d'acceptation si activation
+      if (newStatus) {
+        const partner = partners.find(p => p.id === partnerId);
+        if (partner?.email) {
+          sendAcceptanceEmail(partner);
+        }
+      }
     } catch (error: any) {
-      toast.error("Erreur : " + error.message, { id: toastId });
+      toast.error("❌ Erreur : " + error.message, { id: toastId });
+    }
+  };
+
+  // 📧 ENVOI EMAIL D'ACCEPTATION
+  const sendAcceptanceEmail = async (partner: any) => {
+    try {
+      await fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${RESEND_API_KEY}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          from: 'Kilolab <onboarding@resend.dev>',
+          to: [partner.email],
+          subject: '🎉 Bienvenue chez Kilolab !',
+          html: `
+            <div style="font-family: Arial, sans-serif; padding: 20px; max-width: 600px; margin: 0 auto;">
+              <div style="background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%); padding: 30px; border-radius: 12px 12px 0 0; text-align: center;">
+                <h1 style="color: white; margin: 0; font-size: 28px;">🎉 Félicitations !</h1>
+              </div>
+              <div style="background: white; padding: 30px; border: 1px solid #e5e7eb; border-top: none; border-radius: 0 0 12px 12px;">
+                <p style="font-size: 16px; color: #333;">Bonjour <strong>${partner.name}</strong>,</p>
+                <p style="font-size: 16px; color: #333; line-height: 1.6;">
+                  Nous avons le plaisir de vous informer que votre candidature a été <strong style="color: #14b8a6;">acceptée</strong> ! 
+                  Vous faites maintenant partie du réseau Kilolab.
+                </p>
+                <div style="background: #f0fdfa; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #14b8a6;">
+                  <p style="margin: 0; color: #0d9488; font-weight: 600;">🚀 Prochaines étapes :</p>
+                  <ul style="color: #333; margin: 10px 0; padding-left: 20px;">
+                    <li>Vous recevrez bientôt vos identifiants de connexion</li>
+                    <li>Accédez à votre tableau de bord partenaire</li>
+                    <li>Commencez à recevoir des commandes</li>
+                  </ul>
+                </div>
+                <p style="font-size: 16px; color: #333;">À très bientôt ! 👋</p>
+                <hr style="margin: 30px 0; border: none; border-top: 1px solid #e5e7eb;" />
+                <p style="font-size: 13px; color: #888; text-align: center;">
+                  L'équipe Kilolab<br>
+                  <a href="https://kilolab.fr" style="color: #14b8a6; text-decoration: none;">kilolab.fr</a>
+                </p>
+              </div>
+            </div>
+          `
+        })
+      });
+      console.log("✅ Email d'acceptation envoyé à", partner.email);
+    } catch (error) {
+      console.error("❌ Erreur envoi email acceptation:", error);
     }
   };
 
   // 🔥 FONCTION : REFUS + ENVOI EMAIL AUTOMATIQUE VIA RESEND
   const rejectPartner = async (partner: any) => {
-    if (!confirm(`⛔ Êtes-vous sûr de vouloir REFUSER ${partner.name} ?\n\nCela enverra un email automatique et supprimera sa demande.`)) return;
+    if (!confirm(`⛔ Êtes-vous sûr de vouloir REFUSER ${partner.name} ?\n\n✉️ Un email de refus sera envoyé automatiquement.`)) return;
 
-    const toastId = toast.loading("Envoi de l'email de refus...");
+    const toastId = toast.loading("📧 Envoi de l'email de refus...");
 
     try {
       // 1. Appel API Resend pour envoyer l'email
@@ -122,18 +179,33 @@ export default function AdminDashboard() {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          from: 'Kilolab <onboarding@resend.dev>', // ⚠️ Par défaut en mode test. Change en 'contact@kilolab.fr' si domaine vérifié.
+          from: 'Kilolab <onboarding@resend.dev>',
           to: [partner.email],
-          subject: 'Mise à jour de votre candidature Kilolab',
+          subject: 'Réponse à votre candidature Kilolab',
           html: `
-            <div style="font-family: Arial, sans-serif; padding: 20px; color: #333; line-height: 1.6;">
-              <h2 style="color: #ef4444;">Candidature non retenue</h2>
-              <p>Bonjour <strong>${partner.name}</strong>,</p>
-              <p>Nous vous remercions de l'intérêt que vous portez à Kilolab.</p>
-              <p>Après étude de votre dossier, nous ne sommes malheureusement pas en mesure de donner une suite favorable à votre demande d'inscription pour le moment.</p>
-              <p>Nous vous souhaitons une excellente continuation.</p>
-              <hr style="margin: 20px 0; border: none; border-top: 1px solid #eee;" />
-              <p style="font-size: 12px; color: #888;">L'équipe Kilolab</p>
+            <div style="font-family: Arial, sans-serif; padding: 20px; max-width: 600px; margin: 0 auto;">
+              <div style="background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); padding: 30px; border-radius: 12px 12px 0 0; text-align: center;">
+                <h1 style="color: white; margin: 0; font-size: 24px;">Candidature non retenue</h1>
+              </div>
+              <div style="background: white; padding: 30px; border: 1px solid #e5e7eb; border-top: none; border-radius: 0 0 12px 12px;">
+                <p style="font-size: 16px; color: #333;">Bonjour <strong>${partner.name}</strong>,</p>
+                <p style="font-size: 16px; color: #333; line-height: 1.6;">
+                  Nous vous remercions sincèrement de l'intérêt que vous portez à Kilolab.
+                </p>
+                <p style="font-size: 16px; color: #333; line-height: 1.6;">
+                  Après étude de votre dossier, nous ne sommes malheureusement pas en mesure de donner une suite favorable 
+                  à votre demande d'inscription pour le moment.
+                </p>
+                <p style="font-size: 16px; color: #333; line-height: 1.6;">
+                  Nous vous souhaitons une excellente continuation dans vos projets.
+                </p>
+                <hr style="margin: 30px 0; border: none; border-top: 1px solid #e5e7eb;" />
+                <p style="font-size: 13px; color: #888; text-align: center;">
+                  Cordialement,<br>
+                  L'équipe Kilolab<br>
+                  <a href="https://kilolab.fr" style="color: #14b8a6; text-decoration: none;">kilolab.fr</a>
+                </p>
+              </div>
             </div>
           `
         })
@@ -141,11 +213,10 @@ export default function AdminDashboard() {
 
       if (!emailResponse.ok) {
         const errorData = await emailResponse.json();
-        console.error("Erreur Resend:", errorData);
-        // On ne bloque pas la suppression si l'email échoue (ex: domaine non vérifié en mode test)
-        toast.error("Erreur email (vérifiez console). Suppression en cours...", { id: toastId });
+        console.error("❌ Erreur Resend:", errorData);
+        toast.error("⚠️ Erreur email (voir console). Suppression en cours...", { id: toastId });
       } else {
-        toast.loading("Email envoyé ! Suppression du dossier...", { id: toastId });
+        toast.loading("✅ Email envoyé ! Suppression du dossier...", { id: toastId });
       }
 
       // 2. Suppression de la base de données
@@ -155,11 +226,11 @@ export default function AdminDashboard() {
 
       // 3. Mise à jour UI
       setPartners(partners.filter(p => p.id !== partner.id));
-      toast.success("Partenaire refusé et supprimé.", { id: toastId });
+      toast.success("✅ Partenaire refusé et email envoyé", { id: toastId, duration: 4000 });
       
     } catch (error: any) {
       console.error(error);
-      toast.error("Erreur : " + error.message, { id: toastId });
+      toast.error("❌ Erreur : " + error.message, { id: toastId });
     }
   };
 
@@ -186,105 +257,281 @@ export default function AdminDashboard() {
       pending,
       newMessages,
       totalUsers: users.length,
-      revenueGrowth: 0,
-      ordersGrowth: 0,
     };
   }, [filteredOrdersByTime, orders, timeRange, messages, users, partners]);
 
-  const monthlyData = useMemo(() => [], [filteredOrdersByTime]); 
-  const cityData = useMemo(() => [], [filteredOrdersByTime]); 
-  const statusData = useMemo(() => [], [filteredOrdersByTime]); 
-
-  const markMessageAsRead = async (id:string) => { await supabase.from("contact_messages").update({ read: true }).eq("id", id); fetchData(); };
-  const handleReplyInApp = async (msg:any) => { 
-      if (!replyText.trim()) return toast.error("Écris une réponse");
-      try {
-        await supabase.from("support_responses").insert({ message_id: msg.id, response: replyText, admin_email: "admin@kilolab.fr" });
-        toast.success("Réponse interne enregistrée"); setReplyText(""); setSelectedMessage(null); markMessageAsRead(msg.id);
-      } catch(e:any) { toast.error(e.message); }
+  const markMessageAsRead = async (id: string) => { 
+    await supabase.from("contact_messages").update({ read: true }).eq("id", id); 
+    fetchData(); 
   };
-  const deleteMessage = async (id:string) => { await supabase.from("contact_messages").delete().eq("id", id); fetchData(); };
+
+  const handleReplyInApp = async (msg: any) => { 
+    if (!replyText.trim()) return toast.error("Écris une réponse");
+    try {
+      await supabase.from("support_responses").insert({ 
+        message_id: msg.id, 
+        response: replyText, 
+        admin_email: "admin@kilolab.fr" 
+      });
+      toast.success("Réponse enregistrée"); 
+      setReplyText(""); 
+      setSelectedMessage(null); 
+      markMessageAsRead(msg.id);
+    } catch(e: any) { 
+      toast.error(e.message); 
+    }
+  };
+
+  const deleteMessage = async (id: string) => { 
+    if (!confirm("Supprimer ce message ?")) return;
+    await supabase.from("contact_messages").delete().eq("id", id); 
+    toast.success("Message supprimé");
+    fetchData(); 
+  };
+
   const handleExportCSV = () => toast.success("Export CSV");
-  const handleLogout = async () => { await supabase.auth.signOut(); window.location.href = "/admin/login"; };
+  const handleLogout = async () => { 
+    await supabase.auth.signOut(); 
+    window.location.href = "/admin/login"; 
+  };
 
   const filteredPartners = useMemo(() => {
     let filtered = partners;
     if (statusFilter === "active") filtered = filtered.filter(p => p.is_active === true);
     else if (statusFilter === "pending") filtered = filtered.filter(p => p.is_active === false);
-    if (searchTerm) filtered = filtered.filter(p => (p.name || "").toLowerCase().includes(searchTerm.toLowerCase()));
+    if (searchTerm) {
+      filtered = filtered.filter(p => 
+        (p.name || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (p.city || "").toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
     return filtered;
   }, [partners, searchTerm, statusFilter]);
 
   const StatCard = ({ title, value, icon, suffix, badge }: any) => (
-    <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 relative">
+    <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 hover:shadow-md transition relative">
       <div className="flex justify-between mb-4">
         <div className="p-3 bg-teal-50 rounded-xl text-teal-600">{icon}</div>
-        {badge > 0 && <div className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center">{badge}</div>}
+        {badge !== undefined && badge > 0 && (
+          <div className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center">
+            {badge}
+          </div>
+        )}
       </div>
       <div className="text-2xl font-bold text-slate-900 mb-1">{value}{suffix}</div>
       <div className="text-sm text-slate-500">{title}</div>
     </div>
   );
 
-  if (loading) return <div className="min-h-screen flex items-center justify-center"><Loader2 className="animate-spin text-teal-600"/></div>;
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-slate-50">
+        <Loader2 className="animate-spin text-teal-600" size={48} />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-slate-50 font-sans text-slate-900 pb-20">
       <Navbar />
       <div className="pt-32 px-4 max-w-7xl mx-auto">
-        <div className="mb-8 flex justify-between items-center">
-            <h1 className="text-3xl font-black">Dashboard Admin 👑</h1>
-            <button onClick={handleLogout} className="text-red-600 bg-white border px-3 py-2 rounded-lg font-bold">Déconnexion</button>
+        <div className="mb-8">
+          <div className="flex justify-between items-center mb-6">
+            <div>
+              <h1 className="text-3xl font-black mb-2">Dashboard Admin 👑</h1>
+              <p className="text-slate-600">Gestion de la plateforme</p>
+            </div>
+            <div className="flex gap-3">
+              <button
+                onClick={() => window.open("https://supabase.com/dashboard", "_blank")}
+                className="bg-white border px-4 py-2 rounded-lg font-bold hover:bg-slate-50 transition flex items-center gap-2"
+              >
+                <Database size={16} />
+                Base de données
+              </button>
+              <button
+                onClick={handleLogout}
+                className="bg-red-50 border border-red-200 text-red-600 px-4 py-2 rounded-lg font-bold hover:bg-red-100 transition flex items-center gap-2"
+              >
+                <LogOut size={16} />
+                Déconnexion
+              </button>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <StatCard
+              title="Chiffre d'affaires"
+              value={stats.totalRevenue.toFixed(2)}
+              suffix=" €"
+              icon={<DollarSign size={24} />}
+            />
+            <StatCard
+              title="Commandes"
+              value={stats.totalOrders}
+              icon={<ShoppingBag size={24} />}
+            />
+            <StatCard
+              title="Partenaires Actifs"
+              value={stats.activePartners}
+              icon={<Users size={24} />}
+            />
+            <StatCard
+              title="Messages non lus"
+              value={stats.newMessages}
+              icon={<MessageSquare size={24} />}
+              badge={stats.newMessages}
+            />
+          </div>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-sm border border-slate-100 mb-8 p-6">
-            <div className="flex border-b mb-6 overflow-x-auto">
-                {["partners", "orders", "messages"].map(tab => (
-                    <button key={tab} onClick={() => setActiveTab(tab as any)} className={`px-6 py-4 font-bold capitalize ${activeTab === tab ? "text-teal-600 border-b-2 border-teal-600" : "text-slate-500"}`}>{tab}</button>
-                ))}
-            </div>
+        <div className="bg-white rounded-2xl shadow-sm border border-slate-100 mb-8">
+          <div className="flex border-b overflow-x-auto">
+            {(["partners", "orders", "messages"] as const).map((tab) => (
+              <button
+                key={tab}
+                onClick={() => setActiveTab(tab)}
+                className={`px-6 py-4 font-medium transition whitespace-nowrap capitalize ${
+                  activeTab === tab
+                    ? "text-teal-600 border-b-2 border-teal-600"
+                    : "text-slate-500 hover:text-slate-700"
+                }`}
+              >
+                {tab === "partners" ? `Partenaires (${partners.length})` :
+                 tab === "messages" ? `Messages (${stats.newMessages})` :
+                 tab === "orders" ? `Commandes (${stats.totalOrders})` :
+                 tab}
+              </button>
+            ))}
+          </div>
 
+          <div className="p-6">
             {activeTab === "partners" && (
-                <div>
-                    <div className="flex gap-2 mb-4">
-                        <button onClick={() => setStatusFilter("all")} className={`px-4 py-2 rounded font-bold ${statusFilter === 'all' ? 'bg-teal-600 text-white' : 'bg-slate-100'}`}>Tous</button>
-                        <button onClick={() => setStatusFilter("pending")} className={`px-4 py-2 rounded font-bold ${statusFilter === 'pending' ? 'bg-orange-500 text-white' : 'bg-slate-100'}`}>En attente</button>
-                        <button onClick={() => setStatusFilter("active")} className={`px-4 py-2 rounded font-bold ${statusFilter === 'active' ? 'bg-green-600 text-white' : 'bg-slate-100'}`}>Actifs</button>
-                    </div>
-                    <table className="w-full text-left">
-                        <thead className="bg-slate-50 text-slate-500 font-bold uppercase text-xs">
-                            <tr><th className="p-4">Statut</th><th className="p-4">Nom</th><th className="p-4 text-right">Actions</th></tr>
-                        </thead>
-                        <tbody>
-                            {filteredPartners.map(p => (
-                                <tr key={p.id} className="border-b hover:bg-slate-50">
-                                    <td className="p-4">
-                                        {p.is_active ? <span className="bg-green-100 text-green-700 px-2 py-1 rounded text-xs font-bold">Actif</span> 
-                                                     : <span className="bg-orange-100 text-orange-700 px-2 py-1 rounded text-xs font-bold">En attente</span>}
-                                    </td>
-                                    <td className="p-4 font-bold">{p.name} <div className="text-xs font-normal text-slate-500">{p.email}</div></td>
-                                    <td className="p-4 text-right flex justify-end gap-2">
-                                        {p.is_active ? (
-                                            <button onClick={() => togglePartnerStatus(p.id, true)} className="text-red-600 border border-red-200 px-3 py-1 rounded text-xs font-bold">Désactiver</button>
-                                        ) : (
-                                            <>
-                                                <button onClick={() => rejectPartner(p)} className="bg-red-50 text-red-600 border border-red-200 px-3 py-1 rounded text-xs font-bold flex items-center gap-1 hover:bg-red-100">
-                                                    <XCircle size={12}/> Refuser
-                                                </button>
-                                                <button onClick={() => togglePartnerStatus(p.id, false)} className="bg-green-600 text-white px-3 py-1 rounded text-xs font-bold flex items-center gap-1 hover:bg-green-700">
-                                                    <CheckCircle size={12}/> Accepter
-                                                </button>
-                                            </>
-                                        )}
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
+              <div>
+                <div className="flex flex-wrap gap-4 justify-between items-center mb-6">
+                  <div className="flex gap-2">
+                    <button 
+                      onClick={() => setStatusFilter("all")} 
+                      className={`px-4 py-2 rounded-lg font-bold transition ${statusFilter === 'all' ? 'bg-teal-600 text-white shadow-lg shadow-teal-500/30' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}
+                    >
+                      Tous ({partners.length})
+                    </button>
+                    <button 
+                      onClick={() => setStatusFilter("pending")} 
+                      className={`px-4 py-2 rounded-lg font-bold transition ${statusFilter === 'pending' ? 'bg-orange-500 text-white shadow-lg shadow-orange-500/30' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}
+                    >
+                      <AlertCircle size={14} className="inline mr-1" />
+                      En attente ({partners.filter(p => !p.is_active).length})
+                    </button>
+                    <button 
+                      onClick={() => setStatusFilter("active")} 
+                      className={`px-4 py-2 rounded-lg font-bold transition ${statusFilter === 'active' ? 'bg-green-600 text-white shadow-lg shadow-green-500/30' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}
+                    >
+                      <CheckCircle size={14} className="inline mr-1" />
+                      Actifs ({partners.filter(p => p.is_active).length})
+                    </button>
+                  </div>
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                    <input
+                      type="text"
+                      placeholder="Rechercher..."
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      className="pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 w-64"
+                    />
+                  </div>
                 </div>
+
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead>
+                      <tr className="border-b bg-slate-50">
+                        <th className="text-left py-3 px-4 text-sm font-semibold text-slate-600 uppercase">Statut</th>
+                        <th className="text-left py-3 px-4 text-sm font-semibold text-slate-600 uppercase">Partenaire</th>
+                        <th className="text-left py-3 px-4 text-sm font-semibold text-slate-600 uppercase">Ville</th>
+                        <th className="text-right py-3 px-4 text-sm font-semibold text-slate-600 uppercase">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {filteredPartners.length === 0 ? (
+                        <tr>
+                          <td colSpan={4} className="py-12 text-center text-slate-400">
+                            <Users size={48} className="mx-auto mb-3 opacity-30" />
+                            <p className="font-bold">Aucun partenaire trouvé</p>
+                          </td>
+                        </tr>
+                      ) : (
+                        filteredPartners.map((p) => (
+                          <tr key={p.id} className="border-b hover:bg-slate-50 transition">
+                            <td className="py-3 px-4">
+                              {p.is_active ? (
+                                <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-bold border border-green-300 inline-flex items-center gap-1">
+                                  <CheckCircle size={12} />
+                                  Actif
+                                </span>
+                              ) : (
+                                <span className="bg-orange-100 text-orange-700 px-3 py-1 rounded-full text-xs font-bold border border-orange-300 inline-flex items-center gap-1">
+                                  <AlertCircle size={12} />
+                                  En attente
+                                </span>
+                              )}
+                            </td>
+                            <td className="py-3 px-4">
+                              <div className="font-bold text-slate-900">{p.name}</div>
+                              <div className="text-xs text-slate-500">{p.email}</div>
+                            </td>
+                            <td className="py-3 px-4 text-slate-700">
+                              <span className="inline-flex items-center gap-1">
+                                <MapPin size={14} className="text-slate-400" />
+                                {p.city || "Non spécifié"}
+                              </span>
+                            </td>
+                            <td className="py-3 px-4 text-right">
+                              <div className="flex justify-end gap-2">
+                                {p.is_active ? (
+                                  <button
+                                    onClick={() => togglePartnerStatus(p.id, true)}
+                                    className="bg-white border border-red-200 text-red-600 px-3 py-2 rounded-lg text-xs font-bold hover:bg-red-50 transition"
+                                  >
+                                    Désactiver
+                                  </button>
+                                ) : (
+                                  <>
+                                    <button
+                                      onClick={() => rejectPartner(p)}
+                                      className="bg-red-50 text-red-600 border border-red-200 px-3 py-2 rounded-lg text-xs font-bold hover:bg-red-100 transition inline-flex items-center gap-1"
+                                    >
+                                      <XCircle size={14} /> 
+                                      Refuser
+                                    </button>
+                                    <button
+                                      onClick={() => togglePartnerStatus(p.id, false)}
+                                      className="bg-green-600 text-white px-3 py-2 rounded-lg text-xs font-bold hover:bg-green-700 transition shadow-sm shadow-green-200 inline-flex items-center gap-1"
+                                    >
+                                      <CheckCircle size={14} /> 
+                                      Accepter
+                                    </button>
+                                  </>
+                                )}
+                              </div>
+                            </td>
+                          </tr>
+                        ))
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
             )}
-            
-            {activeTab !== "partners" && <div className="text-center text-slate-400 py-10">Module {activeTab} actif (voir code complet pour détails)</div>}
+
+            {activeTab !== "partners" && (
+              <div className="text-center text-slate-400 py-10">
+                <p className="font-bold">Module {activeTab} à implémenter</p>
+                <p className="text-sm mt-2">Voir le code complet pour les détails</p>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>
