@@ -35,10 +35,10 @@ export default function AdminDashboard() {
     try {
       const { data: ordersData, error: ordersError } = await supabase
         .from("orders")
-        .select(\`
+        .select(`
           *,
           partner:partners!orders_partner_id_fkey(company_name)
-        \`)
+        `)
         .order("created_at", { ascending: false });
 
       if (ordersError) console.error("Orders error:", ordersError);
@@ -90,7 +90,7 @@ export default function AdminDashboard() {
           ...partner,
           id: partner.id,
           email: partner.email,
-          name: partner.company_name || partner.name || \`Partenaire \${partner.id.slice(0, 6)}\`,
+          name: partner.company_name || partner.name || `Partenaire ${partner.id.slice(0, 6)}`,
           city: partner.city || "Non spécifié",
           is_active: partner.is_active,
           totalOrders: stats.totalOrders,
@@ -124,7 +124,7 @@ export default function AdminDashboard() {
 
   // ❌ REFUSER VIA RPC (Résout CORS)
   const rejectPartner = async (partner: any) => {
-    if (!confirm(\`⛔ Refuser \${partner.name} ?\n\nUn email sera envoyé.\`)) return;
+    if (!confirm(`⛔ Refuser ${partner.name} ?\n\nUn email sera envoyé.`)) return;
     const toastId = toast.loading("⏳ Refus...");
     try {
       const { error } = await supabase.rpc('admin_reject_partner', { partner_uuid: partner.id });
@@ -199,7 +199,7 @@ export default function AdminDashboard() {
       .filter(o => o.status === "completed")
       .forEach(order => {
         const date = new Date(order.created_at);
-        const monthKey = \`\${date.getFullYear()}-\${String(date.getMonth() + 1).padStart(2, "0")}\`;
+        const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
         const monthName = date.toLocaleDateString("fr-FR", { month: "short", year: "2-digit" });
         if (!months[monthKey]) months[monthKey] = { month: monthName, revenue: 0, orders: 0 };
         months[monthKey].revenue += parseFloat(order.total_price || 0);
@@ -329,7 +329,7 @@ export default function AdminDashboard() {
       <div className="flex items-start justify-between mb-4">
         <div className="p-3 bg-teal-50 rounded-xl text-teal-600">{icon}</div>
         {trend !== undefined && (
-          <div className={\`flex items-center gap-1 text-sm font-semibold \${trend >= 0 ? "text-green-600" : "text-red-600"}\`}>
+          <div className={`flex items-center gap-1 text-sm font-semibold ${trend >= 0 ? "text-green-600" : "text-red-600"}`}>
             {trend >= 0 ? <TrendingUp size={16} /> : <TrendingDown size={16} />}
             {Math.abs(trend).toFixed(1)}%
           </div>
@@ -363,13 +363,13 @@ export default function AdminDashboard() {
     const csvHeader = "Date,ID Commande,Client,Montant,Poids,Statut,Partenaire\n";
     const csvData = filteredOrdersByTime
       .slice(0, 100)
-      .map(o => \`\${new Date(o.created_at).toLocaleDateString()},\${o.id.slice(0, 8)},\${o.pickup_address || "N/A"},\${o.total_price},\${o.weight},\${o.status},\${o.partner?.company_name || 'Non attribué'}\`)
+      .map(o => `${new Date(o.created_at).toLocaleDateString()},${o.id.slice(0, 8)},${o.pickup_address || "N/A"},${o.total_price},${o.weight},${o.status},${o.partner?.company_name || 'Non attribué'}`)
       .join("\n");
     const blob = new Blob([csvHeader + csvData], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
-    link.download = \`kilolab-export-\${new Date().toISOString().split("T")[0]}.csv\`;
+    link.download = `kilolab-export-${new Date().toISOString().split("T")[0]}.csv`;
     link.click();
     URL.revokeObjectURL(url);
     toast.success("Export CSV !");
@@ -402,7 +402,7 @@ export default function AdminDashboard() {
               <p className="text-slate-600">Vue d'ensemble</p>
             </div>
             <div className="flex gap-3">
-              <button onClick={() => window.open("https://supabase.com/dashboard/project/dhecegehcjelbxydeolg", "_blank")} className="bg-white border px-4 py-2 rounded-lg text-sm font-bold hover:bg-slate-50 flex items-center gap-2">
+              <button onClick={() => window.open("https://supabase.com/dashboard", "_blank")} className="bg-white border px-4 py-2 rounded-lg text-sm font-bold hover:bg-slate-50 flex items-center gap-2">
                 <Database size={16} />
                 Supabase
               </button>
@@ -415,7 +415,7 @@ export default function AdminDashboard() {
 
           <div className="flex gap-2 mb-6 flex-wrap">
             {(["7d", "30d", "90d", "all"] as const).map((range) => (
-              <button key={range} onClick={() => setTimeRange(range)} className={\`px-4 py-2 rounded-lg font-medium transition \${timeRange === range ? "bg-teal-600 text-white shadow-md" : "bg-white text-slate-600 hover:bg-slate-50"}\`}>
+              <button key={range} onClick={() => setTimeRange(range)} className={`px-4 py-2 rounded-lg font-medium transition ${timeRange === range ? "bg-teal-600 text-white shadow-md" : "bg-white text-slate-600 hover:bg-slate-50"}`}>
                 {range === "7d" ? "7 jours" : range === "30d" ? "30 jours" : range === "90d" ? "90 jours" : "Tout"}
               </button>
             ))}
@@ -432,8 +432,8 @@ export default function AdminDashboard() {
         <div className="bg-white rounded-2xl shadow-sm border mb-8">
           <div className="flex border-b overflow-x-auto">
             {(["overview", "messages", "users", "partners", "cities", "orders"] as const).map((tab) => (
-              <button key={tab} onClick={() => setActiveTab(tab)} className={\`px-6 py-4 font-medium transition whitespace-nowrap \${activeTab === tab ? "text-teal-600 border-b-2 border-teal-600" : "text-slate-500"}\`}>
-                {tab === "overview" ? "Vue" : tab === "messages" ? \`Messages (\${stats.newMessages})\` : tab === "users" ? "Users" : tab === "partners" ? "Partenaires" : tab === "cities" ? "Villes" : "Commandes"}
+              <button key={tab} onClick={() => setActiveTab(tab)} className={`px-6 py-4 font-medium transition whitespace-nowrap ${activeTab === tab ? "text-teal-600 border-b-2 border-teal-600" : "text-slate-500 hover:text-slate-700"}`}>
+                {tab === "overview" ? "Vue" : tab === "messages" ? `Messages (${stats.newMessages})` : tab === "users" ? "Users" : tab === "partners" ? "Partenaires" : tab === "cities" ? "Villes" : "Commandes"}
               </button>
             ))}
           </div>
@@ -474,8 +474,8 @@ export default function AdminDashboard() {
                     <h3 className="text-lg font-bold mb-4">Répartition</h3>
                     <ResponsiveContainer width="100%" height={300}>
                       <PieChart>
-                        <Pie data={statusData} cx="50%" cy="50%" labelLine={false} label={({ name, percent }) => \`\${name} \${(percent * 100).toFixed(0)}%\`} outerRadius={80} dataKey="value">
-                          {statusData.map((entry, index) => <Cell key={\`cell-\${index}\`} fill={entry.color} />)}
+                        <Pie data={statusData} cx="50%" cy="50%" labelLine={false} label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`} outerRadius={80} dataKey="value">
+                          {statusData.map((entry, index) => <Cell key={`cell-${index}`} fill={entry.color} />)}
                         </Pie>
                         <Tooltip />
                       </PieChart>
@@ -508,7 +508,7 @@ export default function AdminDashboard() {
                 ) : (
                   <div className="space-y-4">
                     {messages.map((message) => (
-                      <div key={message.id} className={\`border rounded-xl p-4 hover:shadow-md \${message.read ? "bg-white" : "bg-teal-50 border-teal-200"}\`}>
+                      <div key={message.id} className={`border rounded-xl p-4 hover:shadow-md ${message.read ? "bg-white border-slate-200" : "bg-teal-50 border-teal-200"}`}>
                         <div className="flex justify-between mb-3">
                           <div className="flex-1">
                             <div className="flex gap-3 mb-2">
@@ -535,7 +535,7 @@ export default function AdminDashboard() {
                             {message.support_responses.sort((a:any, b:any) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()).map((resp: any) => (
                               <div key={resp.id} className="bg-white p-3 rounded-lg shadow-sm text-sm border border-teal-100">
                                 <div className="flex justify-between text-xs text-slate-400 mb-1">
-                                  <span className="font-bold text-teal-700">Admin</span>
+                                  <span className="font-bold text-teal-700">Vous (Admin)</span>
                                   <span>{new Date(resp.created_at).toLocaleDateString("fr-FR")} {new Date(resp.created_at).toLocaleTimeString("fr-FR", {hour: '2-digit', minute:'2-digit'})}</span>
                                 </div>
                                 <p className="whitespace-pre-wrap">{resp.response}</p>
@@ -590,11 +590,11 @@ export default function AdminDashboard() {
 
             {activeTab === "partners" && (
               <div>
-                <div className="flex flex-wrap gap-4 justify-between mb-6">
+                <div className="flex flex-wrap gap-4 justify-between items-center mb-6">
                   <div className="flex gap-2">
-                    <button onClick={() => setStatusFilter("all")} className={\`px-4 py-2 rounded-lg font-bold text-sm \${statusFilter === "all" ? "bg-teal-600 text-white shadow-lg" : "bg-slate-100"}\`}>Tous ({partners.length})</button>
-                    <button onClick={() => setStatusFilter("pending")} className={\`px-4 py-2 rounded-lg font-bold text-sm \${statusFilter === "pending" ? "bg-orange-500 text-white shadow-lg" : "bg-slate-100"}\`}><AlertCircle size={14} className="inline mr-1" />En attente ({partners.filter(p => !p.is_active).length})</button>
-                    <button onClick={() => setStatusFilter("active")} className={\`px-4 py-2 rounded-lg font-bold text-sm \${statusFilter === "active" ? "bg-green-600 text-white shadow-lg" : "bg-slate-100"}\`}><CheckCircle size={14} className="inline mr-1" />Actifs ({partners.filter(p => p.is_active).length})</button>
+                    <button onClick={() => setStatusFilter("all")} className={`px-4 py-2 rounded-lg font-bold text-sm ${statusFilter === "all" ? "bg-teal-600 text-white shadow-lg" : "bg-slate-100"}`}>Tous ({partners.length})</button>
+                    <button onClick={() => setStatusFilter("pending")} className={`px-4 py-2 rounded-lg font-bold text-sm ${statusFilter === "pending" ? "bg-orange-500 text-white shadow-lg" : "bg-slate-100"}`}><AlertCircle size={14} className="inline mr-1" />En attente ({partners.filter(p => !p.is_active).length})</button>
+                    <button onClick={() => setStatusFilter("active")} className={`px-4 py-2 rounded-lg font-bold text-sm ${statusFilter === "active" ? "bg-green-600 text-white shadow-lg" : "bg-slate-100"}`}><CheckCircle size={14} className="inline mr-1" />Actifs ({partners.filter(p => p.is_active).length})</button>
                   </div>
                   <div className="relative">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
@@ -682,7 +682,7 @@ export default function AdminDashboard() {
                           <td className="p-4 text-slate-500">{new Date(order.created_at).toLocaleDateString("fr-FR")}</td>
                           <td className="p-4"><div className="font-bold truncate max-w-xs">{order.pickup_address || "Adresse inconnue"}</div></td>
                           <td className="p-4"><span className="font-bold">{order.weight || "?"} kg</span></td>
-                          <td className="p-4"><span className={\`px-2 py-1 rounded-full text-xs font-bold uppercase \${order.status === "pending" ? "bg-orange-100 text-orange-700" : order.status === "assigned" ? "bg-purple-100 text-purple-700" : order.status === "completed" ? "bg-green-100 text-green-700" : order.status === "in_progress" ? "bg-blue-100 text-blue-700" : "bg-slate-100"}\`}>{order.status}</span></td>
+                          <td className="p-4"><span className={`px-2 py-1 rounded-full text-xs font-bold uppercase ${order.status === "pending" ? "bg-orange-100 text-orange-700" : order.status === "assigned" ? "bg-purple-100 text-purple-700" : order.status === "completed" ? "bg-green-100 text-green-700" : order.status === "in_progress" ? "bg-blue-100 text-blue-700" : "bg-slate-100"}`}>{order.status}</span></td>
                           <td className="p-4">
                             {order.partner ? (
                               <span className="font-bold flex items-center gap-1"><CheckCircle size={14} className="text-green-500" />{order.partner.company_name}</span>
