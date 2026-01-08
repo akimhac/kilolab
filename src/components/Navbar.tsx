@@ -1,146 +1,76 @@
-import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Menu, X, LogOut } from 'lucide-react';
-import { useState, useEffect } from 'react';
-import { supabase } from '../lib/supabase';
-import toast from 'react-hot-toast';
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
+import { User, LogOut, LayoutDashboard, Shirt } from "lucide-react";
 
 export default function Navbar() {
-  const [isOpen, setIsOpen] = useState(false);
-  const [user, setUser] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
-  const location = useLocation();
+  const { user, signOut } = useAuth();
   const navigate = useNavigate();
 
-  // 🔥 VÉRIFICATION DE L'UTILISATEUR CONNECTÉ
-  useEffect(() => {
-    checkUser();
-    
-    // 🎧 ÉCOUTER LES CHANGEMENTS D'AUTH
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
-    });
-
-    return () => subscription.unsubscribe();
-  }, []);
-
-  const checkUser = async () => {
-    const { data: { session } } = await supabase.auth.getSession();
-    setUser(session?.user ?? null);
-    setLoading(false);
-  };
-
-  // 🚪 DÉCONNEXION
   const handleLogout = async () => {
-    await supabase.auth.signOut();
-    setUser(null);
-    toast.success('Déconnexion réussie');
-    navigate('/');
+    await signOut();
+    navigate("/login");
   };
 
   return (
-    <nav className="fixed w-full z-50 bg-white/80 backdrop-blur-md border-b border-slate-100 transition-all duration-300">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-20">
-          
-          {/* LOGO */}
-          <Link to="/" className="flex items-center gap-2 group">
-            <div className="w-10 h-10 bg-teal-500 rounded-xl flex items-center justify-center text-white font-black text-xl shadow-lg shadow-teal-500/20 group-hover:scale-105 transition-transform">
-              K
-            </div>
-            <span className="font-black text-2xl tracking-tight text-slate-900">
-              Kilolab<span className="text-teal-500">.</span>
-            </span>
+    <nav className="fixed w-full bg-white/80 backdrop-blur-md z-50 border-b border-slate-100 h-20">
+      <div className="max-w-7xl mx-auto px-4 h-full flex items-center justify-between">
+        
+        <Link to="/" className="flex items-center gap-2">
+          <div className="bg-teal-500 text-white p-2 rounded-lg">
+            <Shirt size={24} strokeWidth={3} />
+          </div>
+          <span className="text-2xl font-black tracking-tighter text-slate-900">
+            Kilolab<span className="text-teal-500">.</span>
+          </span>
+        </Link>
+
+        <div className="flex items-center gap-6">
+          <Link to="/trouver-pressing" className="hidden md:block font-bold text-slate-600 hover:text-teal-600 transition">
+            Trouver un pressing
+          </Link>
+          <Link to="/tarifs" className="hidden md:block font-bold text-slate-600 hover:text-teal-600 transition">
+            Tarifs
           </Link>
 
-          {/* MENU DESKTOP */}
-          <div className="hidden md:flex items-center gap-8">
-            <Link to="/new-order" className="text-sm font-bold text-slate-500 hover:text-slate-900 transition-colors">
-              Trouver un pressing
-            </Link>
-            <Link to="/tarifs" className="text-sm font-bold text-slate-500 hover:text-slate-900 transition-colors">
-              Tarifs
-            </Link>
-            
-            {/* LIEN VERS LA PAGE DE VENTE B2B (PUBLIC) */}
-            <Link to="/partner" className="text-sm font-bold text-teal-600 bg-teal-50 px-4 py-2 rounded-full hover:bg-teal-100 transition-colors">
-              Espace Pro B2B
-            </Link>
+          <Link 
+            to="/pro" 
+            className="hidden md:block bg-teal-50 text-teal-700 px-4 py-2 rounded-full font-bold hover:bg-teal-100 transition border border-teal-100"
+          >
+            Vous êtes un pressing ?
+          </Link>
 
-            <div className="h-6 w-px bg-slate-200 mx-2"></div>
-
-            {/* 🔥 CONNEXION / DÉCONNEXION CONDITIONNEL */}
-            {!loading && (
-              user ? (
-                <button 
-                  onClick={handleLogout}
-                  className="text-sm font-bold text-slate-500 hover:text-red-600 transition-colors flex items-center gap-2"
-                >
-                  <LogOut size={16}/> Déconnexion
-                </button>
-              ) : (
-                <Link to="/login" className="text-sm font-bold text-slate-900 hover:text-teal-600 transition-colors">
-                  Connexion
-                </Link>
-              )
-            )}
-
-            <Link 
-              to="/new-order" 
-              className="bg-slate-900 text-white px-6 py-3 rounded-full font-bold text-sm hover:bg-slate-800 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
-            >
-              Nouvelle Commande
-            </Link>
-          </div>
-
-          {/* BOUTON MOBILE */}
-          <div className="md:hidden flex items-center">
-            <button onClick={() => setIsOpen(!isOpen)} className="text-slate-900 p-2">
-              {isOpen ? <X size={28} /> : <Menu size={28} />}
-            </button>
-          </div>
+          {user ? (
+            <div className="flex items-center gap-4 pl-4 border-l border-slate-200">
+              <Link 
+                to={user.user_metadata?.role === 'admin' ? "/admin/dashboard" : "/dashboard"}
+                className="flex items-center gap-2 font-bold text-slate-900 hover:text-teal-600 transition"
+              >
+                <LayoutDashboard size={20} />
+                <span className="hidden sm:inline">Mon Espace</span>
+              </Link>
+              <button 
+                onClick={handleLogout}
+                className="text-slate-400 hover:text-red-500 transition"
+                title="Déconnexion"
+              >
+                <LogOut size={20} />
+              </button>
+            </div>
+          ) : (
+            <div className="flex items-center gap-3 pl-4 border-l border-slate-200">
+              <Link to="/login" className="font-bold text-slate-900 hover:text-teal-600 transition">
+                Connexion
+              </Link>
+              <Link 
+                to="/register" 
+                className="bg-slate-900 text-white px-5 py-2.5 rounded-full font-bold hover:bg-slate-800 transition shadow-lg shadow-slate-200"
+              >
+                S'inscrire
+              </Link>
+            </div>
+          )}
         </div>
       </div>
-
-      {/* MENU MOBILE */}
-      {isOpen && (
-        <div className="md:hidden bg-white border-t border-slate-100 absolute w-full shadow-2xl animate-fade-in-down">
-          <div className="px-4 py-6 space-y-4 flex flex-col">
-            <Link to="/new-order" onClick={() => setIsOpen(false)} className="text-lg font-bold text-slate-600 py-2">
-              Trouver un pressing
-            </Link>
-            <Link to="/tarifs" onClick={() => setIsOpen(false)} className="text-lg font-bold text-slate-600 py-2">
-              Tarifs
-            </Link>
-            <Link to="/partner" onClick={() => setIsOpen(false)} className="text-lg font-bold text-teal-600 py-2">
-              Devenir Partenaire
-            </Link>
-            <hr className="border-slate-100"/>
-            
-            {/* 🔥 MOBILE : CONNEXION / DÉCONNEXION */}
-            {!loading && (
-              user ? (
-                <button 
-                  onClick={() => {
-                    handleLogout();
-                    setIsOpen(false);
-                  }}
-                  className="text-lg font-bold text-red-600 py-2 flex items-center gap-2"
-                >
-                  <LogOut size={20}/> Déconnexion
-                </button>
-              ) : (
-                <Link to="/login" onClick={() => setIsOpen(false)} className="text-lg font-bold text-slate-900 py-2">
-                  Se connecter
-                </Link>
-              )
-            )}
-            
-            <Link to="/new-order" onClick={() => setIsOpen(false)} className="bg-slate-900 text-white text-center py-4 rounded-xl font-bold text-lg shadow-lg">
-              Commander
-            </Link>
-          </div>
-        </div>
-      )}
     </nav>
   );
 }
