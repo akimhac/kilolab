@@ -1,7 +1,7 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { useState, useRef, useEffect } from "react";
-import { User, LogOut, LayoutDashboard, Shirt, ChevronDown } from "lucide-react";
+import { User, LogOut, LayoutDashboard, Shirt, ChevronDown, Settings } from "lucide-react";
 
 export default function Navbar() {
   const { user, signOut } = useAuth();
@@ -25,11 +25,11 @@ export default function Navbar() {
   }, []);
 
   return (
-    <nav className="fixed w-full bg-white/90 backdrop-blur-md z-50 border-b border-slate-100 h-20">
+    <nav className="fixed w-full bg-white/90 backdrop-blur-md z-50 border-b border-slate-100 h-20 transition-all">
       <div className="max-w-7xl mx-auto px-4 h-full flex items-center justify-between">
         
-        <Link to="/" className="flex items-center gap-2">
-          <div className="bg-teal-500 text-white p-2.5 rounded-xl shadow-lg shadow-teal-200">
+        <Link to="/" className="flex items-center gap-2 group">
+          <div className="bg-teal-500 text-white p-2.5 rounded-xl shadow-lg shadow-teal-200 group-hover:scale-105 transition">
             <Shirt size={24} strokeWidth={3} />
           </div>
           <span className="text-2xl font-black tracking-tighter text-slate-900">
@@ -38,15 +38,9 @@ export default function Navbar() {
         </Link>
 
         <div className="flex items-center gap-6">
-          <Link to="/trouver" className="hidden md:block font-bold text-slate-600 hover:text-teal-600 transition text-sm">
-            Trouver un pressing
-          </Link>
-          <Link to="/tarifs" className="hidden md:block font-bold text-slate-600 hover:text-teal-600 transition text-sm">
-            Tarifs
-          </Link>
-          <Link to="/partner" className="hidden md:block bg-teal-50 text-teal-700 px-4 py-2 rounded-full font-bold hover:bg-teal-100 transition border border-teal-100 text-sm">
-            Vous êtes un pressing ?
-          </Link>
+          <Link to="/trouver" className="hidden md:block font-bold text-slate-600 hover:text-teal-600 transition text-sm">Trouver un pressing</Link>
+          <Link to="/tarifs" className="hidden md:block font-bold text-slate-600 hover:text-teal-600 transition text-sm">Tarifs</Link>
+          <Link to="/partner" className="hidden md:block bg-teal-50 text-teal-700 px-4 py-2 rounded-full font-bold hover:bg-teal-100 transition border border-teal-100 text-sm">Vous êtes un pressing ?</Link>
 
           {user ? (
             <div className="relative pl-4 border-l border-slate-200" ref={menuRef}>
@@ -80,6 +74,17 @@ export default function Navbar() {
                     Tableau de bord
                   </Link>
                   
+                  <Link 
+                    to="/settings"
+                    className="flex items-center gap-3 px-4 py-3 hover:bg-slate-50 transition text-slate-700 font-medium"
+                    onClick={() => setShowMenu(false)}
+                  >
+                    <Settings size={18} className="text-slate-600" />
+                    Paramètres
+                  </Link>
+                  
+                  <div className="h-px bg-slate-100 my-1"></div>
+                  
                   <button 
                     onClick={() => {
                       setShowMenu(false);
@@ -95,12 +100,8 @@ export default function Navbar() {
             </div>
           ) : (
             <div className="flex items-center gap-3 pl-4 border-l border-slate-200">
-              <Link to="/login" className="font-bold text-slate-900 hover:text-teal-600 transition text-sm">
-                Connexion
-              </Link>
-              <Link to="/login" className="bg-slate-900 text-white px-5 py-2.5 rounded-full font-bold hover:bg-slate-800 transition shadow-lg shadow-slate-200 text-sm">
-                S'inscrire
-              </Link>
+              <Link to="/login" className="font-bold text-slate-900 hover:text-teal-600 transition text-sm">Connexion</Link>
+              <Link to="/login" className="bg-slate-900 text-white px-5 py-2.5 rounded-full font-bold hover:bg-slate-800 transition shadow-lg shadow-slate-200 text-sm">S'inscrire</Link>
             </div>
           )}
         </div>
