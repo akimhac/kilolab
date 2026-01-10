@@ -37,7 +37,6 @@ module.exports = async (req, res) => {
       .single();
 
     if (profile?.stripe_account_id) {
-      // Compte existe, créer juste un nouveau lien
       const accountLink = await stripe.accountLinks.create({
         account: profile.stripe_account_id,
         refresh_url: `https://kilolab.fr/connect-stripe?refresh=true`,
@@ -59,7 +58,7 @@ module.exports = async (req, res) => {
       business_type: 'company',
       business_profile: { 
         name: businessName || 'Pressing Partenaire',
-        mcc: '7210', // Laundry services
+        mcc: '7210',
       },
       capabilities: {
         card_payments: { requested: true },
@@ -76,7 +75,6 @@ module.exports = async (req, res) => {
       })
       .eq('id', userId);
 
-    // Créer le lien d'onboarding
     const accountLink = await stripe.accountLinks.create({
       account: account.id,
       refresh_url: `https://kilolab.fr/connect-stripe?refresh=true`,

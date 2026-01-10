@@ -22,11 +22,10 @@ module.exports = async (req, res) => {
       process.env.STRIPE_WEBHOOK_SECRET
     );
   } catch (err) {
-    console.error('Webhook signature verification failed:', err.message);
+    console.error('Webhook Error:', err.message);
     return res.status(400).json({ error: 'Webhook Error' });
   }
 
-  // Gérer les événements
   switch (event.type) {
     case 'account.updated':
       const account = event.data.object;
@@ -46,7 +45,7 @@ module.exports = async (req, res) => {
       break;
 
     default:
-      console.log(`Unhandled event type: ${event.type}`);
+      console.log(`Unhandled event: ${event.type}`);
   }
 
   res.status(200).json({ received: true });

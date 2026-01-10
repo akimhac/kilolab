@@ -37,12 +37,10 @@ export default function SetPassword() {
     setLoading(true);
 
     try {
-      const { data, error } = await supabase.auth.signUp({
+      const { error } = await supabase.auth.signUp({
         email: email!,
         password: password,
-        options: {
-          data: { role: 'partner' }
-        }
+        options: { data: { role: 'partner' } }
       });
 
       if (error) throw error;
@@ -56,14 +54,11 @@ export default function SetPassword() {
         .eq('email', email);
 
       toast.success('Mot de passe créé avec succès !');
-      
-      setTimeout(() => {
-        navigate('/login?type=partner');
-      }, 1500);
+      setTimeout(() => navigate('/login?type=partner'), 1500);
 
     } catch (error: any) {
       console.error('Erreur:', error);
-      toast.error(error.message || 'Erreur lors de la création du mot de passe');
+      toast.error(error.message || 'Erreur');
     } finally {
       setLoading(false);
     }
@@ -76,20 +71,14 @@ export default function SetPassword() {
           <div className="inline-flex items-center justify-center w-16 h-16 bg-teal-100 rounded-full mb-4">
             <Lock className="w-8 h-8 text-teal-600" />
           </div>
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">
-            Créez votre mot de passe
-          </h1>
-          <p className="text-gray-600">
-            Votre compte pressing a été validé !
-          </p>
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">Créez votre mot de passe</h1>
+          <p className="text-gray-600">Votre compte pressing a été validé !</p>
           <p className="text-sm text-gray-500 mt-2">{email}</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <label className="block text-sm font-bold text-gray-700 mb-2">
-              Mot de passe
-            </label>
+            <label className="block text-sm font-bold text-gray-700 mb-2">Mot de passe</label>
             <div className="relative">
               <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
               <input
@@ -112,9 +101,7 @@ export default function SetPassword() {
           </div>
 
           <div>
-            <label className="block text-sm font-bold text-gray-700 mb-2">
-              Confirmer le mot de passe
-            </label>
+            <label className="block text-sm font-bold text-gray-700 mb-2">Confirmer</label>
             <div className="relative">
               <CheckCircle className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
               <input
@@ -122,7 +109,7 @@ export default function SetPassword() {
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:border-teal-500 focus:outline-none"
-                placeholder="Confirmez votre mot de passe"
+                placeholder="Confirmez"
                 required
                 minLength={6}
               />
@@ -150,13 +137,9 @@ export default function SetPassword() {
             disabled={loading || password.length < 6 || password !== confirmPassword}
             className="w-full bg-gradient-to-r from-teal-600 to-cyan-600 text-white py-4 rounded-xl font-bold hover:from-teal-700 hover:to-cyan-700 transition-all shadow-lg shadow-teal-200 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {loading ? 'Création en cours...' : 'Créer mon mot de passe'}
+            {loading ? 'Création...' : 'Créer mon mot de passe'}
           </button>
         </form>
-
-        <p className="text-center text-sm text-gray-500 mt-6">
-          Vous aurez ensuite accès à votre tableau de bord pressing
-        </p>
       </div>
     </div>
   );
