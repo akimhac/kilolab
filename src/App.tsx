@@ -34,6 +34,11 @@ const Tarifs = lazy(() => import('./pages/Tarifs'));
 const Trouver = lazy(() => import('./pages/Trouver'));
 const CityLanding = lazy(() => import('./pages/CityLanding'));
 
+// Selection & Profile (NOUVELLES PAGES)
+const SelectDashboard = lazy(() => import('./pages/SelectDashboard'));
+const SelectSignup = lazy(() => import('./pages/SelectSignup'));
+const UserProfile = lazy(() => import('./pages/UserProfile'));
+
 // Dashboards
 const ClientDashboard = lazy(() => import('./pages/ClientDashboard'));
 const PartnerDashboard = lazy(() => import('./pages/PartnerDashboard'));
@@ -114,6 +119,13 @@ export default function App() {
           <Route path="/contact" element={<Contact />} />
           <Route path="/login" element={<Login />} />
           <Route path="/pressing/:city" element={<CityLanding />} />
+
+          {/* ========================================
+              SÉLECTION & INSCRIPTION (NOUVELLES ROUTES)
+          ======================================== */}
+          <Route path="/select-dashboard" element={<SelectDashboard />} />
+          <Route path="/select-signup" element={<SelectSignup />} />
+          <Route path="/user-profile" element={<UserProfile />} />
 
           {/* ========================================
               SEO / INFO
