@@ -37,20 +37,16 @@ export default function SetPassword() {
     setLoading(true);
 
     try {
-      // Créer le compte Supabase Auth
       const { data, error } = await supabase.auth.signUp({
         email: email!,
         password: password,
         options: {
-          data: {
-            role: 'partner'
-          }
+          data: { role: 'partner' }
         }
       });
 
       if (error) throw error;
 
-      // Mettre à jour le profil
       await supabase
         .from('user_profiles')
         .update({ 
@@ -61,7 +57,6 @@ export default function SetPassword() {
 
       toast.success('Mot de passe créé avec succès !');
       
-      // Rediriger vers login
       setTimeout(() => {
         navigate('/login?type=partner');
       }, 1500);
@@ -87,13 +82,10 @@ export default function SetPassword() {
           <p className="text-gray-600">
             Votre compte pressing a été validé !
           </p>
-          <p className="text-sm text-gray-500 mt-2">
-            {email}
-          </p>
+          <p className="text-sm text-gray-500 mt-2">{email}</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Mot de passe */}
           <div>
             <label className="block text-sm font-bold text-gray-700 mb-2">
               Mot de passe
@@ -119,7 +111,6 @@ export default function SetPassword() {
             </div>
           </div>
 
-          {/* Confirmation */}
           <div>
             <label className="block text-sm font-bold text-gray-700 mb-2">
               Confirmer le mot de passe
@@ -138,19 +129,18 @@ export default function SetPassword() {
             </div>
           </div>
 
-          {/* Indicateur de force */}
           {password.length > 0 && (
             <div className="space-y-2">
               <div className="flex gap-2">
                 <div className={`h-2 flex-1 rounded ${password.length >= 6 ? 'bg-teal-500' : 'bg-gray-200'}`}></div>
                 <div className={`h-2 flex-1 rounded ${password.length >= 8 ? 'bg-teal-500' : 'bg-gray-200'}`}></div>
-                <div className={`h-2 flex-1 rounded ${password.length >= 10 && /[A-Z]/.test(password) && /[0-9]/.test(password) ? 'bg-teal-500' : 'bg-gray-200'}`}></div>
+                <div className={`h-2 flex-1 rounded ${password.length >= 10 ? 'bg-teal-500' : 'bg-gray-200'}`}></div>
               </div>
               <p className="text-xs text-gray-500">
                 {password.length < 6 && 'Faible'}
                 {password.length >= 6 && password.length < 8 && 'Moyen'}
-                {password.length >= 8 && 'Bon'}
-                {password.length >= 10 && /[A-Z]/.test(password) && /[0-9]/.test(password) && 'Fort'}
+                {password.length >= 8 && password.length < 10 && 'Bon'}
+                {password.length >= 10 && 'Fort'}
               </p>
             </div>
           )}
