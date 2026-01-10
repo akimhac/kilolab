@@ -10,7 +10,8 @@
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0"
   },
   "dependencies": {
-    "@supabase/supabase-js": "^2.45.0",
+    "@stripe/stripe-js": "^8.6.1",
+    "@supabase/supabase-js": "^2.90.1",
     "clsx": "^2.1.1",
     "framer-motion": "10.12.16",
     "html5-qrcode": "^2.3.8",
@@ -26,11 +27,12 @@
     "react-router-dom": "^6.30.2",
     "recharts": "^2.10.3",
     "resend": "^6.5.2",
-    "stripe": "^20.0.0",
+    "stripe": "^20.1.2",
     "tailwind-merge": "^3.4.0",
     "vite-plugin-pwa": "^0.19.0"
   },
   "devDependencies": {
+    "@netlify/functions": "^5.1.2",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
     "@typescript-eslint/eslint-plugin": "^7.2.0",

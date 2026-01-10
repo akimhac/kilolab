@@ -1,0 +1,16 @@
+DIAGNOSTIC STRIPE CONNECT - KILOLAB
+Date: Sat Jan 10 20:21:56 UTC 2026
+==================================
+
+VARIABLES D'ENVIRONNEMENT:
+VITE_STRIPE_PUBLISHABLE_KEY=pk_test_votre_NOUVELLE_key_ici
+
+FICHIERS STRIPE:
+src/hooks/useInvoiceGenerator.ts
+src/pages/Invoice.tsx
+src/pages/legal/CGV.tsx
+src/pages/NewOrder.tsx
+src/pages/PartnerTerms.tsx
+
+PACKAGES:
+    "stripe": "^20.0.0",
