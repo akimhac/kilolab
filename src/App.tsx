@@ -43,6 +43,8 @@ const PaymentCancel = lazy(() => import('./pages/PaymentCancel'));
 const Referral = lazy(() => import('./pages/Referral'));
 const ScanQR = lazy(() => import('./pages/ScanQR'));
 const Settings = lazy(() => import('./pages/Settings'));
+const SetPassword = lazy(() => import('./pages/SetPassword'));
+const ConnectStripe = lazy(() => import('./pages/ConnectStripe'));
 
 const PageLoader = () => (
   <div className="min-h-screen flex items-center justify-center bg-slate-50">
@@ -108,6 +110,7 @@ export default function App() {
           <Route path="/partner-terms" element={<PartnerTerms />} />
           <Route path="/partner-dashboard" element={<PrivateRoute><PartnerDashboard /></PrivateRoute>} />
           <Route path="/partner-app" element={<PrivateRoute><PartnerDashboard /></PrivateRoute>} />
+          <Route path="/connect-stripe" element={<PrivateRoute><ConnectStripe /></PrivateRoute>} />
 
           {/* PAIEMENT */}
           <Route path="/payment-success" element={<PaymentSuccess />} />
