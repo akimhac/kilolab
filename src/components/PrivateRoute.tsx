@@ -16,7 +16,6 @@ export default function PrivateRoute({ children }: { children: React.ReactNode }
 
     checkAuth();
 
-    // Écouter les changements d'auth
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setAuthenticated(!!session);
       setLoading(false);
@@ -28,10 +27,7 @@ export default function PrivateRoute({ children }: { children: React.ReactNode }
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-50">
-        <div className="text-center">
-          <Loader2 className="animate-spin mx-auto mb-4 text-teal-600" size={48} />
-          <p className="text-slate-600 font-medium">Vérification...</p>
-        </div>
+        <Loader2 className="animate-spin text-teal-600" size={48} />
       </div>
     );
   }
