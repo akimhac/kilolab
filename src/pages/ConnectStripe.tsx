@@ -88,8 +88,9 @@ export default function ConnectStripe() {
               <p className="text-xs text-teal-700 font-mono break-all">{profile.stripe_account_id}</p>
             </div>
             
-              href="https://dashboard.stripe.com"
-              target="_blank"
+            <a 
+              href="https://dashboard.stripe.com" 
+              target="_blank" 
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 bg-teal-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-teal-700"
             >
