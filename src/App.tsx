@@ -91,6 +91,7 @@ export default function App() {
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/update-password" element={<UpdatePassword />} />
           <Route path="/reset-password" element={<UpdatePassword />} />
+          <Route path="/set-password" element={<SetPassword />} />
 
           {/* 🔒 CLIENT PROTÉGÉ */}
           <Route path="/user-profile" element={<PrivateRoute><UserProfile /></PrivateRoute>} />
