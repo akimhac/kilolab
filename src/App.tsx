@@ -4,6 +4,7 @@ import { Toaster } from 'react-hot-toast';
 import { Loader2 } from 'lucide-react';
 import { HelmetProvider } from 'react-helmet-async';
 import ProtectedAdminRoute from './components/ProtectedAdminRoute';
+import PrivateRoute from './components/PrivateRoute';
 
 // ========================================
 // PAGES CORE
@@ -34,7 +35,7 @@ const Tarifs = lazy(() => import('./pages/Tarifs'));
 const Trouver = lazy(() => import('./pages/Trouver'));
 const CityLanding = lazy(() => import('./pages/CityLanding'));
 
-// Selection & Profile (NOUVELLES PAGES)
+// Selection & Profile
 const SelectDashboard = lazy(() => import('./pages/SelectDashboard'));
 const SelectSignup = lazy(() => import('./pages/SelectSignup'));
 const UserProfile = lazy(() => import('./pages/UserProfile'));
@@ -121,11 +122,10 @@ export default function App() {
           <Route path="/pressing/:city" element={<CityLanding />} />
 
           {/* ========================================
-              SÉLECTION & INSCRIPTION (NOUVELLES ROUTES)
+              SÉLECTION & INSCRIPTION
           ======================================== */}
           <Route path="/select-dashboard" element={<SelectDashboard />} />
           <Route path="/select-signup" element={<SelectSignup />} />
-          <Route path="/user-profile" element={<UserProfile />} />
 
           {/* ========================================
               SEO / INFO
@@ -142,23 +142,26 @@ export default function App() {
           <Route path="/reset-password" element={<UpdatePassword />} />
 
           {/* ========================================
-              CLIENT
+              🔒 CLIENT - ROUTES PROTÉGÉES
           ======================================== */}
-          <Route path="/dashboard" element={<ClientDashboard />} />
-          <Route path="/client-dashboard" element={<ClientDashboard />} />
-          <Route path="/settings" element={<Settings />} />
-          <Route path="/referral" element={<Referral />} />
+          <Route path="/user-profile" element={<PrivateRoute><UserProfile /></PrivateRoute>} />
+          <Route path="/dashboard" element={<PrivateRoute><ClientDashboard /></PrivateRoute>} />
+          <Route path="/client-dashboard" element={<PrivateRoute><ClientDashboard /></PrivateRoute>} />
+          <Route path="/settings" element={<PrivateRoute><Settings /></PrivateRoute>} />
+          <Route path="/referral" element={<PrivateRoute><Referral /></PrivateRoute>} />
 
           {/* ========================================
-              PARTENAIRES
+              PARTENAIRES (PUBLIC + PROTECTED)
           ======================================== */}
           <Route path="/partner" element={<PartnerLanding />} />
           <Route path="/become-partner" element={<BecomePartner />} />
-          <Route path="/partner-dashboard" element={<PartnerDashboard />} />
-          <Route path="/partner-app" element={<PartnerDashboard />} />
           <Route path="/partner-guide" element={<PartnerGuide />} />
           <Route path="/partner-pending" element={<PartnerPending />} />
           <Route path="/partner-terms" element={<PartnerTerms />} />
+          
+          {/* 🔒 PROTECTED */}
+          <Route path="/partner-dashboard" element={<PrivateRoute><PartnerDashboard /></PrivateRoute>} />
+          <Route path="/partner-app" element={<PrivateRoute><PartnerDashboard /></PrivateRoute>} />
 
           {/* ========================================
               PAIEMENT
@@ -170,24 +173,8 @@ export default function App() {
               🔐 ADMIN - ROUTES PROTÉGÉES
           ======================================== */}
           <Route path="/admin/login" element={<SuperAccess />} />
-          
-          <Route
-            path="/admin"
-            element={
-              <ProtectedAdminRoute>
-                <AdminDashboard />
-              </ProtectedAdminRoute>
-            }
-          />
-          
-          <Route
-            path="/admin-dashboard"
-            element={
-              <ProtectedAdminRoute>
-                <AdminDashboard />
-              </ProtectedAdminRoute>
-            }
-          />
+          <Route path="/admin" element={<ProtectedAdminRoute><AdminDashboard /></ProtectedAdminRoute>} />
+          <Route path="/admin-dashboard" element={<ProtectedAdminRoute><AdminDashboard /></ProtectedAdminRoute>} />
 
           {/* ========================================
               OUTILS
