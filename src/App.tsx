@@ -83,6 +83,7 @@ export default function App() {
           <Route path="/select-signup" element={<SelectSignup />} />
           
           <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/tarifs" element={<Tarifs />} />
           <Route path="/trouver" element={<Trouver />} />

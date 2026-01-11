@@ -17,7 +17,7 @@ export default function SelectSignup() {
           <p className="text-gray-600">Choisissez le type de compte que vous souhaitez créer</p>
         </div>
         <div className="grid md:grid-cols-2 gap-6">
-          <button onClick={() => navigate('/signup?type=client')} className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 border-2 border-transparent hover:border-teal-600 group">
+          <button onClick={() => navigate('/signup')} className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 border-2 border-transparent hover:border-teal-600 group">
             <div className="flex flex-col items-center text-center">
               <div className="w-16 h-16 bg-teal-100 rounded-full flex items-center justify-center mb-4 group-hover:bg-teal-600 transition-colors">
                 <User className="w-8 h-8 text-teal-600 group-hover:text-white transition-colors" />
