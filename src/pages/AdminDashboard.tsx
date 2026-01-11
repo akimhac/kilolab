@@ -18,7 +18,7 @@ export default function AdminDashboard() {
   const [partners, setPartners] = useState<any[]>([]);
   const [messages, setMessages] = useState<any[]>([]);
   const [users, setUsers] = useState<any[]>([]);
-  const [clients, setClients] = useState<any[]>([]); // État pour les clients
+  const [clients, setClients] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   
   const [timeRange, setTimeRange] = useState<"7d" | "30d" | "90d" | "all">("30d");
@@ -30,7 +30,6 @@ export default function AdminDashboard() {
   const [replyText, setReplyText] = useState("");
   const [selectedPartnerForAssign, setSelectedPartnerForAssign] = useState<string>("");
   
-  // États pour la modal
   const [selectedPartner, setSelectedPartner] = useState<any>(null);
   const [showModal, setShowModal] = useState(false);
 
@@ -47,7 +46,6 @@ export default function AdminDashboard() {
       setMessages(m || []); 
       setUsers(u || []);
 
-      // 🟢 LOGIQUE AJOUTÉE : Filtrer les clients (ceux qui ne sont pas partners/admins)
       if (u) {
         const clientList = u.filter((user: any) => user.role === 'client' || !user.role);
         setClients(clientList);
@@ -80,7 +78,6 @@ export default function AdminDashboard() {
     } catch (e) { console.error(e); } finally { setLoading(false); }
   };
 
-  // ✅ ACCEPTER VIA RPC
   const approvePartner = async (id: string, e?: React.MouseEvent) => {
     if(e) e.stopPropagation();
     const t = toast.loading("⏳ Validation...");
@@ -93,7 +90,6 @@ export default function AdminDashboard() {
     }
   };
 
-  // ❌ REFUSER VIA RPC
   const rejectPartner = async (partner: any, e?: React.MouseEvent) => {
     if(e) e.stopPropagation();
     if (!confirm(`⛔ Refuser ${partner.name} ?`)) return;
@@ -380,7 +376,6 @@ export default function AdminDashboard() {
                           <tr 
                             key={partner.id} 
                             onClick={(e) => {
-                                // On ouvre la modal uniquement si on ne clique pas sur un bouton
                                 if((e.target as HTMLElement).closest('button')) return;
                                 setSelectedPartner(partner); 
                                 setShowModal(true); 
