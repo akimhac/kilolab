@@ -1,0 +1,54 @@
+═══════════════════════════════════════════════════════════
+KILOLAB - INSTRUCTIONS SUPABASE EMAIL TEMPLATE
+═══════════════════════════════════════════════════════════
+
+🚨 PROBLÈME 3 (CRITIQUE) : Email pressing pointe vers /login
+
+SOLUTION :
+
+1️⃣  Va sur https://supabase.com/dashboard
+
+2️⃣  Sélectionne ton projet "Kilolab"
+
+3️⃣  Menu gauche → Authentication → Email Templates
+
+4️⃣  Clique sur "Invite user" (ou "Invite User")
+
+5️⃣  SUPPRIME tout le HTML actuel dans la zone de texte
+
+6️⃣  Ouvre le fichier SUPABASE_EMAIL_TEMPLATE.html
+
+7️⃣  COPIE TOUT le contenu de ce fichier
+
+8️⃣  COLLE-le dans Supabase (remplace tout l'ancien code)
+
+9️⃣  Change le SUJET en :
+    "Votre compte pressing Kilolab est validé ! 🎉"
+
+🔟  Clique sur "Save" ou "Enregistrer"
+
+═══════════════════════════════════════════════════════════
+
+✅ VÉRIFICATION :
+
+Après avoir sauvegardé, fais un test :
+
+1. Crée un nouveau pressing test
+2. Valide-le dans l'admin
+3. Vérifie l'email reçu
+4. Le lien DOIT pointer vers :
+   https://kilolab.fr/set-password?email=...&token=...
+
+5. Clique sur le lien
+6. Tu DOIS arriver sur la page /set-password
+7. PAS sur /login !
+
+═══════════════════════════════════════════════════════════
+
+⚠️  SI ÇA NE MARCHE TOUJOURS PAS :
+
+Vérifie dans AdminDashboard.tsx si tu utilises :
+- supabase.auth.inviteUserByEmail() → Utilise "Invite User" template
+- OU supabase.auth.admin.generateLink() → Utilise autre template
+
+═══════════════════════════════════════════════════════════

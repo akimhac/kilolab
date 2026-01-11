@@ -1,0 +1,45 @@
+═══════════════════════════════════════════════════════════
+🏁 KILOLAB - INSTRUCTIONS DE CORRECTION MANUELLE
+═══════════════════════════════════════════════════════════
+
+1️⃣ PROBLÈME : Clients invisibles dans admin
+-----------------------------------------------------------
+Ouvrir : src/pages/AdminDashboard.tsx
+Action :
+1. Dans la fonction de récupération (fetch), change la requête pour :
+   const { data } = await supabase.from('user_profiles').select('*');
+   (Au lieu de filtrer uniquement sur 'partner')
+
+2️⃣ PROBLÈME : Signup client → Landing
+-----------------------------------------------------------
+Ouvrir : src/pages/SelectSignup.tsx
+Action :
+Cherche la ligne : navigate('/signup?type=client')
+Remplace par   : navigate('/signup')
+
+3️⃣ PROBLÈME : Email pressing → /login (LE PLUS IMPORTANT)
+-----------------------------------------------------------
+Action :
+1. Va sur https://supabase.com/dashboard > Auth > Email Templates
+2. Ouvre "Invite user"
+3. Remplace TOUT le code HTML par celui-ci :
+
+<!DOCTYPE html>
+<html>
+<body>
+  <h2>Bienvenue chez Kilolab ! 🎉</h2>
+  <p>Votre compte partenaire a été validé.</p>
+  <p>Cliquez ci-dessous pour définir votre mot de passe :</p>
+  <p>
+    <a href="{{ .SiteURL }}/set-password?email={{ .Email }}&token={{ .Token }}" 
+       style="background-color: #0d9488; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">
+      🔐 Créer mon mot de passe
+    </a>
+  </p>
+  <p><small>Lien de secours : {{ .SiteURL }}/set-password?email={{ .Email }}&token={{ .Token }}</small></p>
+</body>
+</html>
+
+4. Sauvegarde.
+
+═══════════════════════════════════════════════════════════
