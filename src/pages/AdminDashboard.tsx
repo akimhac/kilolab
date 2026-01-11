@@ -18,14 +18,17 @@ export default function AdminDashboard() {
   const [partners, setPartners] = useState<any[]>([]);
   const [messages, setMessages] = useState<any[]>([]);
   const [users, setUsers] = useState<any[]>([]);
+  const [clients, setClients] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [timeRange, setTimeRange] = useState<"7d" | "30d" | "90d" | "all">("30d");
-  const [activeTab, setActiveTab] = useState<"overview" | "partners" | "cities" | "orders" | "messages" | "users">("overview");
+  const [activeTab, setActiveTab] = useState<"overview" | "partners" | "cities" | "orders" | "messages" | "users" | "clients">("overview");
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<"all" | "active" | "pending">("all");
   const [selectedMessage, setSelectedMessage] = useState<any>(null);
   const [replyText, setReplyText] = useState("");
   const [selectedPartnerForAssign, setSelectedPartnerForAssign] = useState<string>("");
+  const [selectedPartner, setSelectedPartner] = useState<any>(null);
+  const [showModal, setShowModal] = useState(false);
 
   useEffect(() => { fetchData(); }, []);
 
@@ -294,9 +297,9 @@ export default function AdminDashboard() {
 
         <div className="bg-white rounded-2xl shadow-sm border mb-8">
           <div className="flex border-b overflow-x-auto">
-            {(["overview", "partners", "cities", "orders", "messages", "users"] as const).map((tab) => (
+            {["overview", "partners", "cities", "orders", "messages", "users", "clients"] as const).map((tab) => (
               <button key={tab} onClick={() => setActiveTab(tab)} className={`px-6 py-4 font-medium transition whitespace-nowrap ${activeTab === tab ? "text-teal-600 border-b-2 border-teal-600" : "text-slate-500 hover:text-slate-700"}`}>
-                {tab === "overview" ? "Vue" : tab === "partners" ? "Partenaires" : tab === "cities" ? "Villes" : tab === "orders" ? "Commandes" : tab === "messages" ? `Messages (${stats.newMessages})` : "Users"}
+                {tab === "overview" ? "Vue" : tab === "partners" ? "Partenaires" : tab === "cities" ? "Villes" : tab === "orders" ? "Commandes" : tab === "messages" ? `Messages (${stats.newMessages})` : tab === "users" ? "Users" : `Clients (${clients.length})`}
               </button>
             ))}
           </div>
@@ -381,7 +384,7 @@ export default function AdminDashboard() {
                         <tr><td colSpan={5} className="py-12 text-center text-slate-400"><Users size={48} className="mx-auto mb-3 opacity-30" /><p className="font-bold">Aucun</p></td></tr>
                       ) : (
                         filteredPartners.map((partner) => (
-                          <tr key={partner.id} className="border-b hover:bg-slate-50">
+                          <tr key={partner.id} className="border-b hover:bg-slate-50 cursor-pointer" onClick={() => { setSelectedPartner(partner); setShowModal(true); }}>
                             <td className="py-3 px-4">
                               {partner.is_active ? (
                                 <span className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-bold border inline-flex items-center gap-1"><CheckCircle size={12} />Actif</span>
