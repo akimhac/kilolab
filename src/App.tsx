@@ -28,6 +28,7 @@ const Trouver = lazy(() => import('./pages/Trouver'));
 const CityLanding = lazy(() => import('./pages/CityLanding'));
 const SelectDashboard = lazy(() => import('./pages/SelectDashboard'));
 const SelectSignup = lazy(() => import('./pages/SelectSignup'));
+const Signup = lazy(() => import('./pages/Signup')); // ✅ AJOUTÉ
 const UserProfile = lazy(() => import('./pages/UserProfile'));
 const ClientDashboard = lazy(() => import('./pages/ClientDashboard'));
 const PartnerDashboard = lazy(() => import('./pages/PartnerDashboard'));
