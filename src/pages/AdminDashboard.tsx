@@ -1018,7 +1018,7 @@ export default function AdminDashboard() {
                     </div>
                     <div>
                       <span className="text-sm font-semibold text-slate-500">SIRET</span>
-                      <p className="text-lg font-mono font-bold text-slate-900">{selected Partner.siret || 'N/A'}</p>
+                      <p className="text-lg font-mono font-bold text-slate-900">{selectedPartner.siret || 'N/A'}</p>
                     </div>
                   </div>
                 </div>
