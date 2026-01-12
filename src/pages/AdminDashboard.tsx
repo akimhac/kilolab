@@ -68,7 +68,6 @@ export default function AdminDashboard() {
         const stats = partnerStatsMap.get(partner.id) || { totalOrders: 0, totalRevenue: 0 };
         return {
           ...partner,
-          // Fallback intelligent pour le nom
           name: partner.company_name || partner.name || partner.email?.split('@')[0] || "Sans nom",
           city: partner.city || "Non spécifié",
           totalOrders: stats.totalOrders,
@@ -131,8 +130,6 @@ export default function AdminDashboard() {
     const completed = filteredOrdersByTime.filter(o => o.status === "completed");
     const totalRevenue = completed.reduce((sum, o) => sum + parseFloat(o.total_price || 0), 0);
     const activePartners = partners.filter(p => p.is_active).length;
-    
-    // Calcul sécurisé des messages non lus
     const newMessages = Array.isArray(messages) ? messages.filter(m => !m.read).length : 0;
 
     return {
@@ -146,7 +143,6 @@ export default function AdminDashboard() {
     };
   }, [filteredOrdersByTime, orders, timeRange, messages, users, partners]);
 
-  // Données pour les graphiques
   const monthlyData = useMemo(() => {
     const months: any = {};
     filteredOrdersByTime.filter(o => o.status === "completed").forEach(order => {
@@ -172,6 +168,17 @@ export default function AdminDashboard() {
     return Object.values(cities).sort((a: any, b: any) => b.value - a.value).slice(0, 10).map((c: any) => ({ ...c, value: parseFloat(c.value.toFixed(2)) }));
   }, [filteredOrdersByTime]);
 
+  const statusData = useMemo(() => {
+    const labels: any = { "pending": "En attente", "assigned": "Assigné", "in_progress": "En cours", "ready": "Prêt", "completed": "Terminé", "cancelled": "Annulé" };
+    const statuses: any = {};
+    filteredOrdersByTime.forEach(o => {
+      const label = labels[o.status] || o.status;
+      statuses[label] = (statuses[label] || 0) + 1;
+    });
+    const colors: any = { "Terminé": "#10b981", "En cours": "#3b82f6", "En attente": "#f59e0b", "Assigné": "#8b5cf6", "Prêt": "#6366f1", "Annulé": "#ef4444" };
+    return Object.entries(statuses).map(([name, value]) => ({ name, value, color: colors[name] || "#64748b" }));
+  }, [filteredOrdersByTime]);
+
   const filteredPartners = useMemo(() => {
     let filtered = partners;
     if (statusFilter === "active") filtered = filtered.filter(p => p.is_active);
@@ -188,13 +195,48 @@ export default function AdminDashboard() {
     return filtered;
   }, [partners, searchTerm, statusFilter]);
 
-  // Fonctions utilitaires
-  const formatCurrency = (val: number) => new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(val);
-  const handleExportCSV = () => toast.success("Export en cours..."); 
-  const markMessageAsRead = async (id: string) => { /* ... */ };
-  const handleReplyInApp = async (msg: any) => { /* ... */ };
-  const deleteMessage = async (id: string) => { /* ... */ };
-  const assignPartner = async (id: string) => { /* ... */ };
+  const handleExportCSV = () => {
+    toast.success("Export CSV lancé !");
+    // Logique CSV ici si besoin
+  };
+
+  // --- ACTIONS MESSAGERIE ---
+  const markMessageAsRead = async (messageId: string) => {
+    await supabase.from("contact_messages").update({ read: true }).eq("id", messageId);
+    setMessages(messages.map(m => m.id === messageId ? { ...m, read: true } : m));
+    toast.success("Message lu");
+  };
+
+  const handleReplyInApp = async (message: any) => {
+    if (!replyText.trim()) return toast.error("Écris une réponse");
+    const { error } = await supabase.from("support_responses").insert({ message_id: message.id, response: replyText, admin_email: "admin@kilolab.fr" });
+    if (error) return toast.error("❌ " + error.message);
+    toast.success("✅ Réponse enregistrée !");
+    setReplyText("");
+    setSelectedMessage(null);
+    markMessageAsRead(message.id);
+    fetchData();
+  };
+
+  const deleteMessage = async (messageId: string) => {
+    if (!confirm("Supprimer ?")) return;
+    await supabase.from("contact_messages").delete().eq("id", messageId);
+    setMessages(messages.filter(m => m.id !== messageId));
+    setSelectedMessage(null);
+    toast.success("Supprimé");
+  };
+
+  // --- ACTION ASSIGNATION ---
+  const assignPartner = async (orderId: string) => {
+    if (!selectedPartnerForAssign) return toast.error("Choisis un partenaire");
+    const { error } = await supabase.from('orders').update({ partner_id: selectedPartnerForAssign, status: 'assigned' }).eq('id', orderId);
+    if (error) return toast.error(error.message);
+    toast.success("Assigné !");
+    setSelectedPartnerForAssign("");
+    fetchData();
+  };
+
+  const handleLogout = async () => { await supabase.auth.signOut(); window.location.href = "/admin/login"; };
 
   const StatCard = ({ title, value, icon, suffix, badge }: any) => (
     <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 hover:shadow-md transition relative">
@@ -292,7 +334,7 @@ export default function AdminDashboard() {
               </div>
             )}
 
-            {/* --- PARTENAIRES (DESIGN RESTAURÉ STYLE CARTE) --- */}
+            {/* --- PARTENAIRES (DESIGN PREMIUM) --- */}
             {activeTab === "partners" && (
               <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
                 <div className="flex flex-wrap gap-4 justify-between items-center mb-6">
@@ -385,7 +427,6 @@ export default function AdminDashboard() {
               </div>
             )}
 
-            {/* --- AUTRES ONGLETS (Simplifiés pour focus visuel) --- */}
             {activeTab === "cities" && (
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     {cityData.map((city, idx) => (
@@ -396,19 +437,168 @@ export default function AdminDashboard() {
                     ))}
                 </div>
             )}
-            
-            {/* Tu peux ajouter les autres onglets ici si besoin, ils restent fonctionnels */}
-            {(activeTab === "orders" || activeTab === "messages" || activeTab === "users" || activeTab === "clients") && (
-                <div className="bg-white p-8 rounded-3xl shadow-sm border text-center text-slate-500">
-                    <p>Contenu de l'onglet {activeTab} (Code préservé mais masqué pour la clarté du script)</p>
+
+            {activeTab === "orders" && (
+              <div>
+                <div className="flex justify-between mb-4">
+                  <h3 className="text-lg font-bold">Commandes ({filteredOrdersByTime.length})</h3>
+                  <button onClick={handleExportCSV} className="flex items-center gap-2 px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 text-sm"><Download size={16} />CSV</button>
                 </div>
+                <div className="overflow-x-auto bg-white rounded-2xl border border-slate-100 shadow-sm">
+                  <table className="w-full text-left">
+                    <thead className="bg-slate-50 text-slate-500 text-xs uppercase"><tr><th className="p-4">ID</th><th className="p-4">Date</th><th className="p-4">Client</th><th className="p-4">Poids</th><th className="p-4">Statut</th><th className="p-4">Partenaire</th><th className="p-4 text-right">Actions</th></tr></thead>
+                    <tbody className="divide-y text-sm">
+                      {filteredOrdersByTime.slice(0, 50).map((order) => (
+                        <tr key={order.id} className="hover:bg-slate-50 transition">
+                          <td className="p-4 font-mono font-bold">#{order.id.toString().slice(0, 6)}</td>
+                          <td className="p-4 text-slate-500">{new Date(order.created_at).toLocaleDateString("fr-FR")}</td>
+                          <td className="p-4"><div className="font-bold truncate max-w-xs">{order.pickup_address || "Adresse inconnue"}</div></td>
+                          <td className="p-4"><span className="font-bold">{order.weight || "?"} kg</span></td>
+                          <td className="p-4"><span className={`px-2 py-1 rounded-full text-xs font-bold uppercase ${order.status === "pending" ? "bg-orange-100 text-orange-700" : order.status === "assigned" ? "bg-purple-100 text-purple-700" : order.status === "completed" ? "bg-green-100 text-green-700" : order.status === "in_progress" ? "bg-blue-100 text-blue-700" : "bg-slate-100"}`}>{order.status}</span></td>
+                          <td className="p-4">
+                            {order.partner ? (
+                              <span className="font-bold flex items-center gap-1"><CheckCircle size={14} className="text-green-500" />{order.partner.company_name}</span>
+                            ) : order.status === 'assigned' ? (
+                              <div className="flex flex-col gap-2">
+                                <span className="text-xs font-bold text-red-600 flex items-center gap-1 bg-red-50 px-2 py-1 rounded w-fit"><AlertCircle size={12} />À attribuer</span>
+                                <div className="flex gap-1">
+                                  <select className="text-xs border rounded p-1 w-32" value={selectedPartnerForAssign} onChange={(e) => setSelectedPartnerForAssign(e.target.value)}>
+                                    <option value="">Choisir...</option>
+                                    {partners.filter(p => p.is_active).map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
+                                  </select>
+                                  <button onClick={() => assignPartner(order.id)} className="bg-slate-900 text-white text-xs px-2 py-1 rounded hover:bg-black">OK</button>
+                                </div>
+                              </div>
+                            ) : (
+                              <span className="text-slate-400 italic">En attente</span>
+                            )}
+                          </td>
+                          <td className="p-4 text-right"><button className="text-slate-400 hover:text-slate-900"><Eye size={18} /></button></td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+
+            {activeTab === "messages" && (
+              <div>
+                <h3 className="text-lg font-bold mb-6">Messages ({messages.length})</h3>
+                {messages.length === 0 ? (
+                  <div className="text-center py-12 text-slate-400"><MessageSquare size={48} className="mx-auto mb-3 opacity-30" /><p className="font-bold">Aucun message</p></div>
+                ) : (
+                  <div className="space-y-4">
+                    {messages.map((message) => (
+                      <div key={message.id} className={`border rounded-2xl p-6 hover:shadow-md transition ${message.read ? "bg-white border-slate-200" : "bg-teal-50 border-teal-200"}`}>
+                        <div className="flex justify-between mb-3">
+                          <div className="flex-1">
+                            <div className="flex gap-3 mb-2">
+                              <h4 className="font-bold text-lg">{message.subject || "Sans objet"}</h4>
+                              {!message.read && <span className="px-2 py-1 bg-red-100 text-red-700 rounded-full text-xs font-bold">NOUVEAU</span>}
+                            </div>
+                            <p className="text-sm text-slate-600 mb-2"><Mail size={14} className="inline mr-1" />{message.email}{message.name && <span className="ml-2 font-medium">({message.name})</span>}</p>
+                            <p className="text-sm text-slate-500">{new Date(message.created_at).toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric", hour: "2-digit", minute: "2-digit" })}</p>
+                          </div>
+                          <div className="flex gap-2">
+                            {!message.read && <button onClick={() => markMessageAsRead(message.id)} className="px-3 py-2 bg-green-100 text-green-700 rounded-lg text-sm font-bold hover:bg-green-200 flex items-center gap-2"><CheckCircle size={14} />Lu</button>}
+                            <button onClick={() => setSelectedMessage(selectedMessage?.id === message.id ? null : message)} className="px-3 py-2 bg-teal-600 text-white rounded-lg text-sm font-bold hover:bg-teal-700 flex items-center gap-2"><Send size={14} />Répondre</button>
+                            <button onClick={() => deleteMessage(message.id)} className="px-3 py-2 bg-red-100 text-red-700 rounded-lg text-sm font-bold hover:bg-red-200"><Trash2 size={14} /></button>
+                          </div>
+                        </div>
+                        <div className="bg-slate-50/50 rounded-xl p-4 text-sm mb-3 whitespace-pre-wrap border border-slate-100/50">{message.message}</div>
+                        
+                        {/* Réponse rapide */}
+                        {selectedMessage?.id === message.id && (
+                          <div className="mt-4 border-t pt-4 animate-in slide-in-from-top-2">
+                            <label className="block text-sm font-bold mb-2">Votre réponse</label>
+                            <textarea value={replyText} onChange={(e) => setReplyText(e.target.value)} placeholder="Écrivez votre réponse ici..." rows={4} className="w-full border rounded-xl p-3 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 shadow-sm" />
+                            <div className="flex gap-2 mt-3">
+                              <button onClick={() => handleReplyInApp(message)} className="px-6 py-2 bg-teal-600 text-white rounded-xl text-sm font-bold hover:bg-teal-700 flex items-center gap-2 shadow-lg shadow-teal-100"><Send size={14} />Envoyer</button>
+                              <button onClick={() => { setSelectedMessage(null); setReplyText(""); }} className="px-4 py-2 bg-slate-100 rounded-xl text-sm font-bold hover:bg-slate-200 text-slate-600">Annuler</button>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {activeTab === "users" && (
+              <div>
+                <h3 className="text-lg font-bold mb-6">Utilisateurs ({users.length})</h3>
+                <div className="overflow-x-auto bg-white rounded-2xl border border-slate-100 shadow-sm">
+                    <table className="w-full">
+                      <thead><tr className="border-b bg-slate-50/50"><th className="text-left py-4 px-6 text-sm font-semibold">Nom</th><th className="text-left py-4 px-6 text-sm font-semibold">Email</th><th className="text-left py-4 px-6 text-sm font-semibold">Téléphone</th><th className="text-left py-4 px-6 text-sm font-semibold">Inscription</th></tr></thead>
+                      <tbody>
+                        {users.map((user) => (
+                          <tr key={user.id} className="border-b hover:bg-slate-50 transition">
+                            <td className="py-4 px-6 font-medium">{user.full_name || "Non renseigné"}</td>
+                            <td className="py-4 px-6">{user.email || "N/A"}</td>
+                            <td className="py-4 px-6">{user.phone || "N/A"}</td>
+                            <td className="py-4 px-6 text-sm text-slate-500">{new Date(user.created_at).toLocaleDateString("fr-FR")}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                </div>
+              </div>
+            )}
+
+            {activeTab === "clients" && (
+              <div>
+                <h3 className="text-lg font-bold mb-6">👤 Clients inscrits ({clients.length})</h3>
+                {clients.length === 0 ? (
+                  <div className="text-center py-12 text-slate-400 bg-white rounded-3xl border border-dashed border-slate-200">
+                    <Users size={48} className="mx-auto mb-3 opacity-30" />
+                    <p className="font-bold">Aucun client inscrit</p>
+                  </div>
+                ) : (
+                  <div className="overflow-x-auto bg-white rounded-2xl border border-slate-100 shadow-sm">
+                    <table className="w-full">
+                      <thead>
+                        <tr className="border-b bg-slate-50/50">
+                          <th className="text-left py-4 px-6 text-sm font-semibold">Email</th>
+                          <th className="text-left py-4 px-6 text-sm font-semibold">Nom</th>
+                          <th className="text-left py-4 px-6 text-sm font-semibold">Téléphone</th>
+                          <th className="text-left py-4 px-6 text-sm font-semibold">Date inscription</th>
+                          <th className="text-left py-4 px-6 text-sm font-semibold">Commandes</th>
+                          <th className="text-center py-4 px-6 text-sm font-semibold">Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {clients.map((client) => (
+                          <tr key={client.id} className="border-b border-gray-100 hover:bg-slate-50 transition">
+                            <td className="py-4 px-6">{client.email}</td>
+                            <td className="py-4 px-6 font-medium">{client.full_name || "N/A"}</td>
+                            <td className="py-4 px-6">{client.phone || "N/A"}</td>
+                            <td className="py-4 px-6 text-sm text-slate-500">
+                              {new Date(client.created_at).toLocaleDateString("fr-FR")}
+                            </td>
+                            <td className="py-4 px-6">
+                              <span className="text-teal-600 font-bold bg-teal-50 px-2 py-1 rounded">0</span>
+                            </td>
+                            <td className="py-4 px-6 text-center">
+                              <button className="text-teal-600 hover:text-teal-800 text-sm font-bold transition">
+                                Voir détails
+                              </button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
             )}
 
           </div>
         </div>
       </div>
 
-      {/* --- MODAL DÉTAILS PRESSING --- */}
+      {/* --- MODAL DÉTAILS PRESSING (DESIGN PREMIUM) --- */}
       {showModal && selectedPartner && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-in fade-in duration-200">
           <div className="bg-white rounded-3xl p-8 max-w-4xl w-full max-h-[90vh] overflow-y-auto relative shadow-2xl animate-in slide-in-from-bottom-10 duration-300">
