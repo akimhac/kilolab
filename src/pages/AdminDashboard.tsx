@@ -93,16 +93,28 @@ export default function AdminDashboard() {
   };
 
   const approvePartner = async (id: string, e?: React.MouseEvent) => {
-    if (e) e.stopPropagation();
-    const t = toast.loading("⏳ Validation...");
-    const { error } = await supabase.rpc('admin_approve_partner', { partner_uuid: id });
-    if (error) toast.error("❌ Erreur: " + error.message, { id: t });
-    else {
-      toast.success("✅ Partenaire validé & email envoyé !", { id: t });
-      fetchData();
-      if (showModal) setShowModal(false);
-    }
-  };
+  if (e) e.stopPropagation();
+  const t = toast.loading("⏳ Validation...");
+
+  const { data, error } = await supabase.functions.invoke("approve-partner", {
+    body: { partner_id: id },
+  });
+
+  if (error) {
+    toast.error("❌ Erreur: " + error.message, { id: t });
+    return;
+  }
+
+  // optionnel si la function renvoie un warning "déjà existant"
+  if ((data as any)?.warning) {
+    toast.success("✅ Validé (compte déjà existant)", { id: t });
+  } else {
+    toast.success("✅ Partenaire validé & email envoyé !", { id: t });
+  }
+
+  fetchData();
+  if (showModal) setShowModal(false);
+};
 
   const rejectPartner = async (partner: any, e?: React.MouseEvent) => {
     if (e) e.stopPropagation();
