@@ -29,11 +29,15 @@
       fbq('init', '1573268523913279');
       fbq('track', 'PageView');
     </script>
+<<<<<<< HEAD
     <noscript>
       <img height="1" width="1" style="display:none"
            src="https://www.facebook.com/tr?id=1573268523913279&ev=PageView&noscript=1"/>
     </noscript>
     <!-- End Facebook Pixel Code -->
+=======
+    <!-- NE PAS METTRE LE NOSCRIPT ICI -->
+>>>>>>> 80f80383 (🐛 Fix Facebook Pixel noscript position)
     
     <!-- Preconnect pour optimiser le chargement -->
     <link rel="preconnect" href="https://dhecegehcjelbxydeolg.supabase.co" />
@@ -61,7 +65,7 @@
     <!-- Meta description -->
     <meta name="description" content="Pressing au kilo simple et transparent. Déposez votre linge, récupérez-le propre et plié en 24h. À partir de 3€/kg. Service disponible à Paris et en France." />
     
-    <!-- Meta keywords (moins important aujourd'hui mais ça aide) -->
+    <!-- Meta keywords -->
     <meta name="keywords" content="pressing au kilo, laverie, blanchisserie, nettoyage vêtements, pressing Paris, pressing express, pressing pas cher" />
     
     <!-- Open Graph (Facebook, LinkedIn) -->
@@ -80,7 +84,7 @@
     <meta name="twitter:description" content="Déposez votre linge en 1 minute. Récupérez-le propre et plié en 24h. À partir de 3€/kg." />
     <meta name="twitter:image" content="https://images.unsplash.com/photo-1545173168-9f1947eebb7f?q=80&w=1200&auto=format&fit=crop" />
     
-    <!-- Canonical URL (évite duplicate content) -->
+    <!-- Canonical URL -->
     <link rel="canonical" href="https://kilolab.fr/" />
     
     <!-- Schema.org pour Google (JSON-LD) -->
@@ -122,6 +126,12 @@
         width="0" 
         style="display:none;visibility:hidden"
       ></iframe>
+    </noscript>
+    
+    <!-- Facebook Pixel (noscript) - DÉPLACÉ ICI -->
+    <noscript>
+      <img height="1" width="1" style="display:none"
+           src="https://www.facebook.com/tr?id=1573268523913279&ev=PageView&noscript=1"/>
     </noscript>
     
     <div id="root"></div>
