@@ -5,6 +5,7 @@ import { Building2, User, Mail, Loader2, Upload, FileText, Phone, CheckSquare, M
 import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
+import { trackPartnerSignup } from '../lib/facebookPixel'; // ← AJOUTÉ
 
 // ========================================
 // GÉOCODAGE AUTOMATIQUE
@@ -198,9 +199,12 @@ export default function BecomePartner() {
         throw insertError;
       }
 
+      // ✅ 5. TRACKING FACEBOOK PIXEL ← AJOUTÉ ICI
+      trackPartnerSignup(formData.company_name);
+
       toast.success("Candidature envoyée avec succès !", { id: 'submit' });
       
-      // ✅ 5. REDIRECTION
+      // ✅ 6. REDIRECTION
       setTimeout(() => {
         navigate('/partner-pending');
       }, 1500);
