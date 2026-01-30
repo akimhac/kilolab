@@ -3,32 +3,39 @@ import { Routes, Route } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { Loader2 } from 'lucide-react';
 import { HelmetProvider } from 'react-helmet-async';
+import ScrollToTop from './components/ScrollToTop';
 import ProtectedAdminRoute from './components/ProtectedAdminRoute';
-import PrivateRoute from './components/PrivateRoute';
+import PrivateRoute from './components/PrivateRoute'; // ← Garde ton nom actuel
 
-// Imports directs
+// Imports directs (Pages critiques pour le SEO/LCP)
 import Landing from './pages/Landing';
 import Login from './pages/Login';
 import Contact from './pages/Contact';
 import ForgotPassword from './pages/ForgotPassword';
 import UpdatePassword from './pages/UpdatePassword';
+
+// Pages légales (import direct pour SEO)
 import Legal from './pages/legal/Legal';
 import CGU from './pages/legal/CGU';
 import CGV from './pages/legal/CGV';
 import Privacy from './pages/legal/Privacy';
 import Cookies from './pages/legal/Cookies';
+
+// Pages info (import direct car souvent visitées)
 import FAQ from './pages/FAQ';
 import ForWho from './pages/ForWho';
 import Blog from './pages/Blog';
 
-// Lazy loading
+// Lazy loading (Pages secondaires)
+const BecomeWasher = lazy(() => import('./pages/BecomeWasher')); // ← AJOUTÉ
+const WasherApp = lazy(() => import('./pages/WasherApp'));       // ← AJOUTÉ
+const Signup = lazy(() => import('./pages/Signup'));
 const NewOrder = lazy(() => import('./pages/NewOrder'));
 const Tarifs = lazy(() => import('./pages/Tarifs'));
 const Trouver = lazy(() => import('./pages/Trouver'));
 const CityLanding = lazy(() => import('./pages/CityLanding'));
 const SelectDashboard = lazy(() => import('./pages/SelectDashboard'));
 const SelectSignup = lazy(() => import('./pages/SelectSignup'));
-const Signup = lazy(() => import('./pages/Signup')); // ✅ AJOUTÉ
 const UserProfile = lazy(() => import('./pages/UserProfile'));
 const ClientDashboard = lazy(() => import('./pages/ClientDashboard'));
 const PartnerDashboard = lazy(() => import('./pages/PartnerDashboard'));
@@ -46,6 +53,10 @@ const ScanQR = lazy(() => import('./pages/ScanQR'));
 const Settings = lazy(() => import('./pages/Settings'));
 const SetPassword = lazy(() => import('./pages/SetPassword'));
 const ConnectStripe = lazy(() => import('./pages/ConnectStripe'));
+const OrderTracking = lazy(() => import('./pages/OrderTracking')); // ← AJOUTÉ
+const PickupQR = lazy(() => import('./pages/PickupQR'));           // ← AJOUTÉ
+const Invoice = lazy(() => import('./pages/Invoice'));             // ← AJOUTÉ
+const NotFound = lazy(() => import('./pages/NotFound'));           // ← AJOUTÉ
 
 const PageLoader = () => (
   <div className="min-h-screen flex items-center justify-center bg-slate-50">
@@ -59,6 +70,7 @@ const PageLoader = () => (
 export default function App() {
   return (
     <HelmetProvider>
+      <ScrollToTop /> {/* ← AJOUTÉ pour scroll en haut */}
       <Toaster
         position="top-center"
         toastOptions={{
@@ -76,35 +88,46 @@ export default function App() {
       />
       <Suspense fallback={<PageLoader />}>
         <Routes>
-          {/* PUBLIC */}
+          {/* === PUBLIC === */}
           <Route path="/" element={<Landing />} />
           
-          {/* NOUVELLES ROUTES CONNECTÉES */}
+          {/* === WASHER (PIVOT C2C) === */}
+          <Route path="/become-washer" element={<BecomeWasher />} />
+          <Route path="/washer-app" element={<PrivateRoute><WasherApp /></PrivateRoute>} />
+
+          {/* === ONBOARDING === */}
           <Route path="/select-dashboard" element={<SelectDashboard />} />
           <Route path="/select-signup" element={<SelectSignup />} />
           
+          {/* === AUTH === */}
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
-          <Route path="/contact" element={<Contact />} />
-          <Route path="/tarifs" element={<Tarifs />} />
-          <Route path="/trouver" element={<Trouver />} />
-          <Route path="/new-order" element={<NewOrder />} />
-          <Route path="/pressing/:city" element={<CityLanding />} />
-          
-          {/* AUTH */}
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/update-password" element={<UpdatePassword />} />
           <Route path="/reset-password" element={<UpdatePassword />} />
           <Route path="/set-password" element={<SetPassword />} />
 
-          {/* 🔒 CLIENT PROTÉGÉ */}
+          {/* === INFO PUBLIQUE === */}
+          <Route path="/contact" element={<Contact />} />
+          <Route path="/tarifs" element={<Tarifs />} />
+          <Route path="/trouver" element={<Trouver />} />
+          <Route path="/new-order" element={<NewOrder />} />
+          <Route path="/pressing/:city" element={<CityLanding />} />
+          <Route path="/faq" element={<FAQ />} />
+          <Route path="/blog" element={<Blog />} />
+          <Route path="/for-who" element={<ForWho />} />
+
+          {/* === CLIENT (PROTÉGÉ) === */}
           <Route path="/user-profile" element={<PrivateRoute><UserProfile /></PrivateRoute>} />
           <Route path="/dashboard" element={<PrivateRoute><ClientDashboard /></PrivateRoute>} />
           <Route path="/client-dashboard" element={<PrivateRoute><ClientDashboard /></PrivateRoute>} />
           <Route path="/settings" element={<PrivateRoute><Settings /></PrivateRoute>} />
           <Route path="/referral" element={<PrivateRoute><Referral /></PrivateRoute>} />
+          <Route path="/order/:orderId" element={<PrivateRoute><OrderTracking /></PrivateRoute>} />
+          <Route path="/pickup-qr/:orderId" element={<PrivateRoute><PickupQR /></PrivateRoute>} />
+          <Route path="/invoice/:orderId" element={<PrivateRoute><Invoice /></PrivateRoute>} />
 
-          {/* PARTENAIRES */}
+          {/* === PARTENAIRES (LEGACY B2B) === */}
           <Route path="/partner" element={<PartnerLanding />} />
           <Route path="/become-partner" element={<BecomePartner />} />
           <Route path="/partner-guide" element={<PartnerGuide />} />
@@ -114,30 +137,25 @@ export default function App() {
           <Route path="/partner-app" element={<PrivateRoute><PartnerDashboard /></PrivateRoute>} />
           <Route path="/connect-stripe" element={<PrivateRoute><ConnectStripe /></PrivateRoute>} />
 
-          {/* PAIEMENT */}
+          {/* === PAIEMENT === */}
           <Route path="/payment-success" element={<PaymentSuccess />} />
           <Route path="/payment-cancel" element={<PaymentCancel />} />
 
-          {/* 🔐 ADMIN */}
+          {/* === ADMIN === */}
           <Route path="/admin/login" element={<SuperAccess />} />
           <Route path="/admin" element={<ProtectedAdminRoute><AdminDashboard /></ProtectedAdminRoute>} />
           <Route path="/admin-dashboard" element={<ProtectedAdminRoute><AdminDashboard /></ProtectedAdminRoute>} />
+          <Route path="/scan-qr" element={<ProtectedAdminRoute><ScanQR /></ProtectedAdminRoute>} />
 
-          {/* INFO */}
-          <Route path="/faq" element={<FAQ />} />
-          <Route path="/blog" element={<Blog />} />
-          <Route path="/for-who" element={<ForWho />} />
-          <Route path="/scan-qr" element={<ScanQR />} />
-
-          {/* LEGAL */}
+          {/* === LEGAL === */}
           <Route path="/legal" element={<Legal />} />
           <Route path="/cgu" element={<CGU />} />
           <Route path="/cgv" element={<CGV />} />
           <Route path="/privacy" element={<Privacy />} />
           <Route path="/cookies" element={<Cookies />} />
 
-          {/* FALLBACK */}
-          <Route path="*" element={<Landing />} />
+          {/* === 404 === */}
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </Suspense>
     </HelmetProvider>
