@@ -918,7 +918,99 @@ export default function AdminDashboard() {
         </div>
 
       </div>
+      
+{/* ONGLET WASHERS */}
+{activeTab === 'washers' && (
+  <div>
+    <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden">
+      <div className="p-6 border-b border-slate-200">
+        <h2 className="text-2xl font-black">Validation des Washers</h2>
+      </div>
 
+      {/* FILTRES */}
+      <div className="p-6 border-b border-slate-200 flex gap-4">
+        <select 
+          className="px-4 py-2 border border-slate-200 rounded-xl"
+          onChange={(e) => setWasherFilter(e.target.value)}
+        >
+          <option value="all">Tous</option>
+          <option value="pending">En attente</option>
+          <option value="approved">Approuvés</option>
+          <option value="rejected">Rejetés</option>
+        </select>
+      </div>
+
+      {/* LISTE */}
+      <div className="overflow-x-auto">
+        <table className="w-full">
+          <thead className="bg-slate-50 border-b border-slate-200">
+            <tr>
+              <th className="text-left p-4 font-bold text-sm">Nom</th>
+              <th className="text-left p-4 font-bold text-sm">Email</th>
+              <th className="text-left p-4 font-bold text-sm">Téléphone</th>
+              <th className="text-left p-4 font-bold text-sm">Ville</th>
+              <th className="text-left p-4 font-bold text-sm">Statut</th>
+              <th className="text-left p-4 font-bold text-sm">Date</th>
+              <th className="text-left p-4 font-bold text-sm">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {filteredWashers.map(washer => (
+              <tr key={washer.id} className="border-b border-slate-100 hover:bg-slate-50">
+                <td className="p-4">
+                  <div className="font-bold">{washer.first_name} {washer.last_name}</div>
+                </td>
+                <td className="p-4 text-sm">{washer.email}</td>
+                <td className="p-4 text-sm">{washer.phone}</td>
+                <td className="p-4 text-sm">{washer.city} ({washer.postal_code})</td>
+                <td className="p-4">
+                  <span className={`px-3 py-1 rounded-full text-xs font-bold ${
+                    washer.status === 'approved' 
+                      ? 'bg-green-100 text-green-700'
+                      : washer.status === 'pending'
+                      ? 'bg-orange-100 text-orange-700'
+                      : 'bg-red-100 text-red-700'
+                  }`}>
+                    {washer.status === 'approved' && '✅ Approuvé'}
+                    {washer.status === 'pending' && '⏳ En attente'}
+                    {washer.status === 'rejected' && '❌ Rejeté'}
+                  </span>
+                </td>
+                <td className="p-4 text-sm text-slate-600">
+                  {new Date(washer.created_at).toLocaleDateString('fr-FR')}
+                </td>
+                <td className="p-4">
+                  {washer.status === 'pending' && (
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => updateWasherStatus(washer.id, 'approved')}
+                        className="px-4 py-2 bg-green-600 text-white rounded-lg text-sm font-bold hover:bg-green-500 transition"
+                      >
+                        ✅ Approuver
+                      </button>
+                      <button
+                        onClick={() => updateWasherStatus(washer.id, 'rejected')}
+                        className="px-4 py-2 bg-red-600 text-white rounded-lg text-sm font-bold hover:bg-red-500 transition"
+                      >
+                        ❌ Rejeter
+                      </button>
+                    </div>
+                  )}
+                  <button
+                    onClick={() => setSelectedWasher(washer)}
+                    className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-bold hover:bg-blue-500 transition ml-2"
+                  >
+                    👁️ Voir
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+)}
       {/* MODAL PARTNER */}
       {showModal && selectedPartner && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
