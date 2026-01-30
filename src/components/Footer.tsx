@@ -1,19 +1,8 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { Facebook, Instagram, MessageCircle, MapPin } from 'lucide-react';
-import BackToTop from './BackToTop';
 
 export default function Footer() {
-  return (
-    <footer>
-      {/* ... ton footer actuel ... */}
-      
-      <BackToTop /> {/* ← Ajoute ça */}
-    </footer>
-  );
-}
-
-export default function Footer() {
-  const navigate = useNavigate(); // 👈 Indispensable pour la redirection
+  const navigate = useNavigate();
 
   return (
     <footer className="bg-slate-900 text-slate-300 pt-16 pb-8">
@@ -91,7 +80,6 @@ export default function Footer() {
                 Comment ça marche
               </Link>
             </li>
-            {/* J'ai supprimé le point visible qui était ici */}
           </ul>
         </div>
       </div>
@@ -116,7 +104,6 @@ export default function Footer() {
       {/* Copyright & Accès Secret */}
       <div className="max-w-7xl mx-auto px-4">
         <p className="text-center text-slate-700 text-xs select-none">
-           {/* 👇 ZONE SECRÈTE START */}
           <span 
             onClick={() => navigate('/admin')} 
             className="cursor-default hover:text-slate-600 transition-colors"
@@ -124,7 +111,6 @@ export default function Footer() {
           >
             ©
           </span>
-           {/* 👆 ZONE SECRÈTE END */}
           {' '}{new Date().getFullYear()} Kilolab SAS. Tous droits réservés.
         </p>
       </div>
