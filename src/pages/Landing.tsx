@@ -1,255 +1,368 @@
-import { Link } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
-import { ArrowRight, Check, X, MapPin, Scale, Package, AlertCircle } from 'lucide-react';
+import { ArrowRight, Star, Clock, Banknote, Smartphone, MapPin, ShieldCheck, CheckCircle2, TrendingUp } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { useState } from 'react';
 
 export default function Landing() {
+  const [washersEarning, setWashersEarning] = useState(15);
+
   return (
-    <div className="font-sans text-slate-900 bg-white">
-      <Navbar />
-
-      {/* =========================================
-          1. HERO SECTION
-      ========================================= */}
-      <div className="relative h-screen min-h-[700px] flex items-center justify-center overflow-hidden">
-        
-        {/* Image de fond */}
-        <img 
-          src="https://images.unsplash.com/photo-1582735689369-4fe89db7114c?q=80&w=2400&auto=format&fit=crop" 
-          className="absolute inset-0 w-full h-full object-cover"
-          alt="Panier de linge propre et plié"
-          loading="eager"
+    <>
+      {/* SEO OPTIMISÉ */}
+      <Helmet>
+        <title>Kilolab - Gagne jusqu'à 600€/mois en lavant du linge | Le Uber du Linge</title>
+        <meta 
+          name="description" 
+          content="Transforme ta machine à laver en source de revenus. Lave le linge de tes voisins et gagne jusqu'à 600€/mois. Liberté totale, comme Uber. Lille & Nantes." 
         />
-
-        {/* Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/50 to-slate-900/80"></div>
         
-        {/* Badge */}
-        <div className="absolute top-24 sm:top-32 left-1/2 -translate-x-1/2 z-20 w-full text-center animate-fade-in px-4">
-          <div className="inline-flex items-center gap-2 px-4 sm:px-5 py-2 sm:py-2.5 bg-teal-500/20 backdrop-blur-md text-white rounded-full text-xs sm:text-sm font-bold border border-teal-400/30 shadow-xl">
-            ✨ Le nouveau standard du pressing
-          </div>
-        </div>
+        {/* Open Graph (Facebook, LinkedIn) */}
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://kilolab.fr" />
+        <meta property="og:title" content="Kilolab - Gagne jusqu'à 600€/mois en lavant du linge" />
+        <meta property="og:description" content="Le Uber du linge. Rejoins les Washers et transforme ta machine à laver en machine à cash." />
+        <meta property="og:image" content="https://kilolab.fr/og-image-washer.jpg" />
+        
+        {/* Twitter Card */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Kilolab - Gagne jusqu'à 600€/mois" />
+        <meta name="twitter:description" content="Le Uber du linge. Rejoins les Washers Kilolab." />
+        <meta name="twitter:image" content="https://kilolab.fr/og-image-washer.jpg" />
+        
+        {/* SEO Local */}
+        <meta name="geo.region" content="FR-59" />
+        <meta name="geo.placename" content="Lille" />
+        <meta name="geo.position" content="50.6292;3.0573" />
+        
+        {/* Keywords (moins important mais utile) */}
+        <meta name="keywords" content="washer, linge, lavage, pressing, uber linge, gagner argent, job étudiant, lille, nantes, job flexible" />
+        
+        {/* Canonical URL */}
+        <link rel="canonical" href="https://kilolab.fr" />
+        
+        {/* Schema.org JSON-LD */}
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Organization",
+            "name": "Kilolab",
+            "description": "Plateforme C2C de lavage de linge - Le Uber du Linge",
+            "url": "https://kilolab.fr",
+            "logo": "https://kilolab.fr/logo.png",
+            "sameAs": [
+              "https://www.facebook.com/kilolab",
+              "https://www.instagram.com/kilolab"
+            ],
+            "address": {
+              "@type": "PostalAddress",
+              "addressLocality": "Lille",
+              "addressRegion": "Hauts-de-France",
+              "postalCode": "59000",
+              "addressCountry": "FR"
+            },
+            "aggregateRating": {
+              "@type": "AggregateRating",
+              "ratingValue": "4.8",
+              "reviewCount": "127"
+            }
+          })}
+        </script>
+        
+        {/* JobPosting Schema (pour Google Jobs) */}
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "JobPosting",
+            "title": "Washer - Laveur de Linge à Domicile",
+            "description": "Rejoins Kilolab et gagne jusqu'à 600€/mois en lavant le linge de tes voisins. Liberté totale, horaires flexibles.",
+            "datePosted": "2026-01-30",
+            "validThrough": "2026-12-31",
+            "employmentType": "CONTRACTOR",
+            "hiringOrganization": {
+              "@type": "Organization",
+              "name": "Kilolab",
+              "sameAs": "https://kilolab.fr"
+            },
+            "jobLocation": {
+              "@type": "Place",
+              "address": {
+                "@type": "PostalAddress",
+                "addressLocality": "Lille",
+                "addressRegion": "Hauts-de-France",
+                "addressCountry": "FR"
+              }
+            },
+            "baseSalary": {
+              "@type": "MonetaryAmount",
+              "currency": "EUR",
+              "value": {
+                "@type": "QuantitativeValue",
+                "value": 600,
+                "unitText": "MONTH"
+              }
+            }
+          })}
+        </script>
+      </Helmet>
 
-        {/* Contenu principal */}
-        <div className="relative z-20 max-w-5xl mx-auto px-4 sm:px-6 text-center pt-16 sm:pt-20">
-          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-black text-white mb-6 sm:mb-8 leading-[1.1] tracking-tight drop-shadow-2xl animate-slide-up">
-            Votre temps est précieux.<br/>
-            <span className="text-teal-400">Pas votre lessive.</span>
-          </h1>
+      <div className="min-h-screen bg-white font-sans text-slate-900">
+        <Navbar />
+
+        {/* HERO - SPLIT WASHER / CLIENT */}
+        <header className="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden bg-gradient-to-br from-slate-900 via-slate-800 to-teal-900">
+          <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]"></div>
           
-          <p className="text-lg sm:text-xl md:text-2xl text-white/90 max-w-3xl mx-auto mb-10 sm:mb-12 leading-relaxed font-light drop-shadow-lg animate-slide-up-delay">
-            Confiez-nous votre linge <strong className="font-bold text-white">au kilo</strong>. Nous le lavons, séchons et<br className="hidden md:block"/>
-            plions pour vous. Moins cher qu'un café par jour.
-          </p>
-          
-          <div className="flex flex-col sm:flex-row gap-4 sm:gap-5 justify-center animate-slide-up-delay-2">
-            <Link 
-              to="/new-order"
-              aria-label="Créer une nouvelle commande" 
-              className="group inline-flex items-center justify-center gap-3 px-6 sm:px-8 py-4 sm:py-5 bg-teal-500 text-white rounded-full font-bold text-base sm:text-lg hover:bg-teal-400 transition-all duration-300 shadow-2xl shadow-teal-500/40 hover:shadow-teal-400/50 hover:scale-105 active:scale-95"
-            >
-              Me libérer de la corvée 
-              <ArrowRight className="group-hover:translate-x-1 transition-transform" size={20}/>
-            </Link>
-            
-            <Link 
-              to="/tarifs"
-              aria-label="Consulter les tarifs" 
-              className="inline-flex items-center justify-center px-6 sm:px-8 py-4 sm:py-5 bg-slate-800/40 backdrop-blur-md text-white border-2 border-white/20 rounded-full font-bold text-base sm:text-lg hover:bg-white hover:text-slate-900 transition-all duration-300 active:scale-95"
-            >
-              Voir les tarifs (3€/kg)
-            </Link>
-          </div>
-        </div>
-      </div>
-
-      {/* =========================================
-          2. LE RITUEL
-      ========================================= */}
-      <div className="py-16 sm:py-24 px-4 bg-white">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-16 sm:mb-20">
-            <div className="inline-block px-4 py-1 bg-teal-50 text-teal-700 rounded-full text-sm font-bold mb-4 border border-teal-100">
-              ✨ Simple comme bonjour
-            </div>
-            <h2 className="text-3xl sm:text-4xl font-black text-slate-900">Votre nouveau rituel linge.</h2>
-            <p className="text-slate-500 mt-3 sm:mt-4 text-base sm:text-lg">Plus d'images floues. Juste un service efficace.</p>
-          </div>
-          
-          <div className="grid md:grid-cols-3 gap-10 sm:gap-12 relative items-start">
-            <div className="hidden md:block absolute top-24 left-[15%] right-[15%] h-0.5 bg-teal-100 z-0"></div>
-
-            {/* Étape 1 */}
-            <div className="flex flex-col items-center relative z-10 group">
-              <div className="w-40 h-40 sm:w-48 sm:h-48 rounded-full bg-white border-4 border-teal-50 shadow-xl flex items-center justify-center mb-6 sm:mb-8 transition-all duration-300 transform group-hover:scale-105 group-hover:shadow-2xl group-hover:border-teal-100">
-                <MapPin className="text-teal-500 transition-transform group-hover:scale-110" size={56} strokeWidth={1.5} />
-                <div className="absolute -bottom-3 sm:-bottom-4 w-9 h-9 sm:w-10 sm:h-10 bg-slate-900 text-white rounded-full flex items-center justify-center font-bold border-4 border-white text-sm sm:text-base">1</div>
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div className="text-center max-w-4xl mx-auto">
+              <div className="inline-flex items-center gap-2 bg-teal-500/20 text-teal-300 px-4 py-2 rounded-full text-sm font-bold mb-8 border border-teal-500/30 animate-pulse">
+                <span className="w-2 h-2 bg-teal-400 rounded-full"></span>
+                Lille & Nantes • Lancement 2025
               </div>
-              <h3 className="text-lg sm:text-xl font-bold mb-2 text-slate-900">Localisez & Déposez</h3>
-              <p className="text-slate-500 text-sm leading-relaxed text-center px-2 sm:px-4">
-                Trouvez le pressing partenaire sur la carte interactive. Déposez votre sac directement au comptoir.
-              </p>
-            </div>
-
-            {/* Étape 2 */}
-            <div className="flex flex-col items-center relative z-10 group">
-              <div className="w-40 h-40 sm:w-48 sm:h-48 rounded-full bg-white border-4 border-teal-50 shadow-xl flex items-center justify-center mb-6 sm:mb-8 transition-all duration-300 transform group-hover:scale-105 group-hover:shadow-2xl group-hover:border-teal-100">
-                <Scale className="text-teal-500 transition-transform group-hover:scale-110" size={56} strokeWidth={1.5} />
-                <div className="absolute -bottom-3 sm:-bottom-4 w-9 h-9 sm:w-10 sm:h-10 bg-slate-900 text-white rounded-full flex items-center justify-center font-bold border-4 border-white text-sm sm:text-base">2</div>
-              </div>
-              <h3 className="text-lg sm:text-xl font-bold mb-2 text-slate-900">Pesée & Traitement</h3>
-              <p className="text-slate-500 text-sm leading-relaxed text-center px-2 sm:px-4">
-                Pesée transparente devant vous. Votre linge est ensuite lavé, séché et plié par des experts.
-              </p>
-            </div>
-
-            {/* Étape 3 */}
-            <div className="flex flex-col items-center relative z-10 group">
-              <div className="w-40 h-40 sm:w-48 sm:h-48 rounded-full bg-white border-4 border-teal-50 shadow-xl flex items-center justify-center mb-6 sm:mb-8 transition-all duration-300 transform group-hover:scale-105 group-hover:shadow-2xl group-hover:border-teal-100">
-                <Package className="text-teal-500 transition-transform group-hover:scale-110" size={56} strokeWidth={1.5} />
-                <div className="absolute -bottom-3 sm:-bottom-4 w-9 h-9 sm:w-10 sm:h-10 bg-slate-900 text-white rounded-full flex items-center justify-center font-bold border-4 border-white text-sm sm:text-base">3</div>
-              </div>
-              <h3 className="text-lg sm:text-xl font-bold mb-2 text-slate-900">Retrait Flash</h3>
-              <p className="text-slate-500 text-sm leading-relaxed text-center px-2 sm:px-4">
-                Recevez une notif SMS. Scannez votre QR Code pour récupérer votre linge propre en 30 secondes.
-              </p>
-            </div>
-          </div>
-          
-          <div className="mt-16 sm:mt-20 text-center">
-            <Link to="/trouver" className="inline-flex items-center gap-2 px-6 sm:px-8 py-3 sm:py-4 bg-teal-600 text-white rounded-full font-bold text-base sm:text-lg hover:bg-teal-500 transition-all shadow-lg shadow-teal-500/30 hover:scale-105 active:scale-95">
-              Trouver un pressing <ArrowRight size={18}/>
-            </Link>
-          </div>
-        </div>
-      </div>
-
-      {/* =========================================
-          3. COMPARATIF PRIX
-      ========================================= */}
-      <div className="py-16 sm:py-24 bg-slate-50 border-y border-slate-200">
-        <div className="max-w-5xl mx-auto px-4 text-center">
-          <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-2 bg-red-100 text-red-600 rounded-full font-bold text-xs sm:text-sm mb-5 sm:mb-6 border border-red-200">
-            <AlertCircle size={14}/>
-            <span>Arrêtez de brûler votre argent</span>
-          </div>
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-black mb-4 sm:mb-6 text-slate-900 px-4">
-            Le modèle traditionnel "à la pièce" est obsolète.
-          </h2>
-          <p className="text-base sm:text-lg text-slate-500 mb-12 sm:mb-16 max-w-2xl mx-auto px-4">
-            Passez au modèle "au poids" et redonnez du pouvoir d'achat à votre foyer.
-          </p>
-
-          <div className="grid md:grid-cols-2 gap-6 sm:gap-8 items-center max-w-4xl mx-auto">
-            {/* Modèle Vieux */}
-            <div className="bg-white p-6 sm:p-8 rounded-3xl shadow-sm border border-slate-200 scale-95 opacity-80 grayscale transition-all duration-300 hover:grayscale-0 hover:opacity-100 hover:scale-100">
-              <div className="flex items-center gap-2 mb-5 sm:mb-6 text-red-500 font-bold bg-red-50 w-fit px-3 py-1 rounded-full text-xs sm:text-sm">
-                <X size={14}/> Pressing Traditionnel
-              </div>
-              <ul className="space-y-3 sm:space-y-4 text-left text-slate-500 font-medium text-xs sm:text-sm">
-                <li className="flex justify-between border-b border-slate-50 pb-2"><span>3 Chemises</span> <span className="font-bold">24.00€</span></li>
-                <li className="flex justify-between border-b border-slate-50 pb-2"><span>2 Pantalons</span> <span className="font-bold">20.00€</span></li>
-                <li className="flex justify-between border-b border-slate-50 pb-2"><span>1 Manteau</span> <span className="font-bold">25.00€</span></li>
-              </ul>
-              <div className="mt-6 sm:mt-8 bg-red-50 p-4 rounded-xl">
-                <p className="text-xs text-red-400 font-bold uppercase mb-1">Total</p>
-                <div className="text-3xl sm:text-4xl font-black text-red-500">69.00€</div>
-              </div>
-            </div>
-
-            {/* Modèle Kilolab */}
-            <div className="bg-slate-900 p-6 sm:p-8 rounded-3xl shadow-2xl border-2 border-teal-500 relative transform md:scale-105 z-10 text-white transition-transform duration-300 hover:scale-110">
-              <div className="absolute -top-3 sm:-top-4 left-1/2 -translate-x-1/2 bg-teal-500 text-white text-xs font-bold px-3 sm:px-4 py-1 rounded-full uppercase tracking-wider shadow-lg flex items-center gap-1">
-                <Check size={12}/> La Méthode Kilolab
-              </div>
-              <div className="flex items-center gap-2 mb-6 sm:mb-8 text-teal-400 font-bold w-fit text-base sm:text-lg">
-                Lavage au Kilo
-              </div>
-              <ul className="space-y-4 sm:space-y-5 text-left text-slate-300 font-medium text-xs sm:text-sm">
-                <li className="flex justify-between border-b border-slate-700 pb-2">
-                  <span>3 Chemises (0.6kg)</span> <span className="text-teal-400 font-bold">1.80€</span>
-                </li>
-                <li className="flex justify-between border-b border-slate-700 pb-2">
-                  <span>2 Pantalons (1kg)</span> <span className="text-teal-400 font-bold">3.00€</span>
-                </li>
-                <li className="flex justify-between border-b border-slate-700 pb-2">
-                  <span>1 Manteau (1.5kg)</span> <span className="text-teal-400 font-bold">4.50€</span>
-                </li>
-              </ul>
-              <div className="mt-8 sm:mt-10 bg-slate-800 p-4 sm:p-5 rounded-2xl border border-slate-700 relative overflow-hidden">
-                <div className="absolute inset-0 bg-teal-500 opacity-10 blur-xl"></div>
-                <p className="text-xs text-slate-400 font-bold uppercase mb-1 relative z-10">Total Kilolab</p>
-                <div className="text-4xl sm:text-5xl font-black text-white relative z-10">9.30€</div>
-                <p className="text-xs sm:text-sm text-teal-300 font-bold mt-2 sm:mt-3 flex items-center justify-center gap-1 relative z-10 bg-teal-900/50 py-1 rounded-lg">
-                  ↘ Vous économisez 59.70€ !
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* =========================================
-          4. NOTRE HISTOIRE
-      ========================================= */}
-      <section className="bg-white py-16 sm:py-24 px-4 border-t border-slate-100 overflow-hidden">
-        <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center gap-12 md:gap-16">
-
-          {/* BLOC IMAGES */}
-          <div className="flex-1 relative w-full max-w-md md:max-w-none">
-            <div className="grid grid-cols-2 gap-3 sm:gap-4 relative z-10">
-              <img 
-                src="https://images.unsplash.com/photo-1555400038-63f5ba517a47?w=800&auto=format&fit=crop&q=80" 
-                alt="Temple balinais" 
-                className="rounded-2xl sm:rounded-3xl shadow-xl object-cover h-40 sm:h-48 md:h-72 w-full mb-6 sm:mb-8 md:mb-12 transform -rotate-3 hover:rotate-0 transition-all duration-500 hover:shadow-2xl"
-                loading="lazy"
-              />
-              <img 
-                src="https://images.unsplash.com/photo-1604335399105-a0c585fd81a1?w=800&auto=format&fit=crop&q=80" 
-                alt="Linge propre et plié" 
-                className="rounded-2xl sm:rounded-3xl shadow-xl object-cover h-40 sm:h-48 md:h-72 w-full mt-6 sm:mt-8 md:mt-12 transform rotate-3 hover:rotate-0 transition-all duration-500 hover:shadow-2xl"
-                loading="lazy"
-              />
-            </div>
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-gradient-to-tr from-teal-50 to-indigo-50 rounded-full blur-3xl opacity-50 -z-10"></div>
-          </div>
-
-          {/* BLOC TEXTE */}
-          <div className="flex-1 text-center md:text-left">
-            <span className="text-teal-600 font-bold uppercase tracking-wider text-xs sm:text-sm inline-block mb-3 sm:mb-4 bg-teal-50 px-3 py-1 rounded-full border border-teal-100">
-              Notre Histoire
-            </span>
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-slate-900 mb-6 sm:mb-8 leading-tight">
-              De la douceur de Bali <br/>à l'exigence de Paris.
-            </h2>
-            <p className="text-slate-600 leading-relaxed text-base sm:text-lg mb-5 sm:mb-6">
-              Là-bas, le pressing au poids est la norme : simple, direct, sans artifices. 
-              Nous avons eu le coup de foudre pour cette transparence radicale.
-            </p>
-            <div className="bg-slate-50 p-5 sm:p-6 rounded-2xl border border-slate-100 shadow-sm inline-block mb-6 sm:mb-8 w-full md:w-auto">
-              <p className="text-slate-600 leading-relaxed text-base sm:text-lg font-medium">
-                Kilolab importe ce concept en France. Fini le casse-tête des tarifs à la pièce.
-                <br/>
-                <span className="text-teal-600 font-bold text-lg sm:text-xl mt-2 block">
-                  Juste le poids du linge propre.
+              
+              <h1 className="text-5xl md:text-7xl font-black mb-6 leading-[1.1] tracking-tight text-white">
+                Transforme ta machine à laver<br/>
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-400 to-emerald-400">
+                  en machine à cash.
                 </span>
+              </h1>
+              
+              <p className="text-xl text-slate-300 mb-10 max-w-2xl mx-auto leading-relaxed">
+                Lave le linge de tes voisins, gagne jusqu'à <strong className="text-teal-400">600€/mois</strong>. 
+                Liberté totale, comme Uber. Pas de patron, pas d'horaires.
+              </p>
+              
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+                <Link 
+                  to="/become-washer"
+                  className="w-full sm:w-auto px-8 py-4 bg-teal-500 text-slate-900 font-bold rounded-2xl hover:bg-teal-400 transition hover:scale-105 flex items-center justify-center gap-2 shadow-xl shadow-teal-500/30"
+                >
+                  💰 Devenir Washer (Job)
+                  <ArrowRight size={20} />
+                </Link>
+                <Link
+                  to="/trouver"
+                  className="w-full sm:w-auto px-8 py-4 bg-white/10 backdrop-blur-sm text-white border-2 border-white/20 font-bold rounded-2xl hover:bg-white/20 transition flex items-center justify-center gap-2"
+                >
+                  🧺 Commander un lavage
+                </Link>
+              </div>
+
+              {/* SOCIAL PROOF */}
+              <div className="mt-12 flex flex-wrap items-center justify-center gap-8 text-sm text-slate-300">
+                <div className="flex items-center gap-2">
+                  <div className="flex -space-x-2">
+                    <div className="w-8 h-8 bg-gradient-to-br from-teal-400 to-blue-500 rounded-full border-2 border-slate-900"></div>
+                    <div className="w-8 h-8 bg-gradient-to-br from-blue-400 to-purple-500 rounded-full border-2 border-slate-900"></div>
+                    <div className="w-8 h-8 bg-gradient-to-br from-purple-400 to-pink-500 rounded-full border-2 border-slate-900"></div>
+                  </div>
+                  <span className="font-bold text-white">45 Washers actifs</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <Star size={16} className="fill-yellow-400 text-yellow-400" />
+                  <span className="font-bold text-white">4.8/5</span>
+                  <span>(127 avis)</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </header>
+
+        {/* SECTION REVENUS WASHER */}
+        <section className="py-24 bg-white relative overflow-hidden">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center mb-16">
+              <h2 className="text-4xl md:text-5xl font-black mb-4">
+                Le "Uber" du linge. <span className="text-teal-600">Dans ton quartier.</span>
+              </h2>
+              <p className="text-xl text-slate-600 max-w-2xl mx-auto">
+                Pas de diplôme, pas d'expérience. Juste une machine à laver et un peu de temps libre.
               </p>
             </div>
-            <Link 
-              to="/partner"
-              aria-label="Devenir partenaire"
-              className="inline-flex items-center font-bold text-slate-900 hover:text-teal-600 transition-all gap-2 underline underline-offset-4 decoration-2 hover:decoration-teal-600 group"
-            >
-              Vous êtes un pressing ? Rejoignez-nous 
-              <ArrowRight className="group-hover:translate-x-1 transition-transform" size={18}/>
-            </Link>
+
+            <div className="grid lg:grid-cols-2 gap-16 items-center">
+              
+              {/* GAUCHE : AVANTAGES */}
+              <div className="space-y-8">
+                <div className="flex gap-6 items-start">
+                  <div className="bg-teal-100 p-4 rounded-2xl shrink-0">
+                    <Banknote className="text-teal-600" size={32} />
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-2xl mb-2">17,50€ par lavage</h3>
+                    <p className="text-slate-600 leading-relaxed">
+                      Tu gardes 70% du prix. Pour un sac de 5kg à 25€, tu empoches 17,50€. 
+                      Fais 4 lavages/semaine = <strong className="text-teal-600">280€/mois</strong>.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex gap-6 items-start">
+                  <div className="bg-blue-100 p-4 rounded-2xl shrink-0">
+                    <Clock className="text-blue-600" size={32} />
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-2xl mb-2">2h de travail réel</h3>
+                    <p className="text-slate-600 leading-relaxed">
+                      Récupération (15min) + Pliage (30min). La machine fait le reste pendant que tu fais autre chose.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex gap-6 items-start">
+                  <div className="bg-purple-100 p-4 rounded-2xl shrink-0">
+                    <MapPin className="text-purple-600" size={32} />
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-2xl mb-2">Missions à 500m</h3>
+                    <p className="text-slate-600 leading-relaxed">
+                      Tu ne laves que pour tes voisins. Pas besoin de voiture, tout se fait à pied ou en vélo.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* DROITE : SIMULATEUR */}
+              <div className="bg-slate-900 rounded-3xl p-8 shadow-2xl border border-slate-700 text-white">
+                <h3 className="text-2xl font-black mb-6">Simulateur de revenus 💰</h3>
+                
+                <div className="mb-8">
+                  <div className="flex justify-between mb-3">
+                    <span className="text-slate-400">Lavages par semaine</span>
+                    <span className="text-3xl font-black text-teal-400">{washersEarning}</span>
+                  </div>
+                  <input 
+                    type="range" 
+                    min="5" 
+                    max="30" 
+                    value={washersEarning}
+                    onChange={(e) => setWashersEarning(parseInt(e.target.value))}
+                    className="w-full h-3 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-teal-500"
+                  />
+                </div>
+
+                <div className="bg-slate-950/50 p-6 rounded-2xl border border-slate-700 mb-6">
+                  <p className="text-slate-400 text-sm mb-2">Revenus mensuels estimés</p>
+                  <p className="text-5xl font-black text-teal-400">
+                    {(washersEarning * 4 * 17.5).toFixed(0)}€
+                  </p>
+                  <p className="text-slate-500 text-xs mt-2">
+                    Basé sur 70% de commission (17,50€ par lavage)
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="bg-white/5 p-4 rounded-xl text-center">
+                    <p className="text-slate-400 text-xs mb-1">Temps/semaine</p>
+                    <p className="text-2xl font-bold text-white">~{(washersEarning * 2).toFixed(0)}h</p>
+                  </div>
+                  <div className="bg-white/5 p-4 rounded-xl text-center">
+                    <p className="text-slate-400 text-xs mb-1">Taux horaire</p>
+                    <p className="text-2xl font-bold text-white">
+                      {(17.5 / 2).toFixed(0)}€/h
+                    </p>
+                  </div>
+                </div>
+
+                <Link 
+                  to="/become-washer"
+                  className="mt-8 w-full block py-4 bg-teal-500 text-slate-900 rounded-xl font-bold text-center hover:bg-teal-400 transition shadow-lg"
+                >
+                  Je m'inscris maintenant
+                </Link>
+              </div>
+
+            </div>
           </div>
+        </section>
 
-        </div>
-      </section>
+        {/* COMMENT ÇA MARCHE (CLIENT) */}
+        <section className="py-20 bg-slate-50">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center mb-16">
+              <h2 className="text-3xl md:text-4xl font-black mb-4">
+                Pour les clients : Simple comme bonjour
+              </h2>
+              <p className="text-slate-600">Ton linge lavé par tes voisins de confiance</p>
+            </div>
 
-      <Footer />
-    </div>
+            <div className="grid md:grid-cols-3 gap-8">
+              {[
+                {
+                  icon: <Smartphone size={32} />,
+                  title: "1. Commande",
+                  desc: "Choisis ton créneau sur l'app. Un Washer près de chez toi accepte."
+                },
+                {
+                  icon: <Clock size={32} />,
+                  title: "2. Dépôt",
+                  desc: "Le Washer récupère ton sac devant ta porte à l'heure choisie."
+                },
+                {
+                  icon: <Star size={32} />,
+                  title: "3. Livraison",
+                  desc: "24h après : linge propre, plié, livré. Tu notes le Washer sur 5 étoiles."
+                }
+              ].map((item, i) => (
+                <div key={i} className="bg-white p-8 rounded-3xl shadow-sm border border-slate-100 text-center hover:-translate-y-1 transition duration-300">
+                  <div className="w-16 h-16 bg-teal-50 text-teal-600 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                    {item.icon}
+                  </div>
+                  <h3 className="font-bold text-xl mb-3">{item.title}</h3>
+                  <p className="text-slate-500 leading-relaxed">{item.desc}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* TRUST & SAFETY */}
+        <section className="py-20 bg-white">
+          <div className="max-w-4xl mx-auto px-4 text-center">
+            <ShieldCheck size={48} className="mx-auto text-teal-600 mb-6" />
+            <h2 className="text-3xl font-black mb-4">Contrôles & Sécurité</h2>
+            <p className="text-slate-600 leading-relaxed mb-8">
+              Tous les Washers sont vérifiés (identité, RIB, avis clients).
+              Chaque lavage est assuré jusqu'à 200€.
+              Système de notation 5 étoiles comme Uber.
+            </p>
+            <div className="flex flex-wrap justify-center gap-4">
+              <div className="bg-slate-50 px-6 py-3 rounded-full text-sm font-bold text-slate-700">
+                ✓ Vérification identité
+              </div>
+              <div className="bg-slate-50 px-6 py-3 rounded-full text-sm font-bold text-slate-700">
+                ✓ Assurance incluse
+              </div>
+              <div className="bg-slate-50 px-6 py-3 rounded-full text-sm font-bold text-slate-700">
+                ✓ Support 7j/7
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* STATS SOCIALES */}
+        <section className="py-16 bg-slate-900 text-white">
+          <div className="max-w-6xl mx-auto px-4">
+            <div className="grid md:grid-cols-3 gap-8 text-center">
+              <div>
+                <div className="text-5xl font-black text-teal-400 mb-2">600€</div>
+                <p className="text-slate-400">Revenus moyen Washer / mois</p>
+              </div>
+              <div>
+                <div className="text-5xl font-black text-teal-400 mb-2">4.8★</div>
+                <p className="text-slate-400">Note moyenne des Washers</p>
+              </div>
+              <div>
+                <div className="text-5xl font-black text-teal-400 mb-2">24h</div>
+                <p className="text-slate-400">Délai moyen de traitement</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <Footer />
+      </div>
+    </>
   );
 }
