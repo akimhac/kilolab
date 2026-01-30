@@ -1,5 +1,16 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { Facebook, Instagram, MessageCircle, MapPin } from 'lucide-react';
+import BackToTop from './BackToTop';
+
+export default function Footer() {
+  return (
+    <footer>
+      {/* ... ton footer actuel ... */}
+      
+      <BackToTop /> {/* ← Ajoute ça */}
+    </footer>
+  );
+}
 
 export default function Footer() {
   const navigate = useNavigate(); // 👈 Indispensable pour la redirection
