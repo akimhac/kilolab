@@ -1,3 +1,53 @@
 User-agent: *
 Allow: /
+
+# Pages privées - Ne pas indexer
+Disallow: /dashboard
+Disallow: /client-dashboard
+Disallow: /admin-dashboard
+Disallow: /partner-app
+Disallow: /washer-app
+Disallow: /settings
+Disallow: /new-order
+Disallow: /scan-qr
+Disallow: /payment-success
+Disallow: /payment-cancel
+Disallow: /select-dashboard
+Disallow: /select-signup
+
+# Sitemap
 Sitemap: https://kilolab.fr/sitemap.xml
+```
+
+---
+
+## 🎯 PROCHAINES ÉTAPES SEO
+
+### 1️⃣ **Google Search Console**
+Soumets ton sitemap à Google :
+1. Va sur https://search.google.com/search-console
+2. Ajoute ta propriété `kilolab.fr`
+3. Dans "Sitemaps", soumets `https://kilolab.fr/sitemap.xml`
+
+---
+
+### 2️⃣ **Meta Tags Open Graph (Images de partage)**
+
+Tu dois créer des images pour les réseaux sociaux :
+
+**Images nécessaires dans `public/` :**
+```
+public/
+├── og-image-washer.jpg      (1200x630px) - Pour Landing
+├── og-tarifs.jpg            (1200x630px) - Pour /tarifs
+├── logo.png                 (512x512px)  - Logo Kilolab
+└── favicon.ico              (Pour l'onglet navigateur)
+```
+
+**Template Canva pour og-image-washer.jpg :**
+```
+Fond : Dégradé teal/emerald
+Texte principal : "Gagne 600€/mois en lavant du linge"
+Sous-titre : "Kilolab - Le Uber du Linge"
+Logo : En bas à droite
+Dimensions : 1200x630px
