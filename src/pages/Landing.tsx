@@ -1,277 +1,504 @@
+import { Helmet } from 'react-helmet-async';
 import { Link } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
-import { ArrowRight, Check, X, MapPin, Scale, Package, AlertCircle, Clock, Truck, Droplets } from 'lucide-react';
+import { 
+  ArrowRight, Star, CheckCircle, Clock, MapPin, 
+  Shield, Sparkles, TrendingUp, Users, Package,
+  Zap, Droplet, AlertCircle, Gift
+} from 'lucide-react';
+import { useState } from 'react';
 
 export default function Landing() {
+  const [weight, setWeight] = useState(5);
+
+  // Calcul DIY réaliste
+  const diyWater = 1.80;
+  const diyElectricity = 0.90;
+  const diyDetergent = 1.20;
+  const diySoftener = 0.60;
+  const diyMachineWear = 0.80;
+  const diyDryer = 1.50; // optionnel
+  const diyMaterialTotal = diyWater + diyElectricity + diyDetergent + diySoftener + diyMachineWear + diyDryer;
+  
+  const diyTimeHours = 2.5;
+  const hourlyRate = 12; // SMIC
+  const diyTimeCost = diyTimeHours * hourlyRate;
+  const diyTotalCost = diyMaterialTotal + diyTimeCost;
+
+  // Prix Kilolab
+  const kilolabPrice = weight * 5;
+  const timeSaved = diyTimeHours;
+  const moneySaved = diyMaterialTotal - kilolabPrice;
+
   return (
-    <div className="font-sans text-slate-900 bg-white">
-      <Navbar />
-
-      {/* =========================================
-          1. HERO SECTION
-      ========================================= */}
-      <div className="relative h-screen min-h-[700px] flex items-center justify-center overflow-hidden">
-        
-        <img 
-          src="https://images.unsplash.com/photo-1582735689369-4fe89db7114c?q=80&w=2400&auto=format&fit=crop" 
-          className="absolute inset-0 w-full h-full object-cover"
-          alt="Panier de linge propre et plié"
-          loading="eager"
+    <>
+      <Helmet>
+        <title>Kilolab - Laverie à domicile | Service de pressing en ligne</title>
+        <meta 
+          name="description" 
+          content="Service de laverie à domicile. Enlèvement, lavage professionnel et livraison en 48h. Gagnez du temps avec Kilolab, le Uber du linge." 
         />
+        <link rel="canonical" href="https://kilolab.fr" />
+      </Helmet>
 
-        <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/50 to-slate-900/80"></div>
-        
-        <div className="absolute top-24 sm:top-32 left-1/2 -translate-x-1/2 z-20 w-full text-center animate-fade-in px-4">
-          <div className="inline-flex items-center gap-2 px-4 sm:px-5 py-2 sm:py-2.5 bg-teal-500/20 backdrop-blur-md text-white rounded-full text-xs sm:text-sm font-bold border border-teal-400/30 shadow-xl">
-            ✨ Standard 3€/kg • Express 5€/kg
-          </div>
-        </div>
+      <div className="min-h-screen bg-white">
+        <Navbar />
 
-        <div className="relative z-20 max-w-5xl mx-auto px-4 sm:px-6 text-center pt-16 sm:pt-20">
-          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-black text-white mb-6 sm:mb-8 leading-[1.1] tracking-tight drop-shadow-2xl animate-slide-up">
-            Votre temps est précieux.<br/>
-            <span className="text-teal-400">Pas votre lessive.</span>
-          </h1>
+        {/* HERO */}
+        <section className="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden bg-gradient-to-br from-slate-900 via-teal-900 to-cyan-900">
+          <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]"></div>
           
-          <p className="text-lg sm:text-xl md:text-2xl text-white/90 max-w-3xl mx-auto mb-10 sm:mb-12 leading-relaxed font-light drop-shadow-lg animate-slide-up-delay">
-            Confiez-nous votre linge <strong className="font-bold text-white">au kilo</strong>. Nous le lavons, séchons et<br className="hidden md:block"/>
-            plions pour vous. Moins cher qu'un café par jour.
-          </p>
-          
-          <div className="flex flex-col sm:flex-row gap-4 sm:gap-5 justify-center animate-slide-up-delay-2">
-            <Link 
-              to="/new-order"
-              aria-label="Créer une nouvelle commande" 
-              className="group inline-flex items-center justify-center gap-3 px-6 sm:px-8 py-4 sm:py-5 bg-teal-500 text-white rounded-full font-bold text-base sm:text-lg hover:bg-teal-400 transition-all duration-300 shadow-2xl shadow-teal-500/40 hover:shadow-teal-400/50 hover:scale-105 active:scale-95"
-            >
-              Me libérer de la corvée 
-              <ArrowRight className="group-hover:translate-x-1 transition-transform" size={20}/>
-            </Link>
-            
-            <Link 
-              to="/tarifs"
-              aria-label="Consulter les tarifs" 
-              className="inline-flex items-center justify-center px-6 sm:px-8 py-4 sm:py-5 bg-slate-800/40 backdrop-blur-md text-white border-2 border-white/20 rounded-full font-bold text-base sm:text-lg hover:bg-white hover:text-slate-900 transition-all duration-300 active:scale-95"
-            >
-              Voir les tarifs (Dès 3€/kg)
-            </Link>
-          </div>
-        </div>
-      </div>
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div className="grid lg:grid-cols-2 gap-12 items-center">
+              
+              {/* GAUCHE - TEXTE */}
+              <div className="text-white">
+                <div className="inline-flex items-center gap-2 bg-teal-500/20 text-teal-300 px-4 py-2 rounded-full text-sm font-bold mb-8 border border-teal-500/30">
+                  <span className="w-2 h-2 bg-teal-400 rounded-full animate-pulse"></span>
+                  Lille & Nantes • Lancement 2025
+                </div>
 
-      {/* =========================================
-          2. COMPARATIF 3 COLONNES (AVEC "FAIRE SOI-MÊME")
-      ========================================= */}
-      <section className="py-20 bg-slate-50 border-y border-slate-200">
-        <div className="max-w-6xl mx-auto px-4">
-          <div className="text-center mb-16">
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-red-100 text-red-600 rounded-full text-sm font-bold mb-6">
-              <AlertCircle size={16}/>
-              Arrêtez de brûler votre argent
-            </div>
-            <h2 className="text-3xl md:text-4xl font-black mb-4 text-slate-900">
-              Le vrai coût du linge
-            </h2>
-            <p className="text-slate-600 text-lg">
-              Comparaison pour 3kg de linge (environ 1 machine pleine).
-            </p>
-          </div>
+                <h1 className="text-5xl md:text-7xl font-black mb-6 leading-[1.1] tracking-tight">
+                  Le Uber du linge.<br/>
+                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-400 to-emerald-400">
+                    Dans ton quartier.
+                  </span>
+                </h1>
 
-          <div className="grid md:grid-cols-3 gap-6 items-end">
-            
-            {/* 1. PRESSING CLASSIQUE */}
-            <div className="bg-white p-6 rounded-3xl shadow-sm border border-red-100 opacity-75 grayscale hover:grayscale-0 transition duration-500">
-              <div className="flex items-center gap-2 mb-6 text-red-500">
-                <X size={24}/>
-                <h3 className="text-lg font-bold">Pressing Classique</h3>
-              </div>
-              <ul className="space-y-3 text-sm text-slate-500 mb-8">
-                <li className="flex justify-between border-b pb-2"><span>Chemises (x3)</span> <span>15€</span></li>
-                <li className="flex justify-between border-b pb-2"><span>Pantalons (x2)</span> <span>16€</span></li>
-                <li className="flex justify-between border-b pb-2"><span>Pull</span> <span>8€</span></li>
-              </ul>
-              <div className="bg-red-50 text-red-600 p-4 rounded-xl text-center font-bold">
-                39€ 💸
-              </div>
-            </div>
+                <p className="text-xl text-slate-300 mb-10 leading-relaxed">
+                  Ton linge lavé, séché et plié par un Washer près de chez toi. 
+                  <strong className="text-teal-400"> Enlèvement gratuit + Livraison en 48h.</strong>
+                </p>
 
-            {/* 2. FAIRE SOI-MÊME (NOUVEAU) */}
-            <div className="bg-white p-6 rounded-3xl shadow-sm border border-orange-200 opacity-80 hover:opacity-100 transition duration-500">
-              <div className="flex items-center gap-2 mb-6 text-orange-500">
-                <Droplets size={24}/>
-                <h3 className="text-lg font-bold">Faire soi-même</h3>
-              </div>
-              <ul className="space-y-3 text-sm text-slate-600 mb-8">
-                <li className="flex justify-between border-b pb-2"><span>Eau + Électricité</span> <span>1.20€</span></li>
-                <li className="flex justify-between border-b pb-2"><span>Lessive + Adoucissant</span> <span>0.80€</span></li>
-                <li className="flex justify-between border-b pb-2"><span>Amortissement machine</span> <span>0.60€</span></li>
-                <li className="flex justify-between bg-orange-50 p-2 rounded font-bold text-orange-600">
-                  <span>Votre temps (2h)</span> <span>Inestimable ⏳</span>
-                </li>
-              </ul>
-              <div className="bg-orange-50 text-orange-600 p-4 rounded-xl text-center">
-                <div className="font-bold">2.60€ + 2h</div>
-                <p className="text-xs mt-1">Coût caché élevé</p>
-              </div>
-            </div>
+                <div className="flex flex-col sm:flex-row gap-4 mb-12">
+                  <Link
+                    to="/new-order"
+                    className="px-8 py-4 bg-teal-500 text-slate-900 font-bold rounded-2xl hover:bg-teal-400 transition hover:scale-105 flex items-center justify-center gap-2 shadow-xl shadow-teal-500/30"
+                  >
+                    Commander maintenant
+                    <ArrowRight size={20} />
+                  </Link>
+                  <Link
+                    to="/washers"
+                    className="px-8 py-4 bg-white/10 backdrop-blur-sm text-white border-2 border-white/20 font-bold rounded-2xl hover:bg-white/20 transition flex items-center justify-center gap-2"
+                  >
+                    💰 Devenir Washer
+                  </Link>
+                </div>
 
-            {/* 3. KILOLAB STANDARD (GAGNANT) */}
-            <div className="bg-gradient-to-b from-teal-50 to-white border-2 border-teal-500 rounded-3xl p-8 shadow-2xl relative transform md:scale-105 z-10">
-              <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-teal-500 text-white px-4 py-1 rounded-full text-sm font-bold shadow-lg">
-                🏆 MEILLEUR CHOIX
+                {/* SOCIAL PROOF */}
+                <div className="flex flex-wrap items-center gap-8 text-sm">
+                  <div className="flex items-center gap-2">
+                    <div className="flex -space-x-2">
+                      <div className="w-8 h-8 bg-gradient-to-br from-teal-400 to-blue-500 rounded-full border-2 border-slate-900"></div>
+                      <div className="w-8 h-8 bg-gradient-to-br from-blue-400 to-purple-500 rounded-full border-2 border-slate-900"></div>
+                      <div className="w-8 h-8 bg-gradient-to-br from-purple-400 to-pink-500 rounded-full border-2 border-slate-900"></div>
+                    </div>
+                    <span className="font-bold text-white">45+ Washers actifs</span>
+                  </div>
+                  <div className="flex items-center gap-1 text-white">
+                    <Star size={16} className="fill-yellow-400 text-yellow-400" />
+                    <span className="font-bold">4.8/5</span>
+                    <span className="text-slate-300">(127 avis)</span>
+                  </div>
+                </div>
               </div>
-              <div className="flex items-center gap-2 mb-6 text-teal-600 mt-4">
-                <Check size={24}/>
-                <h3 className="text-lg font-bold">Kilolab Standard</h3>
-              </div>
-              <ul className="space-y-3 text-sm text-slate-600 mb-8">
-                <li className="flex justify-between border-b pb-2"><span>Chemises (x3)</span> <span>Au poids</span></li>
-                <li className="flex justify-between border-b pb-2"><span>Pantalons (x2)</span> <span>Au poids</span></li>
-                <li className="flex justify-between border-b pb-2"><span>Pull</span> <span>Au poids</span></li>
-                <li className="flex justify-between bg-white p-2 rounded font-bold text-teal-700">
-                  <span>Votre temps</span> <span>0 min 🎉</span>
-                </li>
-              </ul>
-              <div className="bg-teal-600 text-white p-6 rounded-2xl text-center shadow-lg">
-                <div className="text-sm opacity-90 mb-1">3kg × 3€</div>
-                <div className="text-4xl font-black">9€</div>
-                <p className="text-xs mt-2 bg-white/20 inline-block px-3 py-1 rounded-full">
-                  ↘ -77% vs Pressing
+
+              {/* DROITE - CALCULATEUR */}
+              <div className="bg-white rounded-3xl p-8 shadow-2xl">
+                <h3 className="text-2xl font-black mb-6 text-slate-900">
+                  💰 Calcule ton prix
+                </h3>
+
+                <div className="mb-6">
+                  <label className="block text-sm font-bold text-slate-700 mb-3">
+                    Poids de ton linge
+                  </label>
+                  <div className="flex items-center gap-4">
+                    <input
+                      type="range"
+                      min="2"
+                      max="10"
+                      value={weight}
+                      onChange={(e) => setWeight(parseInt(e.target.value))}
+                      className="flex-1 h-3 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-teal-500"
+                    />
+                    <div className="w-20 text-center">
+                      <span className="text-3xl font-black text-teal-600">{weight}</span>
+                      <span className="text-sm text-slate-600 ml-1">kg</span>
+                    </div>
+                  </div>
+                  <div className="flex justify-between text-xs text-slate-500 mt-2">
+                    <span>Petit sac</span>
+                    <span>Gros volume</span>
+                  </div>
+                </div>
+
+                <div className="bg-gradient-to-br from-teal-50 to-cyan-50 rounded-2xl p-6 mb-6 border-2 border-teal-200">
+                  <div className="flex justify-between items-center mb-4">
+                    <span className="text-slate-600 font-medium">Prix Kilolab</span>
+                    <div className="text-right">
+                      <div className="text-4xl font-black text-teal-600">{kilolabPrice}€</div>
+                      <div className="text-xs text-slate-500">5€/kg</div>
+                    </div>
+                  </div>
+                  <ul className="space-y-2 text-sm">
+                    <li className="flex items-center gap-2 text-slate-700">
+                      <CheckCircle size={16} className="text-teal-600 shrink-0" />
+                      <span>Enlèvement gratuit à domicile</span>
+                    </li>
+                    <li className="flex items-center gap-2 text-slate-700">
+                      <CheckCircle size={16} className="text-teal-600 shrink-0" />
+                      <span>Lavage + Séchage professionnel</span>
+                    </li>
+                    <li className="flex items-center gap-2 text-slate-700">
+                      <CheckCircle size={16} className="text-teal-600 shrink-0" />
+                      <span>Livraison en 48h maximum</span>
+                    </li>
+                  </ul>
+                </div>
+
+                <Link
+                  to="/new-order"
+                  className="block w-full py-4 bg-teal-600 text-white text-center font-bold rounded-xl hover:bg-teal-700 transition shadow-lg"
+                >
+                  Commander maintenant
+                </Link>
+
+                <p className="text-center text-xs text-slate-500 mt-4">
+                  ✨ Premier lavage à -20% avec le code KILO20
                 </p>
               </div>
+
             </div>
-
           </div>
+        </section>
 
-          <div className="mt-12 bg-white rounded-2xl p-6 text-center border border-teal-100">
-            <p className="text-slate-700 font-medium">
-              <strong>Un foyer français moyen dépense 450€/an en pressing.</strong><br/>
-              Avec Kilolab Standard, vous ne dépensez que <span className="text-teal-600 font-black text-xl">100€/an</span>.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* =========================================
-          3. LE RITUEL (3 ÉTAPES)
-      ========================================= */}
-      <div className="py-16 sm:py-24 px-4 bg-white">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-16 sm:mb-20">
-            <div className="inline-block px-4 py-1 bg-teal-50 text-teal-700 rounded-full text-sm font-bold mb-4 border border-teal-100">
-              ✨ Simple comme bonjour
-            </div>
-            <h2 className="text-3xl sm:text-4xl font-black text-slate-900">Votre nouveau rituel linge.</h2>
-            <p className="text-slate-500 mt-3 sm:mt-4 text-base sm:text-lg">Un service efficace, à domicile.</p>
-          </div>
-          
-          <div className="grid md:grid-cols-3 gap-10 sm:gap-12 relative items-start">
-            <div className="hidden md:block absolute top-24 left-[15%] right-[15%] h-0.5 bg-teal-100 z-0"></div>
-
-            {/* Étape 1 */}
-            <div className="flex flex-col items-center relative z-10 group">
-              <div className="w-40 h-40 sm:w-48 sm:h-48 rounded-full bg-white border-4 border-teal-50 shadow-xl flex items-center justify-center mb-6 sm:mb-8 transition-all duration-300 transform group-hover:scale-105 group-hover:shadow-2xl group-hover:border-teal-100">
-                <MapPin className="text-teal-500 transition-transform group-hover:scale-110" size={56} strokeWidth={1.5} />
-                <div className="absolute -bottom-3 sm:-bottom-4 w-9 h-9 sm:w-10 sm:h-10 bg-slate-900 text-white rounded-full flex items-center justify-center font-bold border-4 border-white text-sm sm:text-base">1</div>
-              </div>
-              <h3 className="text-lg sm:text-xl font-bold mb-2 text-slate-900">Commande & Collecte</h3>
-              <p className="text-slate-500 text-sm leading-relaxed text-center px-2 sm:px-4">
-                Commandez en ligne. Un Washer certifié vient récupérer votre sac directement chez vous.
+        {/* COMPARATIF DIY VS KILOLAB */}
+        <section className="py-24 bg-slate-50">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            
+            <div className="text-center mb-16">
+              <h2 className="text-4xl md:text-5xl font-black mb-4">
+                DIY vs Kilolab : <span className="text-teal-600">Le vrai coût</span>
+              </h2>
+              <p className="text-xl text-slate-600 max-w-2xl mx-auto">
+                Au-delà du prix, c'est ton temps qui a de la valeur
               </p>
             </div>
 
-            {/* Étape 2 */}
-            <div className="flex flex-col items-center relative z-10 group">
-              <div className="w-40 h-40 sm:w-48 sm:h-48 rounded-full bg-white border-4 border-teal-50 shadow-xl flex items-center justify-center mb-6 sm:mb-8 transition-all duration-300 transform group-hover:scale-105 group-hover:shadow-2xl group-hover:border-teal-100">
-                <Scale className="text-teal-500 transition-transform group-hover:scale-110" size={56} strokeWidth={1.5} />
-                <div className="absolute -bottom-3 sm:-bottom-4 w-9 h-9 sm:w-10 sm:h-10 bg-slate-900 text-white rounded-full flex items-center justify-center font-bold border-4 border-white text-sm sm:text-base">2</div>
+            <div className="grid lg:grid-cols-2 gap-8 max-w-6xl mx-auto">
+              
+              {/* DIY */}
+              <div className="bg-gradient-to-br from-orange-50 to-red-50 rounded-3xl p-8 border-2 border-orange-200 relative">
+                <div className="absolute top-4 right-4 bg-red-500 text-white px-3 py-1 rounded-full text-xs font-black">
+                  ⚠️ COÛT CACHÉ
+                </div>
+
+                <div className="flex items-center gap-4 mb-6">
+                  <div className="p-4 bg-orange-100 rounded-2xl">
+                    <AlertCircle className="text-orange-600" size={32} />
+                  </div>
+                  <div>
+                    <h3 className="text-2xl font-black text-slate-900">🧺 Faire soi-même</h3>
+                    <p className="text-sm text-slate-600">Coûts réels pour {weight}kg</p>
+                  </div>
+                </div>
+
+                {/* Détails coûts */}
+                <div className="space-y-3 mb-6">
+                  <div className="flex justify-between items-center p-3 bg-blue-50 rounded-xl">
+                    <div className="flex items-center gap-2">
+                      <Droplet size={18} className="text-blue-600" />
+                      <span className="text-sm font-medium">Eau (60L)</span>
+                    </div>
+                    <span className="font-bold text-slate-900">{diyWater.toFixed(2)}€</span>
+                  </div>
+
+                  <div className="flex justify-between items-center p-3 bg-yellow-50 rounded-xl">
+                    <div className="flex items-center gap-2">
+                      <Zap size={18} className="text-yellow-600" />
+                      <span className="text-sm font-medium">Électricité (60°)</span>
+                    </div>
+                    <span className="font-bold text-slate-900">{diyElectricity.toFixed(2)}€</span>
+                  </div>
+
+                  <div className="flex justify-between items-center p-3 bg-purple-50 rounded-xl">
+                    <div className="flex items-center gap-2">
+                      <Sparkles size={18} className="text-purple-600" />
+                      <span className="text-sm font-medium">Lessive premium</span>
+                    </div>
+                    <span className="font-bold text-slate-900">{diyDetergent.toFixed(2)}€</span>
+                  </div>
+
+                  <div className="flex justify-between items-center p-3 bg-pink-50 rounded-xl">
+                    <div className="flex items-center gap-2">
+                      <Sparkles size={18} className="text-pink-600" />
+                      <span className="text-sm font-medium">Adoucissant</span>
+                    </div>
+                    <span className="font-bold text-slate-900">{diySoftener.toFixed(2)}€</span>
+                  </div>
+
+                  <div className="flex justify-between items-center p-3 bg-slate-50 rounded-xl">
+                    <div className="flex items-center gap-2">
+                      <TrendingUp size={18} className="text-slate-600" />
+                      <span className="text-sm font-medium">Usure machine</span>
+                    </div>
+                    <span className="font-bold text-slate-900">{diyMachineWear.toFixed(2)}€</span>
+                  </div>
+
+                  <div className="flex justify-between items-center p-3 bg-orange-50 rounded-xl">
+                    <div className="flex items-center gap-2">
+                      <Zap size={18} className="text-orange-600" />
+                      <span className="text-sm font-medium">Sèche-linge</span>
+                    </div>
+                    <span className="font-bold text-slate-900">{diyDryer.toFixed(2)}€</span>
+                  </div>
+                </div>
+
+                {/* Temps */}
+                <div className="bg-white/70 backdrop-blur-sm p-5 rounded-2xl border border-orange-300 mb-6">
+                  <div className="flex justify-between items-center mb-3">
+                    <div className="flex items-center gap-2">
+                      <Clock className="text-orange-600" size={20} />
+                      <span className="font-bold text-slate-900">Ton temps</span>
+                    </div>
+                    <span className="text-2xl font-black text-orange-600">{diyTimeHours}h</span>
+                  </div>
+                  <p className="text-xs text-slate-600 mb-3">
+                    Tri (15min) + Lavage (1h30) + Séchage (30min) + Pliage (30min)
+                  </p>
+                  <div className="flex justify-between items-center pt-3 border-t">
+                    <span className="text-sm text-slate-600">Valorisé au SMIC ({hourlyRate}€/h)</span>
+                    <span className="font-bold text-orange-700">{diyTimeCost.toFixed(2)}€</span>
+                  </div>
+                </div>
+
+                {/* Total */}
+                <div className="bg-gradient-to-r from-red-500 to-orange-500 p-6 rounded-2xl text-white">
+                  <div className="flex justify-between items-center mb-2">
+                    <span className="text-sm font-medium opacity-90">Coût matériel seul</span>
+                    <span className="font-bold">{diyMaterialTotal.toFixed(2)}€</span>
+                  </div>
+                  <div className="flex justify-between items-center mb-4 pb-4 border-b border-white/30">
+                    <span className="text-sm font-medium opacity-90">Coût de ton temps</span>
+                    <span className="font-bold">{diyTimeCost.toFixed(2)}€</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="font-black text-lg">COÛT TOTAL RÉEL</span>
+                    <span className="text-4xl font-black">{diyTotalCost.toFixed(2)}€</span>
+                  </div>
+                  <p className="text-center text-xs mt-3 bg-white/20 rounded-lg py-2 font-bold">
+                    ⚠️ Sans compter le stress et la corvée
+                  </p>
+                </div>
               </div>
-              <h3 className="text-lg sm:text-xl font-bold mb-2 text-slate-900">Pesée & Lavage Pro</h3>
-              <p className="text-slate-500 text-sm leading-relaxed text-center px-2 sm:px-4">
-                Pesée transparente devant vous. Lavage séparé avec lessive hypoallergénique, séchage et pliage carré.
-              </p>
-            </div>
 
-            {/* Étape 3 */}
-            <div className="flex flex-col items-center relative z-10 group">
-              <div className="w-40 h-40 sm:w-48 sm:h-48 rounded-full bg-white border-4 border-teal-50 shadow-xl flex items-center justify-center mb-6 sm:mb-8 transition-all duration-300 transform group-hover:scale-105 group-hover:shadow-2xl group-hover:border-teal-100">
-                <Package className="text-teal-500 transition-transform group-hover:scale-110" size={56} strokeWidth={1.5} />
-                <div className="absolute -bottom-3 sm:-bottom-4 w-9 h-9 sm:w-10 sm:h-10 bg-slate-900 text-white rounded-full flex items-center justify-center font-bold border-4 border-white text-sm sm:text-base">3</div>
+              {/* KILOLAB */}
+              <div className="bg-gradient-to-br from-teal-50 to-cyan-50 rounded-3xl p-8 border-2 border-teal-200 relative">
+                <div className="absolute top-4 right-4 bg-yellow-400 text-slate-900 px-3 py-1 rounded-full text-xs font-black rotate-12 shadow-lg">
+                  ⭐ MEILLEUR CHOIX
+                </div>
+
+                <div className="flex items-center gap-4 mb-6">
+                  <div className="p-4 bg-teal-100 rounded-2xl">
+                    <Sparkles className="text-teal-600" size={32} />
+                  </div>
+                  <div>
+                    <h3 className="text-2xl font-black text-slate-900">✨ Service Kilolab</h3>
+                    <p className="text-sm text-slate-600">Tout inclus pour {weight}kg</p>
+                  </div>
+                </div>
+
+                {/* Avantages */}
+                <div className="space-y-3 mb-6">
+                  <div className="flex items-center gap-3 p-4 bg-white rounded-xl border border-teal-100">
+                    <div className="w-8 h-8 bg-teal-500 rounded-full flex items-center justify-center shrink-0">
+                      <CheckCircle size={18} className="text-white" />
+                    </div>
+                    <span className="font-medium text-slate-900">Enlèvement gratuit à ton domicile</span>
+                  </div>
+
+                  <div className="flex items-center gap-3 p-4 bg-white rounded-xl border border-teal-100">
+                    <div className="w-8 h-8 bg-teal-500 rounded-full flex items-center justify-center shrink-0">
+                      <CheckCircle size={18} className="text-white" />
+                    </div>
+                    <span className="font-medium text-slate-900">Lavage professionnel (lessive premium)</span>
+                  </div>
+
+                  <div className="flex items-center gap-3 p-4 bg-white rounded-xl border border-teal-100">
+                    <div className="w-8 h-8 bg-teal-500 rounded-full flex items-center justify-center shrink-0">
+                      <CheckCircle size={18} className="text-white" />
+                    </div>
+                    <span className="font-medium text-slate-900">Séchage + Pliage impeccable</span>
+                  </div>
+
+                  <div className="flex items-center gap-3 p-4 bg-white rounded-xl border border-teal-100">
+                    <div className="w-8 h-8 bg-teal-500 rounded-full flex items-center justify-center shrink-0">
+                      <CheckCircle size={18} className="text-white" />
+                    </div>
+                    <span className="font-medium text-slate-900">Livraison en 48h maximum</span>
+                  </div>
+
+                  <div className="flex items-center gap-3 p-4 bg-white rounded-xl border border-teal-100">
+                    <div className="w-8 h-8 bg-teal-500 rounded-full flex items-center justify-center shrink-0">
+                      <CheckCircle size={18} className="text-white" />
+                    </div>
+                    <span className="font-medium text-slate-900">Assurance 200€ incluse</span>
+                  </div>
+                </div>
+
+                {/* Prix */}
+                <div className="bg-white p-6 rounded-2xl border-2 border-teal-200 mb-6">
+                  <div className="flex justify-between items-center mb-3">
+                    <span className="text-slate-600 font-medium">Prix tout compris</span>
+                    <span className="font-bold text-slate-900">{kilolabPrice.toFixed(2)}€</span>
+                  </div>
+                  <div className="flex justify-between items-center pt-3 border-t">
+                    <div className="flex items-center gap-2">
+                      <Clock size={20} className="text-teal-600" />
+                      <span className="font-bold text-slate-900">Ton temps</span>
+                    </div>
+                    <span className="text-3xl font-black text-teal-600">0h !</span>
+                  </div>
+                </div>
+
+                {/* Économies */}
+                <div className="bg-gradient-to-r from-green-500 to-teal-500 p-6 rounded-2xl text-white mb-6">
+                  <p className="text-sm font-bold mb-4 text-center">🎉 TU ÉCONOMISES PAR RAPPORT AU DIY</p>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="text-center bg-white/20 rounded-xl p-4">
+                      <p className="text-3xl font-black mb-1">{timeSaved.toFixed(1)}h</p>
+                      <p className="text-xs font-medium">de temps libre</p>
+                      <p className="text-xs mt-1 opacity-80">= {diyTimeCost.toFixed(0)}€ en valeur</p>
+                    </div>
+                    <div className="text-center bg-white/20 rounded-xl p-4">
+                      <p className="text-3xl font-black mb-1">0€</p>
+                      <p className="text-xs font-medium">de stress</p>
+                      <p className="text-xs mt-1 opacity-80">corvée = terminée !</p>
+                    </div>
+                  </div>
+                </div>
+
+                <Link
+                  to="/new-order"
+                  className="block w-full py-4 bg-teal-600 text-white text-center font-bold rounded-xl hover:bg-teal-700 transition shadow-lg text-lg"
+                >
+                  ✅ Je choisis Kilolab
+                </Link>
+
+                <p className="text-center text-xs text-slate-500 mt-4">
+                  💡 <strong>Astuce :</strong> {timeSaved}h économisées = {diyTimeCost.toFixed(0)}€ de ton temps valorisé
+                </p>
               </div>
-              <h3 className="text-lg sm:text-xl font-bold mb-2 text-slate-900">Retour en 24h/48h</h3>
-              <p className="text-slate-500 text-sm leading-relaxed text-center px-2 sm:px-4">
-                Votre linge revient propre et plié. Vous êtes notifié par SMS. Simple, rapide, efficace.
-              </p>
+
+            </div>
+
+            {/* Conclusion */}
+            <div className="mt-12 text-center max-w-3xl mx-auto">
+              <div className="bg-gradient-to-r from-teal-600 to-cyan-600 text-white p-8 rounded-2xl">
+                <h3 className="text-2xl font-black mb-3">
+                  💎 Le vrai coût, c'est ton temps
+                </h3>
+                <p className="text-lg text-teal-100 mb-6">
+                  Pour seulement <strong className="text-white">{(kilolabPrice - diyMaterialTotal).toFixed(2)}€ de plus</strong>, 
+                  tu récupères <strong className="text-white">{timeSaved}h de vie</strong> (valeur: {diyTimeCost}€)
+                </p>
+                <div className="inline-block bg-white/20 px-6 py-3 rounded-xl border border-white/30">
+                  <p className="text-sm font-bold">
+                    ✨ En gros, tu es <span className="text-yellow-300">PAYÉ {(diyTimeCost - (kilolabPrice - diyMaterialTotal)).toFixed(0)}€</span> pour ne rien faire
+                  </p>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+        {/* COMMENT ÇA MARCHE */}
+        <section className="py-24 bg-white">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center mb-16">
+              <h2 className="text-4xl font-black mb-4">
+                Comment ça marche ?
+              </h2>
+              <p className="text-xl text-slate-600">Simple comme bonjour</p>
+            </div>
+
+            <div className="grid md:grid-cols-4 gap-8">
+              {[
+                {
+                  step: "1",
+                  icon: <Package size={32} />,
+                  title: "Commande en ligne",
+                  desc: "Choisis ton créneau d'enlèvement en 2 clics"
+                },
+                {
+                  step: "2",
+                  icon: <MapPin size={32} />,
+                  title: "Enlèvement gratuit",
+                  desc: "Un Washer passe récupérer ton linge chez toi"
+                },
+                {
+                  step: "3",
+                  icon: <Sparkles size={32} />,
+                  title: "Lavage pro",
+                  desc: "Lavé, séché, plié avec soin par ton Washer"
+                },
+                {
+                  step: "4",
+                  icon: <CheckCircle size={32} />,
+                  title: "Livraison 48h",
+                  desc: "Reçois ton linge propre prêt à ranger"
+                }
+              ].map((item, i) => (
+                <div key={i} className="relative">
+                  <div className="bg-slate-50 p-6 rounded-2xl border border-slate-200 hover:shadow-lg transition-all hover:-translate-y-1">
+                    <div className="absolute -top-4 -left-4 w-12 h-12 bg-teal-600 text-white rounded-full flex items-center justify-center font-black text-xl shadow-lg">
+                      {item.step}
+                    </div>
+                    <div className="w-16 h-16 bg-teal-50 text-teal-600 rounded-2xl flex items-center justify-center mb-4 mx-auto">
+                      {item.icon}
+                    </div>
+                    <h3 className="font-bold text-lg mb-2 text-center">{item.title}</h3>
+                    <p className="text-slate-600 text-sm text-center leading-relaxed">{item.desc}</p>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
-          
-          <div className="mt-16 sm:mt-20 text-center">
-            <Link to="/new-order" className="inline-flex items-center gap-2 px-6 sm:px-8 py-3 sm:py-4 bg-teal-600 text-white rounded-full font-bold text-base sm:text-lg hover:bg-teal-500 transition-all shadow-lg shadow-teal-500/30 hover:scale-105 active:scale-95">
-              Commander maintenant <ArrowRight size={18}/>
-            </Link>
-          </div>
-        </div>
-      </div>
+        </section>
 
-      {/* =========================================
-          4. HISTOIRE BALI
-      ========================================= */}
-      <section className="bg-white py-16 sm:py-24 px-4 border-t border-slate-100 overflow-hidden">
-        <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center gap-12 md:gap-16">
-
-          <div className="flex-1 relative w-full max-w-md md:max-w-none">
-            <div className="grid grid-cols-2 gap-3 sm:gap-4 relative z-10">
-              <img 
-                src="https://images.unsplash.com/photo-1555400038-63f5ba517a47?w=800&auto=format&fit=crop&q=80" 
-                alt="Temple balinais" 
-                className="rounded-2xl sm:rounded-3xl shadow-xl object-cover h-40 sm:h-48 md:h-72 w-full mb-6 sm:mb-8 md:mb-12 transform -rotate-3 hover:rotate-0 transition-all duration-500 hover:shadow-2xl"
-                loading="lazy"
-              />
-              <img 
-                src="https://images.unsplash.com/photo-1604335399105-a0c585fd81a1?w=800&auto=format&fit=crop&q=80" 
-                alt="Linge propre et plié" 
-                className="rounded-2xl sm:rounded-3xl shadow-xl object-cover h-40 sm:h-48 md:h-72 w-full mt-6 sm:mt-8 md:mt-12 transform rotate-3 hover:rotate-0 transition-all duration-500 hover:shadow-2xl"
-                loading="lazy"
-              />
-            </div>
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-gradient-to-tr from-teal-50 to-indigo-50 rounded-full blur-3xl opacity-50 -z-10"></div>
-          </div>
-
-          <div className="flex-1 text-center md:text-left">
-            <span className="text-teal-600 font-bold uppercase tracking-wider text-xs sm:text-sm inline-block mb-3 sm:mb-4 bg-teal-50 px-3 py-1 rounded-full border border-teal-100">
-              Notre Histoire
-            </span>
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-slate-900 mb-6 sm:mb-8 leading-tight">
-              De la douceur de Bali <br/>à l'exigence de Paris.
+        {/* CTA FINAL */}
+        <section className="py-20 bg-gradient-to-r from-teal-600 to-cyan-600 text-white">
+          <div className="max-w-4xl mx-auto px-4 text-center">
+            <h2 className="text-4xl md:text-5xl font-black mb-4">
+              Prêt à récupérer ton temps libre ?
             </h2>
-            <p className="text-slate-600 leading-relaxed text-base sm:text-lg mb-5 sm:mb-6">
-              Là-bas, le pressing au poids est la norme : simple, direct, sans artifices. 
-              Nous avons eu le coup de foudre pour cette transparence radicale.
+            <p className="text-xl mb-8 text-teal-100">
+              Rejoins les 500+ utilisateurs qui ont déjà arrêté la corvée du linge
             </p>
-            <div className="bg-slate-50 p-5 sm:p-6 rounded-2xl border border-slate-100 shadow-sm inline-block mb-6 sm:mb-8 w-full md:w-auto">
-              <p className="text-slate-600 leading-relaxed text-base sm:text-lg font-medium">
-                Kilolab importe ce concept en France. Fini le casse-tête des tarifs à la pièce.
-                <br/>
-                <span className="text-teal-600 font-bold text-lg sm:text-xl mt-2 block">
-                  Juste le poids du linge propre.
-                </span>
-              </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Link
+                to="/new-order"
+                className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-white text-teal-600 rounded-2xl font-bold hover:bg-slate-100 transition shadow-2xl text-lg"
+              >
+                Commander maintenant
+                <ArrowRight size={20} />
+              </Link>
+              <Link
+                to="/washers"
+                className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-teal-700 text-white rounded-2xl font-bold hover:bg-teal-800 transition border-2 border-white/20 text-lg"
+              >
+                💰 Devenir Washer
+              </Link>
             </div>
-            <Link 
-              to="/become-washer"
-              aria-label="Devenir Washer"
-              className="inline-flex items-center font-bold text-slate-900 hover:text-teal-600 transition-all gap-2 underline underline-offset-4 decoration-2 hover:decoration-teal-600 group"
-            >
-              Envie de gagner de l'argent ? Devenez Washer 
-              <ArrowRight className="group-hover:translate-x-1 transition-transform" size={18}/>
-            </Link>
           </div>
+        </section>
 
-        </div>
-      </section>
-
-      <Footer />
-    </div>
+        <Footer />
+      </div>
+    </>
   );
 }
