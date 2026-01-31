@@ -3,16 +3,16 @@ import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
-import { Loader2, Upload, Check, AlertCircle, Sparkles, Scale, Droplets } from 'lucide-react';
+import { Loader2, Upload, Check, AlertCircle, Sparkles, Scale, Droplets, ShieldCheck, Car, Clock, TrendingUp } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 export default function BecomeWasher() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [step, setStep] = useState(1);
-  const [volume, setVolume] = useState(20); // Pour le simulateur
+  const [volume, setVolume] = useState(20);
 
-  // Simulation revenus : Mix 50/50 Standard/Express => Moyenne 4€/kg * 70% = 2.8€/kg net
+  // Revenus : Moyenne 4€/kg * 70% = 2.8€/kg net
   const revenue = (volume * 2.80).toFixed(0);
 
   const [formData, setFormData] = useState({
@@ -23,47 +23,66 @@ export default function BecomeWasher() {
   const uploadIdCard = async (file: File) => {
     try {
       const fileExt = file.name.split('.').pop();
-      const fileName = `${Date.now()}-${Math.random()}.${fileExt}`;
+      const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
       const filePath = `id-cards/${fileName}`;
-      const { error } = await supabase.storage.from('documents').upload(filePath, file); // J'ai corrigé le bucket 'washers' -> 'documents' si besoin
+      
+      // Essaie d'uploader (compatible avec bucket 'washers' ou 'documents')
+      let bucket = 'washers';
+      let { error } = await supabase.storage.from(bucket).upload(filePath, file);
+      
+      if (error && error.message.includes('not found')) {
+        bucket = 'documents';
+        const retry = await supabase.storage.from(bucket).upload(filePath, file);
+        error = retry.error;
+      }
+      
       if (error) throw error;
-      const { data } = supabase.storage.from('documents').getPublicUrl(filePath);
+      
+      const { data } = supabase.storage.from(bucket).getPublicUrl(filePath);
       setFormData({ ...formData, idCardUrl: data.publicUrl });
-      toast.success("Pièce d'identité reçue !");
+      toast.success("✅ Pièce d'identité reçue !");
     } catch (error: any) {
-      toast.error("Erreur upload: " + error.message);
+      toast.error("❌ Erreur upload: " + error.message);
     }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    
     try {
+      // Vérifications
       if (!formData.has_machine || !formData.has_scale || !formData.use_hypoallergenic || !formData.accept_terms) {
-        toast.error("Veuillez accepter tous les engagements qualité");
+        toast.error("⚠️ Veuillez accepter tous les engagements qualité");
         setLoading(false);
         return;
       }
 
+      if (!formData.idCardUrl) {
+        toast.error("⚠️ Merci d'uploader votre pièce d'identité");
+        setLoading(false);
+        return;
+      }
+
+      // Insert dans washers
       const { error } = await supabase.from('washers').insert({
         full_name: formData.fullName,
         email: formData.email,
         phone: formData.phone,
         city: formData.city,
         postal_code: formData.postalCode,
+        address: formData.address,
         id_card_url: formData.idCardUrl,
-        status: 'pending',
-        has_machine: formData.has_machine,
-        has_scale: formData.has_scale,
-        use_hypoallergenic: formData.use_hypoallergenic
+        status: 'pending'
       });
 
       if (error) throw error;
-      setStep(4); // Succès
-      toast.success("Candidature envoyée !");
+
+      setStep(4);
+      toast.success("🎉 Candidature envoyée !");
     } catch (error: any) {
       console.error(error);
-      toast.error("Erreur : " + error.message);
+      toast.error("❌ " + (error.message || "Erreur"));
     } finally {
       setLoading(false);
     }
@@ -72,125 +91,313 @@ export default function BecomeWasher() {
   return (
     <div className="min-h-screen bg-white font-sans">
       <Navbar />
-      <div className="pt-32 pb-20 px-4 max-w-4xl mx-auto">
+      
+      <div className="pt-32 pb-20 px-4 max-w-5xl mx-auto">
         
         {/* HEADER */}
         <div className="text-center mb-12">
           <div className="inline-flex items-center gap-2 bg-teal-100 text-teal-700 px-4 py-2 rounded-full text-sm font-bold mb-6">
-            <Sparkles size={16} /> Devenez Washer Kilolab
+            <Sparkles size={16} /> Rejoins les Washers Kilolab
           </div>
           <h1 className="text-4xl md:text-5xl font-black mb-4">
-            Transforme ta machine à laver<br/><span className="text-teal-600">en machine à cash 💰</span>
+            Transforme ta machine à laver<br/>
+            <span className="text-teal-600">en machine à cash 💰</span>
           </h1>
           <p className="text-xl text-slate-600 max-w-2xl mx-auto">
             Gagne de l'argent en lavant le linge de ta ville. Liberté totale, sans abonnement.
           </p>
         </div>
 
-        {/* ÉTAPES */}
-        <div className="flex justify-between mb-12 max-w-lg mx-auto">
+        {/* PROGRESSION */}
+        <div className="flex justify-between mb-12 max-w-2xl mx-auto">
           {[1, 2, 3].map(num => (
             <div key={num} className={`flex-1 ${num < 3 ? 'mr-2' : ''}`}>
               <div className={`h-2 rounded-full transition-all ${step >= num ? 'bg-teal-600' : 'bg-slate-200'}`}></div>
+              <p className={`text-xs mt-2 font-bold text-center ${step >= num ? 'text-teal-600' : 'text-slate-400'}`}>
+                {num === 1 ? 'Infos' : num === 2 ? 'Identité' : 'Engagements'}
+              </p>
             </div>
           ))}
         </div>
 
         <form onSubmit={handleSubmit}>
+          
           {/* STEP 1: INFOS */}
           {step === 1 && (
-            <div className="bg-white border border-slate-200 rounded-2xl p-8 shadow-sm">
+            <div className="bg-white border border-slate-200 rounded-2xl p-8 shadow-sm max-w-2xl mx-auto">
               <h2 className="text-2xl font-bold mb-6">1. Tes informations</h2>
+              
               <div className="space-y-4">
-                <input required type="text" placeholder="Nom complet" value={formData.fullName} onChange={e => setFormData({...formData, fullName: e.target.value})} className="w-full p-3 border rounded-xl" />
+                <input 
+                  required 
+                  type="text" 
+                  placeholder="Nom complet *" 
+                  value={formData.fullName} 
+                  onChange={e => setFormData({...formData, fullName: e.target.value})} 
+                  className="w-full p-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-teal-500 outline-none"
+                />
+                
                 <div className="grid md:grid-cols-2 gap-4">
-                    <input required type="email" placeholder="Email" value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} className="w-full p-3 border rounded-xl" />
-                    <input required type="tel" placeholder="Téléphone" value={formData.phone} onChange={e => setFormData({...formData, phone: e.target.value})} className="w-full p-3 border rounded-xl" />
+                  <input 
+                    required 
+                    type="email" 
+                    placeholder="Email *" 
+                    value={formData.email} 
+                    onChange={e => setFormData({...formData, email: e.target.value})} 
+                    className="w-full p-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-teal-500 outline-none"
+                  />
+                  <input 
+                    required 
+                    type="tel" 
+                    placeholder="Téléphone *" 
+                    value={formData.phone} 
+                    onChange={e => setFormData({...formData, phone: e.target.value})} 
+                    className="w-full p-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-teal-500 outline-none"
+                  />
                 </div>
+                
                 <div className="grid md:grid-cols-2 gap-4">
-                    <input required type="text" placeholder="Ville" value={formData.city} onChange={e => setFormData({...formData, city: e.target.value})} className="w-full p-3 border rounded-xl" />
-                    <input required type="text" placeholder="Code postal" value={formData.postalCode} onChange={e => setFormData({...formData, postalCode: e.target.value})} className="w-full p-3 border rounded-xl" />
+                  <input 
+                    required 
+                    type="text" 
+                    placeholder="Ville *" 
+                    value={formData.city} 
+                    onChange={e => setFormData({...formData, city: e.target.value})} 
+                    className="w-full p-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-teal-500 outline-none"
+                  />
+                  <input 
+                    required 
+                    type="text" 
+                    placeholder="Code postal *" 
+                    value={formData.postalCode} 
+                    onChange={e => setFormData({...formData, postalCode: e.target.value})} 
+                    className="w-full p-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-teal-500 outline-none"
+                  />
                 </div>
+
+                <input 
+                  required 
+                  type="text" 
+                  placeholder="Adresse complète *" 
+                  value={formData.address} 
+                  onChange={e => setFormData({...formData, address: e.target.value})} 
+                  className="w-full p-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-teal-500 outline-none"
+                />
               </div>
-              <button type="button" onClick={() => setStep(2)} className="w-full mt-6 py-4 bg-teal-600 text-white rounded-xl font-bold">Continuer</button>
+              
+              <button 
+                type="button" 
+                onClick={() => setStep(2)} 
+                className="w-full mt-6 py-4 bg-teal-600 text-white rounded-xl font-bold hover:bg-teal-500 transition"
+              >
+                Continuer →
+              </button>
             </div>
           )}
 
           {/* STEP 2: ID */}
           {step === 2 && (
-            <div className="bg-white border border-slate-200 rounded-2xl p-8 shadow-sm">
-              <h2 className="text-2xl font-bold mb-6">2. Identité</h2>
-              <div className="mb-6 border-2 border-dashed border-slate-300 rounded-xl p-8 text-center bg-slate-50 relative">
+            <div className="bg-white border border-slate-200 rounded-2xl p-8 shadow-sm max-w-2xl mx-auto">
+              <h2 className="text-2xl font-bold mb-6">2. Vérification d'identité</h2>
+              
+              <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-6 flex items-start gap-3">
+                <AlertCircle className="text-blue-600 shrink-0 mt-0.5" size={20} />
+                <div className="text-sm text-blue-900">
+                  <p className="font-bold mb-1">Pourquoi cette étape ?</p>
+                  <p>Pour la sécurité des clients. Toutes les données sont cryptées et conformes RGPD.</p>
+                </div>
+              </div>
+
+              <label className="block text-sm font-bold mb-2">Pièce d'identité (CNI ou Passeport) *</label>
+              
+              <div className="relative border-2 border-dashed border-slate-300 rounded-xl p-8 text-center bg-slate-50 hover:bg-teal-50 hover:border-teal-500 transition cursor-pointer">
                 {!formData.idCardUrl ? (
-                    <>
-                        <Upload className="mx-auto mb-2 text-slate-400"/>
-                        <p className="font-bold text-slate-600">Clique pour uploader ta CNI/Passeport</p>
-                        <input type="file" accept="image/*" className="absolute inset-0 opacity-0 cursor-pointer" onChange={(e) => e.target.files?.[0] && uploadIdCard(e.target.files[0])} />
-                    </>
+                  <>
+                    <Upload className="mx-auto mb-3 text-slate-400" size={32} />
+                    <p className="font-bold text-slate-600 mb-1">Clique pour uploader</p>
+                    <p className="text-sm text-slate-500">JPG, PNG (max 5MB)</p>
+                    <input 
+                      type="file" 
+                      accept="image/*" 
+                      className="absolute inset-0 opacity-0 cursor-pointer" 
+                      onChange={(e) => e.target.files?.[0] && uploadIdCard(e.target.files[0])} 
+                    />
+                  </>
                 ) : (
-                    <div className="text-green-600 font-bold flex items-center justify-center gap-2"><Check/> Document reçu</div>
+                  <div className="flex items-center justify-center gap-3 text-green-600 font-bold">
+                    <Check size={24} />
+                    <span>Document reçu ✅</span>
+                  </div>
                 )}
               </div>
-              <div className="flex gap-4">
-                <button type="button" onClick={() => setStep(1)} className="flex-1 py-4 border font-bold rounded-xl">Retour</button>
-                <button type="button" onClick={() => setStep(3)} disabled={!formData.idCardUrl} className="flex-1 py-4 bg-teal-600 text-white font-bold rounded-xl disabled:opacity-50">Continuer</button>
+
+              <div className="flex gap-4 mt-6">
+                <button 
+                  type="button" 
+                  onClick={() => setStep(1)} 
+                  className="flex-1 py-4 border-2 border-slate-200 rounded-xl font-bold hover:bg-slate-50 transition"
+                >
+                  ← Retour
+                </button>
+                <button 
+                  type="button" 
+                  onClick={() => setStep(3)} 
+                  disabled={!formData.idCardUrl} 
+                  className="flex-1 py-4 bg-teal-600 text-white rounded-xl font-bold hover:bg-teal-500 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Continuer →
+                </button>
               </div>
             </div>
           )}
 
-          {/* STEP 3: ENGAGEMENTS */}
+          {/* STEP 3: ENGAGEMENTS + SIMULATEUR */}
           {step === 3 && (
-            <div className="bg-white border border-slate-200 rounded-2xl p-8 shadow-sm">
-              <h2 className="text-2xl font-bold mb-6">3. Charte Qualité</h2>
-              
-              {/* Simulateur Mini */}
-              <div className="bg-slate-900 text-white p-6 rounded-xl mb-8">
-                <div className="flex justify-between items-center mb-2">
-                    <span>Volume hebdo: {volume}kg</span>
-                    <span className="text-2xl font-bold text-teal-400">{parseInt(revenue) * 4}€ / mois</span>
+            <div className="max-w-4xl mx-auto">
+              <div className="grid lg:grid-cols-2 gap-8">
+                
+                {/* SIMULATEUR (STICKY À GAUCHE) */}
+                <div className="lg:sticky lg:top-32 h-fit">
+                  <div className="bg-slate-900 text-white p-6 rounded-2xl shadow-xl">
+                    <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
+                      <TrendingUp className="text-teal-400"/> Potentiel de gains
+                    </h3>
+                    
+                    <div className="mb-6">
+                      <div className="flex justify-between items-center mb-2">
+                        <span className="text-slate-400">Volume hebdo</span>
+                        <span className="text-2xl font-black text-white">{volume}kg</span>
+                      </div>
+                      <input 
+                        type="range" 
+                        min="10" 
+                        max="100" 
+                        step="5" 
+                        value={volume} 
+                        onChange={e => setVolume(parseInt(e.target.value))} 
+                        className="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-teal-500"
+                      />
+                      <div className="flex justify-between text-xs text-slate-500 mt-1">
+                        <span>Quelques sacs</span>
+                        <span>Gros volume</span>
+                      </div>
+                    </div>
+
+                    <div className="bg-slate-950 p-6 rounded-xl border border-slate-700 text-center">
+                      <p className="text-slate-400 text-sm mb-1">Gains mensuels potentiels</p>
+                      <p className="text-5xl font-black text-teal-400">{parseInt(revenue) * 4}€</p>
+                      <p className="text-xs text-slate-500 mt-2">*Commission moyenne 70%</p>
+                    </div>
+                  </div>
                 </div>
-                <input type="range" min="10" max="100" value={volume} onChange={e => setVolume(parseInt(e.target.value))} className="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-teal-500"/>
-              </div>
 
-              <div className="space-y-4 mb-8">
-                <label className="flex items-start gap-3 p-3 border rounded-xl cursor-pointer hover:border-teal-500 transition">
-                    <input type="checkbox" className="mt-1" checked={formData.has_machine} onChange={e => setFormData({...formData, has_machine: e.target.checked})} />
-                    <span className="text-sm">Je possède une machine à laver propre.</span>
-                </label>
-                <label className="flex items-start gap-3 p-3 border rounded-xl cursor-pointer hover:border-teal-500 transition">
-                    <input type="checkbox" className="mt-1" checked={formData.has_scale} onChange={e => setFormData({...formData, has_scale: e.target.checked})} />
-                    <span className="text-sm">J'achète un <strong>peson</strong> pour peser le linge.</span>
-                </label>
-                <label className="flex items-start gap-3 p-3 border rounded-xl cursor-pointer hover:border-teal-500 transition">
-                    <input type="checkbox" className="mt-1" checked={formData.use_hypoallergenic} onChange={e => setFormData({...formData, use_hypoallergenic: e.target.checked})} />
-                    <span className="text-sm">J'utilise une <strong>lessive hypoallergénique</strong>.</span>
-                </label>
-                <label className="flex items-start gap-3 p-3 border rounded-xl cursor-pointer hover:border-teal-500 transition">
-                    <input type="checkbox" className="mt-1" checked={formData.accept_terms} onChange={e => setFormData({...formData, accept_terms: e.target.checked})} />
-                    <span className="text-sm">J'accepte les conditions (Indépendant, Com 30%).</span>
-                </label>
-              </div>
+                {/* FORMULAIRE ENGAGEMENTS (À DROITE) */}
+                <div className="bg-white border border-slate-200 rounded-2xl p-8 shadow-sm">
+                  <h2 className="text-2xl font-bold mb-6">3. Charte Qualité Washer</h2>
+                  
+                  <div className="space-y-4 mb-8">
+                    <label className="flex items-start gap-3 p-4 border border-slate-200 rounded-xl cursor-pointer hover:border-teal-500 hover:bg-teal-50 transition">
+                      <input 
+                        type="checkbox" 
+                        className="mt-1 w-5 h-5 accent-teal-600" 
+                        checked={formData.has_machine} 
+                        onChange={e => setFormData({...formData, has_machine: e.target.checked})} 
+                      />
+                      <span className="text-sm text-slate-700">
+                        <span className="font-bold block mb-1">✓ Machine fonctionnelle</span>
+                        Je possède une machine à laver propre et entretenue.
+                      </span>
+                    </label>
 
-              <div className="flex gap-4">
-                <button type="button" onClick={() => setStep(2)} className="flex-1 py-4 border font-bold rounded-xl">Retour</button>
-                <button type="submit" disabled={loading} className="flex-1 py-4 bg-teal-600 text-white font-bold rounded-xl flex justify-center items-center gap-2 disabled:opacity-50">
-                    {loading ? <Loader2 className="animate-spin"/> : "Valider mon inscription"}
-                </button>
+                    <label className="flex items-start gap-3 p-4 border border-slate-200 rounded-xl cursor-pointer hover:border-teal-500 hover:bg-teal-50 transition">
+                      <input 
+                        type="checkbox" 
+                        className="mt-1 w-5 h-5 accent-teal-600" 
+                        checked={formData.has_scale} 
+                        onChange={e => setFormData({...formData, has_scale: e.target.checked})} 
+                      />
+                      <span className="text-sm text-slate-700">
+                        <span className="font-bold flex items-center gap-2 mb-1">
+                          <Scale size={16} className="text-teal-600"/> Peson à bagage
+                        </span>
+                        Je m'engage à acheter un peson (env. 10€) pour peser le linge.
+                      </span>
+                    </label>
+
+                    <label className="flex items-start gap-3 p-4 border border-slate-200 rounded-xl cursor-pointer hover:border-teal-500 hover:bg-teal-50 transition">
+                      <input 
+                        type="checkbox" 
+                        className="mt-1 w-5 h-5 accent-teal-600" 
+                        checked={formData.use_hypoallergenic} 
+                        onChange={e => setFormData({...formData, use_hypoallergenic: e.target.checked})} 
+                      />
+                      <span className="text-sm text-slate-700">
+                        <span className="font-bold flex items-center gap-2 mb-1">
+                          <Droplets size={16} className="text-blue-600"/> Lessive hypoallergénique
+                        </span>
+                        J'utilise exclusivement une lessive douce (type Le Chat, Maison Verte).
+                      </span>
+                    </label>
+
+                    <label className="flex items-start gap-3 p-4 border border-slate-200 rounded-xl cursor-pointer hover:border-teal-500 hover:bg-teal-50 transition">
+                      <input 
+                        type="checkbox" 
+                        className="mt-1 w-5 h-5 accent-teal-600" 
+                        checked={formData.accept_terms} 
+                        onChange={e => setFormData({...formData, accept_terms: e.target.checked})} 
+                      />
+                      <span className="text-sm text-slate-700">
+                        <span className="font-bold block mb-1">✓ Contrat de partenariat</span>
+                        J'accepte les conditions (Statut indépendant, Commission 30%).
+                      </span>
+                    </label>
+                  </div>
+
+                  <div className="flex gap-4">
+                    <button 
+                      type="button" 
+                      onClick={() => setStep(2)} 
+                      className="flex-1 py-4 border-2 border-slate-200 rounded-xl font-bold hover:bg-slate-50 transition"
+                    >
+                      ← Retour
+                    </button>
+                    <button 
+                      type="submit" 
+                      disabled={loading} 
+                      className="flex-1 py-4 bg-teal-600 text-white rounded-xl font-bold hover:bg-teal-500 transition disabled:opacity-50 flex items-center justify-center gap-2"
+                    >
+                      {loading ? <><Loader2 className="animate-spin" size={20}/> Envoi...</> : "Valider mon inscription"}
+                    </button>
+                  </div>
+                </div>
+
               </div>
             </div>
           )}
 
           {/* STEP 4: SUCCÈS */}
           {step === 4 && (
-            <div className="text-center p-8 bg-white border rounded-2xl">
-                <div className="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-4"><Check size={32}/></div>
-                <h2 className="text-2xl font-black mb-2">Dossier reçu ! 🎉</h2>
-                <p className="text-slate-600 mb-6">On t'appelle sous 24h pour valider ton profil.</p>
-                <button onClick={() => navigate('/')} className="px-6 py-3 bg-slate-900 text-white rounded-xl font-bold">Retour Accueil</button>
+            <div className="max-w-2xl mx-auto text-center p-8 bg-white border border-slate-200 rounded-2xl shadow-sm">
+              <div className="w-20 h-20 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-6">
+                <Check size={40} />
+              </div>
+              <h2 className="text-3xl font-black mb-4">Dossier reçu ! 🎉</h2>
+              <p className="text-slate-600 mb-6 leading-relaxed">
+                Prochaine étape : Prépare ton matériel (Peson + Lessive hypoallergénique).
+                <br/>On t'appelle sous 24h pour valider ton profil et t'activer dans l'app.
+              </p>
+              <button 
+                onClick={() => navigate('/')} 
+                className="px-8 py-4 bg-slate-900 text-white rounded-xl font-bold hover:bg-black transition"
+              >
+                Retour Accueil
+              </button>
             </div>
           )}
+
         </form>
       </div>
+      
       <Footer />
     </div>
   );
