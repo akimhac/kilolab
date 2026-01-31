@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
-import { ArrowRight, Check, X, MapPin, Scale, Package, AlertCircle, Clock, Zap } from 'lucide-react';
+import { ArrowRight, Check, X, MapPin, Scale, Package, AlertCircle, Clock, Truck, Droplets } from 'lucide-react';
 
 export default function Landing() {
   return (
@@ -9,11 +9,10 @@ export default function Landing() {
       <Navbar />
 
       {/* =========================================
-          1. HERO SECTION (BALI STYLE)
+          1. HERO SECTION
       ========================================= */}
       <div className="relative h-screen min-h-[700px] flex items-center justify-center overflow-hidden">
         
-        {/* Image de fond */}
         <img 
           src="https://images.unsplash.com/photo-1582735689369-4fe89db7114c?q=80&w=2400&auto=format&fit=crop" 
           className="absolute inset-0 w-full h-full object-cover"
@@ -21,17 +20,14 @@ export default function Landing() {
           loading="eager"
         />
 
-        {/* Overlay */}
         <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/50 to-slate-900/80"></div>
         
-        {/* Badge */}
         <div className="absolute top-24 sm:top-32 left-1/2 -translate-x-1/2 z-20 w-full text-center animate-fade-in px-4">
           <div className="inline-flex items-center gap-2 px-4 sm:px-5 py-2 sm:py-2.5 bg-teal-500/20 backdrop-blur-md text-white rounded-full text-xs sm:text-sm font-bold border border-teal-400/30 shadow-xl">
-            ✨ Nouveau : Standard 3€/kg • Express 5€/kg
+            ✨ Standard 3€/kg • Express 5€/kg
           </div>
         </div>
 
-        {/* Contenu principal */}
         <div className="relative z-20 max-w-5xl mx-auto px-4 sm:px-6 text-center pt-16 sm:pt-20">
           <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-black text-white mb-6 sm:mb-8 leading-[1.1] tracking-tight drop-shadow-2xl animate-slide-up">
             Votre temps est précieux.<br/>
@@ -65,62 +61,165 @@ export default function Landing() {
       </div>
 
       {/* =========================================
-          2. COMPARATIF CHOC (MAISON vs KILOLAB)
+          2. COMPARATIF 3 COLONNES (AVEC "FAIRE SOI-MÊME")
       ========================================= */}
       <section className="py-20 bg-slate-50 border-y border-slate-200">
-        <div className="max-w-5xl mx-auto px-4">
+        <div className="max-w-6xl mx-auto px-4">
           <div className="text-center mb-16">
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-red-100 text-red-600 rounded-full text-sm font-bold mb-6">
+              <AlertCircle size={16}/>
+              Arrêtez de brûler votre argent
+            </div>
             <h2 className="text-3xl md:text-4xl font-black mb-4 text-slate-900">
-              Laver chez soi coûte <span className="text-red-500 underline decoration-red-200 decoration-4">plus cher</span>.
+              Le vrai coût du linge
             </h2>
             <p className="text-slate-600 text-lg">
-              Entre l'eau, l'électricité, la lessive et votre temps... le calcul est vite fait.
+              Comparaison pour 3kg de linge (environ 1 machine pleine).
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-8 items-center max-w-4xl mx-auto">
-            {/* MAISON */}
-            <div className="bg-white p-8 rounded-3xl shadow-sm border border-slate-200">
-              <h3 className="text-xl font-bold text-slate-500 mb-6 flex items-center justify-center gap-2">
-                <X size={20}/> Faire sa lessive soi-même
-              </h3>
-              <ul className="space-y-4 text-left text-slate-500 mb-8 text-sm">
-                <li className="flex justify-between border-b border-slate-100 pb-2"><span>Eau + Électricité</span> <span>~0.80€ /cycle</span></li>
-                <li className="flex justify-between border-b border-slate-100 pb-2"><span>Lessive + Adoucissant</span> <span>~0.50€ /dose</span></li>
-                <li className="flex justify-between border-b border-slate-100 pb-2"><span>Amortissement Machine</span> <span>~0.40€ /cycle</span></li>
-                <li className="flex justify-between border-b border-slate-100 pb-2 bg-red-50 p-2 rounded font-bold text-red-600"><span>Votre Temps (2h)</span> <span>Inestimable ⏳</span></li>
+          <div className="grid md:grid-cols-3 gap-6 items-end">
+            
+            {/* 1. PRESSING CLASSIQUE */}
+            <div className="bg-white p-6 rounded-3xl shadow-sm border border-red-100 opacity-75 grayscale hover:grayscale-0 transition duration-500">
+              <div className="flex items-center gap-2 mb-6 text-red-500">
+                <X size={24}/>
+                <h3 className="text-lg font-bold">Pressing Classique</h3>
+              </div>
+              <ul className="space-y-3 text-sm text-slate-500 mb-8">
+                <li className="flex justify-between border-b pb-2"><span>Chemises (x3)</span> <span>15€</span></li>
+                <li className="flex justify-between border-b pb-2"><span>Pantalons (x2)</span> <span>16€</span></li>
+                <li className="flex justify-between border-b pb-2"><span>Pull</span> <span>8€</span></li>
               </ul>
-              <div className="bg-slate-100 text-slate-500 font-bold p-4 rounded-xl text-center">
-                Coût réel caché élevé 😓
+              <div className="bg-red-50 text-red-600 p-4 rounded-xl text-center font-bold">
+                39€ 💸
               </div>
             </div>
 
-            {/* KILOLAB */}
-            <div className="bg-slate-900 p-8 rounded-3xl shadow-2xl border-2 border-teal-500 text-white transform md:scale-105">
-              <h3 className="text-xl font-bold text-teal-400 mb-6 flex items-center justify-center gap-2">
-                <Check size={20}/> Méthode Kilolab
-              </h3>
-              <ul className="space-y-4 text-left text-slate-300 mb-8 text-sm">
-                <li className="flex justify-between border-b border-slate-700 pb-2"><span>Lavage Pro</span> <span className="text-teal-400">Inclus</span></li>
-                <li className="flex justify-between border-b border-slate-700 pb-2"><span>Séchage & Pliage</span> <span className="text-teal-400">Inclus</span></li>
-                <li className="flex justify-between border-b border-slate-700 pb-2"><span>Collecte & Livraison</span> <span className="text-teal-400">Inclus</span></li>
-                <li className="flex justify-between border-b border-slate-700 pb-2 bg-teal-900/50 p-2 rounded font-bold text-white"><span>Votre Temps</span> <span>100% Libre 🎉</span></li>
+            {/* 2. FAIRE SOI-MÊME (NOUVEAU) */}
+            <div className="bg-white p-6 rounded-3xl shadow-sm border border-orange-200 opacity-80 hover:opacity-100 transition duration-500">
+              <div className="flex items-center gap-2 mb-6 text-orange-500">
+                <Droplets size={24}/>
+                <h3 className="text-lg font-bold">Faire soi-même</h3>
+              </div>
+              <ul className="space-y-3 text-sm text-slate-600 mb-8">
+                <li className="flex justify-between border-b pb-2"><span>Eau + Électricité</span> <span>1.20€</span></li>
+                <li className="flex justify-between border-b pb-2"><span>Lessive + Adoucissant</span> <span>0.80€</span></li>
+                <li className="flex justify-between border-b pb-2"><span>Amortissement machine</span> <span>0.60€</span></li>
+                <li className="flex justify-between bg-orange-50 p-2 rounded font-bold text-orange-600">
+                  <span>Votre temps (2h)</span> <span>Inestimable ⏳</span>
+                </li>
               </ul>
-              <div className="bg-teal-600 text-white font-bold p-4 rounded-xl shadow-lg text-center">
-                À partir de 3€ / kg
+              <div className="bg-orange-50 text-orange-600 p-4 rounded-xl text-center">
+                <div className="font-bold">2.60€ + 2h</div>
+                <p className="text-xs mt-1">Coût caché élevé</p>
               </div>
             </div>
+
+            {/* 3. KILOLAB STANDARD (GAGNANT) */}
+            <div className="bg-gradient-to-b from-teal-50 to-white border-2 border-teal-500 rounded-3xl p-8 shadow-2xl relative transform md:scale-105 z-10">
+              <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-teal-500 text-white px-4 py-1 rounded-full text-sm font-bold shadow-lg">
+                🏆 MEILLEUR CHOIX
+              </div>
+              <div className="flex items-center gap-2 mb-6 text-teal-600 mt-4">
+                <Check size={24}/>
+                <h3 className="text-lg font-bold">Kilolab Standard</h3>
+              </div>
+              <ul className="space-y-3 text-sm text-slate-600 mb-8">
+                <li className="flex justify-between border-b pb-2"><span>Chemises (x3)</span> <span>Au poids</span></li>
+                <li className="flex justify-between border-b pb-2"><span>Pantalons (x2)</span> <span>Au poids</span></li>
+                <li className="flex justify-between border-b pb-2"><span>Pull</span> <span>Au poids</span></li>
+                <li className="flex justify-between bg-white p-2 rounded font-bold text-teal-700">
+                  <span>Votre temps</span> <span>0 min 🎉</span>
+                </li>
+              </ul>
+              <div className="bg-teal-600 text-white p-6 rounded-2xl text-center shadow-lg">
+                <div className="text-sm opacity-90 mb-1">3kg × 3€</div>
+                <div className="text-4xl font-black">9€</div>
+                <p className="text-xs mt-2 bg-white/20 inline-block px-3 py-1 rounded-full">
+                  ↘ -77% vs Pressing
+                </p>
+              </div>
+            </div>
+
+          </div>
+
+          <div className="mt-12 bg-white rounded-2xl p-6 text-center border border-teal-100">
+            <p className="text-slate-700 font-medium">
+              <strong>Un foyer français moyen dépense 450€/an en pressing.</strong><br/>
+              Avec Kilolab Standard, vous ne dépensez que <span className="text-teal-600 font-black text-xl">100€/an</span>.
+            </p>
           </div>
         </div>
       </section>
 
       {/* =========================================
-          3. NOTRE HISTOIRE (BALI)
+          3. LE RITUEL (3 ÉTAPES)
       ========================================= */}
-      <section className="bg-white py-20 px-4 overflow-hidden">
+      <div className="py-16 sm:py-24 px-4 bg-white">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-16 sm:mb-20">
+            <div className="inline-block px-4 py-1 bg-teal-50 text-teal-700 rounded-full text-sm font-bold mb-4 border border-teal-100">
+              ✨ Simple comme bonjour
+            </div>
+            <h2 className="text-3xl sm:text-4xl font-black text-slate-900">Votre nouveau rituel linge.</h2>
+            <p className="text-slate-500 mt-3 sm:mt-4 text-base sm:text-lg">Un service efficace, à domicile.</p>
+          </div>
+          
+          <div className="grid md:grid-cols-3 gap-10 sm:gap-12 relative items-start">
+            <div className="hidden md:block absolute top-24 left-[15%] right-[15%] h-0.5 bg-teal-100 z-0"></div>
+
+            {/* Étape 1 */}
+            <div className="flex flex-col items-center relative z-10 group">
+              <div className="w-40 h-40 sm:w-48 sm:h-48 rounded-full bg-white border-4 border-teal-50 shadow-xl flex items-center justify-center mb-6 sm:mb-8 transition-all duration-300 transform group-hover:scale-105 group-hover:shadow-2xl group-hover:border-teal-100">
+                <MapPin className="text-teal-500 transition-transform group-hover:scale-110" size={56} strokeWidth={1.5} />
+                <div className="absolute -bottom-3 sm:-bottom-4 w-9 h-9 sm:w-10 sm:h-10 bg-slate-900 text-white rounded-full flex items-center justify-center font-bold border-4 border-white text-sm sm:text-base">1</div>
+              </div>
+              <h3 className="text-lg sm:text-xl font-bold mb-2 text-slate-900">Commande & Collecte</h3>
+              <p className="text-slate-500 text-sm leading-relaxed text-center px-2 sm:px-4">
+                Commandez en ligne. Un Washer certifié vient récupérer votre sac directement chez vous.
+              </p>
+            </div>
+
+            {/* Étape 2 */}
+            <div className="flex flex-col items-center relative z-10 group">
+              <div className="w-40 h-40 sm:w-48 sm:h-48 rounded-full bg-white border-4 border-teal-50 shadow-xl flex items-center justify-center mb-6 sm:mb-8 transition-all duration-300 transform group-hover:scale-105 group-hover:shadow-2xl group-hover:border-teal-100">
+                <Scale className="text-teal-500 transition-transform group-hover:scale-110" size={56} strokeWidth={1.5} />
+                <div className="absolute -bottom-3 sm:-bottom-4 w-9 h-9 sm:w-10 sm:h-10 bg-slate-900 text-white rounded-full flex items-center justify-center font-bold border-4 border-white text-sm sm:text-base">2</div>
+              </div>
+              <h3 className="text-lg sm:text-xl font-bold mb-2 text-slate-900">Pesée & Lavage Pro</h3>
+              <p className="text-slate-500 text-sm leading-relaxed text-center px-2 sm:px-4">
+                Pesée transparente devant vous. Lavage séparé avec lessive hypoallergénique, séchage et pliage carré.
+              </p>
+            </div>
+
+            {/* Étape 3 */}
+            <div className="flex flex-col items-center relative z-10 group">
+              <div className="w-40 h-40 sm:w-48 sm:h-48 rounded-full bg-white border-4 border-teal-50 shadow-xl flex items-center justify-center mb-6 sm:mb-8 transition-all duration-300 transform group-hover:scale-105 group-hover:shadow-2xl group-hover:border-teal-100">
+                <Package className="text-teal-500 transition-transform group-hover:scale-110" size={56} strokeWidth={1.5} />
+                <div className="absolute -bottom-3 sm:-bottom-4 w-9 h-9 sm:w-10 sm:h-10 bg-slate-900 text-white rounded-full flex items-center justify-center font-bold border-4 border-white text-sm sm:text-base">3</div>
+              </div>
+              <h3 className="text-lg sm:text-xl font-bold mb-2 text-slate-900">Retour en 24h/48h</h3>
+              <p className="text-slate-500 text-sm leading-relaxed text-center px-2 sm:px-4">
+                Votre linge revient propre et plié. Vous êtes notifié par SMS. Simple, rapide, efficace.
+              </p>
+            </div>
+          </div>
+          
+          <div className="mt-16 sm:mt-20 text-center">
+            <Link to="/new-order" className="inline-flex items-center gap-2 px-6 sm:px-8 py-3 sm:py-4 bg-teal-600 text-white rounded-full font-bold text-base sm:text-lg hover:bg-teal-500 transition-all shadow-lg shadow-teal-500/30 hover:scale-105 active:scale-95">
+              Commander maintenant <ArrowRight size={18}/>
+            </Link>
+          </div>
+        </div>
+      </div>
+
+      {/* =========================================
+          4. HISTOIRE BALI
+      ========================================= */}
+      <section className="bg-white py-16 sm:py-24 px-4 border-t border-slate-100 overflow-hidden">
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center gap-12 md:gap-16">
 
-          {/* BLOC IMAGES */}
           <div className="flex-1 relative w-full max-w-md md:max-w-none">
             <div className="grid grid-cols-2 gap-3 sm:gap-4 relative z-10">
               <img 
@@ -139,7 +238,6 @@ export default function Landing() {
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-gradient-to-tr from-teal-50 to-indigo-50 rounded-full blur-3xl opacity-50 -z-10"></div>
           </div>
 
-          {/* BLOC TEXTE */}
           <div className="flex-1 text-center md:text-left">
             <span className="text-teal-600 font-bold uppercase tracking-wider text-xs sm:text-sm inline-block mb-3 sm:mb-4 bg-teal-50 px-3 py-1 rounded-full border border-teal-100">
               Notre Histoire
@@ -165,7 +263,7 @@ export default function Landing() {
               aria-label="Devenir Washer"
               className="inline-flex items-center font-bold text-slate-900 hover:text-teal-600 transition-all gap-2 underline underline-offset-4 decoration-2 hover:decoration-teal-600 group"
             >
-              Envie de gagner de l'argent ? Devenez Washer (Particulier) 
+              Envie de gagner de l'argent ? Devenez Washer 
               <ArrowRight className="group-hover:translate-x-1 transition-transform" size={18}/>
             </Link>
           </div>
