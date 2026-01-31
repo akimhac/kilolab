@@ -20,15 +20,19 @@ export default function AdminDashboard() {
   const [partners, setPartners] = useState<any[]>([]);
   const [clients, setClients] = useState<any[]>([]);
   const [messages, setMessages] = useState<any[]>([]);
+  const [washers, setWashers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [timeRange, setTimeRange] = useState<"7d" | "30d" | "90d" | "all">("30d");
-  const [activeTab, setActiveTab] = useState<"overview" | "partners" | "clients" | "orders" | "messages">("overview");
+  const [activeTab, setActiveTab] = useState<"overview" | "partners" | "clients" | "orders" | "messages" | "washers">("overview");
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<"all" | "active" | "pending">("all");
+  const [washerFilter, setWasherFilter] = useState<"all" | "pending" | "approved" | "rejected">("all");
   const [selectedMessage, setSelectedMessage] = useState<any>(null);
   const [replyText, setReplyText] = useState("");
   const [selectedPartner, setSelectedPartner] = useState<any>(null);
+  const [selectedWasher, setSelectedWasher] = useState<any>(null);
   const [showModal, setShowModal] = useState(false);
+  const [showWasherModal, setShowWasherModal] = useState(false);
 
   useEffect(() => { fetchData(); }, []);
 
@@ -55,10 +59,16 @@ export default function AdminDashboard() {
         .select("*")
         .eq("role", "client")
         .order("created_at", { ascending: false });
+
+      const { data: w } = await supabase
+        .from("washers")
+        .select("*")
+        .order("created_at", { ascending: false });
       
       setOrders(o || []); 
       setMessages(m || []);
       setClients(c || []);
+      setWashers(w || []);
 
       const partnerStatsMap = new Map();
       (o || []).forEach((order: any) => {
@@ -93,28 +103,27 @@ export default function AdminDashboard() {
   };
 
   const approvePartner = async (id: string, e?: React.MouseEvent) => {
-  if (e) e.stopPropagation();
-  const t = toast.loading("⏳ Validation...");
+    if (e) e.stopPropagation();
+    const t = toast.loading("⏳ Validation...");
 
-  const { data, error } = await supabase.functions.invoke("approve-partner", {
-    body: { partner_id: id },
-  });
+    const { data, error } = await supabase.functions.invoke("approve-partner", {
+      body: { partner_id: id },
+    });
 
-  if (error) {
-    toast.error("❌ Erreur: " + error.message, { id: t });
-    return;
-  }
+    if (error) {
+      toast.error("❌ Erreur: " + error.message, { id: t });
+      return;
+    }
 
-  // optionnel si la function renvoie un warning "déjà existant"
-  if ((data as any)?.warning) {
-    toast.success("✅ Validé (compte déjà existant)", { id: t });
-  } else {
-    toast.success("✅ Partenaire validé & email envoyé !", { id: t });
-  }
+    if ((data as any)?.warning) {
+      toast.success("✅ Validé (compte déjà existant)", { id: t });
+    } else {
+      toast.success("✅ Partenaire validé & email envoyé !", { id: t });
+    }
 
-  fetchData();
-  if (showModal) setShowModal(false);
-};
+    fetchData();
+    if (showModal) setShowModal(false);
+  };
 
   const rejectPartner = async (partner: any, e?: React.MouseEvent) => {
     if (e) e.stopPropagation();
@@ -139,6 +148,30 @@ export default function AdminDashboard() {
     if (showModal) setShowModal(false);
   };
 
+  const updateWasherStatus = async (washerId: string, newStatus: 'approved' | 'rejected') => {
+    const t = toast.loading(`⏳ ${newStatus === 'approved' ? 'Approbation' : 'Rejet'}...`);
+    
+    const { error } = await supabase
+      .from("washers")
+      .update({ status: newStatus })
+      .eq("id", washerId);
+
+    if (error) {
+      toast.error("❌ Erreur: " + error.message, { id: t });
+      return;
+    }
+
+    toast.success(
+      newStatus === 'approved' 
+        ? "✅ Washer approuvé !" 
+        : "❌ Washer rejeté", 
+      { id: t }
+    );
+
+    fetchData();
+    if (showWasherModal) setShowWasherModal(false);
+  };
+
   const filteredOrdersByTime = useMemo(() => {
     if (timeRange === "all") return orders;
     const daysMap = { "7d": 7, "30d": 30, "90d": 90 };
@@ -153,6 +186,7 @@ export default function AdminDashboard() {
     const activePartners = partners.filter(p => p.is_active).length;
     const pendingPartners = partners.filter(p => !p.is_active).length;
     const newMessages = messages.filter(m => !m.read).length;
+    const pendingWashers = washers.filter(w => w.status === 'pending').length;
 
     const periodDays = timeRange === "all" ? 90 : parseInt(timeRange);
     const previousPeriodStart = new Date();
@@ -181,9 +215,10 @@ export default function AdminDashboard() {
       newMessages,
       revenueGrowth,
       ordersGrowth,
-      avgOrderValue
+      avgOrderValue,
+      pendingWashers
     };
-  }, [filteredOrdersByTime, orders, timeRange, messages, clients, partners]);
+  }, [filteredOrdersByTime, orders, timeRange, messages, clients, partners, washers]);
 
   const monthlyData = useMemo(() => {
     const months: any = {};
@@ -298,6 +333,11 @@ export default function AdminDashboard() {
     );
     return filtered;
   }, [partners, searchTerm, statusFilter]);
+
+  const filteredWashers = useMemo(() => {
+    if (washerFilter === "all") return washers;
+    return washers.filter(w => w.status === washerFilter);
+  }, [washers, washerFilter]);
 
   const handleExportCSV = () => {
     const csvHeader = "Date,ID,Client,Montant,Poids,Statut,Partenaire\n";
@@ -451,7 +491,7 @@ export default function AdminDashboard() {
 
         <div className="bg-white rounded-2xl shadow-sm border border-slate-100 mb-8">
           <div className="flex border-b overflow-x-auto">
-            {(["overview", "partners", "clients", "orders", "messages"] as const).map((tab) => (
+            {(["overview", "partners", "washers", "clients", "orders", "messages"] as const).map((tab) => (
               <button 
                 key={tab} 
                 onClick={() => setActiveTab(tab)} 
@@ -463,11 +503,17 @@ export default function AdminDashboard() {
               >
                 {tab === "overview" ? "📊 Vue d'ensemble" : 
                  tab === "partners" ? `🏪 Pressings (${partners.length})` : 
+                 tab === "washers" ? `🧺 Washers (${washers.length})` :
                  tab === "clients" ? `👤 Clients (${clients.length})` :
                  tab === "orders" ? `📦 Commandes (${orders.length})` : 
                  `💬 Messages (${stats.newMessages})`}
                 {activeTab === tab && (
                   <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-teal-600 to-cyan-600"></div>
+                )}
+                {tab === "washers" && stats.pendingWashers > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                    {stats.pendingWashers}
+                  </span>
                 )}
               </button>
             ))}
@@ -676,6 +722,130 @@ export default function AdminDashboard() {
                       ))}
                     </tbody>
                   </table>
+                )}
+              </div>
+            )}
+
+            {activeTab === "washers" && (
+              <div>
+                <div className="mb-6">
+                  <h3 className="text-2xl font-bold mb-2">🧺 Validation des Washers</h3>
+                  <p className="text-slate-600">{washers.length} washers au total</p>
+                </div>
+
+                <div className="flex gap-4 mb-6">
+                  <button
+                    onClick={() => setWasherFilter("all")}
+                    className={`px-4 py-2 rounded-lg font-bold text-sm transition ${
+                      washerFilter === "all" ? "bg-slate-900 text-white" : "bg-white text-slate-500 hover:bg-slate-50 border"
+                    }`}
+                  >
+                    Tous ({washers.length})
+                  </button>
+                  <button
+                    onClick={() => setWasherFilter("pending")}
+                    className={`px-4 py-2 rounded-lg font-bold text-sm transition ${
+                      washerFilter === "pending" ? "bg-orange-500 text-white" : "bg-white text-slate-500 hover:bg-slate-50 border"
+                    }`}
+                  >
+                    En attente ({washers.filter(w => w.status === 'pending').length})
+                  </button>
+                  <button
+                    onClick={() => setWasherFilter("approved")}
+                    className={`px-4 py-2 rounded-lg font-bold text-sm transition ${
+                      washerFilter === "approved" ? "bg-green-500 text-white" : "bg-white text-slate-500 hover:bg-slate-50 border"
+                    }`}
+                  >
+                    Approuvés ({washers.filter(w => w.status === 'approved').length})
+                  </button>
+                  <button
+                    onClick={() => setWasherFilter("rejected")}
+                    className={`px-4 py-2 rounded-lg font-bold text-sm transition ${
+                      washerFilter === "rejected" ? "bg-red-500 text-white" : "bg-white text-slate-500 hover:bg-slate-50 border"
+                    }`}
+                  >
+                    Rejetés ({washers.filter(w => w.status === 'rejected').length})
+                  </button>
+                </div>
+
+                {filteredWashers.length === 0 ? (
+                  <div className="text-center py-16 bg-slate-50 rounded-2xl border-2 border-dashed border-slate-200">
+                    <Users size={64} className="mx-auto mb-4 text-slate-300" />
+                    <p className="text-xl font-bold text-slate-400">Aucun washer trouvé</p>
+                  </div>
+                ) : (
+                  <div className="overflow-x-auto">
+                    <table className="w-full">
+                      <thead className="bg-slate-50 border-b border-slate-200">
+                        <tr>
+                          <th className="text-left p-4 font-bold text-sm">Nom</th>
+                          <th className="text-left p-4 font-bold text-sm">Email</th>
+                          <th className="text-left p-4 font-bold text-sm">Téléphone</th>
+                          <th className="text-left p-4 font-bold text-sm">Ville</th>
+                          <th className="text-left p-4 font-bold text-sm">Statut</th>
+                          <th className="text-left p-4 font-bold text-sm">Date</th>
+                          <th className="text-left p-4 font-bold text-sm">Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {filteredWashers.map(washer => (
+                          <tr key={washer.id} className="border-b border-slate-100 hover:bg-slate-50">
+                            <td className="p-4">
+                              <div className="font-bold">{washer.first_name} {washer.last_name}</div>
+                            </td>
+                            <td className="p-4 text-sm">{washer.email}</td>
+                            <td className="p-4 text-sm">{washer.phone}</td>
+                            <td className="p-4 text-sm">{washer.city} ({washer.postal_code})</td>
+                            <td className="p-4">
+                              <span className={`px-3 py-1 rounded-full text-xs font-bold ${
+                                washer.status === 'approved' 
+                                  ? 'bg-green-100 text-green-700'
+                                  : washer.status === 'pending'
+                                  ? 'bg-orange-100 text-orange-700'
+                                  : 'bg-red-100 text-red-700'
+                              }`}>
+                                {washer.status === 'approved' && '✅ Approuvé'}
+                                {washer.status === 'pending' && '⏳ En attente'}
+                                {washer.status === 'rejected' && '❌ Rejeté'}
+                              </span>
+                            </td>
+                            <td className="p-4 text-sm text-slate-600">
+                              {new Date(washer.created_at).toLocaleDateString('fr-FR')}
+                            </td>
+                            <td className="p-4">
+                              <div className="flex gap-2">
+                                {washer.status === 'pending' && (
+                                  <>
+                                    <button
+                                      onClick={() => updateWasherStatus(washer.id, 'approved')}
+                                      className="px-4 py-2 bg-green-600 text-white rounded-lg text-sm font-bold hover:bg-green-500 transition"
+                                    >
+                                      ✅ Approuver
+                                    </button>
+                                    <button
+                                      onClick={() => updateWasherStatus(washer.id, 'rejected')}
+                                      className="px-4 py-2 bg-red-600 text-white rounded-lg text-sm font-bold hover:bg-red-500 transition"
+                                    >
+                                      ❌ Rejeter
+                                    </button>
+                                  </>
+                                )}
+                                <button
+                                  onClick={() => {
+                                    setSelectedWasher(washer);
+                                    setShowWasherModal(true);
+                                  }}
+                                  className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-bold hover:bg-blue-500 transition"
+                                >
+                                  👁️ Voir
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
                 )}
               </div>
             )}
@@ -919,98 +1089,6 @@ export default function AdminDashboard() {
 
       </div>
       
-{/* ONGLET WASHERS */}
-{activeTab === 'washers' && (
-  <div>
-    <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden">
-      <div className="p-6 border-b border-slate-200">
-        <h2 className="text-2xl font-black">Validation des Washers</h2>
-      </div>
-
-      {/* FILTRES */}
-      <div className="p-6 border-b border-slate-200 flex gap-4">
-        <select 
-          className="px-4 py-2 border border-slate-200 rounded-xl"
-          onChange={(e) => setWasherFilter(e.target.value)}
-        >
-          <option value="all">Tous</option>
-          <option value="pending">En attente</option>
-          <option value="approved">Approuvés</option>
-          <option value="rejected">Rejetés</option>
-        </select>
-      </div>
-
-      {/* LISTE */}
-      <div className="overflow-x-auto">
-        <table className="w-full">
-          <thead className="bg-slate-50 border-b border-slate-200">
-            <tr>
-              <th className="text-left p-4 font-bold text-sm">Nom</th>
-              <th className="text-left p-4 font-bold text-sm">Email</th>
-              <th className="text-left p-4 font-bold text-sm">Téléphone</th>
-              <th className="text-left p-4 font-bold text-sm">Ville</th>
-              <th className="text-left p-4 font-bold text-sm">Statut</th>
-              <th className="text-left p-4 font-bold text-sm">Date</th>
-              <th className="text-left p-4 font-bold text-sm">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredWashers.map(washer => (
-              <tr key={washer.id} className="border-b border-slate-100 hover:bg-slate-50">
-                <td className="p-4">
-                  <div className="font-bold">{washer.first_name} {washer.last_name}</div>
-                </td>
-                <td className="p-4 text-sm">{washer.email}</td>
-                <td className="p-4 text-sm">{washer.phone}</td>
-                <td className="p-4 text-sm">{washer.city} ({washer.postal_code})</td>
-                <td className="p-4">
-                  <span className={`px-3 py-1 rounded-full text-xs font-bold ${
-                    washer.status === 'approved' 
-                      ? 'bg-green-100 text-green-700'
-                      : washer.status === 'pending'
-                      ? 'bg-orange-100 text-orange-700'
-                      : 'bg-red-100 text-red-700'
-                  }`}>
-                    {washer.status === 'approved' && '✅ Approuvé'}
-                    {washer.status === 'pending' && '⏳ En attente'}
-                    {washer.status === 'rejected' && '❌ Rejeté'}
-                  </span>
-                </td>
-                <td className="p-4 text-sm text-slate-600">
-                  {new Date(washer.created_at).toLocaleDateString('fr-FR')}
-                </td>
-                <td className="p-4">
-                  {washer.status === 'pending' && (
-                    <div className="flex gap-2">
-                      <button
-                        onClick={() => updateWasherStatus(washer.id, 'approved')}
-                        className="px-4 py-2 bg-green-600 text-white rounded-lg text-sm font-bold hover:bg-green-500 transition"
-                      >
-                        ✅ Approuver
-                      </button>
-                      <button
-                        onClick={() => updateWasherStatus(washer.id, 'rejected')}
-                        className="px-4 py-2 bg-red-600 text-white rounded-lg text-sm font-bold hover:bg-red-500 transition"
-                      >
-                        ❌ Rejeter
-                      </button>
-                    </div>
-                  )}
-                  <button
-                    onClick={() => setSelectedWasher(washer)}
-                    className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-bold hover:bg-blue-500 transition ml-2"
-                  >
-                    👁️ Voir
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </div>
-)}
       {/* MODAL PARTNER */}
       {showModal && selectedPartner && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
@@ -1103,6 +1181,119 @@ export default function AdminDashboard() {
                 >
                   Valider le compte
                 </button>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL WASHER */}
+      {showWasherModal && selectedWasher && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-3xl p-8 max-w-4xl w-full max-h-[90vh] overflow-y-auto relative shadow-2xl">
+            <button
+              onClick={() => setShowWasherModal(false)}
+              className="absolute top-6 right-6 p-2 bg-slate-100 rounded-full hover:bg-slate-200 transition"
+            >
+              <X size={20} />
+            </button>
+
+            <div className="flex items-center gap-4 mb-8">
+              <div className="w-16 h-16 bg-gradient-to-br from-blue-400 to-indigo-500 rounded-2xl flex items-center justify-center text-white text-2xl font-bold shadow-lg">
+                {selectedWasher.first_name.charAt(0).toUpperCase()}{selectedWasher.last_name.charAt(0).toUpperCase()}
+              </div>
+              <div>
+                <h2 className="text-3xl font-black text-slate-900">
+                  {selectedWasher.first_name} {selectedWasher.last_name}
+                </h2>
+                <span className={`text-xs px-3 py-1 rounded-full font-bold ${
+                  selectedWasher.status === 'approved' 
+                    ? "bg-green-100 text-green-700" 
+                    : selectedWasher.status === 'pending'
+                    ? "bg-orange-100 text-orange-700"
+                    : "bg-red-100 text-red-700"
+                }`}>
+                  {selectedWasher.status === 'approved' && '✅ Approuvé'}
+                  {selectedWasher.status === 'pending' && '⏳ En attente'}
+                  {selectedWasher.status === 'rejected' && '❌ Rejeté'}
+                </span>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div className="space-y-6">
+                <div className="bg-slate-50 p-6 rounded-2xl border">
+                  <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
+                    <Users size={18} className="text-blue-600" /> Informations personnelles
+                  </h3>
+                  <div className="space-y-3">
+                    <div className="flex justify-between">
+                      <span className="text-slate-500">Email</span>
+                      <span className="font-medium">{selectedWasher.email}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-slate-500">Téléphone</span>
+                      <span className="font-medium">{selectedWasher.phone}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-slate-500">Ville</span>
+                      <span className="font-medium">{selectedWasher.city}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-slate-500">Code postal</span>
+                      <span className="font-medium">{selectedWasher.postal_code}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-slate-500">Adresse</span>
+                      <span className="font-medium text-right">{selectedWasher.address}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-6">
+                <div className="bg-slate-50 p-6 rounded-2xl border">
+                  <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
+                    <Calendar size={18} className="text-blue-600" /> Inscription
+                  </h3>
+                  <div className="space-y-3">
+                    <div className="flex justify-between">
+                      <span className="text-slate-500">Date d'inscription</span>
+                      <span className="font-medium">
+                        {new Date(selectedWasher.created_at).toLocaleDateString('fr-FR', {
+                          day: 'numeric',
+                          month: 'long',
+                          year: 'numeric'
+                        })}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-8 pt-6 border-t flex justify-end gap-3">
+              <button
+                onClick={() => setShowWasherModal(false)}
+                className="px-6 py-3 bg-white border rounded-xl font-bold text-slate-600 hover:bg-slate-50"
+              >
+                Fermer
+              </button>
+              {selectedWasher.status === 'pending' && (
+                <>
+                  <button
+                    onClick={() => updateWasherStatus(selectedWasher.id, 'rejected')}
+                    className="px-6 py-3 bg-red-50 text-red-600 border border-red-100 rounded-xl font-bold hover:bg-red-100"
+                  >
+                    ❌ Rejeter
+                  </button>
+                  <button
+                    onClick={() => updateWasherStatus(selectedWasher.id, 'approved')}
+                    className="px-6 py-3 bg-teal-600 text-white rounded-xl font-bold hover:bg-teal-700 shadow-lg"
+                  >
+                    ✅ Approuver
+                  </button>
+                </>
               )}
             </div>
           </div>
