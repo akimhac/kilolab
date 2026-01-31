@@ -5,7 +5,7 @@ import { Loader2 } from 'lucide-react';
 import { HelmetProvider } from 'react-helmet-async';
 import ScrollToTop from './components/ScrollToTop';
 import ProtectedAdminRoute from './components/ProtectedAdminRoute';
-import PrivateRoute from './components/PrivateRoute'; // ← Garde ton nom actuel
+import PrivateRoute from './components/PrivateRoute';
 
 // Imports directs (Pages critiques pour le SEO/LCP)
 import Landing from './pages/Landing';
@@ -28,8 +28,8 @@ import Blog from './pages/Blog';
 
 // Lazy loading (Pages secondaires)
 const WasherLanding = lazy(() => import('./pages/WasherLanding'));
-const BecomeWasher = lazy(() => import('./pages/BecomeWasher')); // ← AJOUTÉ
-const WasherApp = lazy(() => import('./pages/WasherApp'));       // ← AJOUTÉ
+const BecomeWasher = lazy(() => import('./pages/BecomeWasher'));
+const WasherApp = lazy(() => import('./pages/WasherApp'));
 const Signup = lazy(() => import('./pages/Signup'));
 const NewOrder = lazy(() => import('./pages/NewOrder'));
 const Tarifs = lazy(() => import('./pages/Tarifs'));
@@ -54,10 +54,10 @@ const ScanQR = lazy(() => import('./pages/ScanQR'));
 const Settings = lazy(() => import('./pages/Settings'));
 const SetPassword = lazy(() => import('./pages/SetPassword'));
 const ConnectStripe = lazy(() => import('./pages/ConnectStripe'));
-const OrderTracking = lazy(() => import('./pages/OrderTracking')); // ← AJOUTÉ
-const PickupQR = lazy(() => import('./pages/PickupQR'));           // ← AJOUTÉ
-const Invoice = lazy(() => import('./pages/Invoice'));             // ← AJOUTÉ
-const NotFound = lazy(() => import('./pages/NotFound'));           // ← AJOUTÉ
+const OrderTracking = lazy(() => import('./pages/OrderTracking'));
+const PickupQR = lazy(() => import('./pages/PickupQR'));
+const Invoice = lazy(() => import('./pages/Invoice'));
+const NotFound = lazy(() => import('./pages/NotFound'));
 
 const PageLoader = () => (
   <div className="min-h-screen flex items-center justify-center bg-slate-50">
@@ -71,7 +71,7 @@ const PageLoader = () => (
 export default function App() {
   return (
     <HelmetProvider>
-      <ScrollToTop /> {/* ← AJOUTÉ pour scroll en haut */}
+      <ScrollToTop />
       <Toaster
         position="top-center"
         toastOptions={{
@@ -93,9 +93,9 @@ export default function App() {
           <Route path="/" element={<Landing />} />
           
           {/* === WASHER (PIVOT C2C) === */}
+          <Route path="/washers" element={<WasherLanding />} />
           <Route path="/become-washer" element={<BecomeWasher />} />
           <Route path="/washer-app" element={<PrivateRoute><WasherApp /></PrivateRoute>} />
-          <Route path="/washers" element={<WasherLanding />} />
 
           {/* === ONBOARDING === */}
           <Route path="/select-dashboard" element={<SelectDashboard />} />
