@@ -1,9 +1,9 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
-import { Loader2, Upload, Check, AlertCircle, Sparkles, Scale, Droplets, ShieldCheck, Car, Clock, TrendingUp } from 'lucide-react';
+import { Loader2, Upload, Check, AlertCircle, Sparkles, Scale, Droplets, ShieldCheck, TrendingUp } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 export default function BecomeWasher() {
@@ -12,12 +12,22 @@ export default function BecomeWasher() {
   const [step, setStep] = useState(1);
   const [volume, setVolume] = useState(20);
 
-  // Revenus : Moyenne 4€/kg * 70% = 2.8€/kg net
   const revenue = (volume * 2.80).toFixed(0);
 
   const [formData, setFormData] = useState({
-    fullName: '', email: '', phone: '', city: '', postalCode: '', address: '', idCardUrl: '',
-    has_machine: false, has_scale: false, use_hypoallergenic: false, accept_terms: false
+    fullName: '', 
+    email: '', 
+    phone: '', 
+    city: '', 
+    postalCode: '', 
+    address: '', 
+    idCardUrl: '',
+    has_machine: false, 
+    has_scale: false, 
+    use_hypoallergenic: false,
+    legal_capacity: false,      // ← NOUVEAU
+    accept_terms: false,         // ← NOUVEAU
+    data_consent: false          // ← NOUVEAU
   });
 
   const uploadIdCard = async (file: File) => {
@@ -26,19 +36,16 @@ export default function BecomeWasher() {
       const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
       const filePath = `id-cards/${fileName}`;
       
-      // Essaie d'uploader (compatible avec bucket 'washers' ou 'documents')
-      let bucket = 'washers';
-      let { error } = await supabase.storage.from(bucket).upload(filePath, file);
-      
-      if (error && error.message.includes('not found')) {
-        bucket = 'documents';
-        const retry = await supabase.storage.from(bucket).upload(filePath, file);
-        error = retry.error;
-      }
+      const { error } = await supabase.storage
+        .from('documents')
+        .upload(filePath, file);
       
       if (error) throw error;
       
-      const { data } = supabase.storage.from(bucket).getPublicUrl(filePath);
+      const { data } = supabase.storage
+        .from('documents')
+        .getPublicUrl(filePath);
+      
       setFormData({ ...formData, idCardUrl: data.publicUrl });
       toast.success("✅ Pièce d'identité reçue !");
     } catch (error: any) {
@@ -52,8 +59,26 @@ export default function BecomeWasher() {
     
     try {
       // Vérifications
-      if (!formData.has_machine || !formData.has_scale || !formData.use_hypoallergenic || !formData.accept_terms) {
-        toast.error("⚠️ Veuillez accepter tous les engagements qualité");
+      if (!formData.has_machine || !formData.has_scale || !formData.use_hypoallergenic) {
+        toast.error("⚠️ Veuillez cocher tous les engagements qualité");
+        setLoading(false);
+        return;
+      }
+
+      if (!formData.legal_capacity) {
+        toast.error("⚠️ Vous devez certifier avoir la capacité juridique d'exercer");
+        setLoading(false);
+        return;
+      }
+
+      if (!formData.accept_terms) {
+        toast.error("⚠️ Vous devez accepter les CGU/CGV");
+        setLoading(false);
+        return;
+      }
+
+      if (!formData.data_consent) {
+        toast.error("⚠️ Vous devez accepter le traitement des données");
         setLoading(false);
         return;
       }
@@ -73,7 +98,13 @@ export default function BecomeWasher() {
         postal_code: formData.postalCode,
         address: formData.address,
         id_card_url: formData.idCardUrl,
-        status: 'pending'
+        status: 'pending',
+        has_machine: formData.has_machine,
+        has_scale: formData.has_scale,
+        use_hypoallergenic: formData.use_hypoallergenic,
+        legal_capacity: formData.legal_capacity,
+        accept_terms: formData.accept_terms,
+        data_consent: formData.data_consent
       });
 
       if (error) throw error;
@@ -251,12 +282,12 @@ export default function BecomeWasher() {
             </div>
           )}
 
-          {/* STEP 3: ENGAGEMENTS + SIMULATEUR */}
+          {/* STEP 3: ENGAGEMENTS + CONSENTEMENTS */}
           {step === 3 && (
             <div className="max-w-4xl mx-auto">
               <div className="grid lg:grid-cols-2 gap-8">
                 
-                {/* SIMULATEUR (STICKY À GAUCHE) */}
+                {/* SIMULATEUR (GAUCHE) */}
                 <div className="lg:sticky lg:top-32 h-fit">
                   <div className="bg-slate-900 text-white p-6 rounded-2xl shadow-xl">
                     <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
@@ -277,28 +308,27 @@ export default function BecomeWasher() {
                         onChange={e => setVolume(parseInt(e.target.value))} 
                         className="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-teal-500"
                       />
-                      <div className="flex justify-between text-xs text-slate-500 mt-1">
-                        <span>Quelques sacs</span>
-                        <span>Gros volume</span>
-                      </div>
                     </div>
 
                     <div className="bg-slate-950 p-6 rounded-xl border border-slate-700 text-center">
                       <p className="text-slate-400 text-sm mb-1">Gains mensuels potentiels</p>
                       <p className="text-5xl font-black text-teal-400">{parseInt(revenue) * 4}€</p>
-                      <p className="text-xs text-slate-500 mt-2">*Commission moyenne 70%</p>
+                      <p className="text-xs text-slate-500 mt-2">*Commission 70%</p>
                     </div>
                   </div>
                 </div>
 
-                {/* FORMULAIRE ENGAGEMENTS (À DROITE) */}
+                {/* ENGAGEMENTS (DROITE) */}
                 <div className="bg-white border border-slate-200 rounded-2xl p-8 shadow-sm">
-                  <h2 className="text-2xl font-bold mb-6">3. Charte Qualité Washer</h2>
+                  <h2 className="text-2xl font-bold mb-6">3. Charte Qualité & Consentements</h2>
                   
                   <div className="space-y-4 mb-8">
+                    
+                    {/* 1. MACHINE */}
                     <label className="flex items-start gap-3 p-4 border border-slate-200 rounded-xl cursor-pointer hover:border-teal-500 hover:bg-teal-50 transition">
                       <input 
                         type="checkbox" 
+                        required
                         className="mt-1 w-5 h-5 accent-teal-600" 
                         checked={formData.has_machine} 
                         onChange={e => setFormData({...formData, has_machine: e.target.checked})} 
@@ -309,9 +339,11 @@ export default function BecomeWasher() {
                       </span>
                     </label>
 
+                    {/* 2. PESON */}
                     <label className="flex items-start gap-3 p-4 border border-slate-200 rounded-xl cursor-pointer hover:border-teal-500 hover:bg-teal-50 transition">
                       <input 
                         type="checkbox" 
+                        required
                         className="mt-1 w-5 h-5 accent-teal-600" 
                         checked={formData.has_scale} 
                         onChange={e => setFormData({...formData, has_scale: e.target.checked})} 
@@ -324,9 +356,11 @@ export default function BecomeWasher() {
                       </span>
                     </label>
 
+                    {/* 3. LESSIVE */}
                     <label className="flex items-start gap-3 p-4 border border-slate-200 rounded-xl cursor-pointer hover:border-teal-500 hover:bg-teal-50 transition">
                       <input 
                         type="checkbox" 
+                        required
                         className="mt-1 w-5 h-5 accent-teal-600" 
                         checked={formData.use_hypoallergenic} 
                         onChange={e => setFormData({...formData, use_hypoallergenic: e.target.checked})} 
@@ -339,18 +373,67 @@ export default function BecomeWasher() {
                       </span>
                     </label>
 
-                    <label className="flex items-start gap-3 p-4 border border-slate-200 rounded-xl cursor-pointer hover:border-teal-500 hover:bg-teal-50 transition">
+                    {/* 4. CAPACITÉ JURIDIQUE - NOUVEAU */}
+                    <label className="flex items-start gap-3 p-4 border-2 border-orange-200 rounded-xl cursor-pointer hover:border-orange-400 hover:bg-orange-50 transition bg-orange-50/50">
                       <input 
                         type="checkbox" 
-                        className="mt-1 w-5 h-5 accent-teal-600" 
+                        required
+                        className="mt-1 w-5 h-5 accent-orange-600" 
+                        checked={formData.legal_capacity} 
+                        onChange={e => setFormData({...formData, legal_capacity: e.target.checked})} 
+                      />
+                      <span className="text-sm text-slate-700">
+                        <span className="font-bold flex items-center gap-2 mb-1 text-orange-700">
+                          <ShieldCheck size={16}/> Capacité d'exercer *
+                        </span>
+                        Je certifie être majeur(e), avoir la capacité juridique d'exercer une activité indépendante, 
+                        et m'engage à déclarer mes revenus aux impôts.
+                      </span>
+                    </label>
+
+                    {/* 5. CGU - NOUVEAU */}
+                    <label className="flex items-start gap-3 p-4 border-2 border-red-200 rounded-xl cursor-pointer hover:border-red-400 hover:bg-red-50 transition bg-red-50/50">
+                      <input 
+                        type="checkbox" 
+                        required
+                        className="mt-1 w-5 h-5 accent-red-600" 
                         checked={formData.accept_terms} 
                         onChange={e => setFormData({...formData, accept_terms: e.target.checked})} 
                       />
                       <span className="text-sm text-slate-700">
-                        <span className="font-bold block mb-1">✓ Contrat de partenariat</span>
-                        J'accepte les conditions (Statut indépendant, Commission 30%).
+                        <span className="font-bold block mb-1 text-red-700">✓ Conditions générales *</span>
+                        J'accepte les{' '}
+                        <Link to="/cgu" target="_blank" className="text-red-600 underline font-bold">
+                          CGU
+                        </Link>
+                        ,{' '}
+                        <Link to="/cgv" target="_blank" className="text-red-600 underline font-bold">
+                          CGV
+                        </Link>
+                        {' '}et la{' '}
+                        <Link to="/privacy" target="_blank" className="text-red-600 underline font-bold">
+                          politique de confidentialité
+                        </Link>
+                        . Je reconnais être travailleur indépendant (commission 30%).
                       </span>
                     </label>
+
+                    {/* 6. RGPD - NOUVEAU */}
+                    <label className="flex items-start gap-3 p-4 border border-slate-200 rounded-xl cursor-pointer hover:border-slate-400 hover:bg-slate-50 transition">
+                      <input 
+                        type="checkbox" 
+                        required
+                        className="mt-1 w-5 h-5 accent-slate-600" 
+                        checked={formData.data_consent} 
+                        onChange={e => setFormData({...formData, data_consent: e.target.checked})} 
+                      />
+                      <span className="text-sm text-slate-700">
+                        <span className="font-bold block mb-1">🔒 Traitement des données *</span>
+                        J'autorise Kilolab à traiter mes données personnelles (nom, email, téléphone, ID) 
+                        pour la gestion de mon compte Washer, conformément au RGPD.
+                      </span>
+                    </label>
+
                   </div>
 
                   <div className="flex gap-4">
