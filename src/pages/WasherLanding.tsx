@@ -8,6 +8,11 @@ import { useState } from 'react';
 export default function WasherLanding() {
   const [washersEarning, setWashersEarning] = useState(15);
 
+  const scrollToSimulator = (e: React.MouseEvent) => {
+    e.preventDefault();
+    document.getElementById('simulator')?.scrollIntoView({ behavior: 'smooth' });
+  };
+
   return (
     <>
       <Helmet>
@@ -56,11 +61,12 @@ export default function WasherLanding() {
                   <ArrowRight size={20} />
                 </Link>
                 
-                  href="#simulator"
+                <button
+                  onClick={scrollToSimulator}
                   className="w-full sm:w-auto px-8 py-4 bg-white/10 backdrop-blur-sm text-white border-2 border-white/20 font-bold rounded-2xl hover:bg-white/20 transition flex items-center justify-center gap-2"
                 >
                   📊 Simuler mes gains
-                </a>
+                </button>
               </div>
 
               {/* SOCIAL PROOF */}
