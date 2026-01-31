@@ -70,6 +70,31 @@ export default function Signup() {
           Kilolab<span className="text-teal-500">.</span>
         </Link>
         <h2 className="mt-6 text-2xl font-bold text-slate-200">
+          {/* CGU/RGPD - NOUVEAU */}
+<div className="text-sm">
+  <label className="flex items-start gap-3 cursor-pointer">
+    <input 
+      type="checkbox" 
+      required
+      className="mt-0.5 w-4 h-4 accent-teal-600" 
+    />
+    <span className="text-slate-300">
+      J'accepte les{' '}
+      <Link to="/cgu" target="_blank" className="text-teal-400 underline font-bold">
+        CGU
+      </Link>
+      ,{' '}
+      <Link to="/cgv" target="_blank" className="text-teal-400 underline font-bold">
+        CGV
+      </Link>
+      {' '}et la{' '}
+      <Link to="/privacy" target="_blank" className="text-teal-400 underline font-bold">
+        politique RGPD
+      </Link>
+      .
+    </span>
+  </label>
+</div>
           Créer votre compte
         </h2>
       </div>
