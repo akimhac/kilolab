@@ -27,6 +27,7 @@ import ForWho from './pages/ForWho';
 import Blog from './pages/Blog';
 
 // Lazy loading (Pages secondaires)
+const WasherLanding = lazy(() => import('./pages/WasherLanding'));
 const BecomeWasher = lazy(() => import('./pages/BecomeWasher')); // ← AJOUTÉ
 const WasherApp = lazy(() => import('./pages/WasherApp'));       // ← AJOUTÉ
 const Signup = lazy(() => import('./pages/Signup'));
@@ -94,6 +95,7 @@ export default function App() {
           {/* === WASHER (PIVOT C2C) === */}
           <Route path="/become-washer" element={<BecomeWasher />} />
           <Route path="/washer-app" element={<PrivateRoute><WasherApp /></PrivateRoute>} />
+          <Route path="/washers" element={<WasherLanding />} />
 
           {/* === ONBOARDING === */}
           <Route path="/select-dashboard" element={<SelectDashboard />} />
