@@ -44,10 +44,34 @@ export default function BecomeWasher() {
     }
   };
 
+  // ✅ FONCTION DE GÉOCODAGE
+  const geocodeAddress = async (address: string, city: string, postalCode: string): Promise<{lat: number, lng: number} | null> => {
+    try {
+      const fullAddress = `${address}, ${postalCode} ${city}, France`;
+      const response = await fetch(
+        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(fullAddress)}&limit=1`
+      );
+      const data = await response.json();
+      
+      if (data && data.length > 0) {
+        return {
+          lat: parseFloat(data[0].lat),
+          lng: parseFloat(data[0].lon)
+        };
+      }
+      return null;
+    } catch (error) {
+      console.error('Erreur géocodage:', error);
+      return null;
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    
     try {
+      // Validation
       if (!formData.has_machine || !formData.has_scale || !formData.use_hypoallergenic) {
         toast.error("Veuillez valider les engagements qualité");
         setLoading(false); return;
@@ -57,21 +81,36 @@ export default function BecomeWasher() {
         setLoading(false); return;
       }
 
-      try {
-        await supabase.from('washers').insert({
-          full_name: formData.fullName,
-          email: formData.email,
-          phone: formData.phone,
-          city: formData.city,
-          postal_code: formData.postalCode,
-          address: formData.address,
-          id_card_url: formData.idCardUrl,
-          status: 'pending',
-          has_machine: formData.has_machine,
-          has_scale: formData.has_scale,
-          use_hypoallergenic: formData.use_hypoallergenic
-        });
-      } catch (err) { console.log("Mode démo ou table manquante"); }
+      // ✅ GÉOCODAGE DE L'ADRESSE
+      toast.loading("Géolocalisation de l'adresse...", { id: 'geocoding' });
+      const coords = await geocodeAddress(formData.address, formData.city, formData.postalCode);
+      toast.dismiss('geocoding');
+
+      if (!coords) {
+        toast.error("Impossible de géolocaliser l'adresse. Vérifie qu'elle est correcte.");
+        setLoading(false);
+        return;
+      }
+
+      // ✅ INSERTION AVEC COORDONNÉES GPS
+      const { error } = await supabase.from('washers').insert({
+        full_name: formData.fullName,
+        email: formData.email,
+        phone: formData.phone,
+        city: formData.city,
+        postal_code: formData.postalCode,
+        address: formData.address,
+        lat: coords.lat,              // ← NOUVEAU
+        lng: coords.lng,              // ← NOUVEAU
+        id_card_url: formData.idCardUrl,
+        status: 'pending',
+        has_machine: formData.has_machine,
+        has_scale: formData.has_scale,
+        use_hypoallergenic: formData.use_hypoallergenic,
+        is_available: true
+      });
+
+      if (error) throw error;
 
       setStep(4);
       toast.success("Candidature envoyée !");
