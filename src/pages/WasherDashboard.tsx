@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
+import { requestNotificationPermission } from '../lib/firebase';
 import Navbar from '../components/Navbar';
-import { DollarSign, Package, Clock, MapPin, Check, Star, TrendingUp, Loader2, AlertCircle } from 'lucide-react';
+import { DollarSign, Package, Clock, MapPin, Check, Star, TrendingUp, Loader2, AlertCircle, Bell } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 interface WasherStats {
@@ -43,12 +44,48 @@ export default function WasherDashboard() {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'available' | 'active' | 'history'>('available');
   const [isAvailable, setIsAvailable] = useState(true);
+  const [fcmToken, setFcmToken] = useState<string | null>(null);
+  const [notificationsEnabled, setNotificationsEnabled] = useState(false);
 
   useEffect(() => {
     fetchWasherData();
     const interval = setInterval(fetchWasherData, 30000);
     return () => clearInterval(interval);
   }, []);
+
+  // ✅ Demander la permission de notification au chargement
+  useEffect(() => {
+    const setupNotifications = async () => {
+      console.log('🔔 Configuration des notifications...');
+      
+      const token = await requestNotificationPermission();
+      
+      if (token && washerId) {
+        setFcmToken(token);
+        setNotificationsEnabled(true);
+        
+        // Sauvegarder le token FCM dans la BDD
+        const { error } = await supabase
+          .from('washers')
+          .update({ fcm_token: token })
+          .eq('id', washerId);
+        
+        if (error) {
+          console.error('❌ Erreur sauvegarde token:', error);
+          toast.error('Erreur activation notifications');
+        } else {
+          console.log('✅ Token FCM sauvegardé dans la BDD');
+          toast.success('🔔 Notifications activées !', { duration: 2000 });
+        }
+      } else {
+        console.log('⚠️ Permission refusée ou washerId manquant');
+      }
+    };
+    
+    if (washerStatus === 'approved' && washerId && !fcmToken) {
+      setupNotifications();
+    }
+  }, [washerId, washerStatus, fcmToken]);
 
   const fetchWasherData = async () => {
     try {
@@ -61,7 +98,7 @@ export default function WasherDashboard() {
       // Récupérer le profil Washer
       const { data: washerProfile, error: washerError } = await supabase
         .from('washers')
-        .select('id, status, is_available')
+        .select('id, status, is_available, fcm_token')
         .eq('user_id', user.id)
         .single();
 
@@ -73,6 +110,11 @@ export default function WasherDashboard() {
       setWasherId(washerProfile.id);
       setWasherStatus(washerProfile.status);
       setIsAvailable(washerProfile.is_available ?? true);
+      
+      if (washerProfile.fcm_token) {
+        setFcmToken(washerProfile.fcm_token);
+        setNotificationsEnabled(true);
+      }
 
       if (washerProfile.status !== 'approved') {
         setLoading(false);
@@ -101,11 +143,11 @@ export default function WasherDashboard() {
       if (myOrders) {
         setMyMissions(myOrders);
         
-        // Commission Washer : 60% du prix (3€ standard = 1.80€, 5€ express = 3€)
+        // Commission Washer : 60% du prix
         const earnings = myOrders
           .filter(o => o.status === 'completed')
           .reduce((sum, o) => {
-            const commission = o.formula === 'express' ? 0.6 : 0.6; // 60% dans les deux cas
+            const commission = 0.6;
             return sum + (parseFloat(o.total_price) * commission);
           }, 0);
         
@@ -118,7 +160,7 @@ export default function WasherDashboard() {
           totalEarnings: earnings,
           completedOrders: completed,
           pendingOrders: pending,
-          avgRating: 0, // TODO: Implémenter système de notes
+          avgRating: 0,
           totalRatings: 0
         });
       }
@@ -240,7 +282,7 @@ export default function WasherDashboard() {
   }
 
   const calculateEarnings = (mission: Mission) => {
-    const commission = 0.6; // 60% pour le Washer
+    const commission = 0.6;
     return (parseFloat(String(mission.total_price)) * commission).toFixed(2);
   };
 
@@ -252,18 +294,33 @@ export default function WasherDashboard() {
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-3xl font-black">Mon Dashboard Washer 💰</h1>
           
-          {/* Toggle Disponibilité */}
-          <button
-            onClick={toggleAvailability}
-            className={`px-6 py-3 rounded-xl font-bold flex items-center gap-2 transition ${
-              isAvailable 
-                ? 'bg-green-500 text-white hover:bg-green-600' 
-                : 'bg-slate-300 text-slate-600 hover:bg-slate-400'
-            }`}
-          >
-            <div className={`w-3 h-3 rounded-full ${isAvailable ? 'bg-white' : 'bg-slate-500'}`}></div>
-            {isAvailable ? 'Disponible' : 'Indisponible'}
-          </button>
+          <div className="flex items-center gap-3">
+            {/* Statut Notifications */}
+            {notificationsEnabled ? (
+              <div className="px-4 py-2 bg-green-50 border border-green-200 rounded-xl flex items-center gap-2">
+                <Bell size={16} className="text-green-600" />
+                <span className="text-sm font-bold text-green-700">Notifs ON</span>
+              </div>
+            ) : (
+              <div className="px-4 py-2 bg-orange-50 border border-orange-200 rounded-xl flex items-center gap-2">
+                <Bell size={16} className="text-orange-600" />
+                <span className="text-sm font-bold text-orange-700">Notifs OFF</span>
+              </div>
+            )}
+            
+            {/* Toggle Disponibilité */}
+            <button
+              onClick={toggleAvailability}
+              className={`px-6 py-3 rounded-xl font-bold flex items-center gap-2 transition ${
+                isAvailable 
+                  ? 'bg-green-500 text-white hover:bg-green-600' 
+                  : 'bg-slate-300 text-slate-600 hover:bg-slate-400'
+              }`}
+            >
+              <div className={`w-3 h-3 rounded-full ${isAvailable ? 'bg-white' : 'bg-slate-500'}`}></div>
+              {isAvailable ? 'Disponible' : 'Indisponible'}
+            </button>
+          </div>
         </div>
 
         {!isAvailable && (
@@ -271,6 +328,15 @@ export default function WasherDashboard() {
             <AlertCircle className="text-orange-600" size={20} />
             <p className="text-orange-800 font-medium">
               Vous êtes indisponible. Activez votre disponibilité pour recevoir des missions.
+            </p>
+          </div>
+        )}
+
+        {!notificationsEnabled && (
+          <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-6 flex items-center gap-3">
+            <AlertCircle className="text-blue-600" size={20} />
+            <p className="text-blue-800 font-medium">
+              Les notifications sont désactivées. Rechargez la page et autorisez les notifications pour recevoir des alertes de nouvelles missions.
             </p>
           </div>
         )}
