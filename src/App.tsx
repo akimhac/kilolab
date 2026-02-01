@@ -7,29 +7,24 @@ import ScrollToTop from './components/ScrollToTop';
 import ProtectedAdminRoute from './components/ProtectedAdminRoute';
 import PrivateRoute from './components/PrivateRoute';
 
-// Imports directs (Pages critiques pour le SEO/LCP)
+// Imports directs
 import Landing from './pages/Landing';
 import Login from './pages/Login';
 import Contact from './pages/Contact';
 import ForgotPassword from './pages/ForgotPassword';
 import UpdatePassword from './pages/UpdatePassword';
-
-// Pages légales (import direct pour SEO)
 import Legal from './pages/legal/Legal';
 import CGU from './pages/legal/CGU';
 import CGV from './pages/legal/CGV';
 import Privacy from './pages/legal/Privacy';
 import Cookies from './pages/legal/Cookies';
-
-// Pages info (import direct car souvent visitées)
 import FAQ from './pages/FAQ';
 import ForWho from './pages/ForWho';
 import Blog from './pages/Blog';
 
-// Lazy loading (Pages secondaires)
-const WasherLanding = lazy(() => import('./pages/WasherLanding'));
+// Lazy loading
 const BecomeWasher = lazy(() => import('./pages/BecomeWasher'));
-const WasherApp = lazy(() => import('./pages/WasherApp'));
+const WasherDashboard = lazy(() => import('./pages/WasherDashboard')); // ✅ NOUVEAU
 const Signup = lazy(() => import('./pages/Signup'));
 const NewOrder = lazy(() => import('./pages/NewOrder'));
 const Tarifs = lazy(() => import('./pages/Tarifs'));
@@ -89,19 +84,16 @@ export default function App() {
       />
       <Suspense fallback={<PageLoader />}>
         <Routes>
-          {/* === PUBLIC === */}
           <Route path="/" element={<Landing />} />
           
-          {/* === WASHER (PIVOT C2C) === */}
-          <Route path="/washers" element={<WasherLanding />} />
+          {/* ✅ WASHER (FUSIONNÉ) */}
+          <Route path="/washers" element={<BecomeWasher />} />
           <Route path="/become-washer" element={<BecomeWasher />} />
-          <Route path="/washer-app" element={<PrivateRoute><WasherApp /></PrivateRoute>} />
+          <Route path="/washer-dashboard" element={<PrivateRoute><WasherDashboard /></PrivateRoute>} />
 
-          {/* === ONBOARDING === */}
           <Route path="/select-dashboard" element={<SelectDashboard />} />
           <Route path="/select-signup" element={<SelectSignup />} />
           
-          {/* === AUTH === */}
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
@@ -109,7 +101,6 @@ export default function App() {
           <Route path="/reset-password" element={<UpdatePassword />} />
           <Route path="/set-password" element={<SetPassword />} />
 
-          {/* === INFO PUBLIQUE === */}
           <Route path="/contact" element={<Contact />} />
           <Route path="/tarifs" element={<Tarifs />} />
           <Route path="/trouver" element={<Trouver />} />
@@ -119,7 +110,6 @@ export default function App() {
           <Route path="/blog" element={<Blog />} />
           <Route path="/for-who" element={<ForWho />} />
 
-          {/* === CLIENT (PROTÉGÉ) === */}
           <Route path="/user-profile" element={<PrivateRoute><UserProfile /></PrivateRoute>} />
           <Route path="/dashboard" element={<PrivateRoute><ClientDashboard /></PrivateRoute>} />
           <Route path="/client-dashboard" element={<PrivateRoute><ClientDashboard /></PrivateRoute>} />
@@ -129,7 +119,6 @@ export default function App() {
           <Route path="/pickup-qr/:orderId" element={<PrivateRoute><PickupQR /></PrivateRoute>} />
           <Route path="/invoice/:orderId" element={<PrivateRoute><Invoice /></PrivateRoute>} />
 
-          {/* === PARTENAIRES (LEGACY B2B) === */}
           <Route path="/partner" element={<PartnerLanding />} />
           <Route path="/become-partner" element={<BecomePartner />} />
           <Route path="/partner-guide" element={<PartnerGuide />} />
@@ -139,24 +128,20 @@ export default function App() {
           <Route path="/partner-app" element={<PrivateRoute><PartnerDashboard /></PrivateRoute>} />
           <Route path="/connect-stripe" element={<PrivateRoute><ConnectStripe /></PrivateRoute>} />
 
-          {/* === PAIEMENT === */}
           <Route path="/payment-success" element={<PaymentSuccess />} />
           <Route path="/payment-cancel" element={<PaymentCancel />} />
 
-          {/* === ADMIN === */}
           <Route path="/admin/login" element={<SuperAccess />} />
           <Route path="/admin" element={<ProtectedAdminRoute><AdminDashboard /></ProtectedAdminRoute>} />
           <Route path="/admin-dashboard" element={<ProtectedAdminRoute><AdminDashboard /></ProtectedAdminRoute>} />
           <Route path="/scan-qr" element={<ProtectedAdminRoute><ScanQR /></ProtectedAdminRoute>} />
 
-          {/* === LEGAL === */}
           <Route path="/legal" element={<Legal />} />
           <Route path="/cgu" element={<CGU />} />
           <Route path="/cgv" element={<CGV />} />
           <Route path="/privacy" element={<Privacy />} />
           <Route path="/cookies" element={<Cookies />} />
 
-          {/* === 404 === */}
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Suspense>
