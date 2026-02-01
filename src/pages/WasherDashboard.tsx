@@ -4,7 +4,7 @@ import { requestNotificationPermission } from '../lib/firebase';
 import Navbar from '../components/Navbar';
 import { 
   DollarSign, Package, Clock, MapPin, Check, Star, TrendingUp, 
-  Loader2, AlertCircle, Bell, Euro, Calendar, User, ArrowRight 
+  Loader2, AlertCircle, Bell, Euro, Calendar, ArrowRight 
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -34,6 +34,19 @@ interface Mission {
   completed_at: string | null;
 }
 
+// ✅ Fonction de calcul de distance
+function calculateDistance(lat1: number, lng1: number, lat2: number, lng2: number): number {
+  const R = 6371;
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLng = (lng2 - lng1) * Math.PI / 180;
+  const a = 
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+    Math.sin(dLng / 2) * Math.sin(dLng / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c;
+}
+
 export default function WasherDashboard() {
   const [stats, setStats] = useState<WasherStats>({ 
     totalEarnings: 0, 
@@ -53,7 +66,6 @@ export default function WasherDashboard() {
   const [fcmToken, setFcmToken] = useState<string | null>(null);
   const [notificationsEnabled, setNotificationsEnabled] = useState(false);
   
-  // ✅ Stripe Connect
   const [stripeConnectStatus, setStripeConnectStatus] = useState<{
     completed: boolean;
     onboardingUrl?: string;
@@ -61,7 +73,7 @@ export default function WasherDashboard() {
 
   useEffect(() => {
     fetchWasherData();
-    const interval = setInterval(fetchWasherData, 30000); // Refresh toutes les 30s
+    const interval = setInterval(fetchWasherData, 30000);
     return () => clearInterval(interval);
   }, []);
 
@@ -130,7 +142,7 @@ export default function WasherDashboard() {
       // Récupérer le profil Washer
       const { data: washerProfile, error: washerError } = await supabase
         .from('washers')
-        .select('id, status, is_available, fcm_token')
+        .select('id, status, is_available, fcm_token, lat, lng')
         .eq('user_id', user.id)
         .single();
 
@@ -146,6 +158,43 @@ export default function WasherDashboard() {
       if (washerProfile.fcm_token) {
         setFcmToken(washerProfile.fcm_token);
         setNotificationsEnabled(true);
+      }
+
+      // ✅ GÉOLOCALISATION TEMPS RÉEL
+      if (washerProfile.status === 'approved' && navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          async (position) => {
+            const newLat = position.coords.latitude;
+            const newLng = position.coords.longitude;
+            
+            // Mettre à jour uniquement si position a changé de plus de 100m
+            if (washerProfile.lat && washerProfile.lng) {
+              const distance = calculateDistance(
+                washerProfile.lat, 
+                washerProfile.lng, 
+                newLat, 
+                newLng
+              );
+              
+              if (distance < 0.1) return; // Moins de 100m = pas de mise à jour
+            }
+            
+            // Mettre à jour la position
+            await supabase
+              .from('washers')
+              .update({ 
+                lat: newLat, 
+                lng: newLng,
+                last_location_update: new Date().toISOString()
+              })
+              .eq('id', washerProfile.id);
+            
+            console.log('📍 Position GPS mise à jour');
+          },
+          (error) => {
+            console.log('⚠️ Géoloc refusée:', error);
+          }
+        );
       }
 
       if (washerProfile.status !== 'approved') {
@@ -175,12 +224,10 @@ export default function WasherDashboard() {
       if (myOrders) {
         setMyMissions(myOrders);
         
-        // Commission Washer : 60%
         const totalEarnings = myOrders
           .filter(o => o.status === 'completed')
           .reduce((sum, o) => sum + (parseFloat(o.total_price) * 0.6), 0);
         
-        // Gains de la semaine
         const startOfWeek = new Date();
         startOfWeek.setDate(startOfWeek.getDate() - startOfWeek.getDay() + 1);
         startOfWeek.setHours(0, 0, 0, 0);
@@ -280,7 +327,6 @@ export default function WasherDashboard() {
     }
   };
 
-  // ✅ Créer compte Stripe Connect
   const handleStripeConnect = async () => {
     try {
       toast.loading("Création de votre compte de paiement...", { id: 'stripe' });
@@ -387,7 +433,6 @@ export default function WasherDashboard() {
       
       <div className="pt-32 px-4 max-w-7xl mx-auto pb-12">
         
-        {/* HEADER */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
           <div>
             <h1 className="text-3xl font-black mb-2">Mon Dashboard Washer</h1>
@@ -395,7 +440,6 @@ export default function WasherDashboard() {
           </div>
           
           <div className="flex flex-wrap items-center gap-3">
-            {/* Statut Notifications */}
             {notificationsEnabled ? (
               <div className="px-4 py-2 bg-green-50 border border-green-200 rounded-xl flex items-center gap-2">
                 <Bell size={16} className="text-green-600" />
@@ -408,7 +452,6 @@ export default function WasherDashboard() {
               </div>
             )}
             
-            {/* Toggle Disponibilité */}
             <button
               onClick={toggleAvailability}
               className={`px-6 py-3 rounded-xl font-bold flex items-center gap-2 transition-all transform hover:scale-105 ${
@@ -423,7 +466,6 @@ export default function WasherDashboard() {
           </div>
         </div>
 
-        {/* ALERTES */}
         {!isAvailable && (
           <div className="bg-orange-50 border-2 border-orange-200 rounded-xl p-4 mb-6 flex items-center gap-3">
             <AlertCircle className="text-orange-600 shrink-0" size={20} />
@@ -442,7 +484,6 @@ export default function WasherDashboard() {
           </div>
         )}
 
-        {/* ✅ ALERTE STRIPE CONNECT */}
         {!stripeConnectStatus.completed && (
           <div className="bg-gradient-to-r from-blue-50 to-teal-50 border-2 border-blue-200 rounded-2xl p-6 mb-6 shadow-lg">
             <div className="flex items-start gap-4">
@@ -468,7 +509,6 @@ export default function WasherDashboard() {
           </div>
         )}
 
-        {/* STATS */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <div className="bg-white p-6 rounded-2xl shadow-sm border hover:shadow-lg transition">
             <DollarSign className="text-green-600 mb-4" size={32} />
@@ -495,7 +535,6 @@ export default function WasherDashboard() {
           </div>
         </div>
 
-        {/* TABS */}
         <div className="flex gap-4 mb-6 border-b overflow-x-auto">
           <button
             onClick={() => setActiveTab('available')}
@@ -523,7 +562,6 @@ export default function WasherDashboard() {
           </button>
         </div>
 
-        {/* CONTENT */}
         {activeTab === 'available' && (
           <div className="grid md:grid-cols-3 gap-6">
             {availableMissions.map(mission => (
