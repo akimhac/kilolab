@@ -90,14 +90,6 @@ export default function Footer() {
           <MapPin size={12}/> Zones d'intervention principales
         </p>
         <div className="flex flex-wrap gap-x-6 gap-y-2">
-          <Link to="/pressing/lille" className="hover:text-teal-500 transition-colors">Pressing Lille</Link>
-          <Link to="/pressing/nantes" className="hover:text-teal-500 transition-colors">Blanchisserie Nantes</Link>
-          <Link to="/pressing/lyon" className="hover:text-teal-500 transition-colors">Pressing Lyon</Link>
-          <Link to="/pressing/bordeaux" className="hover:text-teal-500 transition-colors">Pressing Bordeaux</Link>
-          <Link to="/pressing/paris" className="hover:text-teal-500 transition-colors">Pressing Paris</Link>
-          <Link to="/pressing/marseille" className="hover:text-teal-500 transition-colors">Pressing Marseille</Link>
-          <Link to="/pressing/toulouse" className="hover:text-teal-500 transition-colors">Pressing Toulouse</Link>
-          <Link to="/pressing/nice" className="hover:text-teal-500 transition-colors">Pressing Nice</Link>
         </div>
       </div>
 
