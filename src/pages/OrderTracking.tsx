@@ -1,108 +1,45 @@
-// src/pages/OrderTracking.tsx
-// Page de tracking de commande avec timeline et QR code
-
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
+import Navbar from '../components/Navbar';
 import { 
-  ArrowLeft, Package, Clock, CheckCircle, Truck, MapPin, 
+  ArrowLeft, Package, Clock, CheckCircle, MapPin, 
   Phone, QrCode, Share2, Download, Copy, RefreshCw,
-  AlertCircle, Star
+  AlertCircle, Star, MessageSquare
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 interface Order {
   id: string;
   user_id: string;
-  partner_id: string;
-  weight_kg: number;
-  service_type: 'standard' | 'express';
-  price_per_kg: number;
-  total_amount: number;
-  status: 'pending' | 'confirmed' | 'in_progress' | 'ready' | 'completed' | 'cancelled';
-  pickup_date?: string;
-  delivery_date?: string;
-  notes?: string;
+  washer_id: string | null;
+  partner_id: string | null;
+  weight: number;
+  formula: string;
+  total_price: number;
+  status: string;
+  pickup_address: string;
+  pickup_date: string;
+  pickup_slot: string;
   created_at: string;
   updated_at: string;
+  completed_at: string | null;
 }
-
-interface Partner {
-  id: string;
-  name: string;
-  address: string;
-  city: string;
-  postal_code: string;
-  phone?: string;
-  latitude?: number;
-  longitude?: number;
-}
-
-interface TrackingEvent {
-  status: string;
-  label: string;
-  description: string;
-  icon: any;
-  color: string;
-  timestamp?: string;
-  completed: boolean;
-  current: boolean;
-}
-
-const statusConfig: Record<string, { label: string; description: string; icon: any; color: string }> = {
-  pending: {
-    label: 'Commande reçue',
-    description: 'Votre commande a été enregistrée',
-    icon: Package,
-    color: 'yellow'
-  },
-  confirmed: {
-    label: 'Confirmée',
-    description: 'Le pressing a confirmé votre commande',
-    icon: CheckCircle,
-    color: 'blue'
-  },
-  in_progress: {
-    label: 'En cours de traitement',
-    description: 'Votre linge est en train d\'être nettoyé',
-    icon: RefreshCw,
-    color: 'purple'
-  },
-  ready: {
-    label: 'Prêt à récupérer',
-    description: 'Votre linge est prêt ! Venez le chercher',
-    icon: CheckCircle,
-    color: 'green'
-  },
-  completed: {
-    label: 'Terminée',
-    description: 'Commande récupérée. Merci !',
-    icon: Star,
-    color: 'green'
-  },
-  cancelled: {
-    label: 'Annulée',
-    description: 'Cette commande a été annulée',
-    icon: AlertCircle,
-    color: 'red'
-  }
-};
-
-const statusOrder = ['pending', 'confirmed', 'in_progress', 'ready', 'completed'];
 
 export default function OrderTracking() {
   const { orderId } = useParams<{ orderId: string }>();
   const navigate = useNavigate();
   const [order, setOrder] = useState<Order | null>(null);
-  const [partner, setPartner] = useState<Partner | null>(null);
+  const [washer, setWasher] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [showQR, setShowQR] = useState(false);
-  const [refreshing, setRefreshing] = useState(false);
+  const [showDisputeForm, setShowDisputeForm] = useState(false);
+  const [disputeType, setDisputeType] = useState('quality');
+  const [disputeDescription, setDisputeDescription] = useState('');
 
   useEffect(() => {
     if (orderId) {
       loadOrderDetails();
-      // Rafraîchir toutes les 30 secondes
       const interval = setInterval(loadOrderDetails, 30000);
       return () => clearInterval(interval);
     }
@@ -110,132 +47,75 @@ export default function OrderTracking() {
 
   const loadOrderDetails = async () => {
     try {
-      // Charger la commande
-      const { data: orderData, error: orderError } = await supabase
+      const { data: orderData, error } = await supabase
         .from('orders')
         .select('*')
         .eq('id', orderId)
         .single();
 
-      if (orderError) throw orderError;
+      if (error) throw error;
       setOrder(orderData);
 
-      // Charger le partenaire
-      const { data: partnerData } = await supabase
-        .from('partners')
-        .select('*')
-        .eq('id', orderData.partner_id)
-        .single();
-
-      setPartner(partnerData);
+      if (orderData.washer_id) {
+        const { data: washerData } = await supabase
+          .from('washers')
+          .select('*')
+          .eq('id', orderData.washer_id)
+          .single();
+        setWasher(washerData);
+      }
     } catch (error) {
       console.error('Erreur:', error);
       toast.error('Commande introuvable');
     } finally {
       setLoading(false);
-      setRefreshing(false);
     }
   };
 
-  const handleRefresh = () => {
-    setRefreshing(true);
-    loadOrderDetails();
-  };
+  const handleSubmitDispute = async () => {
+    if (!disputeDescription.trim()) {
+      toast.error('Veuillez décrire le problème');
+      return;
+    }
 
-  const handleShare = async () => {
-    const url = `https://kilolab.fr/tracking/${orderId}`;
-    
-    if (navigator.share) {
-      try {
-        await navigator.share({
-          title: `Commande Kilolab #${orderId?.slice(0, 8)}`,
-          text: 'Suivez ma commande de pressing',
-          url
-        });
-      } catch (error) {
-        copyToClipboard(url);
-      }
-    } else {
-      copyToClipboard(url);
+    try {
+      const { error } = await supabase.functions.invoke('create-dispute', {
+        body: {
+          orderId: order?.id,
+          type: disputeType,
+          description: disputeDescription
+        }
+      });
+
+      if (error) throw error;
+
+      toast.success('Litige enregistré. Nous vous contacterons sous 24h.');
+      setShowDisputeForm(false);
+      setDisputeDescription('');
+    } catch (error: any) {
+      toast.error(error.message);
     }
   };
 
-  const copyToClipboard = (text: string) => {
-    navigator.clipboard.writeText(text);
-    toast.success('Lien copié !');
-  };
-
-  const downloadQRCode = () => {
-    const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=${encodeURIComponent(
-      `KILOLAB:${orderId}`
-    )}`;
-    
-    const link = document.createElement('a');
-    link.href = qrUrl;
-    link.download = `kilolab-${orderId?.slice(0, 8)}.png`;
-    link.click();
-    toast.success('QR Code téléchargé !');
-  };
-
-  const getTrackingEvents = (): TrackingEvent[] => {
-    if (!order) return [];
-
-    const currentIndex = statusOrder.indexOf(order.status);
-    
-    return statusOrder.map((status, index) => {
-      const config = statusConfig[status];
-      return {
-        status,
-        label: config.label,
-        description: config.description,
-        icon: config.icon,
-        color: config.color,
-        completed: index < currentIndex || (index === currentIndex && status === 'completed'),
-        current: index === currentIndex,
-        timestamp: index <= currentIndex ? order.updated_at : undefined
-      };
-    });
-  };
-
-  const getEstimatedTime = (): string => {
-    if (!order) return '';
-    
-    const created = new Date(order.created_at);
-    const isExpress = order.service_type === 'express';
-    const hoursToAdd = isExpress ? 4 : 24;
-    const estimated = new Date(created.getTime() + hoursToAdd * 60 * 60 * 1000);
-    
-    return estimated.toLocaleDateString('fr-FR', {
-      weekday: 'long',
-      day: 'numeric',
-      month: 'long',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
-  };
+  const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(
+    `KILOLAB:${orderId}`
+  )}`;
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 to-pink-50">
-        <div className="text-center">
-          <div className="w-16 h-16 border-4 border-purple-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-slate-600">Chargement du suivi...</p>
-        </div>
+      <div className="min-h-screen flex items-center justify-center bg-slate-50">
+        <Loader2 className="animate-spin text-teal-600" size={48} />
       </div>
     );
   }
 
   if (!order) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 to-pink-50">
+      <div className="min-h-screen flex items-center justify-center bg-slate-50">
         <div className="text-center">
           <AlertCircle className="w-16 h-16 text-red-400 mx-auto mb-4" />
-          <h2 className="text-xl font-bold text-slate-800 mb-2">Commande introuvable</h2>
-          <p className="text-slate-600 mb-4">Cette commande n'existe pas ou a été supprimée.</p>
-          <button
-            onClick={() => navigate('/')}
-            className="px-6 py-3 bg-purple-600 text-white rounded-xl font-semibold hover:bg-purple-700 transition"
-          >
+          <h2 className="text-xl font-bold mb-2">Commande introuvable</h2>
+          <button onClick={() => navigate('/')} className="px-6 py-3 bg-teal-600 text-white rounded-xl font-bold">
             Retour à l'accueil
           </button>
         </div>
@@ -243,279 +123,180 @@ export default function OrderTracking() {
     );
   }
 
-  const trackingEvents = getTrackingEvents();
-  const currentConfig = statusConfig[order.status];
-  const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(
-    `KILOLAB:${orderId}`
-  )}`;
+  const statusConfig: Record<string, { label: string; color: string; icon: any }> = {
+    pending: { label: 'En attente', color: 'orange', icon: Clock },
+    confirmed: { label: 'Confirmée', color: 'blue', icon: CheckCircle },
+    assigned: { label: 'Assignée à un Washer', color: 'purple', icon: Package },
+    in_progress: { label: 'En cours de lavage', color: 'indigo', icon: RefreshCw },
+    completed: { label: 'Terminée', color: 'green', icon: CheckCircle }
+  };
+
+  const currentStatus = statusConfig[order.status] || statusConfig.pending;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-50">
-      {/* Header */}
-      <div className="bg-white border-b shadow-sm sticky top-0 z-50">
-        <div className="max-w-2xl mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <button
-              onClick={() => navigate(-1)}
-              className="flex items-center gap-2 text-purple-600 hover:text-purple-700 font-semibold"
-            >
-              <ArrowLeft className="w-5 h-5" />
-              Retour
-            </button>
-            <div className="flex items-center gap-2">
-              <button
-                onClick={handleRefresh}
-                className={`p-2 hover:bg-slate-100 rounded-lg transition ${refreshing ? 'animate-spin' : ''}`}
-                disabled={refreshing}
-              >
-                <RefreshCw className="w-5 h-5 text-slate-600" />
-              </button>
-              <button
-                onClick={handleShare}
-                className="p-2 hover:bg-slate-100 rounded-lg transition"
-              >
-                <Share2 className="w-5 h-5 text-slate-600" />
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
+    <div className="min-h-screen bg-slate-50">
+      <Navbar />
+      
+      <div className="pt-32 px-4 max-w-3xl mx-auto pb-12">
+        <button
+          onClick={() => navigate('/client-dashboard')}
+          className="flex items-center gap-2 text-slate-600 hover:text-slate-900 font-bold mb-6"
+        >
+          <ArrowLeft size={20} />
+          Retour au dashboard
+        </button>
 
-      <div className="max-w-2xl mx-auto px-4 py-6">
-        {/* Numéro de commande */}
-        <div className="text-center mb-6">
+        <div className="text-center mb-8">
           <p className="text-sm text-slate-500 mb-1">Commande</p>
-          <h1 className="text-2xl font-bold text-slate-900">
-            #{orderId?.slice(0, 8).toUpperCase()}
-          </h1>
+          <h1 className="text-3xl font-black">#{order.id.slice(0, 8).toUpperCase()}</h1>
         </div>
 
         {/* Statut actuel */}
         <div className={`bg-gradient-to-r ${
-          currentConfig.color === 'green' ? 'from-green-500 to-emerald-600' :
-          currentConfig.color === 'yellow' ? 'from-yellow-500 to-orange-500' :
-          currentConfig.color === 'blue' ? 'from-blue-500 to-cyan-500' :
-          currentConfig.color === 'purple' ? 'from-purple-500 to-pink-500' :
-          'from-red-500 to-rose-500'
-        } rounded-3xl p-6 text-white mb-6 shadow-lg`}>
-          <div className="flex items-center gap-4">
+          currentStatus.color === 'green' ? 'from-green-500 to-emerald-600' :
+          currentStatus.color === 'orange' ? 'from-orange-500 to-yellow-500' :
+          currentStatus.color === 'blue' ? 'from-blue-500 to-cyan-500' :
+          currentStatus.color === 'purple' ? 'from-purple-500 to-pink-500' :
+          'from-indigo-500 to-purple-500'
+        } rounded-3xl p-8 text-white mb-6 shadow-2xl`}>
+          <div className="flex items-center gap-4 mb-4">
             <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center">
-              <currentConfig.icon className="w-8 h-8" />
+              <currentStatus.icon size={32} />
             </div>
             <div>
-              <h2 className="text-xl font-bold">{currentConfig.label}</h2>
-              <p className="text-white/80">{currentConfig.description}</p>
+              <h2 className="text-2xl font-black">{currentStatus.label}</h2>
+              <p className="text-white/80">
+                {new Date(order.updated_at).toLocaleDateString('fr-FR', {
+                  day: 'numeric',
+                  month: 'long',
+                  hour: '2-digit',
+                  minute: '2-digit'
+                })}
+              </p>
             </div>
           </div>
 
-          {order.status !== 'completed' && order.status !== 'cancelled' && (
-            <div className="mt-4 pt-4 border-t border-white/20">
-              <p className="text-sm text-white/70">Estimation</p>
-              <p className="font-semibold">{getEstimatedTime()}</p>
+          {washer && (
+            <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20">
+              <p className="text-sm text-white/70 mb-1">Votre Washer</p>
+              <p className="font-bold text-lg">{washer.full_name}</p>
+              <p className="text-sm text-white/80">{washer.city}</p>
             </div>
           )}
         </div>
 
-        {/* QR Code (si prêt) */}
-        {(order.status === 'ready' || order.status === 'completed') && (
-          <div className="bg-white rounded-3xl p-6 mb-6 shadow-lg text-center">
-            <h3 className="text-lg font-bold text-slate-900 mb-4 flex items-center justify-center gap-2">
-              <QrCode className="w-5 h-5 text-purple-600" />
+        {/* QR Code */}
+        {order.status === 'completed' && (
+          <div className="bg-white rounded-3xl p-8 mb-6 shadow-lg text-center">
+            <h3 className="text-xl font-bold mb-4 flex items-center justify-center gap-2">
+              <QrCode className="text-teal-600" size={24} />
               QR Code de retrait
             </h3>
-            
-            <div 
-              className="inline-block bg-white p-4 rounded-2xl border-4 border-purple-100 cursor-pointer hover:border-purple-300 transition"
-              onClick={() => setShowQR(true)}
-            >
-              <img 
-                src={qrCodeUrl} 
-                alt="QR Code" 
-                className="w-48 h-48 mx-auto"
-              />
+            <div className="inline-block bg-white p-4 rounded-2xl border-4 border-teal-100">
+              <img src={qrCodeUrl} alt="QR Code" className="w-64 h-64" />
             </div>
-
-            <p className="text-slate-600 mt-4 mb-4">
-              Présentez ce code au pressing pour récupérer votre linge
-            </p>
-
-            <div className="flex gap-3 justify-center">
-              <button
-                onClick={downloadQRCode}
-                className="px-4 py-2 bg-purple-100 text-purple-700 rounded-xl font-semibold hover:bg-purple-200 transition flex items-center gap-2"
-              >
-                <Download className="w-4 h-4" />
-                Télécharger
-              </button>
-              <button
-                onClick={() => copyToClipboard(`KILOLAB:${orderId}`)}
-                className="px-4 py-2 bg-slate-100 text-slate-700 rounded-xl font-semibold hover:bg-slate-200 transition flex items-center gap-2"
-              >
-                <Copy className="w-4 h-4" />
-                Copier le code
-              </button>
-            </div>
+            <p className="text-slate-600 mt-4">Présentez ce code pour récupérer votre linge</p>
           </div>
         )}
 
-        {/* Timeline */}
-        <div className="bg-white rounded-3xl p-6 mb-6 shadow-lg">
-          <h3 className="text-lg font-bold text-slate-900 mb-6">Suivi de votre commande</h3>
-          
-          <div className="relative">
-            {trackingEvents.map((event, index) => (
-              <div key={event.status} className="flex gap-4 mb-6 last:mb-0">
-                {/* Ligne verticale */}
-                {index < trackingEvents.length - 1 && (
-                  <div className={`absolute left-[19px] top-[40px] w-0.5 h-[calc(100%-40px)] ${
-                    event.completed ? 'bg-green-400' : 'bg-slate-200'
-                  }`} style={{ 
-                    top: `${index * 80 + 40}px`,
-                    height: '60px'
-                  }}></div>
-                )}
-
-                {/* Icône */}
-                <div className={`relative z-10 w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${
-                  event.completed ? 'bg-green-500 text-white' :
-                  event.current ? `bg-${event.color}-500 text-white` :
-                  'bg-slate-200 text-slate-400'
-                }`}>
-                  <event.icon className="w-5 h-5" />
-                </div>
-
-                {/* Contenu */}
-                <div className="flex-1">
-                  <p className={`font-semibold ${
-                    event.completed || event.current ? 'text-slate-900' : 'text-slate-400'
-                  }`}>
-                    {event.label}
-                  </p>
-                  <p className={`text-sm ${
-                    event.completed || event.current ? 'text-slate-600' : 'text-slate-400'
-                  }`}>
-                    {event.description}
-                  </p>
-                  {event.timestamp && (
-                    <p className="text-xs text-slate-400 mt-1">
-                      {new Date(event.timestamp).toLocaleDateString('fr-FR', {
-                        day: 'numeric',
-                        month: 'short',
-                        hour: '2-digit',
-                        minute: '2-digit'
-                      })}
-                    </p>
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Détails de la commande */}
-        <div className="bg-white rounded-3xl p-6 mb-6 shadow-lg">
-          <h3 className="text-lg font-bold text-slate-900 mb-4">Détails</h3>
-          
-          <div className="space-y-3">
+        {/* Détails */}
+        <div className="bg-white rounded-3xl p-8 mb-6 shadow-lg">
+          <h3 className="text-xl font-bold mb-6">Détails de la commande</h3>
+          <div className="space-y-4">
             <div className="flex justify-between">
-              <span className="text-slate-600">Service</span>
-              <span className="font-semibold">
-                {order.service_type === 'express' ? '⚡ Express' : '📦 Standard'}
+              <span className="text-slate-600">Formule</span>
+              <span className="font-bold">
+                {order.formula === 'express' ? '⚡ Express' : '📦 Standard'}
               </span>
             </div>
             <div className="flex justify-between">
               <span className="text-slate-600">Poids</span>
-              <span className="font-semibold">{order.weight_kg} kg</span>
+              <span className="font-bold">{order.weight} kg</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-slate-600">Prix au kg</span>
-              <span className="font-semibold">{order.price_per_kg}€</span>
+              <span className="text-slate-600">Adresse de collecte</span>
+              <span className="font-bold text-right">{order.pickup_address}</span>
             </div>
-            <div className="flex justify-between pt-3 border-t">
-              <span className="text-lg font-bold text-slate-900">Total</span>
-              <span className="text-lg font-bold text-purple-600">{order.total_amount}€</span>
+            <div className="flex justify-between">
+              <span className="text-slate-600">Date de collecte</span>
+              <span className="font-bold">
+                {new Date(order.pickup_date).toLocaleDateString('fr-FR')}
+              </span>
+            </div>
+            <div className="flex justify-between pt-4 border-t">
+              <span className="text-xl font-black">Total</span>
+              <span className="text-xl font-black text-teal-600">{order.total_price} €</span>
             </div>
           </div>
         </div>
 
-        {/* Pressing */}
-        {partner && (
-          <div className="bg-white rounded-3xl p-6 shadow-lg">
-            <h3 className="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
-              <MapPin className="w-5 h-5 text-purple-600" />
-              Pressing
-            </h3>
-            
-            <div className="mb-4">
-              <p className="font-semibold text-slate-900">{partner.name}</p>
-              <p className="text-slate-600">{partner.address}</p>
-              <p className="text-slate-600">{partner.postal_code} {partner.city}</p>
-            </div>
-
-            <div className="flex gap-3">
-              {partner.phone && (
-                <a
-                  href={`tel:${partner.phone}`}
-                  className="flex-1 py-3 bg-purple-100 text-purple-700 rounded-xl font-semibold text-center hover:bg-purple-200 transition flex items-center justify-center gap-2"
-                >
-                  <Phone className="w-4 h-4" />
-                  Appeler
-                </a>
-              )}
-              {partner.latitude && partner.longitude && (
-                <a
-                  href={`https://www.google.com/maps/dir/?api=1&destination=${partner.latitude},${partner.longitude}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex-1 py-3 bg-slate-100 text-slate-700 rounded-xl font-semibold text-center hover:bg-slate-200 transition flex items-center justify-center gap-2"
-                >
-                  <Truck className="w-4 h-4" />
-                  Itinéraire
-                </a>
-              )}
-            </div>
-          </div>
-        )}
-
-        {/* Bouton avis (si terminée) */}
-        {order.status === 'completed' && (
+        {/* Signaler un problème */}
+        {order.status === 'completed' && !showDisputeForm && (
           <button
-            onClick={() => navigate(`/review/${orderId}`)}
-            className="w-full mt-6 py-4 bg-gradient-to-r from-yellow-500 to-orange-500 text-white rounded-2xl font-bold text-lg hover:shadow-xl transition flex items-center justify-center gap-2"
+            onClick={() => setShowDisputeForm(true)}
+            className="w-full py-4 bg-red-50 border-2 border-red-200 text-red-700 rounded-2xl font-bold hover:bg-red-100 flex items-center justify-center gap-2 mb-6"
           >
-            <Star className="w-5 h-5" />
-            Laisser un avis
+            <AlertCircle size={20} />
+            Signaler un problème
           </button>
         )}
-      </div>
 
-      {/* Modal QR Code plein écran */}
-      {showQR && (
-        <div 
-          className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4"
-          onClick={() => setShowQR(false)}
-        >
-          <div className="bg-white rounded-3xl p-8 max-w-sm w-full text-center">
-            <img 
-              src={qrCodeUrl} 
-              alt="QR Code" 
-              className="w-full max-w-[300px] mx-auto"
-            />
-            <p className="text-2xl font-bold text-purple-600 mt-4">
-              #{orderId?.slice(0, 8).toUpperCase()}
-            </p>
-            <p className="text-slate-500 mt-2">
-              Présentez ce code au pressing
-            </p>
-            <button
-              onClick={() => setShowQR(false)}
-              className="mt-6 px-6 py-3 bg-slate-100 text-slate-700 rounded-xl font-semibold hover:bg-slate-200 transition"
-            >
-              Fermer
-            </button>
+        {/* Formulaire litige */}
+        {showDisputeForm && (
+          <div className="bg-white rounded-3xl p-8 mb-6 shadow-lg border-2 border-red-200">
+            <h3 className="text-xl font-bold mb-4 text-red-700">Signaler un problème</h3>
+            
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-bold mb-2">Type de problème</label>
+                <select
+                  value={disputeType}
+                  onChange={(e) => setDisputeType(e.target.value)}
+                  className="w-full p-3 border-2 rounded-xl"
+                >
+                  <option value="quality">Qualité du lavage</option>
+                  <option value="lost">Linge perdu</option>
+                  <option value="damage">Linge endommagé</option>
+                  <option value="delay">Retard</option>
+                  <option value="other">Autre</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-bold mb-2">Description détaillée</label>
+                <textarea
+                  value={disputeDescription}
+                  onChange={(e) => setDisputeDescription(e.target.value)}
+                  placeholder="Expliquez le problème en détail..."
+                  rows={4}
+                  className="w-full p-3 border-2 rounded-xl"
+                />
+              </div>
+
+              <div className="bg-orange-50 border border-orange-200 rounded-xl p-4">
+                <p className="text-sm text-orange-800">
+                  ⏰ Si aucune réponse sous 48h, un remboursement automatique sera effectué.
+                </p>
+              </div>
+
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setShowDisputeForm(false)}
+                  className="flex-1 py-3 bg-slate-100 rounded-xl font-bold"
+                >
+                  Annuler
+                </button>
+                <button
+                  onClick={handleSubmitDispute}
+                  className="flex-1 py-3 bg-red-600 text-white rounded-xl font-bold"
+                >
+                  Envoyer
+                </button>
+              </div>
+            </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 }
