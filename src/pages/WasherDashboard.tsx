@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
 import Navbar from '../components/Navbar';
-import { DollarSign, Package, Clock, MapPin, Check, Star, TrendingUp, Loader2 } from 'lucide-react';
+import { DollarSign, Package, Clock, MapPin, Check, Star, TrendingUp, Loader2, AlertCircle } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 interface WasherStats {
@@ -16,14 +16,15 @@ interface Mission {
   id: string;
   client_id: string;
   weight: number;
-  service_type: string;
+  formula: string;
   total_price: number;
-  washer_earnings: number;
   status: string;
   pickup_address: string;
   pickup_date: string;
-  client_notes: string;
+  pickup_lat: number | null;
+  pickup_lng: number | null;
   created_at: string;
+  assigned_at: string | null;
   completed_at: string | null;
 }
 
@@ -41,10 +42,11 @@ export default function WasherDashboard() {
   const [washerStatus, setWasherStatus] = useState<string>('pending');
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'available' | 'active' | 'history'>('available');
+  const [isAvailable, setIsAvailable] = useState(true);
 
   useEffect(() => {
     fetchWasherData();
-    const interval = setInterval(fetchWasherData, 30000); // Refresh toutes les 30s
+    const interval = setInterval(fetchWasherData, 30000);
     return () => clearInterval(interval);
   }, []);
 
@@ -59,7 +61,7 @@ export default function WasherDashboard() {
       // Récupérer le profil Washer
       const { data: washerProfile, error: washerError } = await supabase
         .from('washers')
-        .select('id, status')
+        .select('id, status, is_available')
         .eq('user_id', user.id)
         .single();
 
@@ -70,62 +72,54 @@ export default function WasherDashboard() {
 
       setWasherId(washerProfile.id);
       setWasherStatus(washerProfile.status);
+      setIsAvailable(washerProfile.is_available ?? true);
 
       if (washerProfile.status !== 'approved') {
         setLoading(false);
         return;
       }
 
-      // Missions disponibles
+      // ✅ MISSIONS DISPONIBLES (commandes sans washer_id et status=confirmed)
       const { data: available } = await supabase
-        .from('washer_orders')
+        .from('orders')
         .select('*')
         .is('washer_id', null)
-        .eq('status', 'pending')
+        .is('partner_id', null)
+        .eq('status', 'confirmed')
         .order('created_at', { ascending: false })
         .limit(20);
 
       setAvailableMissions(available || []);
 
-      // Mes missions
+      // ✅ MES MISSIONS (commandes assignées à moi)
       const { data: myOrders } = await supabase
-        .from('washer_orders')
+        .from('orders')
         .select('*')
         .eq('washer_id', washerProfile.id)
-        .order('created_at', { ascending: false});
+        .order('created_at', { ascending: false });
 
       if (myOrders) {
         setMyMissions(myOrders);
         
+        // Commission Washer : 60% du prix (3€ standard = 1.80€, 5€ express = 3€)
         const earnings = myOrders
           .filter(o => o.status === 'completed')
-          .reduce((sum, o) => sum + parseFloat(o.washer_earnings || 0), 0);
+          .reduce((sum, o) => {
+            const commission = o.formula === 'express' ? 0.6 : 0.6; // 60% dans les deux cas
+            return sum + (parseFloat(o.total_price) * commission);
+          }, 0);
         
         const completed = myOrders.filter(o => o.status === 'completed').length;
         const pending = myOrders.filter(o => 
-          o.status !== 'completed' && o.status !== 'cancelled'
+          o.status === 'assigned' || o.status === 'in_progress'
         ).length;
 
-        // Récupérer les notes
-        const { data: ratings } = await supabase
-          .from('washer_ratings')
-          .select('rating')
-          .eq('washer_id', washerProfile.id);
-
-        let avgRating = 0;
-        let totalRatings = 0;
-
-        if (ratings && ratings.length > 0) {
-          totalRatings = ratings.length;
-          avgRating = ratings.reduce((sum, r) => sum + r.rating, 0) / totalRatings;
-        }
-        
         setStats({
           totalEarnings: earnings,
           completedOrders: completed,
           pendingOrders: pending,
-          avgRating: Math.round(avgRating * 10) / 10,
-          totalRatings
+          avgRating: 0, // TODO: Implémenter système de notes
+          totalRatings: 0
         });
       }
     } catch (error) {
@@ -136,17 +130,39 @@ export default function WasherDashboard() {
     }
   };
 
-  const acceptMission = async (orderId: string) => {
+  const toggleAvailability = async () => {
     try {
       const { error } = await supabase
-        .from('washer_orders')
+        .from('washers')
+        .update({ is_available: !isAvailable })
+        .eq('id', washerId);
+
+      if (error) throw error;
+
+      setIsAvailable(!isAvailable);
+      toast.success(isAvailable ? "Vous êtes maintenant indisponible" : "Vous êtes maintenant disponible");
+    } catch (error) {
+      toast.error("Erreur");
+    }
+  };
+
+  const acceptMission = async (orderId: string) => {
+    if (!isAvailable) {
+      toast.error("Activez votre disponibilité d'abord");
+      return;
+    }
+
+    try {
+      const { error } = await supabase
+        .from('orders')
         .update({ 
           washer_id: washerId, 
           status: 'assigned',
+          assigned_at: new Date().toISOString(),
           updated_at: new Date().toISOString()
         })
         .eq('id', orderId)
-        .is('washer_id', null); // Empêche 2 Washers de prendre la même mission
+        .is('washer_id', null);
 
       if (error) throw error;
 
@@ -169,7 +185,7 @@ export default function WasherDashboard() {
       }
 
       const { error } = await supabase
-        .from('washer_orders')
+        .from('orders')
         .update(updates)
         .eq('id', orderId)
         .eq('washer_id', washerId);
@@ -223,12 +239,41 @@ export default function WasherDashboard() {
     );
   }
 
+  const calculateEarnings = (mission: Mission) => {
+    const commission = 0.6; // 60% pour le Washer
+    return (parseFloat(String(mission.total_price)) * commission).toFixed(2);
+  };
+
   return (
     <div className="min-h-screen bg-slate-50">
       <Navbar />
       
       <div className="pt-32 px-4 max-w-7xl mx-auto pb-12">
-        <h1 className="text-3xl font-black mb-8">Mon Dashboard Washer 💰</h1>
+        <div className="flex justify-between items-center mb-8">
+          <h1 className="text-3xl font-black">Mon Dashboard Washer 💰</h1>
+          
+          {/* Toggle Disponibilité */}
+          <button
+            onClick={toggleAvailability}
+            className={`px-6 py-3 rounded-xl font-bold flex items-center gap-2 transition ${
+              isAvailable 
+                ? 'bg-green-500 text-white hover:bg-green-600' 
+                : 'bg-slate-300 text-slate-600 hover:bg-slate-400'
+            }`}
+          >
+            <div className={`w-3 h-3 rounded-full ${isAvailable ? 'bg-white' : 'bg-slate-500'}`}></div>
+            {isAvailable ? 'Disponible' : 'Indisponible'}
+          </button>
+        </div>
+
+        {!isAvailable && (
+          <div className="bg-orange-50 border border-orange-200 rounded-xl p-4 mb-6 flex items-center gap-3">
+            <AlertCircle className="text-orange-600" size={20} />
+            <p className="text-orange-800 font-medium">
+              Vous êtes indisponible. Activez votre disponibilité pour recevoir des missions.
+            </p>
+          </div>
+        )}
 
         {/* STATS */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
@@ -291,29 +336,30 @@ export default function WasherDashboard() {
         {activeTab === 'available' && (
           <div className="grid md:grid-cols-3 gap-6">
             {availableMissions.map(mission => (
-              <div key={mission.id} className="bg-white rounded-2xl p-6 border">
+              <div key={mission.id} className="bg-white rounded-2xl p-6 border hover:shadow-lg transition">
                 <div className="flex justify-between items-start mb-4">
                   <p className="font-bold text-2xl text-teal-600">
-                    {mission.washer_earnings?.toFixed(2)} €
+                    {calculateEarnings(mission)} €
                   </p>
                   <span className={`px-2 py-1 rounded-full text-xs font-bold ${
-                    mission.service_type === 'express' 
-                      ? 'bg-orange-100 text-orange-700' 
+                    mission.formula === 'express' 
+                      ? 'bg-purple-100 text-purple-700' 
                       : 'bg-blue-100 text-blue-700'
                   }`}>
-                    {mission.service_type === 'express' ? '⚡ Express' : 'Standard'}
+                    {mission.formula === 'express' ? '⚡ Express' : '🟢 Standard'}
                   </span>
                 </div>
                 <p className="text-sm text-slate-600 mb-2 flex items-center gap-2">
                   <MapPin size={14} />
-                  {mission.pickup_address}
+                  {mission.pickup_address?.split(' (')[0] || 'Adresse non définie'}
                 </p>
                 <p className="text-xs text-slate-400 mb-4">
                   {mission.weight} kg • {new Date(mission.pickup_date).toLocaleDateString('fr-FR')}
                 </p>
                 <button
                   onClick={() => acceptMission(mission.id)}
-                  className="w-full py-3 bg-teal-600 text-white rounded-xl font-bold hover:bg-teal-500 flex items-center justify-center gap-2"
+                  disabled={!isAvailable}
+                  className="w-full py-3 bg-teal-600 text-white rounded-xl font-bold hover:bg-teal-500 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed transition"
                 >
                   <Check size={20} />
                   Accepter
@@ -324,6 +370,7 @@ export default function WasherDashboard() {
               <div className="col-span-3 text-center py-20 bg-slate-50 rounded-2xl">
                 <Package size={48} className="mx-auto mb-4 text-slate-300" />
                 <p className="font-bold text-slate-400">Aucune mission disponible</p>
+                <p className="text-sm text-slate-400 mt-2">Les nouvelles commandes apparaîtront ici</p>
               </div>
             )}
           </div>
@@ -332,30 +379,33 @@ export default function WasherDashboard() {
         {activeTab === 'active' && (
           <div>
             {myMissions
-              .filter(m => m.status !== 'completed' && m.status !== 'cancelled')
+              .filter(m => m.status === 'assigned' || m.status === 'in_progress')
               .map(mission => (
                 <div key={mission.id} className="bg-white rounded-2xl p-6 mb-4 border">
                   <div className="flex justify-between items-start">
-                    <div>
-                      <p className="font-bold text-xl mb-2">{mission.washer_earnings?.toFixed(2)} €</p>
+                    <div className="flex-1">
+                      <p className="font-bold text-xl mb-2 text-teal-600">{calculateEarnings(mission)} €</p>
                       <p className="text-sm text-slate-600 flex items-center gap-2 mb-2">
                         <MapPin size={14} />
-                        {mission.pickup_address}
+                        {mission.pickup_address?.split(' (')[0]}
                       </p>
-                      <span className={`px-2 py-1 rounded-full text-xs font-bold ${
+                      <p className="text-xs text-slate-400 mb-3">
+                        {mission.weight} kg • {mission.formula === 'express' ? '⚡ Express' : '🟢 Standard'}
+                      </p>
+                      <span className={`px-3 py-1 rounded-full text-xs font-bold ${
                         mission.status === 'assigned' ? 'bg-blue-100 text-blue-700' :
                         mission.status === 'in_progress' ? 'bg-purple-100 text-purple-700' :
                         'bg-orange-100 text-orange-700'
                       }`}>
-                        {mission.status === 'assigned' && 'Assigné'}
-                        {mission.status === 'in_progress' && 'En cours'}
+                        {mission.status === 'assigned' && '📦 Assigné'}
+                        {mission.status === 'in_progress' && '🔄 En cours'}
                       </span>
                     </div>
                     <div className="flex flex-col gap-2">
                       {mission.status === 'assigned' && (
                         <button
                           onClick={() => updateMissionStatus(mission.id, 'in_progress')}
-                          className="px-6 py-2 bg-purple-600 text-white rounded-lg font-bold hover:bg-purple-500"
+                          className="px-6 py-2 bg-purple-600 text-white rounded-lg font-bold hover:bg-purple-500 whitespace-nowrap"
                         >
                           ▶ Commencer
                         </button>
@@ -363,7 +413,7 @@ export default function WasherDashboard() {
                       {mission.status === 'in_progress' && (
                         <button
                           onClick={() => updateMissionStatus(mission.id, 'completed')}
-                          className="px-6 py-2 bg-green-600 text-white rounded-lg font-bold hover:bg-green-500"
+                          className="px-6 py-2 bg-green-600 text-white rounded-lg font-bold hover:bg-green-500 whitespace-nowrap"
                         >
                           ✅ Terminer
                         </button>
@@ -372,7 +422,7 @@ export default function WasherDashboard() {
                   </div>
                 </div>
               ))}
-            {myMissions.filter(m => m.status !== 'completed' && m.status !== 'cancelled').length === 0 && (
+            {myMissions.filter(m => m.status === 'assigned' || m.status === 'in_progress').length === 0 && (
               <div className="text-center py-20 bg-slate-50 rounded-2xl">
                 <Clock size={48} className="mx-auto mb-4 text-slate-300" />
                 <p className="font-bold text-slate-400">Aucune mission active</p>
@@ -388,13 +438,13 @@ export default function WasherDashboard() {
               .map(mission => (
                 <div key={mission.id} className="bg-white rounded-2xl p-6 mb-4 border flex justify-between items-center">
                   <div>
-                    <p className="font-bold text-green-600">+{mission.washer_earnings?.toFixed(2)} €</p>
+                    <p className="font-bold text-green-600">+{calculateEarnings(mission)} €</p>
                     <p className="text-sm text-slate-500">
-                      {new Date(mission.completed_at || mission.created_at).toLocaleDateString('fr-FR')}
+                      {new Date(mission.completed_at || mission.created_at).toLocaleDateString('fr-FR')} • {mission.weight}kg
                     </p>
                   </div>
                   <span className="px-3 py-1 bg-green-50 text-green-700 rounded-full text-xs font-bold">
-                    Terminé
+                    ✅ Terminé
                   </span>
                 </div>
               ))}
