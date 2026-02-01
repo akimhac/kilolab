@@ -28,10 +28,9 @@ export default function NewOrder() {
 
   useEffect(() => { 
     fetchPartners();
-    requestGeolocation(); // ← NOUVEAU
+    requestGeolocation();
   }, []);
 
-  // ✅ NOUVEAU : Demande géolocalisation
   const requestGeolocation = () => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
@@ -76,7 +75,6 @@ export default function NewOrder() {
     setSearchDone(false);
 
     setTimeout(() => {
-      // Recherche par ville OU code postal
       const results = allPartners.filter(p => 
         (p.city && p.city.toLowerCase().includes(searchQuery.toLowerCase())) ||
         (p.postal_code && p.postal_code.includes(searchQuery)) ||
@@ -151,7 +149,6 @@ export default function NewOrder() {
         return;
       }
 
-      // ✅ NOUVEAU : Vérification email si pas confirmé
       if (!user.email_confirmed_at) {
         toast.error('⚠️ Veuillez confirmer votre email avant de commander');
         setLoading(false);
@@ -162,16 +159,19 @@ export default function NewOrder() {
       const cleanDate = pickupDate || new Date().toISOString().split('T')[0];
       const fullAddressInfo = `${finalAddress} (${searchQuery}) - Créneau : ${pickupSlot}`;
 
+      // ✅ MODIFICATION ICI : Ajout de pickup_lat et pickup_lng
       const { data: order, error } = await supabase.from('orders').insert({
         client_id: user.id,
         partner_id: isNetwork ? null : selectedPartnerId,
         weight: weight,
         pickup_address: fullAddressInfo,
+        pickup_lat: userLocation?.lat || null,       // ← LIGNE AJOUTÉE
+        pickup_lng: userLocation?.lng || null,       // ← LIGNE AJOUTÉE
         pickup_date: cleanDate,
         total_price: totalPrice,
         status: 'pending',
         formula: formula,
-        pickup_slot: pickupSlot // ← NOUVEAU : Stockage du créneau
+        pickup_slot: pickupSlot
       })
       .select()
       .single();
@@ -196,7 +196,6 @@ export default function NewOrder() {
       <div className="pt-32 max-w-3xl mx-auto px-4 w-full">
         <h1 className="text-3xl font-bold mb-8 text-center">Nouvelle Commande</h1>
         
-        {/* PROGRESSION */}
         <div className="flex justify-center mb-8 text-xs md:text-sm overflow-x-auto">
           {['Formule', 'Poids', 'Localisation', 'Date', 'Paiement'].map((label, i) => (
             <div 
@@ -222,7 +221,6 @@ export default function NewOrder() {
               </h2>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                {/* ÉCO */}
                 <div 
                   onClick={() => setFormula('eco')} 
                   className={`group p-6 border-2 rounded-2xl cursor-pointer transition-all transform hover:scale-105 ${
@@ -254,7 +252,6 @@ export default function NewOrder() {
                   </div>
                 </div>
 
-                {/* EXPRESS */}
                 <div 
                   onClick={() => setFormula('express')} 
                   className={`group p-6 border-2 rounded-2xl cursor-pointer transition-all transform hover:scale-105 relative ${
@@ -394,7 +391,6 @@ export default function NewOrder() {
                 </button>
               </div>
 
-              {/* CARTE VISUELLE */}
               <div className="flex-1 relative rounded-2xl overflow-hidden bg-slate-100 border-2 border-slate-200 min-h-[300px]">
                 <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1569336415962-a4bd9f69c07b?q=80&w=1000&auto=format&fit=crop')] bg-cover bg-center opacity-30 blur-sm"></div>
                 
@@ -465,7 +461,6 @@ export default function NewOrder() {
               </h2>
 
               <div className="space-y-6">
-                {/* DATE */}
                 <div>
                   <label className="block text-sm font-bold text-slate-700 mb-2">
                     📅 Date de dépôt
@@ -487,7 +482,6 @@ export default function NewOrder() {
                   )}
                 </div>
 
-                {/* CRÉNEAU */}
                 <div>
                   <label className="block text-sm font-bold text-slate-700 mb-2">
                     🕐 Créneau horaire (indicatif)
@@ -504,13 +498,11 @@ export default function NewOrder() {
                   </select>
                 </div>
 
-                {/* ZONE CONFIRMÉE */}
                 <div className="bg-teal-50 border-2 border-teal-200 p-5 rounded-xl">
                   <p className="text-sm font-bold text-teal-700 mb-2">📍 Zone de collecte</p>
                   <p className="text-teal-900 font-black text-xl">{searchQuery}</p>
                 </div>
 
-                {/* ADRESSE EXACTE */}
                 <div>
                   <label className="block text-sm font-bold text-slate-700 mb-2">
                     🏠 Adresse précise de retrait
@@ -524,7 +516,6 @@ export default function NewOrder() {
                   />
                 </div>
 
-                {/* CHOIX PRESSING (SI DISPONIBLE) */}
                 {filteredPartners.length > 0 && (
                   <div>
                     <label className="block text-sm font-bold text-slate-700 mb-2">
