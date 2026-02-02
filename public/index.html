@@ -53,17 +53,17 @@
     <meta name="googlebot" content="index, follow" />
     <meta name="author" content="Kilolab" />
     
-    <!-- SEO -->
-    <title>Kilolab - Laverie Collaborative à Lille & Nantes | Dès 3€/kg</title>
-    <meta name="description" content="Faites laver votre linge au kilo par des particuliers à Lille et Nantes. Devenez Washer et gagnez de l'argent depuis chez vous. Paiement sécurisé, retrait 24h, 100% local. Dès 3€/kg." />
-    <meta name="keywords" content="laverie collaborative, pressing au kilo, linge au kilo, washer, Lille, Nantes, économie collaborative, laverie pas cher, pressing express" />
+    <!-- SEO PRINCIPAL - FOCUS CLIENT (Ceux qui paient) -->
+    <title>Kilolab - Pressing à Domicile | Collecte & Livraison à Lille & Nantes</title>
+    <meta name="description" content="Libérez-vous de la corvée de lessive ! Kilolab collecte votre linge à domicile, le lave et vous le livre propre en 48h. Service collaboratif de confiance. Dès 3€/kg à Lille et Nantes." />
+    <meta name="keywords" content="pressing à domicile, laverie à domicile, linge à domicile, pressing Lille, pressing Nantes, collecte linge, livraison linge, pressing collaboratif, laverie collaborative" />
     
-    <!-- Open Graph -->
+    <!-- Open Graph (Facebook, LinkedIn, WhatsApp) -->
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://kilolab.fr/" />
     <meta property="og:site_name" content="Kilolab" />
-    <meta property="og:title" content="Kilolab - Laverie Collaborative" />
-    <meta property="og:description" content="Faites laver votre linge au kilo par des particuliers. Devenez Washer et gagnez de l'argent depuis chez vous." />
+    <meta property="og:title" content="Kilolab - Pressing à Domicile | Collecte & Livraison" />
+    <meta property="og:description" content="Libérez-vous de la corvée de lessive ! Collecte et livraison à domicile en 48h. Service collaboratif de confiance." />
     <meta property="og:image" content="https://kilolab.fr/og-image.jpg" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
@@ -72,8 +72,8 @@
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:url" content="https://kilolab.fr/" />
-    <meta name="twitter:title" content="Kilolab - Laverie Collaborative" />
-    <meta name="twitter:description" content="Faites laver votre linge au kilo par des particuliers." />
+    <meta name="twitter:title" content="Kilolab - Pressing à Domicile" />
+    <meta name="twitter:description" content="Collecte et livraison de linge à domicile en 48h. Dès 3€/kg." />
     <meta name="twitter:image" content="https://kilolab.fr/og-image.jpg" />
     
     <!-- Canonical -->
@@ -85,14 +85,15 @@
     <meta name="geo.position" content="50.6292;3.0573" />
     <meta name="ICBM" content="50.6292, 3.0573" />
     
-    <!-- Schema.org -->
+    <!-- Schema.org - LocalBusiness -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
       "@type": "LocalBusiness",
+      "@id": "https://kilolab.fr",
       "name": "Kilolab",
       "image": "https://kilolab.fr/logo.png",
-      "description": "Laverie collaborative à Lille et Nantes. Service de linge au kilo.",
+      "description": "Service de pressing à domicile. Collecte, lavage et livraison de votre linge en 48h. Service collaboratif de confiance à Lille et Nantes.",
       "url": "https://kilolab.fr",
       "telephone": "+33-XXX-XXX-XXX",
       "priceRange": "€€",
@@ -110,8 +111,16 @@
         "longitude": 3.0573
       },
       "areaServed": [
-        {"@type": "City", "name": "Lille"},
-        {"@type": "City", "name": "Nantes"}
+        {
+          "@type": "City",
+          "name": "Lille",
+          "sameAs": "https://fr.wikipedia.org/wiki/Lille"
+        },
+        {
+          "@type": "City",
+          "name": "Nantes",
+          "sameAs": "https://fr.wikipedia.org/wiki/Nantes"
+        }
       ],
       "openingHoursSpecification": {
         "@type": "OpeningHoursSpecification",
@@ -125,6 +134,23 @@
         "reviewCount": "127",
         "bestRating": "5",
         "worstRating": "1"
+      },
+      "hasOfferCatalog": {
+        "@type": "OfferCatalog",
+        "name": "Services de pressing",
+        "itemListElement": [
+          {
+            "@type": "Offer",
+            "itemOffered": {
+              "@type": "Service",
+              "name": "Lavage au kilo",
+              "description": "Service de lavage professionnel au kilo"
+            },
+            "price": "3.00",
+            "priceCurrency": "EUR",
+            "availability": "https://schema.org/InStock"
+          }
+        ]
       }
     }
     </script>
