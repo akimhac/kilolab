@@ -8,7 +8,7 @@ export default function CGV() {
 
       <div className="max-w-4xl mx-auto px-4 py-32">
         <h1 className="text-4xl font-extrabold mb-2">Conditions Générales de Vente</h1>
-        <p className="text-slate-500 mb-8">Applicables aux prestations de lavage</p>
+        <p className="text-slate-500 mb-8">Applicables aux prestations de lavage - Version 1.1</p>
 
         <div className="bg-white p-8 md:p-12 rounded-3xl shadow-sm border border-slate-200 space-y-8 text-slate-700 leading-relaxed text-sm md:text-base">
 
@@ -44,17 +44,27 @@ export default function CGV() {
             </p>
           </section>
 
-          <section>
-            <h2 className="text-xl font-bold text-slate-900 mb-2">4. Responsabilité et Indemnisation</h2>
-            <p className="mb-2">
-              En cas de perte ou de détérioration avérée imputable au Washer, l'indemnisation est plafonnée conformément 
-              aux barèmes légaux du nettoyage textile (Décret n°67-295), et ne pourra excéder 10 fois le prix du lavage de l'article concerné.
+          {/* --- AJOUT CRITIQUE POUR LA CONFIANCE (STYLE AIRBNB) --- */}
+          <section className="bg-orange-50 p-6 rounded-xl border border-orange-100">
+            <h2 className="text-xl font-bold text-orange-900 mb-2">4. Responsabilité & Garantie Kilolab</h2>
+            <p className="mb-4 text-orange-800">
+              Bien que Kilolab agisse en qualité d'intermédiaire, nous avons mis en place une protection pour nos utilisateurs.
             </p>
-            <p>
-              Sont exclus de toute indemnisation : l'usure normale, les vêtements sans étiquette de lavage, 
-              et les objets laissés dans les poches.
-            </p>
+            <ul className="list-disc pl-5 space-y-2 text-orange-900 font-medium">
+              <li>
+                <strong>Responsabilité du Washer :</strong> Le Washer est responsable des dommages causés au linge confié (perte, dégradation).
+              </li>
+              <li>
+                <strong>Fonds de Garantie :</strong> En cas de litige avéré et non résolu à l'amiable sous 72h, Kilolab peut indemniser le client à hauteur de <strong>200€ maximum</strong> par commande.
+              </li>
+              <li>
+                <span className="text-xs font-normal text-orange-700 block mt-1">
+                  *Sont exclus de la garantie : l'usure normale, les vêtements sans étiquette d'entretien, et les objets oubliés dans les poches.
+                </span>
+              </li>
+            </ul>
           </section>
+          {/* ------------------------------------------------------- */}
 
           <section>
             <h2 className="text-xl font-bold text-slate-900 mb-2">5. Droit de Rétractation</h2>
