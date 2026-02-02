@@ -30,99 +30,114 @@
       fbq('track', 'PageView');
     </script>
     
-    <!-- Preconnect pour optimiser le chargement -->
+    <!-- Preconnect -->
     <link rel="preconnect" href="https://dhecegehcjelbxydeolg.supabase.co" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
+    <link rel="dns-prefetch" href="https://connect.facebook.net" />
     
-    <!-- Favicon et icônes -->
+    <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="apple-touch-icon" href="/icon.svg" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
     
     <!-- Manifest PWA -->
-    <link rel="manifest" href="/manifest.json" />
+    <link rel="manifest" href="/site.webmanifest" />
     
-    <!-- Meta viewport -->
+    <!-- Meta -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
-    
-    <!-- Meta theme color -->
     <meta name="theme-color" content="#14b8a6" />
+    <meta name="msapplication-TileColor" content="#14b8a6" />
+    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
+    <meta name="googlebot" content="index, follow" />
+    <meta name="author" content="Kilolab" />
     
-    <!-- Meta robots (indexation Google) -->
-    <meta name="robots" content="index, follow" />
+    <!-- SEO -->
+    <title>Kilolab - Laverie Collaborative à Lille & Nantes | Dès 3€/kg</title>
+    <meta name="description" content="Faites laver votre linge au kilo par des particuliers à Lille et Nantes. Devenez Washer et gagnez de l'argent depuis chez vous. Paiement sécurisé, retrait 24h, 100% local. Dès 3€/kg." />
+    <meta name="keywords" content="laverie collaborative, pressing au kilo, linge au kilo, washer, Lille, Nantes, économie collaborative, laverie pas cher, pressing express" />
     
-    <!-- Titre -->
-    <title>Kilolab - Pressing au Kilo | À partir de 3€/kg</title>
-    
-    <!-- Meta description -->
-    <meta name="description" content="Pressing au kilo simple et transparent. Déposez votre linge, récupérez-le propre et plié en 24h. À partir de 3€/kg. Service disponible à Paris et en France." />
-    
-    <!-- Meta keywords -->
-    <meta name="keywords" content="pressing au kilo, laverie, blanchisserie, nettoyage vêtements, pressing Paris, pressing express, pressing pas cher" />
-    
-    <!-- Open Graph (Facebook, LinkedIn) -->
+    <!-- Open Graph -->
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://kilolab.fr/" />
     <meta property="og:site_name" content="Kilolab" />
-    <meta property="og:title" content="Kilolab - Finie la corvée de linge !" />
-    <meta property="og:description" content="Déposez votre linge en 1 minute. Récupérez-le propre et plié en 24h. À partir de 3€/kg." />
-    <meta property="og:image" content="https://images.unsplash.com/photo-1545173168-9f1947eebb7f?q=80&w=1200&auto=format&fit=crop" />
+    <meta property="og:title" content="Kilolab - Laverie Collaborative" />
+    <meta property="og:description" content="Faites laver votre linge au kilo par des particuliers. Devenez Washer et gagnez de l'argent depuis chez vous." />
+    <meta property="og:image" content="https://kilolab.fr/og-image.jpg" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
+    <meta property="og:locale" content="fr_FR" />
     
-    <!-- Twitter Card -->
+    <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Kilolab - Pressing au Kilo" />
-    <meta name="twitter:description" content="Déposez votre linge en 1 minute. Récupérez-le propre et plié en 24h. À partir de 3€/kg." />
-    <meta name="twitter:image" content="https://images.unsplash.com/photo-1545173168-9f1947eebb7f?q=80&w=1200&auto=format&fit=crop" />
+    <meta name="twitter:url" content="https://kilolab.fr/" />
+    <meta name="twitter:title" content="Kilolab - Laverie Collaborative" />
+    <meta name="twitter:description" content="Faites laver votre linge au kilo par des particuliers." />
+    <meta name="twitter:image" content="https://kilolab.fr/og-image.jpg" />
     
-    <!-- Canonical URL -->
+    <!-- Canonical -->
     <link rel="canonical" href="https://kilolab.fr/" />
     
-    <!-- Schema.org pour Google (JSON-LD) -->
+    <!-- GEO -->
+    <meta name="geo.region" content="FR-59" />
+    <meta name="geo.placename" content="Lille, Nantes" />
+    <meta name="geo.position" content="50.6292;3.0573" />
+    <meta name="ICBM" content="50.6292, 3.0573" />
+    
+    <!-- Schema.org -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
       "@type": "LocalBusiness",
       "name": "Kilolab",
-      "description": "Pressing au kilo simple et transparent",
+      "image": "https://kilolab.fr/logo.png",
+      "description": "Laverie collaborative à Lille et Nantes. Service de linge au kilo.",
       "url": "https://kilolab.fr",
-      "telephone": "+33-X-XX-XX-XX-XX",
+      "telephone": "+33-XXX-XXX-XXX",
       "priceRange": "€€",
-      "image": "https://images.unsplash.com/photo-1545173168-9f1947eebb7f?q=80&w=1200",
       "address": {
         "@type": "PostalAddress",
-        "addressCountry": "FR",
-        "addressLocality": "Paris"
+        "streetAddress": "Votre adresse",
+        "addressLocality": "Lille",
+        "addressRegion": "Hauts-de-France",
+        "postalCode": "59000",
+        "addressCountry": "FR"
       },
       "geo": {
         "@type": "GeoCoordinates",
-        "latitude": "48.8566",
-        "longitude": "2.3522"
+        "latitude": 50.6292,
+        "longitude": 3.0573
       },
-      "openingHours": "Mo-Su 08:00-20:00",
+      "areaServed": [
+        {"@type": "City", "name": "Lille"},
+        {"@type": "City", "name": "Nantes"}
+      ],
+      "openingHoursSpecification": {
+        "@type": "OpeningHoursSpecification",
+        "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"],
+        "opens": "00:00",
+        "closes": "23:59"
+      },
       "aggregateRating": {
         "@type": "AggregateRating",
         "ratingValue": "4.8",
-        "reviewCount": "127"
+        "reviewCount": "127",
+        "bestRating": "5",
+        "worstRating": "1"
       }
     }
     </script>
   </head>
   <body>
-    <!-- Google Tag Manager (noscript) -->
+    <!-- GTM noscript -->
     <noscript>
-      <iframe 
-        src="https://www.googletagmanager.com/ns.html?id=GTM-KZ7CGGPL"
-        height="0" 
-        width="0" 
-        style="display:none;visibility:hidden"
-      ></iframe>
+      <iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KZ7CGGPL" height="0" width="0" style="display:none;visibility:hidden"></iframe>
     </noscript>
     
-    <!-- Facebook Pixel (noscript) -->
+    <!-- FB Pixel noscript -->
     <noscript>
-      <img height="1" width="1" style="display:none"
-           src="https://www.facebook.com/tr?id=1573268523913279&ev=PageView&noscript=1"/>
+      <img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=1573268523913279&ev=PageView&noscript=1" alt="" />
     </noscript>
     
     <div id="root"></div>
