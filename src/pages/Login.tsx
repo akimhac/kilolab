@@ -17,11 +17,12 @@ export default function Login() {
   // 🔥 VÉRIFICATION AUTO AU CHARGEMENT
   useEffect(() => {
     checkSession();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const checkSession = async () => {
     const { data: { session } } = await supabase.auth.getSession();
-    
+
     if (session) {
       const { data: profile } = await supabase
         .from('user_profiles')
@@ -29,7 +30,10 @@ export default function Login() {
         .eq('id', session.user.id)
         .single();
 
-      if (profile?.role === 'partner') {
+      // ✅ AJOUT : WASHER en premier
+      if (profile?.role === 'washer') {
+        navigate('/washer-dashboard');
+      } else if (profile?.role === 'partner') {
         navigate('/partner-app');
       } else if (profile?.role === 'admin') {
         navigate('/admin-dashboard');
@@ -49,30 +53,30 @@ export default function Login() {
       if (isSignUp) {
         // 📊 TRACK DÉBUT INSCRIPTION
         analytics.signupStarted();
-        
+
         // 📝 INSCRIPTION
-        const { error } = await supabase.auth.signUp({ 
-          email, 
+        const { error } = await supabase.auth.signUp({
+          email,
           password
         });
-        
+
         if (error) throw error;
-        
+
         // 📊 TRACK SUCCÈS INSCRIPTION
         analytics.signupCompleted("email");
-        
+
         toast.success('Compte créé ! Vérifiez vos emails (et vos spams 📧).');
       } else {
         // 🔐 CONNEXION
-        const { data, error } = await supabase.auth.signInWithPassword({ 
-          email, 
-          password 
+        const { data, error } = await supabase.auth.signInWithPassword({
+          email,
+          password
         });
-        
+
         if (error) throw error;
-        
+
         toast.success('Connexion réussie !');
-        
+
         // 🎯 REDIRECTION selon le rôle
         const { data: profile } = await supabase
           .from('user_profiles')
@@ -80,7 +84,10 @@ export default function Login() {
           .eq('id', data.user.id)
           .single();
 
-        if (profile?.role === 'partner') {
+        // ✅ AJOUT : WASHER en premier
+        if (profile?.role === 'washer') {
+          navigate('/washer-dashboard');
+        } else if (profile?.role === 'partner') {
           navigate('/partner-app');
         } else if (profile?.role === 'admin') {
           navigate('/admin-dashboard');
@@ -99,7 +106,7 @@ export default function Login() {
   if (pageLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-50">
-        <Loader2 className="animate-spin text-teal-600" size={48}/>
+        <Loader2 className="animate-spin text-teal-600" size={48} />
       </div>
     );
   }
@@ -107,10 +114,10 @@ export default function Login() {
   return (
     <div className="min-h-screen bg-slate-50 font-sans text-slate-900">
       <Navbar />
-      
+
       <div className="pt-32 pb-20 px-4 flex justify-center items-center min-h-[80vh]">
         <div className="bg-white p-8 md:p-10 rounded-3xl shadow-xl w-full max-w-md border border-slate-100">
-          
+
           <div className="text-center mb-8">
             <h1 className="text-3xl font-black mb-2">
               {isSignUp ? 'Créer un compte' : 'Bon retour !'}
@@ -120,14 +127,14 @@ export default function Login() {
 
           {/* TOGGLE */}
           <div className="flex bg-slate-100 p-1 rounded-xl mb-8">
-            <button 
-              onClick={() => setIsSignUp(false)} 
+            <button
+              onClick={() => setIsSignUp(false)}
               className={`flex-1 py-2 rounded-lg text-sm font-bold transition ${!isSignUp ? 'bg-white shadow-sm text-slate-900' : 'text-slate-500'}`}
             >
               Connexion
             </button>
-            <button 
-              onClick={() => setIsSignUp(true)} 
+            <button
+              onClick={() => setIsSignUp(true)}
               className={`flex-1 py-2 rounded-lg text-sm font-bold transition ${isSignUp ? 'bg-white shadow-sm text-slate-900' : 'text-slate-500'}`}
             >
               Inscription
@@ -136,22 +143,23 @@ export default function Login() {
 
           <form onSubmit={handleAuth} className="space-y-4">
             <div className="relative">
-              <Mail className="absolute top-3.5 left-4 text-slate-400" size={20}/>
-              <input 
-                type="email" 
-                required 
-                placeholder="Votre email" 
+              <Mail className="absolute top-3.5 left-4 text-slate-400" size={20} />
+              <input
+                type="email"
+                required
+                placeholder="Votre email"
                 value={email}
                 onChange={e => setEmail(e.target.value)}
                 className="w-full pl-12 pr-4 py-3 rounded-xl border border-slate-200 focus:border-teal-500 outline-none transition bg-slate-50 focus:bg-white"
               />
             </div>
+
             <div className="relative">
-              <Lock className="absolute top-3.5 left-4 text-slate-400" size={20}/>
-              <input 
-                type="password" 
-                required 
-                placeholder="Mot de passe" 
+              <Lock className="absolute top-3.5 left-4 text-slate-400" size={20} />
+              <input
+                type="password"
+                required
+                placeholder="Mot de passe"
                 value={password}
                 onChange={e => setPassword(e.target.value)}
                 className="w-full pl-12 pr-4 py-3 rounded-xl border border-slate-200 focus:border-teal-500 outline-none transition bg-slate-50 focus:bg-white"
@@ -166,16 +174,16 @@ export default function Login() {
               </div>
             )}
 
-            <button 
-              type="submit" 
+            <button
+              type="submit"
               disabled={loading}
               className="w-full bg-slate-900 text-white py-4 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-slate-800 transition shadow-lg mt-6"
             >
               {loading ? (
-                <Loader2 className="animate-spin"/>
+                <Loader2 className="animate-spin" />
               ) : (
                 <>
-                  {isSignUp ? "S'inscrire" : 'Se connecter'} <ArrowRight size={20}/>
+                  {isSignUp ? "S'inscrire" : 'Se connecter'} <ArrowRight size={20} />
                 </>
               )}
             </button>
