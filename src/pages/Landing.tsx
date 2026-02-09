@@ -36,7 +36,7 @@ export default function Landing() {
         <title>Kilolab - Votre pressing à domicile | Lille & Nantes</title>
         <meta 
           name="description" 
-          content="Ne perdez plus votre temps. Kilolab lave, sèche et plie votre linge pour 5€/kg. Collecte et livraison incluses." 
+          content="Ne perdez plus votre temps. Kilolab lave, sèche et plie votre linge pour 3€/kg. Collecte et livraison incluses." 
         />
         <link rel="canonical" href="https://kilolab.fr" />
       </Helmet>
@@ -82,7 +82,7 @@ export default function Landing() {
                 to="/tarifs"
                 className="inline-flex items-center justify-center px-8 py-5 bg-white/10 backdrop-blur-md text-white border-2 border-white/20 rounded-full font-bold text-lg hover:bg-white hover:text-slate-900 transition-all"
               >
-                Voir les tarifs (5€/kg)
+                Voir les tarifs (3€/kg)
               </Link>
             </div>
 
