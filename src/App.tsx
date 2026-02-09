@@ -85,15 +85,22 @@ export default function App() {
       <Suspense fallback={<PageLoader />}>
         <Routes>
           <Route path="/" element={<Landing />} />
-          
+
           {/* ✅ WASHER (FUSIONNÉ) */}
           <Route path="/washers" element={<BecomeWasher />} />
           <Route path="/become-washer" element={<BecomeWasher />} />
-          <Route path="/washer-dashboard" element={<PrivateRoute><WasherDashboard /></PrivateRoute>} />
+          <Route
+            path="/washer-dashboard"
+            element={
+              <PrivateRoute>
+                <WasherDashboard />
+              </PrivateRoute>
+            }
+          />
 
           <Route path="/select-dashboard" element={<SelectDashboard />} />
           <Route path="/select-signup" element={<SelectSignup />} />
-          
+
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
@@ -110,31 +117,148 @@ export default function App() {
           <Route path="/blog" element={<Blog />} />
           <Route path="/for-who" element={<ForWho />} />
 
-          <Route path="/user-profile" element={<PrivateRoute><UserProfile /></PrivateRoute>} />
-          <Route path="/dashboard" element={<PrivateRoute><ClientDashboard /></PrivateRoute>} />
-          <Route path="/client-dashboard" element={<PrivateRoute><ClientDashboard /></PrivateRoute>} />
-          <Route path="/settings" element={<PrivateRoute><Settings /></PrivateRoute>} />
-          <Route path="/referral" element={<PrivateRoute><Referral /></PrivateRoute>} />
-          <Route path="/order/:orderId" element={<PrivateRoute><OrderTracking /></PrivateRoute>} />
-          <Route path="/pickup-qr/:orderId" element={<PrivateRoute><PickupQR /></PrivateRoute>} />
-          <Route path="/invoice/:orderId" element={<PrivateRoute><Invoice /></PrivateRoute>} />
+          <Route
+            path="/user-profile"
+            element={
+              <PrivateRoute>
+                <UserProfile />
+              </PrivateRoute>
+            }
+          />
+
+          {/* ✅ AJOUT : Alias profile */}
+          <Route
+            path="/profile"
+            element={
+              <PrivateRoute>
+                <UserProfile />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/mon-compte"
+            element={
+              <PrivateRoute>
+                <UserProfile />
+              </PrivateRoute>
+            }
+          />
+
+          <Route
+            path="/dashboard"
+            element={
+              <PrivateRoute>
+                <ClientDashboard />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/client-dashboard"
+            element={
+              <PrivateRoute>
+                <ClientDashboard />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/settings"
+            element={
+              <PrivateRoute>
+                <Settings />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/referral"
+            element={
+              <PrivateRoute>
+                <Referral />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/order/:orderId"
+            element={
+              <PrivateRoute>
+                <OrderTracking />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/pickup-qr/:orderId"
+            element={
+              <PrivateRoute>
+                <PickupQR />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/invoice/:orderId"
+            element={
+              <PrivateRoute>
+                <Invoice />
+              </PrivateRoute>
+            }
+          />
 
           <Route path="/partner" element={<PartnerLanding />} />
           <Route path="/become-partner" element={<BecomePartner />} />
           <Route path="/partner-guide" element={<PartnerGuide />} />
           <Route path="/partner-pending" element={<PartnerPending />} />
           <Route path="/partner-terms" element={<PartnerTerms />} />
-          <Route path="/partner-dashboard" element={<PrivateRoute><PartnerDashboard /></PrivateRoute>} />
-          <Route path="/partner-app" element={<PrivateRoute><PartnerDashboard /></PrivateRoute>} />
-          <Route path="/connect-stripe" element={<PrivateRoute><ConnectStripe /></PrivateRoute>} />
+          <Route
+            path="/partner-dashboard"
+            element={
+              <PrivateRoute>
+                <PartnerDashboard />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/partner-app"
+            element={
+              <PrivateRoute>
+                <PartnerDashboard />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/connect-stripe"
+            element={
+              <PrivateRoute>
+                <ConnectStripe />
+              </PrivateRoute>
+            }
+          />
 
           <Route path="/payment-success" element={<PaymentSuccess />} />
           <Route path="/payment-cancel" element={<PaymentCancel />} />
 
           <Route path="/admin/login" element={<SuperAccess />} />
-          <Route path="/admin" element={<ProtectedAdminRoute><AdminDashboard /></ProtectedAdminRoute>} />
-          <Route path="/admin-dashboard" element={<ProtectedAdminRoute><AdminDashboard /></ProtectedAdminRoute>} />
-          <Route path="/scan-qr" element={<ProtectedAdminRoute><ScanQR /></ProtectedAdminRoute>} />
+          <Route
+            path="/admin"
+            element={
+              <ProtectedAdminRoute>
+                <AdminDashboard />
+              </ProtectedAdminRoute>
+            }
+          />
+          <Route
+            path="/admin-dashboard"
+            element={
+              <ProtectedAdminRoute>
+                <AdminDashboard />
+              </ProtectedAdminRoute>
+            }
+          />
+          <Route
+            path="/scan-qr"
+            element={
+              <ProtectedAdminRoute>
+                <ScanQR />
+              </ProtectedAdminRoute>
+            }
+          />
 
           <Route path="/legal" element={<Legal />} />
           <Route path="/cgu" element={<CGU />} />
