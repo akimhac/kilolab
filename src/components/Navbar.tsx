@@ -47,7 +47,7 @@ export default function Navbar() {
     if (!profile) return '/dashboard';
     if (profile.role === 'admin') return '/admin';
     if (profile.role === 'partner') return '/partner-dashboard';
-    if (profile.role === 'washer') return '/washer-app';
+    if (profile.role === 'washer') return '/washer-dashboard';
     return '/dashboard';
   };
 
