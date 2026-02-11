@@ -4,7 +4,7 @@ import { supabase } from '../lib/supabase';
 import Navbar from '../components/Navbar';
 import {
   Scale, MapPin, ArrowRight, Sparkles, Tag, Search,
-  Loader2, Calendar as CalendarIcon, Info, CheckCircle, CreditCard
+  Loader2, Calendar as CalendarIcon, Info, CheckCircle, CreditCard, Gift
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -30,6 +30,12 @@ export default function NewOrder() {
   const [finalAddress, setFinalAddress] = useState('');
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
 
+  // ✅ COUPONS
+  const [couponCode, setCouponCode] = useState('');
+  const [couponDiscount, setCouponDiscount] = useState(0);
+  const [couponApplied, setCouponApplied] = useState(false);
+  const [couponLoading, setCouponLoading] = useState(false);
+
   useEffect(() => {
     fetchPartners();
     requestGeolocation();
@@ -53,6 +59,13 @@ export default function NewOrder() {
           setSearchQuery(order.search_query || '');
           setFinalAddress(order.final_address || '');
           setStep(order.step || 0);
+
+          // coupons (si jamais tu veux restaurer plus tard)
+          if (order.coupon_code) setCouponCode(order.coupon_code);
+          if (order.coupon_discount) {
+            setCouponDiscount(order.coupon_discount);
+            setCouponApplied(true);
+          }
 
           localStorage.removeItem('kilolab_pending_order');
           toast.success("✅ Panier restauré ! Tu peux continuer ta commande.", { duration: 4000 });
@@ -135,17 +148,62 @@ export default function NewOrder() {
     if (searchDone) setSearchDone(false);
   }, [searchQuery]);
 
+  // ✅ PRIX
   const basePrice = formula === 'eco' ? 3 : 5;
   let total = weight * basePrice;
   if (isWeekend) total += 5;
   const totalPrice = parseFloat(total.toFixed(2));
+  const finalPrice = Math.max(0, parseFloat((totalPrice - couponDiscount).toFixed(2)));
+
+  // ✅ VALIDATION COUPON
+  const validateCoupon = async () => {
+    if (!couponCode.trim()) {
+      toast.error('Entrez un code promo');
+      return;
+    }
+
+    setCouponLoading(true);
+    try {
+      const { data, error } = await supabase.rpc('validate_and_use_coupon', {
+        p_code: couponCode.toUpperCase(),
+        p_order_amount: totalPrice,
+        p_user_id: null
+      });
+
+      if (error) throw error;
+
+      if (data && data.valid) {
+        const discount = parseFloat(data.discount_amount);
+        setCouponDiscount(discount);
+        setCouponApplied(true);
+        toast.success(`✅ -${discount.toFixed(2)}€ appliqués !`);
+      } else {
+        toast.error(data?.error || 'Code promo invalide');
+        setCouponCode('');
+        setCouponDiscount(0);
+        setCouponApplied(false);
+      }
+    } catch (e: any) {
+      console.error('Erreur validation coupon:', e);
+      toast.error('❌ Erreur : ' + (e.message || 'validation coupon'));
+      setCouponCode('');
+      setCouponDiscount(0);
+      setCouponApplied(false);
+    } finally {
+      setCouponLoading(false);
+    }
+  };
 
   const handlePayment = async (orderId: string, email: string) => {
     try {
       toast.loading("🔄 Redirection vers le paiement...", { id: 'payment' });
 
       const { data, error } = await supabase.functions.invoke('create-checkout-session', {
-        body: { orderId, email }
+        body: {
+          orderId,
+          email,
+          finalAmount: finalPrice // ✅ envoie le montant final à Stripe (si ton Edge Function le gère)
+        }
       });
 
       if (error) {
@@ -181,7 +239,11 @@ export default function NewOrder() {
           pickup_slot: pickupSlot,
           search_query: searchQuery,
           final_address: finalAddress,
-          step: step
+          step: step,
+
+          // coupons
+          coupon_code: couponApplied ? couponCode : null,
+          coupon_discount: couponApplied ? couponDiscount : 0
         };
 
         localStorage.setItem('kilolab_pending_order', JSON.stringify(cartData));
@@ -212,10 +274,17 @@ export default function NewOrder() {
           pickup_lat: userLocation?.lat || null,
           pickup_lng: userLocation?.lng || null,
           pickup_date: cleanDate,
-          total_price: totalPrice,
+
+          // ✅ prix final
+          total_price: finalPrice,
+
           status: 'pending',
           formula: formula,
-          pickup_slot: pickupSlot
+          pickup_slot: pickupSlot,
+
+          // ✅ coupons
+          coupon_code: couponApplied ? couponCode.toUpperCase() : null,
+          coupon_discount: couponApplied ? couponDiscount : 0
         })
         .select()
         .single();
@@ -627,9 +696,67 @@ export default function NewOrder() {
                   </div>
                 )}
 
-                <div className="border-t-2 border-slate-300 pt-4 mt-4 flex justify-between items-center">
-                  <span className="font-black text-xl text-slate-900">Total à payer</span>
-                  <span className="font-black text-4xl text-teal-600">{totalPrice.toFixed(2)} €</span>
+                {/* ✅ COUPON */}
+                {!couponApplied ? (
+                  <div className="p-4 bg-teal-50 rounded-xl border border-teal-200">
+                    <label className="block text-sm font-bold text-teal-700 mb-2">
+                      <span className="inline-flex items-center gap-2">
+                        <Gift size={18} /> Code promo
+                      </span>
+                    </label>
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        value={couponCode}
+                        onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
+                        placeholder="PROMO5"
+                        className="flex-1 px-4 py-2 border-2 border-teal-200 rounded-lg focus:border-teal-500 outline-none uppercase font-bold"
+                      />
+                      <button
+                        type="button"
+                        onClick={validateCoupon}
+                        disabled={couponLoading || !couponCode.trim()}
+                        className="px-6 py-2 bg-teal-600 text-white rounded-lg font-bold hover:bg-teal-700 disabled:opacity-50 disabled:cursor-not-allowed transition flex items-center justify-center"
+                      >
+                        {couponLoading ? <Loader2 className="animate-spin" size={18} /> : 'Valider'}
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="p-4 bg-green-50 rounded-xl border-2 border-green-200 flex justify-between items-center">
+                    <div>
+                      <p className="text-sm font-bold text-green-700">✅ Code promo appliqué</p>
+                      <p className="text-xs text-green-600 font-mono">{couponCode}</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-xl font-black text-green-700">-{couponDiscount.toFixed(2)}€</p>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setCouponApplied(false);
+                          setCouponDiscount(0);
+                          setCouponCode('');
+                        }}
+                        className="text-xs text-green-600 hover:text-green-800 underline mt-1"
+                      >
+                        Retirer
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {/* ✅ TOTAL */}
+                <div className="border-t-2 border-slate-300 pt-4 mt-4">
+                  {couponApplied && (
+                    <div className="flex justify-between items-center mb-2 text-slate-600">
+                      <span className="font-medium">Sous-total</span>
+                      <span className="font-bold line-through">{totalPrice.toFixed(2)} €</span>
+                    </div>
+                  )}
+                  <div className="flex justify-between items-center">
+                    <span className="font-black text-xl text-slate-900">Total à payer</span>
+                    <span className="font-black text-4xl text-teal-600">{finalPrice.toFixed(2)} €</span>
+                  </div>
                 </div>
               </div>
 
@@ -658,7 +785,7 @@ export default function NewOrder() {
                   ) : (
                     <>
                       <CreditCard size={24} />
-                      Payer {totalPrice.toFixed(2)}€
+                      Payer {finalPrice.toFixed(2)}€
                     </>
                   )}
                 </button>
