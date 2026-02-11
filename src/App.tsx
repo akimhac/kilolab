@@ -7,6 +7,9 @@ import ScrollToTop from './components/ScrollToTop';
 import ProtectedAdminRoute from './components/ProtectedAdminRoute';
 import PrivateRoute from './components/PrivateRoute';
 
+// ✅ AJOUT : Popup Instagram
+import InstagramPromoPopup from './components/InstagramPromoPopup';
+
 // Imports directs
 import Landing from './pages/Landing';
 import Login from './pages/Login';
@@ -82,6 +85,10 @@ export default function App() {
           error: { iconTheme: { primary: '#ef4444', secondary: '#fff' } },
         }}
       />
+
+      {/* ✅ AJOUT : POPUP INSTAGRAM */}
+      <InstagramPromoPopup />
+
       <Suspense fallback={<PageLoader />}>
         <Routes>
           <Route path="/" element={<Landing />} />
