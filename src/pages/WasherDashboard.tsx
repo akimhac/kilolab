@@ -343,10 +343,10 @@ export default function WasherDashboard() {
 
       const { data, error } = await supabase.functions.invoke('create-stripe-connect-account', {
         body: { 
-          washerId,
+          user_id: washerId,
           email: washerData.email,
-          firstName,
-          lastName
+          full_name: washerData.full_name,
+          role: 'washer'
         }
       });
 
