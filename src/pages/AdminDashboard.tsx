@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { MouseEvent } from "react";
 import { supabase } from "../lib/supabase";
 import Navbar from "../components/Navbar";
@@ -9,7 +9,6 @@ import {
   Search,
   Download,
   TrendingUp,
-  MapPin,
   Package,
   Loader2,
   MessageSquare,
@@ -25,8 +24,11 @@ import {
   BarChart3,
   RefreshCw,
   AlertCircle,
+  AlertTriangle,
   X,
   Phone,
+  Shield,
+  Tag,
 } from "lucide-react";
 import {
   LineChart,
@@ -45,6 +47,22 @@ import {
 } from "recharts";
 import toast from "react-hot-toast";
 
+type TimeRange = "7d" | "30d" | "90d" | "all";
+type Tab =
+  | "overview"
+  | "partners"
+  | "washers"
+  | "clients"
+  | "orders"
+  | "messages"
+  | "logs"
+  | "coupons";
+
+type PartnerStatusFilter = "all" | "active" | "pending";
+type WasherFilter = "all" | "pending" | "approved" | "rejected";
+
+type CouponType = "percentage" | "fixed";
+
 export default function AdminDashboard() {
   // --- ÉTATS ---
   const [orders, setOrders] = useState<any[]>([]);
@@ -52,18 +70,16 @@ export default function AdminDashboard() {
   const [clients, setClients] = useState<any[]>([]);
   const [messages, setMessages] = useState<any[]>([]);
   const [washers, setWashers] = useState<any[]>([]);
+  const [errorLogs, setErrorLogs] = useState<any[]>([]);
+  const [coupons, setCoupons] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   // Filtres & UI
-  const [timeRange, setTimeRange] = useState<"7d" | "30d" | "90d" | "all">("30d");
-  const [activeTab, setActiveTab] = useState<
-    "overview" | "partners" | "clients" | "orders" | "messages" | "washers"
-  >("overview");
+  const [timeRange, setTimeRange] = useState<TimeRange>("30d");
+  const [activeTab, setActiveTab] = useState<Tab>("overview");
   const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState<"all" | "active" | "pending">("all");
-  const [washerFilter, setWasherFilter] = useState<"all" | "pending" | "approved" | "rejected">(
-    "all"
-  );
+  const [statusFilter, setStatusFilter] = useState<PartnerStatusFilter>("all");
+  const [washerFilter, setWasherFilter] = useState<WasherFilter>("all");
 
   // Modales & Sélection
   const [selectedMessage, setSelectedMessage] = useState<any>(null);
@@ -72,6 +88,21 @@ export default function AdminDashboard() {
   const [selectedWasher, setSelectedWasher] = useState<any>(null);
   const [showPartnerModal, setShowPartnerModal] = useState(false);
   const [showWasherModal, setShowWasherModal] = useState(false);
+
+  // Nouveau coupon
+  const [newCoupon, setNewCoupon] = useState<{
+    code: string;
+    discount_value: number;
+    discount_type: CouponType;
+    max_uses: number;
+    expires_at: string; // YYYY-MM-DD
+  }>({
+    code: "",
+    discount_value: 5,
+    discount_type: "percentage",
+    max_uses: 100,
+    expires_at: "",
+  });
 
   // --- CHARGEMENT DES DONNÉES ---
   useEffect(() => {
@@ -89,9 +120,10 @@ export default function AdminDashboard() {
         .order("created_at", { ascending: false });
 
       // 2. Partenaires
-      const { data: p } = await supabase.from("partners").select("*").order("created_at", {
-        ascending: false,
-      });
+      const { data: p } = await supabase
+        .from("partners")
+        .select("*")
+        .order("created_at", { ascending: false });
 
       // 3. Messages
       const { data: m } = await supabase
@@ -107,14 +139,30 @@ export default function AdminDashboard() {
         .order("created_at", { ascending: false });
 
       // 5. Washers
-      const { data: w } = await supabase.from("washers").select("*").order("created_at", {
-        ascending: false,
-      });
+      const { data: w } = await supabase
+        .from("washers")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+      // 6. Error logs
+      const { data: logs } = await supabase
+        .from("error_logs")
+        .select("*")
+        .order("created_at", { ascending: false })
+        .limit(200);
+
+      // 7. Coupons
+      const { data: coup } = await supabase
+        .from("coupons")
+        .select("*")
+        .order("created_at", { ascending: false });
 
       setOrders(o || []);
       setMessages(m || []);
       setClients(c || []);
       setWashers(w || []);
+      setErrorLogs(logs || []);
+      setCoupons(coup || []);
 
       // Calcul stats Partenaires
       const partnerStatsMap = new Map<string, { totalOrders: number; totalRevenue: number }>();
@@ -133,7 +181,7 @@ export default function AdminDashboard() {
         const stats = partnerStatsMap.get(partner.id) || { totalOrders: 0, totalRevenue: 0 };
         return {
           ...partner,
-          name: partner.company_name || partner.name || `Partenaire ${partner.id.slice(0, 6)}`,
+          name: partner.company_name || partner.name || `Partenaire ${partner.id?.slice(0, 6)}`,
           city: partner.city || "Non spécifié",
           totalOrders: stats.totalOrders,
           totalRevenue: parseFloat(stats.totalRevenue.toFixed(2)),
@@ -163,11 +211,8 @@ export default function AdminDashboard() {
       return;
     }
 
-    if ((data as any)?.warning) {
-      toast.success("✅ Validé (compte déjà existant)", { id: t });
-    } else {
-      toast.success("✅ Partenaire validé & email envoyé !", { id: t });
-    }
+    if ((data as any)?.warning) toast.success("✅ Validé (compte déjà existant)", { id: t });
+    else toast.success("✅ Partenaire validé & email envoyé !", { id: t });
 
     fetchData();
     if (showPartnerModal) setShowPartnerModal(false);
@@ -199,7 +244,6 @@ export default function AdminDashboard() {
   // --- ACTIONS WASHERS ---
   const approveWasher = async (washerId: string) => {
     const t = toast.loading("⏳ Approbation du Washer...");
-
     try {
       const { error } = await supabase.functions.invoke("approve-washer", {
         body: { washer_id: washerId },
@@ -214,41 +258,33 @@ export default function AdminDashboard() {
       fetchData();
       if (showWasherModal) setShowWasherModal(false);
     } catch (err: any) {
-      console.error("Error approving washer:", err);
+      console.error(err);
       toast.error("❌ Erreur lors de l'approbation", { id: t });
     }
   };
 
   const rejectWasher = async (washerId: string) => {
     if (!confirm("⛔ Êtes-vous sûr de vouloir rejeter ce Washer ?")) return;
-
     const t = toast.loading("⏳ Rejet...");
-
     const { error } = await supabase.from("washers").update({ status: "rejected" }).eq("id", washerId);
-
     if (error) {
       toast.error("❌ Erreur: " + error.message, { id: t });
       return;
     }
-
     toast.success("❌ Washer rejeté", { id: t });
     fetchData();
     if (showWasherModal) setShowWasherModal(false);
   };
 
-  // ✅ NOUVEAU : BLOQUER / DÉBLOQUER
   const blockWasher = async (washerId: string) => {
     const reason = prompt("Raison du blocage (obligatoire) :");
-
     if (!reason || reason.trim() === "") {
       toast.error("Veuillez indiquer une raison");
       return;
     }
-
     if (!confirm(`⛔ Bloquer ce Washer ?\nRaison : ${reason}`)) return;
 
     const t = toast.loading("⏳ Blocage en cours...");
-
     try {
       const { error } = await supabase.rpc("admin_block_washer", {
         washer_uuid: washerId,
@@ -264,7 +300,7 @@ export default function AdminDashboard() {
       fetchData();
       if (showWasherModal) setShowWasherModal(false);
     } catch (err: any) {
-      console.error("Error blocking washer:", err);
+      console.error(err);
       toast.error("❌ Erreur lors du blocage", { id: t });
     }
   };
@@ -273,7 +309,6 @@ export default function AdminDashboard() {
     if (!confirm("✅ Débloquer ce Washer ?")) return;
 
     const t = toast.loading("⏳ Déblocage en cours...");
-
     try {
       const { error } = await supabase.rpc("admin_unblock_washer", {
         washer_uuid: washerId,
@@ -288,7 +323,7 @@ export default function AdminDashboard() {
       fetchData();
       if (showWasherModal) setShowWasherModal(false);
     } catch (err: any) {
-      console.error("Error unblocking washer:", err);
+      console.error(err);
       toast.error("❌ Erreur lors du déblocage", { id: t });
     }
   };
@@ -296,7 +331,7 @@ export default function AdminDashboard() {
   // --- ACTIONS MESSAGES ---
   const markMessageAsRead = async (messageId: string) => {
     await supabase.from("contact_messages").update({ read: true }).eq("id", messageId);
-    setMessages(messages.map((m) => (m.id === messageId ? { ...m, read: true } : m)));
+    setMessages((prev) => prev.map((m) => (m.id === messageId ? { ...m, read: true } : m)));
     toast.success("Message lu");
   };
 
@@ -308,6 +343,7 @@ export default function AdminDashboard() {
       admin_email: "admin@kilolab.fr",
     });
     if (error) return toast.error("❌ " + error.message);
+
     toast.success("✅ Réponse enregistrée !");
     setReplyText("");
     setSelectedMessage(null);
@@ -318,7 +354,7 @@ export default function AdminDashboard() {
   const deleteMessage = async (messageId: string) => {
     if (!confirm("Supprimer ?")) return;
     await supabase.from("contact_messages").delete().eq("id", messageId);
-    setMessages(messages.filter((m) => m.id !== messageId));
+    setMessages((prev) => prev.filter((m) => m.id !== messageId));
     setSelectedMessage(null);
     toast.success("Supprimé");
   };
@@ -326,7 +362,7 @@ export default function AdminDashboard() {
   const handleExportCSV = () => {
     const csvHeader = "Date,ID,Client,Montant,Poids,Statut,Partenaire\n";
     const csvData = filteredOrdersByTime
-      .slice(0, 100)
+      .slice(0, 200)
       .map(
         (o) =>
           `${new Date(o.created_at).toLocaleDateString()},${o.id.slice(0, 8)},${
@@ -334,6 +370,7 @@ export default function AdminDashboard() {
           },${o.total_price},${o.weight},${o.status},${o.partner?.company_name || "Non attribué"}`
       )
       .join("\n");
+
     const blob = new Blob([csvHeader + csvData], { type: "text/csv" });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
@@ -344,10 +381,47 @@ export default function AdminDashboard() {
     toast.success("Export CSV !");
   };
 
+  // --- COUPONS ---
+  const createCoupon = async () => {
+    if (!newCoupon.code.trim()) return toast.error("Code requis");
+
+    const expiresAt = newCoupon.expires_at
+      ? new Date(newCoupon.expires_at).toISOString()
+      : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
+
+    const { error } = await supabase.from("coupons").insert({
+      code: newCoupon.code.toUpperCase(),
+      discount_type: newCoupon.discount_type,
+      discount_value: newCoupon.discount_value,
+      max_uses: newCoupon.max_uses,
+      uses_count: 0,
+      expires_at: expiresAt,
+      source: "admin",
+    });
+
+    if (error) {
+      // unique violation
+      if ((error as any).code === "23505") return toast.error("Ce code existe déjà");
+      return toast.error(error.message);
+    }
+
+    toast.success("✅ Coupon créé !");
+    setNewCoupon({ code: "", discount_value: 5, discount_type: "percentage", max_uses: 100, expires_at: "" });
+    fetchData();
+  };
+
+  const deleteCoupon = async (id: string) => {
+    if (!confirm("Supprimer ce coupon ?")) return;
+    const { error } = await supabase.from("coupons").delete().eq("id", id);
+    if (error) return toast.error(error.message);
+    toast.success("🗑️ Coupon supprimé");
+    fetchData();
+  };
+
   // --- STATS & FILTRES ---
   const filteredOrdersByTime = useMemo(() => {
     if (timeRange === "all") return orders;
-    const daysMap: Record<"7d" | "30d" | "90d", number> = { "7d": 7, "30d": 30, "90d": 90 };
+    const daysMap: Record<Exclude<TimeRange, "all">, number> = { "7d": 7, "30d": 30, "90d": 90 };
     const cutoffDate = new Date();
     cutoffDate.setDate(cutoffDate.getDate() - daysMap[timeRange]);
     return orders.filter((o) => new Date(o.created_at) >= cutoffDate);
@@ -356,10 +430,15 @@ export default function AdminDashboard() {
   const stats = useMemo(() => {
     const completed = filteredOrdersByTime.filter((o) => o.status === "completed");
     const totalRevenue = completed.reduce((sum, o) => sum + parseFloat(o.total_price || 0), 0);
+
     const activePartners = partners.filter((p) => p.is_active).length;
     const pendingPartners = partners.filter((p) => !p.is_active).length;
     const newMessages = messages.filter((m) => !m.read).length;
     const pendingWashers = washers.filter((w) => w.status === "pending").length;
+
+    const criticalErrors = errorLogs.filter(
+      (l) => l.severity === "critical" || l.severity === "error"
+    ).length;
 
     const avgOrderValue = completed.length > 0 ? totalRevenue / completed.length : 0;
 
@@ -373,8 +452,9 @@ export default function AdminDashboard() {
       newMessages,
       avgOrderValue,
       pendingWashers,
+      criticalErrors,
     };
-  }, [filteredOrdersByTime, messages, clients, partners, washers]);
+  }, [filteredOrdersByTime, partners, messages, washers, clients, errorLogs]);
 
   const monthlyData = useMemo(() => {
     const months: any = {};
@@ -388,12 +468,10 @@ export default function AdminDashboard() {
         months[monthKey].revenue += parseFloat(order.total_price || 0);
         months[monthKey].orders += 1;
       });
+
     return Object.values(months)
       .slice(-12)
-      .map((m: any) => ({
-        ...m,
-        revenue: parseFloat(m.revenue.toFixed(2)),
-      }));
+      .map((m: any) => ({ ...m, revenue: parseFloat(m.revenue.toFixed(2)) }));
   }, [filteredOrdersByTime]);
 
   const statusData = useMemo(() => {
@@ -410,6 +488,7 @@ export default function AdminDashboard() {
       const label = labels[o.status] || o.status;
       statuses[label] = (statuses[label] || 0) + 1;
     });
+
     const colors: any = {
       Terminé: "#10b981",
       "En cours": "#3b82f6",
@@ -418,6 +497,7 @@ export default function AdminDashboard() {
       Prêt: "#6366f1",
       Annulé: "#ef4444",
     };
+
     return Object.entries(statuses).map(([name, value]) => ({
       name,
       value,
@@ -429,13 +509,16 @@ export default function AdminDashboard() {
     let filtered = partners;
     if (statusFilter === "active") filtered = filtered.filter((p) => p.is_active);
     else if (statusFilter === "pending") filtered = filtered.filter((p) => !p.is_active);
-    if (searchTerm)
+
+    if (searchTerm) {
+      const q = searchTerm.toLowerCase();
       filtered = filtered.filter(
         (p) =>
-          p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          p.city.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          p.email?.toLowerCase().includes(searchTerm.toLowerCase())
+          (p.name || "").toLowerCase().includes(q) ||
+          (p.city || "").toLowerCase().includes(q) ||
+          (p.email || "").toLowerCase().includes(q)
       );
+    }
     return filtered;
   }, [partners, searchTerm, statusFilter]);
 
@@ -444,32 +527,41 @@ export default function AdminDashboard() {
     return washers.filter((w) => w.status === washerFilter);
   }, [washers, washerFilter]);
 
-  // --- COMPOSANT STATCARD ---
-  // ⚠️ Note Tailwind : from-${color}-50 etc nécessite safelist, tu sembles déjà le faire.
-  const StatCard = ({ title, value, icon, suffix, badge, color = "teal" }: any) => (
-    <div
-      className={`bg-white rounded-2xl p-6 shadow-sm border border-slate-100 hover:shadow-lg transition-all relative overflow-hidden group`}
-    >
-      <div
-        className={`absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-${color}-50 to-transparent rounded-full -mr-16 -mt-16 opacity-50 group-hover:scale-110 transition-transform`}
-      ></div>
-      <div className="relative z-10">
-        <div className="flex items-start justify-between mb-4">
-          <div className={`p-3 bg-${color}-50 rounded-xl text-${color}-600`}>{icon}</div>
-          {badge !== undefined && badge > 0 && (
-            <div className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full w-7 h-7 flex items-center justify-center shadow-lg">
-              {badge}
-            </div>
-          )}
+  // --- STATCARD (classes stables) ---
+  const statTheme: Record<
+    string,
+    { iconBg: string; iconText: string; orbFrom: string }
+  > = {
+    teal: { iconBg: "bg-teal-50", iconText: "text-teal-600", orbFrom: "from-teal-50" },
+    blue: { iconBg: "bg-blue-50", iconText: "text-blue-600", orbFrom: "from-blue-50" },
+    purple: { iconBg: "bg-purple-50", iconText: "text-purple-600", orbFrom: "from-purple-50" },
+    orange: { iconBg: "bg-orange-50", iconText: "text-orange-600", orbFrom: "from-orange-50" },
+    red: { iconBg: "bg-red-50", iconText: "text-red-600", orbFrom: "from-red-50" },
+  };
+
+  const StatCard = ({ title, value, icon, suffix, badge, color = "teal" }: any) => {
+    const t = statTheme[color] || statTheme.teal;
+    return (
+      <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 hover:shadow-lg transition-all relative overflow-hidden group">
+        <div className={`absolute top-0 right-0 w-32 h-32 bg-gradient-to-br ${t.orbFrom} to-transparent rounded-full -mr-16 -mt-16 opacity-50 group-hover:scale-110 transition-transform`} />
+        <div className="relative z-10">
+          <div className="flex items-start justify-between mb-4">
+            <div className={`p-3 ${t.iconBg} rounded-xl ${t.iconText}`}>{icon}</div>
+            {badge !== undefined && badge > 0 && (
+              <div className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full w-7 h-7 flex items-center justify-center shadow-lg">
+                {badge}
+              </div>
+            )}
+          </div>
+          <div className="text-3xl font-black text-slate-900 mb-1">
+            {value}
+            {suffix}
+          </div>
+          <div className="text-sm text-slate-500 font-medium">{title}</div>
         </div>
-        <div className="text-3xl font-black text-slate-900 mb-1">
-          {value}
-          {suffix}
-        </div>
-        <div className="text-sm text-slate-500 font-medium">{title}</div>
       </div>
-    </div>
-  );
+    );
+  };
 
   if (loading)
     return (
@@ -486,7 +578,7 @@ export default function AdminDashboard() {
       <Navbar />
 
       <div className="pt-32 pb-20 px-4 max-w-[1400px] mx-auto">
-        {/* HEADER DASHBOARD */}
+        {/* HEADER */}
         <div className="mb-8">
           <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-6">
             <div>
@@ -495,9 +587,10 @@ export default function AdminDashboard() {
               </h1>
               <p className="text-slate-600 flex items-center gap-2">
                 <Activity size={16} className="text-teal-500" />
-                Vue d'ensemble en temps réel
+                Vue d&apos;ensemble en temps réel
               </p>
             </div>
+
             <div className="flex gap-3 flex-wrap">
               <button
                 onClick={fetchData}
@@ -506,6 +599,7 @@ export default function AdminDashboard() {
                 <RefreshCw size={16} />
                 Actualiser
               </button>
+
               <button
                 onClick={() => window.open("https://supabase.com/dashboard", "_blank")}
                 className="bg-white border border-slate-200 px-4 py-2.5 rounded-xl text-sm font-bold hover:bg-slate-50 flex items-center gap-2 shadow-sm hover:shadow transition-all"
@@ -513,6 +607,7 @@ export default function AdminDashboard() {
                 <Database size={16} />
                 Supabase
               </button>
+
               <button
                 onClick={handleExportCSV}
                 className="bg-gradient-to-r from-teal-600 to-cyan-600 text-white px-4 py-2.5 rounded-xl text-sm font-bold hover:from-teal-700 hover:to-cyan-700 flex items-center gap-2 shadow-lg transition-all"
@@ -523,6 +618,7 @@ export default function AdminDashboard() {
             </div>
           </div>
 
+          {/* TIME RANGE */}
           <div className="flex gap-2 mb-8">
             {(["7d", "30d", "90d", "all"] as const).map((range) => (
               <button
@@ -534,17 +630,12 @@ export default function AdminDashboard() {
                     : "bg-white text-slate-600 border border-slate-200 hover:border-teal-300"
                 }`}
               >
-                {range === "7d"
-                  ? "7 jours"
-                  : range === "30d"
-                  ? "30 jours"
-                  : range === "90d"
-                  ? "90 jours"
-                  : "Tout"}
+                {range === "7d" ? "7 jours" : range === "30d" ? "30 jours" : range === "90d" ? "90 jours" : "Tout"}
               </button>
             ))}
           </div>
 
+          {/* TOP STATS */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <StatCard
               title="Chiffre d'affaires"
@@ -555,16 +646,11 @@ export default function AdminDashboard() {
             />
             <StatCard title="Commandes" value={stats.completedOrders} icon={<ShoppingBag size={24} />} color="blue" />
             <StatCard title="Clients" value={stats.totalClients} icon={<Users size={24} />} color="purple" />
-            <StatCard
-              title="Messages"
-              value={stats.newMessages}
-              icon={<MessageSquare size={24} />}
-              badge={stats.newMessages}
-              color="orange"
-            />
+            <StatCard title="Messages" value={stats.newMessages} icon={<MessageSquare size={24} />} badge={stats.newMessages} color="orange" />
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+          {/* SECOND STATS */}
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mt-6">
             <div className="bg-white rounded-2xl p-6 border border-slate-100">
               <div className="flex items-center justify-between">
                 <div>
@@ -576,6 +662,7 @@ export default function AdminDashboard() {
                 </div>
               </div>
             </div>
+
             <div className="bg-white rounded-2xl p-6 border border-slate-100">
               <div className="flex items-center justify-between">
                 <div>
@@ -587,6 +674,7 @@ export default function AdminDashboard() {
                 </div>
               </div>
             </div>
+
             <div className="bg-white rounded-2xl p-6 border border-slate-100">
               <div className="flex items-center justify-between">
                 <div>
@@ -598,45 +686,71 @@ export default function AdminDashboard() {
                 </div>
               </div>
             </div>
+
+            <div className="bg-white rounded-2xl p-6 border border-slate-100">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-slate-500 font-medium mb-1">Erreurs (crit.)</p>
+                  <p className="text-2xl font-black text-red-600">{stats.criticalErrors}</p>
+                </div>
+                <div className="p-3 bg-red-50 rounded-xl">
+                  <AlertTriangle size={24} className="text-red-600" />
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
         {/* NAVIGATION TABS */}
         <div className="bg-white rounded-2xl shadow-sm border border-slate-100 mb-8">
           <div className="flex border-b overflow-x-auto">
-            {(["overview", "partners", "washers", "clients", "orders", "messages"] as const).map((tab) => (
-              <button
-                key={tab}
-                onClick={() => setActiveTab(tab)}
-                className={`px-6 py-4 font-bold transition whitespace-nowrap relative ${
-                  activeTab === tab ? "text-teal-600" : "text-slate-500 hover:text-slate-700"
-                }`}
-              >
-                {tab === "overview"
-                  ? "📊 Vue d'ensemble"
-                  : tab === "partners"
-                  ? `🏪 Pressings (${partners.length})`
-                  : tab === "washers"
-                  ? `🧺 Washers (${washers.length})`
-                  : tab === "clients"
-                  ? `👤 Clients (${clients.length})`
-                  : tab === "orders"
-                  ? `📦 Commandes (${orders.length})`
-                  : `💬 Messages (${stats.newMessages})`}
-                {activeTab === tab && (
-                  <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-teal-600 to-cyan-600"></div>
-                )}
-                {tab === "washers" && stats.pendingWashers > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
-                    {stats.pendingWashers}
-                  </span>
-                )}
-              </button>
-            ))}
+            {(["overview", "partners", "washers", "clients", "orders", "messages", "logs", "coupons"] as const).map(
+              (tab) => (
+                <button
+                  key={tab}
+                  onClick={() => setActiveTab(tab)}
+                  className={`px-6 py-4 font-bold transition whitespace-nowrap relative ${
+                    activeTab === tab ? "text-teal-600" : "text-slate-500 hover:text-slate-700"
+                  }`}
+                >
+                  {tab === "overview"
+                    ? "📊 Vue d'ensemble"
+                    : tab === "partners"
+                    ? `🏪 Pressings (${partners.length})`
+                    : tab === "washers"
+                    ? `🧺 Washers (${washers.length})`
+                    : tab === "clients"
+                    ? `👤 Clients (${clients.length})`
+                    : tab === "orders"
+                    ? `📦 Commandes (${orders.length})`
+                    : tab === "messages"
+                    ? `💬 Messages (${stats.newMessages})`
+                    : tab === "logs"
+                    ? `🔴 Logs (${stats.criticalErrors})`
+                    : `🎟️ Coupons (${coupons.length})`}
+
+                  {activeTab === tab && (
+                    <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-teal-600 to-cyan-600" />
+                  )}
+
+                  {tab === "washers" && stats.pendingWashers > 0 && (
+                    <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                      {stats.pendingWashers}
+                    </span>
+                  )}
+
+                  {tab === "logs" && stats.criticalErrors > 0 && (
+                    <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                      {stats.criticalErrors}
+                    </span>
+                  )}
+                </button>
+              )
+            )}
           </div>
 
           <div className="p-6">
-            {/* --- TAB OVERVIEW --- */}
+            {/* TAB OVERVIEW */}
             {activeTab === "overview" && (
               <div className="space-y-8">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -652,14 +766,7 @@ export default function AdminDashboard() {
                         <YAxis stroke="#64748b" fontSize={12} />
                         <Tooltip />
                         <Legend />
-                        <Line
-                          type="monotone"
-                          dataKey="revenue"
-                          stroke="#14b8a6"
-                          strokeWidth={3}
-                          name="CA (€)"
-                          dot={{ r: 4 }}
-                        />
+                        <Line type="monotone" dataKey="revenue" stroke="#14b8a6" strokeWidth={3} name="CA (€)" dot={{ r: 4 }} />
                       </LineChart>
                     </ResponsiveContainer>
                   </div>
@@ -712,7 +819,7 @@ export default function AdminDashboard() {
               </div>
             )}
 
-            {/* --- TAB PARTNERS --- */}
+            {/* TAB PARTNERS */}
             {activeTab === "partners" && (
               <div>
                 <div className="flex flex-col md:flex-row justify-between gap-4 mb-6">
@@ -729,25 +836,19 @@ export default function AdminDashboard() {
                   <div className="flex gap-2">
                     <button
                       onClick={() => setStatusFilter("all")}
-                      className={`px-4 py-2 rounded-xl text-sm font-bold ${
-                        statusFilter === "all" ? "bg-slate-900 text-white" : "bg-white border"
-                      }`}
+                      className={`px-4 py-2 rounded-xl text-sm font-bold ${statusFilter === "all" ? "bg-slate-900 text-white" : "bg-white border"}`}
                     >
                       Tous
                     </button>
                     <button
                       onClick={() => setStatusFilter("active")}
-                      className={`px-4 py-2 rounded-xl text-sm font-bold ${
-                        statusFilter === "active" ? "bg-green-600 text-white" : "bg-white border"
-                      }`}
+                      className={`px-4 py-2 rounded-xl text-sm font-bold ${statusFilter === "active" ? "bg-green-600 text-white" : "bg-white border"}`}
                     >
                       Actifs
                     </button>
                     <button
                       onClick={() => setStatusFilter("pending")}
-                      className={`px-4 py-2 rounded-xl text-sm font-bold ${
-                        statusFilter === "pending" ? "bg-orange-500 text-white" : "bg-white border"
-                      }`}
+                      className={`px-4 py-2 rounded-xl text-sm font-bold ${statusFilter === "pending" ? "bg-orange-500 text-white" : "bg-white border"}`}
                     >
                       En attente
                     </button>
@@ -826,7 +927,7 @@ export default function AdminDashboard() {
               </div>
             )}
 
-            {/* --- TAB WASHERS (AVEC BLOCAGE) --- */}
+            {/* TAB WASHERS */}
             {activeTab === "washers" && (
               <div>
                 <div className="mb-6">
@@ -835,46 +936,23 @@ export default function AdminDashboard() {
                 </div>
 
                 <div className="flex gap-4 mb-6 flex-wrap">
-                  <button
-                    onClick={() => setWasherFilter("all")}
-                    className={`px-4 py-2 rounded-lg font-bold text-sm transition ${
-                      washerFilter === "all"
-                        ? "bg-slate-900 text-white"
-                        : "bg-white text-slate-500 hover:bg-slate-50 border"
-                    }`}
-                  >
-                    Tous ({washers.length})
-                  </button>
-                  <button
-                    onClick={() => setWasherFilter("pending")}
-                    className={`px-4 py-2 rounded-lg font-bold text-sm transition ${
-                      washerFilter === "pending"
-                        ? "bg-orange-500 text-white"
-                        : "bg-white text-slate-500 hover:bg-slate-50 border"
-                    }`}
-                  >
-                    En attente ({washers.filter((w) => w.status === "pending").length})
-                  </button>
-                  <button
-                    onClick={() => setWasherFilter("approved")}
-                    className={`px-4 py-2 rounded-lg font-bold text-sm transition ${
-                      washerFilter === "approved"
-                        ? "bg-green-500 text-white"
-                        : "bg-white text-slate-500 hover:bg-slate-50 border"
-                    }`}
-                  >
-                    Approuvés ({washers.filter((w) => w.status === "approved").length})
-                  </button>
-                  <button
-                    onClick={() => setWasherFilter("rejected")}
-                    className={`px-4 py-2 rounded-lg font-bold text-sm transition ${
-                      washerFilter === "rejected"
-                        ? "bg-red-500 text-white"
-                        : "bg-white text-slate-500 hover:bg-slate-50 border"
-                    }`}
-                  >
-                    Rejetés ({washers.filter((w) => w.status === "rejected").length})
-                  </button>
+                  {(["all", "pending", "approved", "rejected"] as const).map((f) => (
+                    <button
+                      key={f}
+                      onClick={() => setWasherFilter(f)}
+                      className={`px-4 py-2 rounded-lg font-bold text-sm transition ${
+                        washerFilter === f ? "bg-slate-900 text-white" : "bg-white text-slate-500 hover:bg-slate-50 border"
+                      }`}
+                    >
+                      {f === "all"
+                        ? `Tous (${washers.length})`
+                        : f === "pending"
+                        ? `En attente (${washers.filter((w) => w.status === "pending").length})`
+                        : f === "approved"
+                        ? `Approuvés (${washers.filter((w) => w.status === "approved").length})`
+                        : `Rejetés (${washers.filter((w) => w.status === "rejected").length})`}
+                    </button>
+                  ))}
                 </div>
 
                 {filteredWashers.length === 0 ? (
@@ -908,7 +986,6 @@ export default function AdminDashboard() {
                               {washer.city} ({washer.postal_code})
                             </td>
 
-                            {/* ✅ STATUT + BADGE BLOQUÉ */}
                             <td className="p-4">
                               <div className="flex flex-col gap-1">
                                 <span
@@ -937,7 +1014,6 @@ export default function AdminDashboard() {
                               {new Date(washer.created_at).toLocaleDateString("fr-FR")}
                             </td>
 
-                            {/* ✅ ACTIONS : approuver / rejeter / bloquer / débloquer / voir */}
                             <td className="p-4">
                               <div className="flex gap-2 flex-wrap">
                                 {washer.status === "pending" && (
@@ -1000,7 +1076,7 @@ export default function AdminDashboard() {
               </div>
             )}
 
-            {/* --- TAB CLIENTS --- */}
+            {/* TAB CLIENTS */}
             {activeTab === "clients" && (
               <div>
                 <table className="w-full">
@@ -1030,7 +1106,7 @@ export default function AdminDashboard() {
               </div>
             )}
 
-            {/* --- TAB ORDERS --- */}
+            {/* TAB ORDERS */}
             {activeTab === "orders" && (
               <div>
                 <table className="w-full">
@@ -1074,7 +1150,7 @@ export default function AdminDashboard() {
               </div>
             )}
 
-            {/* --- TAB MESSAGES --- */}
+            {/* TAB MESSAGES */}
             {activeTab === "messages" && (
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 h-[600px]">
                 <div className="overflow-y-auto border-r pr-4">
@@ -1090,9 +1166,7 @@ export default function AdminDashboard() {
                     >
                       <div className="flex justify-between mb-1">
                         <span className="font-bold">{msg.name}</span>
-                        <span className="text-xs text-slate-400">
-                          {new Date(msg.created_at).toLocaleDateString()}
-                        </span>
+                        <span className="text-xs text-slate-400">{new Date(msg.created_at).toLocaleDateString()}</span>
                       </div>
                       <p className="text-sm text-slate-600 line-clamp-1">{msg.subject}</p>
                     </div>
@@ -1116,10 +1190,7 @@ export default function AdminDashboard() {
                             )}
                           </div>
                         </div>
-                        <button
-                          onClick={() => deleteMessage(selectedMessage.id)}
-                          className="text-red-400 hover:text-red-600"
-                        >
+                        <button onClick={() => deleteMessage(selectedMessage.id)} className="text-red-400 hover:text-red-600">
                           <Trash2 size={18} />
                         </button>
                       </div>
@@ -1131,9 +1202,7 @@ export default function AdminDashboard() {
                       {selectedMessage.support_responses?.length > 0 && (
                         <div className="mb-4 pl-4 border-l-2 border-teal-200">
                           <p className="text-xs font-bold text-teal-600 mb-1">Réponse envoyée :</p>
-                          <p className="text-sm text-slate-600 italic">
-                            "{selectedMessage.support_responses[0].response}"
-                          </p>
+                          <p className="text-sm text-slate-600 italic">"{selectedMessage.support_responses[0].response}"</p>
                         </div>
                       )}
 
@@ -1157,6 +1226,197 @@ export default function AdminDashboard() {
                     <div className="h-full flex items-center justify-center text-slate-400 flex-col gap-4">
                       <MessageSquare size={48} />
                       <p>Sélectionnez un message pour répondre</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* TAB LOGS */}
+            {activeTab === "logs" && (
+              <div>
+                <div className="mb-6">
+                  <h3 className="text-2xl font-bold mb-2">🔴 Logs d&apos;erreurs</h3>
+                  <p className="text-slate-600">{errorLogs.length} logs au total</p>
+                </div>
+
+                {errorLogs.length === 0 ? (
+                  <div className="text-center py-16 bg-slate-50 rounded-2xl">
+                    <AlertTriangle size={64} className="mx-auto mb-4 text-slate-300" />
+                    <p className="text-xl font-bold text-slate-400">Aucune erreur enregistrée</p>
+                    <p className="text-sm text-slate-500 mt-2">C&apos;est une bonne nouvelle ! 🎉</p>
+                  </div>
+                ) : (
+                  <div className="overflow-x-auto">
+                    <table className="w-full">
+                      <thead className="bg-slate-50 border-b">
+                        <tr>
+                          <th className="text-left p-4 font-bold text-sm">Date</th>
+                          <th className="text-left p-4 font-bold text-sm">Source</th>
+                          <th className="text-left p-4 font-bold text-sm">Sévérité</th>
+                          <th className="text-left p-4 font-bold text-sm">Message</th>
+                          <th className="text-left p-4 font-bold text-sm">Order ID</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {errorLogs.map((log) => (
+                          <tr key={log.id} className="border-b hover:bg-slate-50">
+                            <td className="p-4 text-sm text-slate-600">{new Date(log.created_at).toLocaleString("fr-FR")}</td>
+                            <td className="p-4 font-mono text-xs">{log.source}</td>
+                            <td className="p-4">
+                              <span
+                                className={`px-2 py-1 rounded-full text-xs font-bold ${
+                                  log.severity === "critical"
+                                    ? "bg-red-100 text-red-700"
+                                    : log.severity === "error"
+                                    ? "bg-orange-100 text-orange-700"
+                                    : log.severity === "warning"
+                                    ? "bg-yellow-100 text-yellow-700"
+                                    : "bg-blue-100 text-blue-700"
+                                }`}
+                              >
+                                {log.severity}
+                              </span>
+                            </td>
+                            <td className="p-4 text-sm max-w-md truncate">{log.message}</td>
+                            <td className="p-4 font-mono text-xs">{log.order_id ? String(log.order_id).slice(0, 8) : "-"}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* TAB COUPONS */}
+            {activeTab === "coupons" && (
+              <div>
+                <div className="mb-8">
+                  <h3 className="text-2xl font-bold mb-4 flex items-center gap-2">
+                    <Tag size={20} className="text-teal-600" />
+                    Créer un coupon
+                  </h3>
+
+                  <div className="bg-white p-6 rounded-2xl border grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-bold mb-2">Code *</label>
+                      <input
+                        type="text"
+                        placeholder="PROMO2026"
+                        value={newCoupon.code}
+                        onChange={(e) => setNewCoupon({ ...newCoupon, code: e.target.value })}
+                        className="w-full p-3 border rounded-xl uppercase"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-bold mb-2">Type</label>
+                      <select
+                        value={newCoupon.discount_type}
+                        onChange={(e) => setNewCoupon({ ...newCoupon, discount_type: e.target.value as CouponType })}
+                        className="w-full p-3 border rounded-xl"
+                      >
+                        <option value="percentage">Pourcentage (%)</option>
+                        <option value="fixed">Montant fixe (€)</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-bold mb-2">
+                        Réduction ({newCoupon.discount_type === "percentage" ? "%" : "€"})
+                      </label>
+                      <input
+                        type="number"
+                        min={1}
+                        max={newCoupon.discount_type === "percentage" ? 100 : 1000}
+                        value={newCoupon.discount_value}
+                        onChange={(e) => setNewCoupon({ ...newCoupon, discount_value: parseInt(e.target.value || "0", 10) })}
+                        className="w-full p-3 border rounded-xl"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-bold mb-2">Utilisations max</label>
+                      <input
+                        type="number"
+                        min={1}
+                        value={newCoupon.max_uses}
+                        onChange={(e) => setNewCoupon({ ...newCoupon, max_uses: parseInt(e.target.value || "0", 10) })}
+                        className="w-full p-3 border rounded-xl"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-bold mb-2">Expire le (optionnel)</label>
+                      <input
+                        type="date"
+                        value={newCoupon.expires_at}
+                        onChange={(e) => setNewCoupon({ ...newCoupon, expires_at: e.target.value })}
+                        className="w-full p-3 border rounded-xl"
+                      />
+                    </div>
+
+                    <div className="flex items-end">
+                      <button
+                        onClick={createCoupon}
+                        className="w-full py-3 bg-teal-600 text-white rounded-xl font-bold hover:bg-teal-700 flex items-center justify-center gap-2"
+                      >
+                        <Shield size={18} />
+                        Créer le coupon
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <div>
+                  <h3 className="text-2xl font-bold mb-4">📋 Coupons existants</h3>
+
+                  {coupons.length === 0 ? (
+                    <div className="text-center py-12 bg-slate-50 rounded-2xl border border-slate-200">
+                      <p className="text-slate-600">Aucun coupon pour le moment.</p>
+                    </div>
+                  ) : (
+                    <div className="overflow-x-auto">
+                      <table className="w-full">
+                        <thead className="bg-slate-50 border-b">
+                          <tr>
+                            <th className="text-left p-4 font-bold text-sm">Code</th>
+                            <th className="text-left p-4 font-bold text-sm">Réduction</th>
+                            <th className="text-left p-4 font-bold text-sm">Utilisations</th>
+                            <th className="text-left p-4 font-bold text-sm">Expire le</th>
+                            <th className="text-left p-4 font-bold text-sm">Actions</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {coupons.map((coupon) => (
+                            <tr key={coupon.id} className="border-b hover:bg-slate-50">
+                              <td className="p-4 font-mono font-bold">{coupon.code}</td>
+                              <td className="p-4">
+                                {coupon.discount_value}
+                                {coupon.discount_type === "percentage" ? "%" : "€"}
+                              </td>
+                              <td className="p-4">
+                                <span className={`font-bold ${coupon.uses_count >= coupon.max_uses ? "text-red-600" : "text-green-600"}`}>
+                                  {coupon.uses_count} / {coupon.max_uses}
+                                </span>
+                              </td>
+                              <td className="p-4 text-sm">
+                                {coupon.expires_at ? new Date(coupon.expires_at).toLocaleDateString("fr-FR") : "Jamais"}
+                              </td>
+                              <td className="p-4">
+                                <button
+                                  onClick={() => deleteCoupon(coupon.id)}
+                                  className="p-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100"
+                                  title="Supprimer"
+                                >
+                                  <Trash2 size={18} />
+                                </button>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
                     </div>
                   )}
                 </div>
@@ -1302,7 +1562,6 @@ export default function AdminDashboard() {
                   </div>
                 </div>
 
-                {/* ✅ NOUVEAU : bloc état bloqué */}
                 {selectedWasher?.is_blocked && (
                   <div className="bg-red-50 border-2 border-red-200 p-6 rounded-2xl">
                     <h3 className="text-lg font-bold mb-4 flex items-center gap-2 text-red-700">
@@ -1320,9 +1579,7 @@ export default function AdminDashboard() {
                       <div className="flex justify-between">
                         <span className="text-slate-500">Bloqué le</span>
                         <span className="font-medium">
-                          {selectedWasher.blocked_at
-                            ? new Date(selectedWasher.blocked_at).toLocaleDateString("fr-FR")
-                            : "-"}
+                          {selectedWasher.blocked_at ? new Date(selectedWasher.blocked_at).toLocaleDateString("fr-FR") : "-"}
                         </span>
                       </div>
                     </div>
@@ -1351,7 +1608,6 @@ export default function AdminDashboard() {
               </div>
             </div>
 
-            {/* ✅ FOOTER MODALE : approuver/rejeter + bloquer/débloquer */}
             <div className="mt-8 pt-6 border-t flex justify-end gap-3 flex-wrap">
               <button
                 onClick={() => setShowWasherModal(false)}
