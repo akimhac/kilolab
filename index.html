@@ -26,12 +26,16 @@
       fbq('track', 'PageView');
     </script>
 
+    <!-- ✅ LOTTIE PLAYER - CHARGÉ EN PREMIER -->
+    <script src="https://unpkg.com/@lottiefiles/lottie-player@2.0.8/dist/lottie-player.js"></script>
+
     <!-- Preconnect -->
     <link rel="preconnect" href="https://dhecegehcjelbxydcolg.supabase.co" crossorigin />
     <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
     <link rel="dns-prefetch" href="https://connect.facebook.net" />
+    <link rel="dns-prefetch" href="https://unpkg.com" />
 
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
@@ -86,44 +90,48 @@
 
     <!-- Schema.org -->
     <script type="application/ld+json">
-      {
-        "@context": "https://schema.org",
-        "@type": "Organization",
-        "@id": "https://kilolab.fr/#org",
-        "name": "Kilolab",
-        "url": "https://kilolab.fr/",
-        "logo": "https://kilolab.fr/logo.png",
-        "description": "Service de pressing à domicile collaboratif. Collecte, lavage et livraison en 48h partout en France.",
-        "sameAs": [
-          "https://www.facebook.com/kilolab.fr",
-          "https://www.instagram.com/kilolab.fr"
-        ],
-        "areaServed": {
-          "@type": "Country",
-          "name": "France"
-        },
-        "contactPoint": {
-          "@type": "ContactPoint",
-          "contactType": "customer service",
-          "email": "contact@kilolab.fr",
-          "availableLanguage": "French",
-          "areaServed": "FR"
-        }
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "@id": "https://kilolab.fr/#org",
+      "name": "Kilolab",
+      "url": "https://kilolab.fr/",
+      "logo": "https://kilolab.fr/logo.png",
+      "description": "Service de pressing à domicile collaboratif. Collecte, lavage et livraison en 48h partout en France.",
+      "sameAs": [
+        "https://www.facebook.com/kilolab.fr",
+        "https://www.instagram.com/kilolab.fr"
+      ],
+      "areaServed": {
+        "@type": "Country",
+        "name": "France"
+      },
+      "contactPoint": {
+        "@type": "ContactPoint",
+        "contactType": "customer service",
+        "email": "contact@kilolab.fr",
+        "availableLanguage": "French",
+        "areaServed": "FR"
       }
+    }
     </script>
 
-    <!-- 🎨 LOADER PRO -->
+    <!-- ═══════════════════════════════════════════════════════════
+        🎨 LOTTIE LOADER - ANIMATION PROFESSIONNELLE
+    ═══════════════════════════════════════════════════════════ -->
     <style>
+      /* ✅ Loader Container */
       #app-loader {
         position: fixed;
         inset: 0;
         background: linear-gradient(135deg, #14b8a6 0%, #06b6d4 100%);
         z-index: 9999;
         display: flex;
+        flex-direction: column;
         align-items: center;
         justify-content: center;
-        transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1),
-          visibility 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1),
+                    visibility 0.8s cubic-bezier(0.4, 0, 0.2, 1);
       }
 
       #app-loader.loaded {
@@ -131,82 +139,78 @@
         visibility: hidden;
       }
 
-      .loader-container {
-        text-align: center;
-        animation: fadeInUp 0.8s ease-out;
+      /* ✅ Animation Container */
+      .loader-animation {
+        animation: fadeInScale 0.6s ease-out;
       }
 
-      .loader-logo {
-        font-size: 64px;
-        font-weight: 900;
+      /* ✅ Logo KILOLAB */
+      .loader-title {
         color: white;
-        margin-bottom: 32px;
+        font-size: 56px;
+        font-weight: 900;
+        margin-top: 24px;
         letter-spacing: 4px;
-        animation: logoFloat 2.5s ease-in-out infinite;
+        text-align: center;
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        animation: fadeInUp 0.8s ease-out 0.2s both;
         text-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
       }
 
-      .loader-spinner {
-        width: 80px;
-        height: 80px;
-        margin: 0 auto;
-        position: relative;
-      }
-
-      .loader-spinner::before {
-        content: '';
-        position: absolute;
-        inset: 0;
-        border: 6px solid rgba(255, 255, 255, 0.2);
-        border-top-color: white;
-        border-radius: 50%;
-        animation: spin 1s linear infinite;
-      }
-
-      .loader-spinner::after {
-        content: '';
-        position: absolute;
-        inset: 12px;
-        border: 4px solid rgba(255, 255, 255, 0.3);
-        border-radius: 50%;
-        animation: spinReverse 1.5s linear infinite;
-      }
-
+      /* ✅ Tagline */
       .loader-tagline {
-        margin-top: 24px;
-        color: rgba(255, 255, 255, 0.9);
-        font-size: 16px;
+        color: rgba(255, 255, 255, 0.95);
+        font-size: 18px;
         font-weight: 600;
-        font-family: system-ui, -apple-system, sans-serif;
+        margin-top: 16px;
         letter-spacing: 1px;
-        animation: pulse 2s ease-in-out infinite;
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        animation: fadeInUp 0.8s ease-out 0.4s both;
       }
 
-      @keyframes logoFloat {
-        0%, 100% { transform: translateY(0px) scale(1); }
-        50% { transform: translateY(-10px) scale(1.02); }
+      /* ✅ Progress Bar (optionnel) */
+      .loader-progress {
+        width: 200px;
+        height: 3px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 999px;
+        margin-top: 24px;
+        overflow: hidden;
+        animation: fadeInUp 0.8s ease-out 0.6s both;
       }
 
-      @keyframes spin { to { transform: rotate(360deg); } }
+      .loader-progress-bar {
+        height: 100%;
+        background: white;
+        border-radius: 999px;
+        animation: progressFill 2s ease-in-out infinite;
+      }
 
-      @keyframes spinReverse { to { transform: rotate(-360deg); } }
+      /* ✅ Animations */
+      @keyframes fadeInScale {
+        from { opacity: 0; transform: scale(0.8); }
+        to   { opacity: 1; transform: scale(1); }
+      }
 
       @keyframes fadeInUp {
-        from { opacity: 0; transform: translateY(30px); }
-        to { opacity: 1; transform: translateY(0); }
+        from { opacity: 0; transform: translateY(20px); }
+        to   { opacity: 1; transform: translateY(0); }
       }
 
-      @keyframes pulse {
-        0%, 100% { opacity: 1; }
-        50% { opacity: 0.7; }
+      @keyframes progressFill {
+        0%   { width: 0%;   margin-left: 0%; }
+        50%  { width: 60%;  margin-left: 20%; }
+        100% { width: 0%;   margin-left: 100%; }
       }
 
+      /* ✅ Bloquer scroll pendant chargement */
       body.loading { overflow: hidden; }
 
+      /* ✅ Responsive */
       @media (max-width: 768px) {
-        .loader-logo { font-size: 48px; letter-spacing: 2px; }
-        .loader-spinner { width: 64px; height: 64px; }
-        .loader-tagline { font-size: 14px; }
+        .loader-title { font-size: 42px; letter-spacing: 2px; }
+        .loader-tagline { font-size: 16px; }
+        .loader-animation lottie-player { width: 220px !important; height: 220px !important; }
       }
     </style>
   </head>
@@ -222,12 +226,31 @@
       <img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=1573268523913279&ev=PageView&noscript=1" alt="" />
     </noscript>
 
-    <!-- Loader -->
+    <!-- ═══════════════════════════════════════════════════════════
+        🎬 LOTTIE LOADER
+    ═══════════════════════════════════════════════════════════ -->
     <div id="app-loader">
-      <div class="loader-container">
-        <div class="loader-logo">KILOLAB</div>
-        <div class="loader-spinner"></div>
-        <div class="loader-tagline">Libérez votre temps</div>
+      <div class="loader-animation">
+        <!-- ✅ ANIMATION LOTTIE (URL DIRECTE - PAS DE LOCAL) -->
+        <lottie-player
+          src="https://lottie.host/f0b5c70c-4e4d-4e77-9c6f-8e6f4b6d3a2c/animation.json"
+          background="transparent"
+          speed="1"
+          style="width: 280px; height: 280px; margin: 0 auto;"
+          loop
+          autoplay
+        ></lottie-player>
+      </div>
+
+      <!-- Logo Kilolab -->
+      <h1 class="loader-title">KILOLAB</h1>
+
+      <!-- Tagline -->
+      <p class="loader-tagline">Libérez votre temps</p>
+
+      <!-- Progress Bar (optionnel) -->
+      <div class="loader-progress">
+        <div class="loader-progress-bar"></div>
       </div>
     </div>
 
@@ -235,23 +258,27 @@
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
 
-    <!-- Loader Script -->
+    <!-- ═══════════════════════════════════════════════════════════
+        📜 LOADER SCRIPT
+    ═══════════════════════════════════════════════════════════ -->
     <script>
-      window.addEventListener('load', function () {
-        setTimeout(function () {
+      // Cacher le loader quand la page est chargée
+      window.addEventListener('load', function() {
+        setTimeout(function() {
           const loader = document.getElementById('app-loader');
           if (loader) loader.classList.add('loaded');
           document.body.classList.remove('loading');
-        }, 400);
+        }, 600); // Temps pour apprécier l'animation
       });
 
-      setTimeout(function () {
+      // Fallback : cacher après 4 secondes max
+      setTimeout(function() {
         const loader = document.getElementById('app-loader');
         if (loader && !loader.classList.contains('loaded')) {
           loader.classList.add('loaded');
           document.body.classList.remove('loading');
         }
-      }, 3000);
+      }, 4000);
     </script>
   </body>
 </html>
