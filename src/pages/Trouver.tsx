@@ -30,7 +30,15 @@ export default function Trouver() {
     fetchAllWashers();
   }, []);
 
-  // ✅ Charger TOUS les Washers au démarrage
+  const enrich = (list: any[]) =>
+    (list || []).map((w: any) => ({
+      ...w,
+      rating: 4.5 + Math.random() * 0.5,
+      completed_orders: Math.floor(Math.random() * 50) + 5,
+      response_time: Math.floor(Math.random() * 10) + 2,
+      distance: Math.random() * 2 + 0.3,
+    })) as Washer[];
+
   const fetchAllWashers = async () => {
     setLoading(true);
     try {
@@ -42,15 +50,7 @@ export default function Trouver() {
 
       if (error) throw error;
 
-      const enrichedWashers = (data || []).map((w: any) => ({
-        ...w,
-        rating: 4.5 + Math.random() * 0.5,
-        completed_orders: Math.floor(Math.random() * 50) + 5,
-        response_time: Math.floor(Math.random() * 10) + 2,
-        distance: Math.random() * 2 + 0.3
-      }));
-
-      setWashers(enrichedWashers);
+      setWashers(enrich(data || []));
     } catch (error: any) {
       console.error('Erreur chargement washers:', error);
       toast.error('Erreur de chargement');
@@ -59,12 +59,11 @@ export default function Trouver() {
     }
   };
 
-  // ✅ FONCTION DE RECHERCHE CORRIGÉE
   const handleSearch = async () => {
     const searchTerm = userCity.trim() || userPostalCode.trim();
 
     if (!searchTerm) {
-      toast.error("Veuillez entrer une ville ou un code postal");
+      toast.error('Veuillez entrer une ville ou un code postal');
       return;
     }
 
@@ -80,28 +79,18 @@ export default function Trouver() {
       if (error) throw error;
 
       const filtered = (data || []).filter((w: any) => {
-        const cityMatch = w.city?.toLowerCase().includes(searchTerm.toLowerCase());
-        const postalMatch = w.postal_code?.includes(searchTerm);
+        const cityMatch = (w.city || '').toLowerCase().includes(searchTerm.toLowerCase());
+        const postalMatch = (w.postal_code || '').includes(searchTerm);
         return cityMatch || postalMatch;
       });
 
-      const enriched = filtered.map((w: any) => ({
-        ...w,
-        rating: 4.5 + Math.random() * 0.5,
-        completed_orders: Math.floor(Math.random() * 50) + 5,
-        response_time: Math.floor(Math.random() * 10) + 2,
-        distance: Math.random() * 2 + 0.3
-      }));
-
+      const enriched = enrich(filtered);
       setWashers(enriched);
 
       toast.dismiss('search');
 
-      if (enriched.length > 0) {
-        toast.success(`✅ ${enriched.length} Washer(s) trouvé(s) !`);
-      } else {
-        toast.error('❌ Aucun Washer trouvé dans cette zone');
-      }
+      if (enriched.length > 0) toast.success(`✅ ${enriched.length} Washer(s) trouvé(s) !`);
+      else toast.error('❌ Aucun Washer trouvé dans cette zone');
     } catch (error: any) {
       console.error('Erreur recherche:', error);
       toast.dismiss('search');
@@ -111,27 +100,32 @@ export default function Trouver() {
     }
   };
 
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') handleSearch();
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleSearch();
+    }
   };
 
   return (
     <>
       <Helmet>
         <title>Trouve ton Washer - Kilolab</title>
-        <meta name="description" content="Trouve un Washer près de chez toi à Lille et Nantes. Lavage professionnel à domicile." />
+        <meta
+          name="description"
+          content="Trouve un Washer près de chez toi partout en France. Lavage professionnel à domicile."
+        />
       </Helmet>
 
       <div className="min-h-screen bg-slate-50">
         <Navbar />
 
         <div className="pt-32 pb-20 px-4 max-w-7xl mx-auto">
-
           {/* HERO */}
           <div className="text-center mb-12">
             <h1 className="text-4xl md:text-5xl font-black mb-4">🗺️ Trouve ton Washer</h1>
             <p className="text-xl text-slate-600 max-w-2xl mx-auto">
-              Des Washers disponibles près de chez toi à Lille et Nantes
+              Des Washers disponibles partout en France
             </p>
           </div>
 
@@ -143,13 +137,14 @@ export default function Trouver() {
                   <label className="block text-sm font-bold text-slate-700 mb-2">📍 Ta ville</label>
                   <input
                     type="text"
-                    placeholder="Ex: Lille, Nantes..."
+                    placeholder="Ex: Lille, Paris, Nantes..."
                     value={userCity}
                     onChange={(e) => setUserCity(e.target.value)}
-                    onKeyPress={handleKeyPress}
+                    onKeyDown={handleKeyDown}
                     className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500"
                   />
                 </div>
+
                 <div className="w-40">
                   <label className="block text-sm font-bold text-slate-700 mb-2">Code postal</label>
                   <input
@@ -157,10 +152,11 @@ export default function Trouver() {
                     placeholder="59000"
                     value={userPostalCode}
                     onChange={(e) => setUserPostalCode(e.target.value)}
-                    onKeyPress={handleKeyPress}
+                    onKeyDown={handleKeyDown}
                     className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500"
                   />
                 </div>
+
                 <div className="flex items-end">
                   <button
                     onClick={handleSearch}
@@ -174,18 +170,22 @@ export default function Trouver() {
             </div>
           </div>
 
-          {/* STATS */}
+          {/* ✅ STATS - TEXTE CORRIGÉ */}
           <div className="grid grid-cols-3 gap-6 max-w-4xl mx-auto mb-12">
             <div className="bg-white rounded-xl p-6 text-center border border-slate-100">
               <div className="text-3xl font-black text-teal-600 mb-1">
-                {washers.filter(w => w.is_available).length}
+                {washers.filter((w) => w.is_available).length}
               </div>
-              <div className="text-sm text-slate-600 font-medium">Washers disponibles</div>
+              <div className="text-sm text-slate-600 font-medium">
+                Washers disponibles{washers.length > 0 ? ' près de vous' : ''}
+              </div>
             </div>
+
             <div className="bg-white rounded-xl p-6 text-center border border-slate-100">
               <div className="text-3xl font-black text-blue-600 mb-1">~5min</div>
               <div className="text-sm text-slate-600 font-medium">Temps de réponse</div>
             </div>
+
             <div className="bg-white rounded-xl p-6 text-center border border-slate-100">
               <div className="text-3xl font-black text-purple-600 mb-1">4.8⭐</div>
               <div className="text-sm text-slate-600 font-medium">Note moyenne</div>
@@ -204,7 +204,9 @@ export default function Trouver() {
           {!loading && washers.length === 0 && (
             <div className="text-center py-12 bg-white rounded-2xl border border-slate-200">
               <MapPin size={64} className="mx-auto mb-4 text-slate-300" />
-              <h3 className="text-2xl font-bold text-slate-900 mb-2">Pas encore de Washers dans ta zone</h3>
+              <h3 className="text-2xl font-bold text-slate-900 mb-2">
+                Pas encore de Washers dans ta zone
+              </h3>
               <p className="text-slate-600 mb-6">Sois le premier Washer de ton quartier !</p>
               <Link
                 to="/become-washer"
@@ -229,13 +231,16 @@ export default function Trouver() {
                         {washer.full_name ? washer.full_name.charAt(0).toUpperCase() : '?'}
                       </div>
                       <div>
-                        <h3 className="font-bold text-lg text-slate-900">{washer.full_name || 'Washer'}</h3>
+                        <h3 className="font-bold text-lg text-slate-900">
+                          {washer.full_name || 'Washer'}
+                        </h3>
                         <div className="flex items-center gap-1 text-sm text-slate-500">
                           <MapPin size={14} />
                           {washer.city} ({washer.postal_code})
                         </div>
                       </div>
                     </div>
+
                     {washer.is_available ? (
                       <span className="px-2 py-1 bg-green-100 text-green-700 text-xs font-bold rounded-full">
                         🟢 Dispo
@@ -251,14 +256,18 @@ export default function Trouver() {
                     <div className="text-center">
                       <div className="flex items-center justify-center gap-1 text-yellow-500 mb-1">
                         <Star size={14} className="fill-yellow-400" />
-                        <span className="font-bold text-slate-900">{washer.rating?.toFixed(1) || '4.8'}</span>
+                        <span className="font-bold text-slate-900">
+                          {washer.rating?.toFixed(1) || '4.8'}
+                        </span>
                       </div>
                       <p className="text-xs text-slate-500">Note</p>
                     </div>
+
                     <div className="text-center">
                       <div className="font-bold text-slate-900 mb-1">{washer.completed_orders || 0}</div>
                       <p className="text-xs text-slate-500">Lavages</p>
                     </div>
+
                     <div className="text-center">
                       <div className="font-bold text-slate-900 mb-1">{washer.distance?.toFixed(1) || '0.5'}km</div>
                       <p className="text-xs text-slate-500">Distance</p>
@@ -292,7 +301,6 @@ export default function Trouver() {
               Je m'inscris
             </Link>
           </div>
-
         </div>
 
         <Footer />
