@@ -11,29 +11,22 @@
       'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
       })(window,document,'script','dataLayer','GTM-KZ7CGGPL');
     </script>
-    <!-- End GTM -->
 
-    <!-- Facebook Pixel Code -->
+    <!-- Facebook Pixel -->
     <script>
       !function(f,b,e,v,n,t,s){
-        if(f.fbq)return;
-        n=f.fbq=function(){
-          n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)
-        };
-        if(!f._fbq)f._fbq=n;
-        n.push=n;n.loaded=!0;n.version='2.0';
-        n.queue=[];
-        t=b.createElement(e);t.async=!0;
-        t.src=v;
-        s=b.getElementsByTagName(e)[0];
+        if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+        n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+        if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+        n.queue=[];t=b.createElement(e);t.async=!0;
+        t.src=v;s=b.getElementsByTagName(e)[0];
         s.parentNode.insertBefore(t,s)
-      }(window, document,'script','https://connect.facebook.net/en_US/fbevents.js');
-
+      }(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
       fbq('init', '1573268523913279');
       fbq('track', 'PageView');
     </script>
 
-    <!-- Preconnect / DNS Prefetch -->
+    <!-- Preconnect -->
     <link rel="preconnect" href="https://dhecegehcjelbxydcolg.supabase.co" crossorigin />
     <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -45,8 +38,6 @@
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
-
-    <!-- Manifest PWA -->
     <link rel="manifest" href="/site.webmanifest" />
 
     <!-- Meta -->
@@ -58,10 +49,10 @@
     <meta name="author" content="Kilolab" />
 
     <!-- SEO -->
-    <title>Kilolab - Pressing à Domicile | Collecte & Livraison à Lille & Nantes</title>
+    <title>Kilolab - Pressing à Domicile | Collecte & Livraison partout en France</title>
     <meta
       name="description"
-      content="Libérez-vous de la corvée de lessive ! Kilolab collecte votre linge à domicile, le lave et vous le livre propre en 48h. Service collaboratif de confiance. Dès 3€/kg à Lille et Nantes."
+      content="Libérez-vous de la corvée de lessive ! Kilolab collecte votre linge à domicile, le lave et vous le livre propre en 48h. Service collaboratif de confiance. Dès 3€/kg."
     />
     <meta
       name="keywords"
@@ -73,7 +64,7 @@
     <meta property="og:url" content="https://kilolab.fr/" />
     <meta property="og:site_name" content="Kilolab" />
     <meta property="og:title" content="Kilolab - Pressing à Domicile | Collecte & Livraison" />
-    <meta property="og:description" content="Collecte et livraison à domicile en 48h. Service collaboratif de confiance." />
+    <meta property="og:description" content="Libérez votre temps. On prend soin de votre linge. Collecte et livraison en 48h. Dès 3€/kg." />
     <meta property="og:image" content="https://kilolab.fr/og-image.jpg" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
@@ -89,64 +80,134 @@
     <!-- Canonical -->
     <link rel="canonical" href="https://kilolab.fr/" />
 
-    <!-- GEO (optionnel) -->
-    <meta name="geo.region" content="FR-59" />
-    <meta name="geo.placename" content="Lille, Nantes" />
+    <!-- GEO -->
+    <meta name="geo.region" content="FR" />
+    <meta name="geo.placename" content="France" />
 
-    <!-- ✅ Schema.org (propre, sans fake address/phone si tu ne veux pas) -->
+    <!-- Schema.org -->
     <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "Organization",
-      "@id": "https://kilolab.fr/#org",
-      "name": "Kilolab",
-      "url": "https://kilolab.fr/",
-      "logo": "https://kilolab.fr/logo.png",
-      "description": "Service de pressing à domicile collaboratif. Collecte, lavage et livraison en 48h à Lille et Nantes.",
-      "sameAs": [
-        "https://www.facebook.com/kilolab.fr",
-        "https://www.instagram.com/kilolab.fr"
-      ],
-      "areaServed": [
-        { "@type": "City", "name": "Lille" },
-        { "@type": "City", "name": "Nantes" }
-      ],
-      "contactPoint": {
-        "@type": "ContactPoint",
-        "contactType": "customer service",
-        "email": "contact@kilolab.fr",
-        "availableLanguage": "French",
-        "areaServed": "FR"
+      {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        "@id": "https://kilolab.fr/#org",
+        "name": "Kilolab",
+        "url": "https://kilolab.fr/",
+        "logo": "https://kilolab.fr/logo.png",
+        "description": "Service de pressing à domicile collaboratif. Collecte, lavage et livraison en 48h partout en France.",
+        "sameAs": [
+          "https://www.facebook.com/kilolab.fr",
+          "https://www.instagram.com/kilolab.fr"
+        ],
+        "areaServed": {
+          "@type": "Country",
+          "name": "France"
+        },
+        "contactPoint": {
+          "@type": "ContactPoint",
+          "contactType": "customer service",
+          "email": "contact@kilolab.fr",
+          "availableLanguage": "French",
+          "areaServed": "FR"
+        }
       }
-    }
     </script>
 
-    <!-- ✅ PRELOADER CSS -->
+    <!-- 🎨 LOADER PRO -->
     <style>
-      #preloader {
+      #app-loader {
         position: fixed;
         inset: 0;
-        background: #ffffff;
+        background: linear-gradient(135deg, #14b8a6 0%, #06b6d4 100%);
         z-index: 9999;
         display: flex;
         align-items: center;
         justify-content: center;
-        transition: opacity 0.45s ease, visibility 0.45s ease;
+        transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1),
+          visibility 0.6s cubic-bezier(0.4, 0, 0.2, 1);
       }
-      #preloader.loaded {
+
+      #app-loader.loaded {
         opacity: 0;
         visibility: hidden;
       }
-      .washer-spinner {
-        width: 64px;
-        height: 64px;
-        border: 4px solid #e5e7eb;
-        border-top-color: #14b8a6;
+
+      .loader-container {
+        text-align: center;
+        animation: fadeInUp 0.8s ease-out;
+      }
+
+      .loader-logo {
+        font-size: 64px;
+        font-weight: 900;
+        color: white;
+        margin-bottom: 32px;
+        letter-spacing: 4px;
+        animation: logoFloat 2.5s ease-in-out infinite;
+        text-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+      }
+
+      .loader-spinner {
+        width: 80px;
+        height: 80px;
+        margin: 0 auto;
+        position: relative;
+      }
+
+      .loader-spinner::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        border: 6px solid rgba(255, 255, 255, 0.2);
+        border-top-color: white;
         border-radius: 50%;
         animation: spin 1s linear infinite;
       }
+
+      .loader-spinner::after {
+        content: '';
+        position: absolute;
+        inset: 12px;
+        border: 4px solid rgba(255, 255, 255, 0.3);
+        border-radius: 50%;
+        animation: spinReverse 1.5s linear infinite;
+      }
+
+      .loader-tagline {
+        margin-top: 24px;
+        color: rgba(255, 255, 255, 0.9);
+        font-size: 16px;
+        font-weight: 600;
+        font-family: system-ui, -apple-system, sans-serif;
+        letter-spacing: 1px;
+        animation: pulse 2s ease-in-out infinite;
+      }
+
+      @keyframes logoFloat {
+        0%, 100% { transform: translateY(0px) scale(1); }
+        50% { transform: translateY(-10px) scale(1.02); }
+      }
+
       @keyframes spin { to { transform: rotate(360deg); } }
+
+      @keyframes spinReverse { to { transform: rotate(-360deg); } }
+
+      @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(30px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+
+      @keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.7; }
+      }
+
       body.loading { overflow: hidden; }
+
+      @media (max-width: 768px) {
+        .loader-logo { font-size: 48px; letter-spacing: 2px; }
+        .loader-spinner { width: 64px; height: 64px; }
+        .loader-tagline { font-size: 14px; }
+      }
     </style>
   </head>
 
@@ -161,26 +222,36 @@
       <img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=1573268523913279&ev=PageView&noscript=1" alt="" />
     </noscript>
 
-    <!-- ✅ PRELOADER -->
-    <div id="preloader">
-      <div style="text-align:center;">
-        <div class="washer-spinner"></div>
-        <p style="margin-top:16px;color:#64748b;font-family:system-ui;font-weight:800;">Kilolab</p>
+    <!-- Loader -->
+    <div id="app-loader">
+      <div class="loader-container">
+        <div class="loader-logo">KILOLAB</div>
+        <div class="loader-spinner"></div>
+        <div class="loader-tagline">Libérez votre temps</div>
       </div>
     </div>
 
+    <!-- App React -->
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
 
-    <!-- ✅ PRELOADER SCRIPT -->
+    <!-- Loader Script -->
     <script>
       window.addEventListener('load', function () {
         setTimeout(function () {
-          var preloader = document.getElementById('preloader');
-          if (preloader) preloader.classList.add('loaded');
+          const loader = document.getElementById('app-loader');
+          if (loader) loader.classList.add('loaded');
           document.body.classList.remove('loading');
-        }, 250);
+        }, 400);
       });
+
+      setTimeout(function () {
+        const loader = document.getElementById('app-loader');
+        if (loader && !loader.classList.contains('loaded')) {
+          loader.classList.add('loaded');
+          document.body.classList.remove('loading');
+        }
+      }, 3000);
     </script>
   </body>
 </html>
