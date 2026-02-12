@@ -19,9 +19,6 @@ export default function Tarifs() {
       <div className="min-h-screen bg-white font-sans">
         <Navbar />
 
-        {/* ═══════════════════════════════════════════════════════════
-            HERO - CORRIGÉ
-        ═══════════════════════════════════════════════════════════ */}
         <header className="pt-32 pb-16 bg-slate-900 text-white text-center">
           <div className="max-w-4xl mx-auto px-4">
             <h1 className="text-4xl md:text-6xl font-black mb-6">
@@ -34,13 +31,10 @@ export default function Tarifs() {
           </div>
         </header>
 
-        {/* ═══════════════════════════════════════════════════════════
-            LES 2 FORMULES - CORRIGÉES
-        ═══════════════════════════════════════════════════════════ */}
         <section className="py-20 px-4 -mt-10">
           <div className="max-w-5xl mx-auto grid md:grid-cols-2 gap-8">
 
-            {/* ✅ STANDARD */}
+            {/* Standard */}
             <div className="bg-white rounded-3xl p-8 shadow-xl border border-slate-200 flex flex-col hover:-translate-y-2 transition duration-300">
               <div className="mb-6">
                 <span className="bg-slate-100 text-slate-600 px-3 py-1 rounded-full text-xs font-bold uppercase">
@@ -79,7 +73,7 @@ export default function Tarifs() {
               </Link>
             </div>
 
-            {/* ✅ EXPRESS */}
+            {/* Express */}
             <div className="bg-slate-900 text-white rounded-3xl p-8 shadow-2xl border-2 border-teal-500 flex flex-col relative transform md:scale-105 hover:scale-110 transition duration-300">
               <div className="absolute top-4 right-4 bg-teal-500 text-white text-xs font-bold px-3 py-1 rounded-full uppercase">
                 Populaire
@@ -128,7 +122,6 @@ export default function Tarifs() {
 
           </div>
 
-          {/* ✅ BADGES CONFIANCE */}
           <div className="mt-12 flex justify-center items-center gap-6 flex-wrap text-sm font-medium text-slate-600">
             <div className="flex items-center gap-2">
               <Shield size={18} className="text-green-500" />
@@ -145,7 +138,7 @@ export default function Tarifs() {
           </div>
         </section>
 
-        {/* COMPARATIF PRIX */}
+        {/* Comparatif prix */}
         <section className="py-20 bg-slate-50 border-y border-slate-200">
           <div className="max-w-5xl mx-auto px-4">
             <div className="text-center mb-12">
@@ -158,8 +151,6 @@ export default function Tarifs() {
             </div>
 
             <div className="grid md:grid-cols-2 gap-8 items-center">
-
-              {/* Pressing */}
               <div className="bg-white p-8 rounded-3xl border border-red-100 opacity-80 grayscale hover:grayscale-0 transition duration-500">
                 <div className="flex items-center gap-3 mb-6 text-red-500">
                   <X size={32} />
@@ -175,7 +166,6 @@ export default function Tarifs() {
                 </div>
               </div>
 
-              {/* Kilolab */}
               <div className="bg-white p-8 rounded-3xl border-2 border-teal-500 shadow-xl relative">
                 <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-teal-500 text-white px-4 py-1 rounded-full text-sm font-bold">
                   🏆 GAGNANT
@@ -197,7 +187,6 @@ export default function Tarifs() {
                   ↘ Vous économisez 30€ (77%)
                 </p>
               </div>
-
             </div>
           </div>
         </section>
