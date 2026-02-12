@@ -1,22 +1,27 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import {
   Loader2, Upload, Check, Sparkles, TrendingUp,
-  MapPin, ShieldCheck, ArrowRight, Home,
-  DollarSign, Users
+  ShieldCheck, ArrowRight, Home, DollarSign, Users
 } from 'lucide-react';
 import toast from 'react-hot-toast';
+
+type Coords = { lat: number; lng: number };
+
+const normalizeEmail = (email: string) => email.trim().toLowerCase();
+const isPostalCodeValid = (cp: string) => /^[0-9]{5}$/.test(cp.trim());
+const isPhoneProbablyValid = (p: string) => p.trim().replace(/\s+/g, '').length >= 8;
 
 export default function BecomeWasher() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
-  const [step, setStep] = useState(0); // Step 0 = Landing
+  const [step, setStep] = useState(0);
   const [volume, setVolume] = useState(20);
 
-  const revenue = (volume * 2.80 * 4).toFixed(0);
+  const revenue = useMemo(() => (volume * 2.8 * 4).toFixed(0), [volume]);
 
   const [formData, setFormData] = useState({
     fullName: '',
@@ -34,57 +39,88 @@ export default function BecomeWasher() {
     data_consent: false
   });
 
+  // ─────────────────────────────────────────────
+  // Upload ID Card (safe)
+  // ─────────────────────────────────────────────
   const uploadIdCard = async (file: File) => {
     try {
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${Date.now()}-${Math.random()}.${fileExt}`;
-      const filePath = `id-cards/${fileName}`;
+      if (!file) return;
 
-      const { error } = await supabase.storage.from('documents').upload(filePath, file);
+      const max = 10 * 1024 * 1024; // 10MB
+      if (file.size > max) {
+        toast.error('Fichier trop lourd (max 10MB).');
+        return;
+      }
+
+      const fileExt = (file.name.split('.').pop() || 'bin').toLowerCase();
+      const safeId =
+        typeof crypto !== 'undefined' && 'randomUUID' in crypto
+          ? crypto.randomUUID()
+          : `${Date.now()}-${Math.floor(Math.random() * 1e9)}`;
+
+      const filePath = `id-cards/${Date.now()}-${safeId}.${fileExt}`;
+
+      const { error } = await supabase.storage.from('documents').upload(filePath, file, {
+        cacheControl: '3600',
+        upsert: false,
+      });
+
       if (error) throw error;
 
       const { data } = supabase.storage.from('documents').getPublicUrl(filePath);
-      setFormData({ ...formData, idCardUrl: data.publicUrl });
+      setFormData((prev) => ({ ...prev, idCardUrl: data.publicUrl }));
       toast.success("Pièce d'identité reçue !");
     } catch (error: any) {
-      toast.error("Erreur upload: " + error.message);
+      toast.error("Erreur upload: " + (error?.message ?? 'inconnue'));
     }
   };
 
+  // ─────────────────────────────────────────────
+  // Geocode via Edge Function (safe)
+  // ─────────────────────────────────────────────
   const geocodeAddress = async (
     address: string,
     city: string,
     postalCode: string
-  ): Promise<{ lat: number; lng: number } | null> => {
+  ): Promise<Coords | null> => {
     try {
-      const fullAddress = `${address}, ${postalCode} ${city}, France`;
-      const response = await fetch(
-        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(fullAddress)}&limit=1`
-      );
-      const data = await response.json();
-      return (data && data.length > 0)
-        ? { lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon) }
-        : null;
-    } catch (error) {
-      console.error('Erreur géocodage:', error);
+      const { data, error } = await supabase.functions.invoke('geocode-address', {
+        body: {
+          address: address.trim(),
+          city: city.trim(),
+          postalCode: postalCode.trim(),
+        }
+      });
+
+      if (error) {
+        console.error('Erreur Edge Function:', error);
+        return null;
+      }
+
+      if (!data?.lat || !data?.lng) return null;
+      return { lat: data.lat, lng: data.lng };
+    } catch (err) {
+      console.error('Erreur geocodeAddress:', err);
       return null;
     }
   };
 
-  // ✅ NOUVEAU : Vérifier si l'email existe déjà
+  // ─────────────────────────────────────────────
+  // Check email exists (normalized)
+  // ─────────────────────────────────────────────
   const checkEmailExists = async (email: string): Promise<boolean> => {
     try {
+      const e = normalizeEmail(email);
       const { data, error } = await supabase
         .from('washers')
         .select('email')
-        .eq('email', email)
+        .eq('email', e)
         .maybeSingle();
 
       if (error) {
         console.error('Erreur vérification email:', error);
         return false;
       }
-
       return !!data;
     } catch (error) {
       console.error('Erreur vérification email:', error);
@@ -92,52 +128,54 @@ export default function BecomeWasher() {
     }
   };
 
+  // ─────────────────────────────────────────────
+  // Submit
+  // ─────────────────────────────────────────────
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (loading) return;
+
     setLoading(true);
 
     try {
-      // ✅ Vérifier les engagements qualité
+      // validations (step 3 submit final)
+      if (!formData.fullName.trim()) return toast.error('Nom complet requis.');
+      const email = normalizeEmail(formData.email);
+      if (!email) return toast.error('Email requis.');
+      if (!isPhoneProbablyValid(formData.phone)) return toast.error('Téléphone invalide.');
+      if (!formData.city.trim()) return toast.error('Ville requise.');
+      if (!isPostalCodeValid(formData.postalCode)) return toast.error('Code postal invalide (5 chiffres).');
+      if (!formData.address.trim()) return toast.error('Adresse complète requise.');
+      if (!formData.idCardUrl) return toast.error("Merci d'uploader votre pièce d'identité.");
+
       if (!formData.has_machine || !formData.has_scale || !formData.use_hypoallergenic) {
-        toast.error("Veuillez valider les engagements qualité");
-        setLoading(false);
-        return;
+        return toast.error("Veuillez valider les engagements qualité");
       }
 
-      // ✅ Vérifier les conditions légales
       if (!formData.legal_capacity || !formData.accept_terms || !formData.data_consent) {
-        toast.error("Veuillez accepter les conditions légales");
-        setLoading(false);
-        return;
+        return toast.error("Veuillez accepter les conditions légales");
       }
 
-      // ✅ NOUVEAU : Vérifier si l'email existe déjà
-      const emailExists = await checkEmailExists(formData.email);
-      if (emailExists) {
-        toast.error("❌ Cet email est déjà inscrit comme Washer. Utilisez un autre email ou contactez le support.");
-        setLoading(false);
-        return;
+      const exists = await checkEmailExists(email);
+      if (exists) {
+        return toast.error("❌ Cet email est déjà inscrit comme Washer. Utilisez un autre email ou contactez le support.");
       }
 
-      // ✅ Géocodage de l'adresse
       toast.loading("Géolocalisation de l'adresse...", { id: 'geo' });
       const coords = await geocodeAddress(formData.address, formData.city, formData.postalCode);
       toast.dismiss('geo');
 
       if (!coords) {
-        toast.error("Impossible de géolocaliser l'adresse. Vérifiez qu'elle est correcte.");
-        setLoading(false);
-        return;
+        return toast.error("Impossible de géolocaliser l'adresse. Vérifiez qu'elle est correcte.");
       }
 
-      // ✅ Insertion dans la base de données
       const { error } = await supabase.from('washers').insert({
-        full_name: formData.fullName,
-        email: formData.email,
-        phone: formData.phone,
-        city: formData.city,
-        postal_code: formData.postalCode,
-        address: formData.address,
+        full_name: formData.fullName.trim(),
+        email,
+        phone: formData.phone.trim(),
+        city: formData.city.trim(),
+        postal_code: formData.postalCode.trim(),
+        address: formData.address.trim(),
         lat: coords.lat,
         lng: coords.lng,
         id_card_url: formData.idCardUrl,
@@ -150,27 +188,32 @@ export default function BecomeWasher() {
 
       if (error) {
         console.error('Erreur insertion Washer:', error);
-
         if ((error as any).code === '23505') {
-          toast.error("❌ Cet email est déjà utilisé. Contactez le support si c'est une erreur.");
+          toast.error("❌ Cet email est déjà utilisé.");
         } else {
           toast.error("❌ Erreur technique : " + error.message);
         }
-
-        setLoading(false);
         return;
       }
 
-      // ✅ Succès !
       setStep(4);
       toast.success("🎉 Candidature envoyée avec succès !");
     } catch (error: any) {
       console.error('Erreur handleSubmit:', error);
-      toast.error("❌ Erreur : " + error.message);
+      toast.error("❌ Erreur : " + (error?.message ?? 'inconnue'));
     } finally {
       setLoading(false);
     }
   };
+
+  // Helpers for step navigation (optionnel mais propre)
+  const canGoStep2 = () =>
+    formData.fullName.trim() &&
+    normalizeEmail(formData.email) &&
+    isPhoneProbablyValid(formData.phone) &&
+    formData.city.trim() &&
+    isPostalCodeValid(formData.postalCode) &&
+    formData.address.trim();
 
   return (
     <div className="min-h-screen bg-white font-sans text-slate-900">
@@ -322,7 +365,7 @@ export default function BecomeWasher() {
                     type="text"
                     placeholder="Ex: Thomas Dupont"
                     value={formData.fullName}
-                    onChange={e => setFormData({ ...formData, fullName: e.target.value })}
+                    onChange={e => setFormData(prev => ({ ...prev, fullName: e.target.value }))}
                     className="w-full p-4 bg-slate-50 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none transition"
                   />
                 </div>
@@ -335,7 +378,7 @@ export default function BecomeWasher() {
                       type="email"
                       placeholder="thomas@email.com"
                       value={formData.email}
-                      onChange={e => setFormData({ ...formData, email: e.target.value })}
+                      onChange={e => setFormData(prev => ({ ...prev, email: e.target.value }))}
                       className="w-full p-4 bg-slate-50 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none transition"
                     />
                   </div>
@@ -346,7 +389,7 @@ export default function BecomeWasher() {
                       type="tel"
                       placeholder="06 12 34 56 78"
                       value={formData.phone}
-                      onChange={e => setFormData({ ...formData, phone: e.target.value })}
+                      onChange={e => setFormData(prev => ({ ...prev, phone: e.target.value }))}
                       className="w-full p-4 bg-slate-50 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none transition"
                     />
                   </div>
@@ -360,7 +403,7 @@ export default function BecomeWasher() {
                       type="text"
                       placeholder="Lille"
                       value={formData.city}
-                      onChange={e => setFormData({ ...formData, city: e.target.value })}
+                      onChange={e => setFormData(prev => ({ ...prev, city: e.target.value }))}
                       className="w-full p-4 bg-slate-50 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none transition"
                     />
                   </div>
@@ -369,9 +412,10 @@ export default function BecomeWasher() {
                     <input
                       required
                       type="text"
+                      inputMode="numeric"
                       placeholder="59000"
                       value={formData.postalCode}
-                      onChange={e => setFormData({ ...formData, postalCode: e.target.value })}
+                      onChange={e => setFormData(prev => ({ ...prev, postalCode: e.target.value }))}
                       className="w-full p-4 bg-slate-50 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none transition"
                     />
                   </div>
@@ -384,7 +428,7 @@ export default function BecomeWasher() {
                     type="text"
                     placeholder="12 rue de la République"
                     value={formData.address}
-                    onChange={e => setFormData({ ...formData, address: e.target.value })}
+                    onChange={e => setFormData(prev => ({ ...prev, address: e.target.value }))}
                     className="w-full p-4 bg-slate-50 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none transition"
                   />
                 </div>
@@ -400,7 +444,13 @@ export default function BecomeWasher() {
                 </button>
                 <button
                   type="button"
-                  onClick={() => setStep(2)}
+                  onClick={() => {
+                    if (!canGoStep2()) {
+                      toast.error("Merci de remplir correctement tous les champs (CP 5 chiffres).");
+                      return;
+                    }
+                    setStep(2);
+                  }}
                   className="flex-1 py-4 bg-slate-900 text-white font-bold rounded-xl hover:bg-black transition shadow-lg"
                 >
                   Suivant
@@ -461,7 +511,6 @@ export default function BecomeWasher() {
           {/* ==================== STEP 3 : ENGAGEMENTS ==================== */}
           {step === 3 && (
             <div className="grid lg:grid-cols-2 gap-8 animate-fade-in">
-
               {/* SIMULATEUR STICKY */}
               <div className="lg:sticky lg:top-32 h-fit">
                 <div className="bg-slate-900 text-white p-8 rounded-3xl shadow-2xl relative overflow-hidden">
@@ -502,7 +551,6 @@ export default function BecomeWasher() {
                 <h2 className="text-2xl font-bold mb-6">✅ Charte Qualité & Légal</h2>
 
                 <div className="space-y-4 mb-8">
-
                   <div className="p-5 bg-slate-50 rounded-xl border border-slate-200">
                     <h4 className="font-bold text-slate-900 mb-4 flex items-center gap-2">
                       <Sparkles size={18} className="text-teal-600" /> Matériel requis
@@ -513,7 +561,7 @@ export default function BecomeWasher() {
                         type="checkbox"
                         className="mt-1 w-5 h-5 accent-teal-600 cursor-pointer"
                         checked={formData.has_machine}
-                        onChange={e => setFormData({ ...formData, has_machine: e.target.checked })}
+                        onChange={e => setFormData(prev => ({ ...prev, has_machine: e.target.checked }))}
                       />
                       <span className="text-sm text-slate-600 group-hover:text-slate-900 transition">
                         Machine à laver propre et entretenue
@@ -525,7 +573,7 @@ export default function BecomeWasher() {
                         type="checkbox"
                         className="mt-1 w-5 h-5 accent-teal-600 cursor-pointer"
                         checked={formData.has_scale}
-                        onChange={e => setFormData({ ...formData, has_scale: e.target.checked })}
+                        onChange={e => setFormData(prev => ({ ...prev, has_scale: e.target.checked }))}
                       />
                       <span className="text-sm text-slate-600 group-hover:text-slate-900 transition">
                         J'achèterai un <strong>peson digital</strong> (~10€)
@@ -537,7 +585,7 @@ export default function BecomeWasher() {
                         type="checkbox"
                         className="mt-1 w-5 h-5 accent-teal-600 cursor-pointer"
                         checked={formData.use_hypoallergenic}
-                        onChange={e => setFormData({ ...formData, use_hypoallergenic: e.target.checked })}
+                        onChange={e => setFormData(prev => ({ ...prev, use_hypoallergenic: e.target.checked }))}
                       />
                       <span className="text-sm text-slate-600 group-hover:text-slate-900 transition">
                         Lessive <strong>hypoallergénique</strong> uniquement
@@ -555,7 +603,7 @@ export default function BecomeWasher() {
                         type="checkbox"
                         className="mt-1 w-5 h-5 accent-orange-600 cursor-pointer"
                         checked={formData.legal_capacity}
-                        onChange={e => setFormData({ ...formData, legal_capacity: e.target.checked })}
+                        onChange={e => setFormData(prev => ({ ...prev, legal_capacity: e.target.checked }))}
                       />
                       <span className="text-sm text-orange-900 group-hover:text-orange-700 transition">
                         Je suis majeur(e) et apte à exercer une activité indépendante
@@ -567,7 +615,7 @@ export default function BecomeWasher() {
                         type="checkbox"
                         className="mt-1 w-5 h-5 accent-orange-600 cursor-pointer"
                         checked={formData.accept_terms}
-                        onChange={e => setFormData({ ...formData, accept_terms: e.target.checked })}
+                        onChange={e => setFormData(prev => ({ ...prev, accept_terms: e.target.checked }))}
                       />
                       <span className="text-sm text-orange-900 group-hover:text-orange-700 transition">
                         J'accepte les{' '}
@@ -583,14 +631,13 @@ export default function BecomeWasher() {
                         type="checkbox"
                         className="mt-1 w-5 h-5 accent-orange-600 cursor-pointer"
                         checked={formData.data_consent}
-                        onChange={e => setFormData({ ...formData, data_consent: e.target.checked })}
+                        onChange={e => setFormData(prev => ({ ...prev, data_consent: e.target.checked }))}
                       />
                       <span className="text-sm text-orange-900 group-hover:text-orange-700 transition">
                         J'accepte le traitement de mes données (RGPD)
                       </span>
                     </label>
                   </div>
-
                 </div>
 
                 <div className="flex gap-4">
@@ -635,7 +682,7 @@ export default function BecomeWasher() {
               <div className="bg-teal-50 border-2 border-teal-200 rounded-xl p-6 mb-8">
                 <p className="text-sm font-bold text-teal-900 mb-2">📦 Préparez votre matériel :</p>
                 <ul className="text-sm text-teal-700 space-y-1">
-                  <li>• Peson digital (~10€ sur Amazon)</li>
+                  <li>• Peson digital (~10€)</li>
                   <li>• Lessive hypoallergénique</li>
                   <li>• Machine à laver propre</li>
                 </ul>
