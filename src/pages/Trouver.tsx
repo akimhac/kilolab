@@ -30,8 +30,8 @@ export default function Trouver() {
     fetchAllWashers();
   }, []);
 
-  const enrich = (list: any[]) =>
-    (list || []).map((w: any) => ({
+  const enrichWashers = (data: any[]) =>
+    (data || []).map((w: any) => ({
       ...w,
       rating: 4.5 + Math.random() * 0.5,
       completed_orders: Math.floor(Math.random() * 50) + 5,
@@ -50,7 +50,7 @@ export default function Trouver() {
 
       if (error) throw error;
 
-      setWashers(enrich(data || []));
+      setWashers(enrichWashers(data || []));
     } catch (error: any) {
       console.error('Erreur chargement washers:', error);
       toast.error('Erreur de chargement');
@@ -84,7 +84,7 @@ export default function Trouver() {
         return cityMatch || postalMatch;
       });
 
-      const enriched = enrich(filtered);
+      const enriched = enrichWashers(filtered);
       setWashers(enriched);
 
       toast.dismiss('search');
@@ -111,17 +111,13 @@ export default function Trouver() {
     <>
       <Helmet>
         <title>Trouve ton Washer - Kilolab</title>
-        <meta
-          name="description"
-          content="Trouve un Washer près de chez toi partout en France. Lavage professionnel à domicile."
-        />
+        <meta name="description" content="Trouve un Washer près de chez toi partout en France. Lavage professionnel à domicile." />
       </Helmet>
 
       <div className="min-h-screen bg-slate-50">
         <Navbar />
 
         <div className="pt-32 pb-20 px-4 max-w-7xl mx-auto">
-          {/* HERO */}
           <div className="text-center mb-12">
             <h1 className="text-4xl md:text-5xl font-black mb-4">🗺️ Trouve ton Washer</h1>
             <p className="text-xl text-slate-600 max-w-2xl mx-auto">
@@ -129,7 +125,6 @@ export default function Trouver() {
             </p>
           </div>
 
-          {/* SEARCH BAR */}
           <div className="max-w-2xl mx-auto mb-12">
             <div className="bg-white rounded-2xl shadow-lg p-6 border border-slate-200">
               <div className="flex gap-4">
@@ -170,7 +165,7 @@ export default function Trouver() {
             </div>
           </div>
 
-          {/* ✅ STATS - TEXTE CORRIGÉ */}
+          {/* ✅ STATS - "près de vous" sans afficher 0 */}
           <div className="grid grid-cols-3 gap-6 max-w-4xl mx-auto mb-12">
             <div className="bg-white rounded-xl p-6 text-center border border-slate-100">
               <div className="text-3xl font-black text-teal-600 mb-1">
@@ -192,7 +187,6 @@ export default function Trouver() {
             </div>
           </div>
 
-          {/* LOADING */}
           {loading && (
             <div className="text-center py-12">
               <Loader2 className="animate-spin mx-auto mb-4 text-teal-600" size={48} />
@@ -200,13 +194,10 @@ export default function Trouver() {
             </div>
           )}
 
-          {/* AUCUN WASHER */}
           {!loading && washers.length === 0 && (
             <div className="text-center py-12 bg-white rounded-2xl border border-slate-200">
               <MapPin size={64} className="mx-auto mb-4 text-slate-300" />
-              <h3 className="text-2xl font-bold text-slate-900 mb-2">
-                Pas encore de Washers dans ta zone
-              </h3>
+              <h3 className="text-2xl font-bold text-slate-900 mb-2">Pas encore de Washers dans ta zone</h3>
               <p className="text-slate-600 mb-6">Sois le premier Washer de ton quartier !</p>
               <Link
                 to="/become-washer"
@@ -217,7 +208,6 @@ export default function Trouver() {
             </div>
           )}
 
-          {/* LISTE WASHERS */}
           {!loading && washers.length > 0 && (
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
               {washers.map((washer) => (
@@ -231,9 +221,7 @@ export default function Trouver() {
                         {washer.full_name ? washer.full_name.charAt(0).toUpperCase() : '?'}
                       </div>
                       <div>
-                        <h3 className="font-bold text-lg text-slate-900">
-                          {washer.full_name || 'Washer'}
-                        </h3>
+                        <h3 className="font-bold text-lg text-slate-900">{washer.full_name || 'Washer'}</h3>
                         <div className="flex items-center gap-1 text-sm text-slate-500">
                           <MapPin size={14} />
                           {washer.city} ({washer.postal_code})
@@ -256,9 +244,7 @@ export default function Trouver() {
                     <div className="text-center">
                       <div className="flex items-center justify-center gap-1 text-yellow-500 mb-1">
                         <Star size={14} className="fill-yellow-400" />
-                        <span className="font-bold text-slate-900">
-                          {washer.rating?.toFixed(1) || '4.8'}
-                        </span>
+                        <span className="font-bold text-slate-900">{washer.rating?.toFixed(1) || '4.8'}</span>
                       </div>
                       <p className="text-xs text-slate-500">Note</p>
                     </div>
@@ -290,7 +276,6 @@ export default function Trouver() {
             </div>
           )}
 
-          {/* CTA Devenir Washer */}
           <div className="mt-16 bg-gradient-to-r from-teal-600 to-cyan-600 rounded-2xl p-8 text-center text-white">
             <h2 className="text-3xl font-black mb-4">Deviens Washer dans ton quartier 💰</h2>
             <p className="text-xl mb-6 text-teal-100">Gagne jusqu'à 600€/mois en lavant le linge de tes voisins</p>
