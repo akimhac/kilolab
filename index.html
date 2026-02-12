@@ -2,14 +2,17 @@
 <html lang="fr">
   <head>
     <meta charset="UTF-8" />
-    
+
     <!-- Google Tag Manager -->
-    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-    })(window,document,'script','dataLayer','GTM-KZ7CGGPL');</script>
-    
+    <script>
+      (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+      new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+      j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+      'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+      })(window,document,'script','dataLayer','GTM-KZ7CGGPL');
+    </script>
+    <!-- End GTM -->
+
     <!-- Facebook Pixel Code -->
     <script>
       !function(f,b,e,v,n,t,s){
@@ -25,26 +28,27 @@
         s=b.getElementsByTagName(e)[0];
         s.parentNode.insertBefore(t,s)
       }(window, document,'script','https://connect.facebook.net/en_US/fbevents.js');
-      
+
       fbq('init', '1573268523913279');
       fbq('track', 'PageView');
     </script>
-    
-    <!-- Preconnect -->
-    <link rel="preconnect" href="https://dhecegehcjelbxydeolg.supabase.co" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
+
+    <!-- Preconnect / DNS Prefetch -->
+    <link rel="preconnect" href="https://dhecegehcjelbxydcolg.supabase.co" crossorigin />
+    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
     <link rel="dns-prefetch" href="https://connect.facebook.net" />
-    
+
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
-    
+
     <!-- Manifest PWA -->
     <link rel="manifest" href="/site.webmanifest" />
-    
+
     <!-- Meta -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
     <meta name="theme-color" content="#14b8a6" />
@@ -52,121 +56,131 @@
     <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
     <meta name="googlebot" content="index, follow" />
     <meta name="author" content="Kilolab" />
-    
-    <!-- SEO PRINCIPAL - FOCUS CLIENT (Ceux qui paient) -->
+
+    <!-- SEO -->
     <title>Kilolab - Pressing à Domicile | Collecte & Livraison à Lille & Nantes</title>
-    <meta name="description" content="Libérez-vous de la corvée de lessive ! Kilolab collecte votre linge à domicile, le lave et vous le livre propre en 48h. Service collaboratif de confiance. Dès 3€/kg à Lille et Nantes." />
-    <meta name="keywords" content="pressing à domicile, laverie à domicile, linge à domicile, pressing Lille, pressing Nantes, collecte linge, livraison linge, pressing collaboratif, laverie collaborative" />
-    
-    <!-- Open Graph (Facebook, LinkedIn, WhatsApp) -->
+    <meta
+      name="description"
+      content="Libérez-vous de la corvée de lessive ! Kilolab collecte votre linge à domicile, le lave et vous le livre propre en 48h. Service collaboratif de confiance. Dès 3€/kg à Lille et Nantes."
+    />
+    <meta
+      name="keywords"
+      content="pressing à domicile, laverie à domicile, linge à domicile, pressing Lille, pressing Nantes, collecte linge, livraison linge, pressing collaboratif, laverie collaborative"
+    />
+
+    <!-- Open Graph -->
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://kilolab.fr/" />
     <meta property="og:site_name" content="Kilolab" />
     <meta property="og:title" content="Kilolab - Pressing à Domicile | Collecte & Livraison" />
-    <meta property="og:description" content="Libérez-vous de la corvée de lessive ! Collecte et livraison à domicile en 48h. Service collaboratif de confiance." />
+    <meta property="og:description" content="Collecte et livraison à domicile en 48h. Service collaboratif de confiance." />
     <meta property="og:image" content="https://kilolab.fr/og-image.jpg" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
     <meta property="og:locale" content="fr_FR" />
-    
+
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:url" content="https://kilolab.fr/" />
     <meta name="twitter:title" content="Kilolab - Pressing à Domicile" />
     <meta name="twitter:description" content="Collecte et livraison de linge à domicile en 48h. Dès 3€/kg." />
     <meta name="twitter:image" content="https://kilolab.fr/og-image.jpg" />
-    
+
     <!-- Canonical -->
     <link rel="canonical" href="https://kilolab.fr/" />
-    
-    <!-- GEO -->
+
+    <!-- GEO (optionnel) -->
     <meta name="geo.region" content="FR-59" />
     <meta name="geo.placename" content="Lille, Nantes" />
-    <meta name="geo.position" content="50.6292;3.0573" />
-    <meta name="ICBM" content="50.6292, 3.0573" />
-    
-    <!-- Schema.org - LocalBusiness -->
+
+    <!-- ✅ Schema.org (propre, sans fake address/phone si tu ne veux pas) -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
-      "@type": "LocalBusiness",
-      "@id": "https://kilolab.fr",
+      "@type": "Organization",
+      "@id": "https://kilolab.fr/#org",
       "name": "Kilolab",
-      "image": "https://kilolab.fr/logo.png",
-      "description": "Service de pressing à domicile. Collecte, lavage et livraison de votre linge en 48h. Service collaboratif de confiance à Lille et Nantes.",
-      "url": "https://kilolab.fr",
-      "telephone": "+33-XXX-XXX-XXX",
-      "priceRange": "€€",
-      "address": {
-        "@type": "PostalAddress",
-        "streetAddress": "Votre adresse",
-        "addressLocality": "Lille",
-        "addressRegion": "Hauts-de-France",
-        "postalCode": "59000",
-        "addressCountry": "FR"
-      },
-      "geo": {
-        "@type": "GeoCoordinates",
-        "latitude": 50.6292,
-        "longitude": 3.0573
-      },
-      "areaServed": [
-        {
-          "@type": "City",
-          "name": "Lille",
-          "sameAs": "https://fr.wikipedia.org/wiki/Lille"
-        },
-        {
-          "@type": "City",
-          "name": "Nantes",
-          "sameAs": "https://fr.wikipedia.org/wiki/Nantes"
-        }
+      "url": "https://kilolab.fr/",
+      "logo": "https://kilolab.fr/logo.png",
+      "description": "Service de pressing à domicile collaboratif. Collecte, lavage et livraison en 48h à Lille et Nantes.",
+      "sameAs": [
+        "https://www.facebook.com/kilolab.fr",
+        "https://www.instagram.com/kilolab.fr"
       ],
-      "openingHoursSpecification": {
-        "@type": "OpeningHoursSpecification",
-        "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"],
-        "opens": "00:00",
-        "closes": "23:59"
-      },
-      "aggregateRating": {
-        "@type": "AggregateRating",
-        "ratingValue": "4.8",
-        "reviewCount": "127",
-        "bestRating": "5",
-        "worstRating": "1"
-      },
-      "hasOfferCatalog": {
-        "@type": "OfferCatalog",
-        "name": "Services de pressing",
-        "itemListElement": [
-          {
-            "@type": "Offer",
-            "itemOffered": {
-              "@type": "Service",
-              "name": "Lavage au kilo",
-              "description": "Service de lavage professionnel au kilo"
-            },
-            "price": "3.00",
-            "priceCurrency": "EUR",
-            "availability": "https://schema.org/InStock"
-          }
-        ]
+      "areaServed": [
+        { "@type": "City", "name": "Lille" },
+        { "@type": "City", "name": "Nantes" }
+      ],
+      "contactPoint": {
+        "@type": "ContactPoint",
+        "contactType": "customer service",
+        "email": "contact@kilolab.fr",
+        "availableLanguage": "French",
+        "areaServed": "FR"
       }
     }
     </script>
+
+    <!-- ✅ PRELOADER CSS -->
+    <style>
+      #preloader {
+        position: fixed;
+        inset: 0;
+        background: #ffffff;
+        z-index: 9999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: opacity 0.45s ease, visibility 0.45s ease;
+      }
+      #preloader.loaded {
+        opacity: 0;
+        visibility: hidden;
+      }
+      .washer-spinner {
+        width: 64px;
+        height: 64px;
+        border: 4px solid #e5e7eb;
+        border-top-color: #14b8a6;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
+      @keyframes spin { to { transform: rotate(360deg); } }
+      body.loading { overflow: hidden; }
+    </style>
   </head>
-  <body>
+
+  <body class="loading">
     <!-- GTM noscript -->
     <noscript>
       <iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KZ7CGGPL" height="0" width="0" style="display:none;visibility:hidden"></iframe>
     </noscript>
-    
+
     <!-- FB Pixel noscript -->
     <noscript>
       <img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=1573268523913279&ev=PageView&noscript=1" alt="" />
     </noscript>
-    
+
+    <!-- ✅ PRELOADER -->
+    <div id="preloader">
+      <div style="text-align:center;">
+        <div class="washer-spinner"></div>
+        <p style="margin-top:16px;color:#64748b;font-family:system-ui;font-weight:800;">Kilolab</p>
+      </div>
+    </div>
+
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
+
+    <!-- ✅ PRELOADER SCRIPT -->
+    <script>
+      window.addEventListener('load', function () {
+        setTimeout(function () {
+          var preloader = document.getElementById('preloader');
+          if (preloader) preloader.classList.add('loaded');
+          document.body.classList.remove('loading');
+        }, 250);
+      });
+    </script>
   </body>
 </html>
