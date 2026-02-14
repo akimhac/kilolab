@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
-import { MapPin, Star, Clock, Search, Loader2 } from 'lucide-react';
+import { MapPin, Star, Clock, Search, Loader2, Users } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
@@ -25,6 +25,7 @@ export default function Trouver() {
   const [searching, setSearching] = useState(false);
   const [userCity, setUserCity] = useState('');
   const [userPostalCode, setUserPostalCode] = useState('');
+  const [hasSearched, setHasSearched] = useState(false); // ✅ NOUVEAU
 
   useEffect(() => {
     fetchAllWashers();
@@ -68,6 +69,7 @@ export default function Trouver() {
     }
 
     setSearching(true);
+    setHasSearched(true); // ✅ MARQUER LA RECHERCHE
     toast.loading('Recherche en cours...', { id: 'search' });
 
     try {
@@ -107,17 +109,24 @@ export default function Trouver() {
     }
   };
 
+  // ✅ CALCUL DU NOMBRE DE WASHERS DISPONIBLES
+  const availableWashersCount = washers.filter((w) => w.is_available).length;
+
   return (
     <>
       <Helmet>
         <title>Trouve ton Washer - Kilolab</title>
-        <meta name="description" content="Trouve un Washer près de chez toi partout en France. Lavage professionnel à domicile." />
+        <meta
+          name="description"
+          content="Trouve un Washer près de chez toi partout en France. Lavage professionnel à domicile."
+        />
       </Helmet>
 
       <div className="min-h-screen bg-slate-50">
         <Navbar />
 
         <div className="pt-32 pb-20 px-4 max-w-7xl mx-auto">
+          {/* HERO */}
           <div className="text-center mb-12">
             <h1 className="text-4xl md:text-5xl font-black mb-4">🗺️ Trouve ton Washer</h1>
             <p className="text-xl text-slate-600 max-w-2xl mx-auto">
@@ -125,6 +134,7 @@ export default function Trouver() {
             </p>
           </div>
 
+          {/* SEARCH BAR */}
           <div className="max-w-2xl mx-auto mb-12">
             <div className="bg-white rounded-2xl shadow-lg p-6 border border-slate-200">
               <div className="flex gap-4">
@@ -165,15 +175,29 @@ export default function Trouver() {
             </div>
           </div>
 
-          {/* ✅ STATS - "près de vous" sans afficher 0 */}
+          {/* ═══════════════════════════════════════════════════════════
+              STATS - SANS AFFICHER "0" SI AUCUN WASHER
+          ═══════════════════════════════════════════════════════════ */}
           <div className="grid grid-cols-3 gap-6 max-w-4xl mx-auto mb-12">
             <div className="bg-white rounded-xl p-6 text-center border border-slate-100">
-              <div className="text-3xl font-black text-teal-600 mb-1">
-                {washers.filter((w) => w.is_available).length}
-              </div>
-              <div className="text-sm text-slate-600 font-medium">
-                Washers disponibles{washers.length > 0 ? ' près de vous' : ''}
-              </div>
+              {/* ✅ TEXTE CONDITIONNEL */}
+              {!loading && washers.length === 0 && !hasSearched ? (
+                <>
+                  <div className="text-3xl font-black text-teal-600 mb-1">
+                    <Users size={32} className="mx-auto" />
+                  </div>
+                  <div className="text-sm text-slate-600 font-medium">Washers disponibles</div>
+                </>
+              ) : (
+                <>
+                  <div className="text-3xl font-black text-teal-600 mb-1">
+                    {availableWashersCount > 0 ? availableWashersCount : '✓'}
+                  </div>
+                  <div className="text-sm text-slate-600 font-medium">
+                    {availableWashersCount > 0 ? 'Washers disponibles près de vous' : 'Réseau national actif'}
+                  </div>
+                </>
+              )}
             </div>
 
             <div className="bg-white rounded-xl p-6 text-center border border-slate-100">
@@ -187,6 +211,7 @@ export default function Trouver() {
             </div>
           </div>
 
+          {/* LOADING */}
           {loading && (
             <div className="text-center py-12">
               <Loader2 className="animate-spin mx-auto mb-4 text-teal-600" size={48} />
@@ -194,20 +219,41 @@ export default function Trouver() {
             </div>
           )}
 
+          {/* ═══════════════════════════════════════════════════════════
+              AUCUN WASHER - MESSAGE ENCOURAGEANT
+          ═══════════════════════════════════════════════════════════ */}
           {!loading && washers.length === 0 && (
             <div className="text-center py-12 bg-white rounded-2xl border border-slate-200">
-              <MapPin size={64} className="mx-auto mb-4 text-slate-300" />
-              <h3 className="text-2xl font-bold text-slate-900 mb-2">Pas encore de Washers dans ta zone</h3>
-              <p className="text-slate-600 mb-6">Sois le premier Washer de ton quartier !</p>
-              <Link
-                to="/become-washer"
-                className="inline-block px-6 py-3 bg-teal-600 text-white rounded-xl font-bold hover:bg-teal-700 transition"
-              >
-                💰 Devenir Washer
-              </Link>
+              <MapPin size={64} className="mx-auto mb-4 text-teal-500" />
+              <h3 className="text-2xl font-bold text-slate-900 mb-2">
+                {hasSearched ? 'Pas encore de Washers dans cette zone' : 'Lancez une recherche'}
+              </h3>
+              <p className="text-slate-600 mb-6 max-w-md mx-auto">
+                {hasSearched
+                  ? "Le réseau Kilolab s'étend chaque jour. Soyez le premier Washer de votre quartier et profitez d'un complément de revenu !"
+                  : 'Entrez votre ville ou code postal pour découvrir les Washers disponibles près de chez vous.'}
+              </p>
+              <div className="flex gap-4 justify-center flex-wrap">
+                <Link
+                  to="/become-washer"
+                  className="inline-block px-6 py-3 bg-teal-600 text-white rounded-xl font-bold hover:bg-teal-700 transition"
+                >
+                  💰 Devenir Washer
+                </Link>
+
+                {hasSearched && (
+                  <Link
+                    to="/new-order"
+                    className="inline-block px-6 py-3 bg-white border-2 border-teal-600 text-teal-600 rounded-xl font-bold hover:bg-teal-50 transition"
+                  >
+                    Commander quand même
+                  </Link>
+                )}
+              </div>
             </div>
           )}
 
+          {/* LISTE WASHERS */}
           {!loading && washers.length > 0 && (
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
               {washers.map((washer) => (
@@ -276,9 +322,14 @@ export default function Trouver() {
             </div>
           )}
 
+          {/* ═══════════════════════════════════════════════════════════
+              CTA DEVENIR WASHER - SANS "VOISINS"
+          ═══════════════════════════════════════════════════════════ */}
           <div className="mt-16 bg-gradient-to-r from-teal-600 to-cyan-600 rounded-2xl p-8 text-center text-white">
             <h2 className="text-3xl font-black mb-4">Deviens Washer dans ton quartier 💰</h2>
-            <p className="text-xl mb-6 text-teal-100">Gagne jusqu'à 600€/mois en lavant le linge de tes voisins</p>
+            <p className="text-xl mb-6 text-teal-100">
+              Gagne jusqu'à 600€/mois avec ta machine à laver
+            </p>
             <Link
               to="/become-washer"
               className="inline-block px-8 py-4 bg-white text-teal-600 rounded-xl font-bold hover:bg-slate-100 transition shadow-xl"
