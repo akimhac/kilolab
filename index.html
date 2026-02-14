@@ -26,16 +26,12 @@
       fbq('track', 'PageView');
     </script>
 
-    <!-- ✅ LOTTIE PLAYER - CHARGÉ EN PREMIER -->
-    <script src="https://unpkg.com/@lottiefiles/lottie-player@2.0.8/dist/lottie-player.js"></script>
-
     <!-- Preconnect -->
     <link rel="preconnect" href="https://dhecegehcjelbxydcolg.supabase.co" crossorigin />
     <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
     <link rel="dns-prefetch" href="https://connect.facebook.net" />
-    <link rel="dns-prefetch" href="https://unpkg.com" />
 
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
@@ -53,10 +49,10 @@
     <meta name="author" content="Kilolab" />
 
     <!-- SEO -->
-    <title>Kilolab - Pressing à Domicile | Collecte & Livraison partout en France</title>
+    <title>Kilolab.fr - La 1ère Plateforme Collaborative d'Entretien du Linge</title>
     <meta
       name="description"
-      content="Libérez-vous de la corvée de lessive ! Kilolab collecte votre linge à domicile, le lave et vous le livre propre en 48h. Service collaboratif de confiance. Dès 3€/kg."
+      content="Transformez votre machine à laver en source de revenus ou déléguez votre corvée de linge. La solution linge nouvelle génération partout en France. Simple, Rapide, Économique."
     />
     <meta
       name="keywords"
@@ -117,7 +113,7 @@
     </script>
 
     <!-- ═══════════════════════════════════════════════════════════
-        🎨 LOTTIE LOADER - ANIMATION PROFESSIONNELLE
+         🎨 ANIMATION CSS PURE - AUCUNE DÉPENDANCE
     ═══════════════════════════════════════════════════════════ -->
     <style>
       /* ✅ Loader Container */
@@ -127,11 +123,10 @@
         background: linear-gradient(135deg, #14b8a6 0%, #06b6d4 100%);
         z-index: 9999;
         display: flex;
-        flex-direction: column;
         align-items: center;
         justify-content: center;
-        transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1),
-                    visibility 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1),
+                    visibility 0.6s cubic-bezier(0.4, 0, 0.2, 1);
       }
 
       #app-loader.loaded {
@@ -139,68 +134,86 @@
         visibility: hidden;
       }
 
-      /* ✅ Animation Container */
-      .loader-animation {
-        animation: fadeInScale 0.6s ease-out;
+      /* ✅ Container animation */
+      .loader-container {
+        text-align: center;
+        animation: fadeInUp 0.8s ease-out;
       }
 
-      /* ✅ Logo KILOLAB */
-      .loader-title {
-        color: white;
-        font-size: 56px;
+      /* ✅ Logo KILOLAB animé */
+      .loader-logo {
+        font-size: 64px;
         font-weight: 900;
-        margin-top: 24px;
+        color: white;
+        margin-bottom: 32px;
         letter-spacing: 4px;
-        text-align: center;
-        font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-        animation: fadeInUp 0.8s ease-out 0.2s both;
+        animation: logoFloat 2.5s ease-in-out infinite;
         text-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        font-family: system-ui, -apple-system, sans-serif;
+      }
+
+      /* ✅ Washing Machine Spinner (double cercle) */
+      .loader-spinner {
+        width: 80px;
+        height: 80px;
+        margin: 0 auto;
+        position: relative;
+      }
+
+      /* Cercle extérieur */
+      .loader-spinner::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        border: 6px solid rgba(255, 255, 255, 0.2);
+        border-top-color: white;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
+
+      /* Cercle intérieur (effet machine à laver) */
+      .loader-spinner::after {
+        content: '';
+        position: absolute;
+        inset: 12px;
+        border: 4px solid rgba(255, 255, 255, 0.3);
+        border-radius: 50%;
+        animation: spinReverse 1.5s linear infinite;
       }
 
       /* ✅ Tagline */
       .loader-tagline {
-        color: rgba(255, 255, 255, 0.95);
-        font-size: 18px;
-        font-weight: 600;
-        margin-top: 16px;
-        letter-spacing: 1px;
-        font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-        animation: fadeInUp 0.8s ease-out 0.4s both;
-      }
-
-      /* ✅ Progress Bar (optionnel) */
-      .loader-progress {
-        width: 200px;
-        height: 3px;
-        background: rgba(255, 255, 255, 0.2);
-        border-radius: 999px;
         margin-top: 24px;
-        overflow: hidden;
-        animation: fadeInUp 0.8s ease-out 0.6s both;
-      }
-
-      .loader-progress-bar {
-        height: 100%;
-        background: white;
-        border-radius: 999px;
-        animation: progressFill 2s ease-in-out infinite;
+        color: rgba(255, 255, 255, 0.9);
+        font-size: 16px;
+        font-weight: 600;
+        font-family: system-ui, -apple-system, sans-serif;
+        letter-spacing: 1px;
+        animation: pulse 2s ease-in-out infinite;
       }
 
       /* ✅ Animations */
-      @keyframes fadeInScale {
-        from { opacity: 0; transform: scale(0.8); }
-        to   { opacity: 1; transform: scale(1); }
+      @keyframes logoFloat {
+        0%, 100% { transform: translateY(0px) scale(1); }
+        50% { transform: translateY(-10px) scale(1.02); }
+      }
+
+      @keyframes spin {
+        to { transform: rotate(360deg); }
+      }
+
+      @keyframes spinReverse {
+        to { transform: rotate(-360deg); }
       }
 
       @keyframes fadeInUp {
-        from { opacity: 0; transform: translateY(20px); }
+        from { opacity: 0; transform: translateY(30px); }
         to   { opacity: 1; transform: translateY(0); }
       }
 
-      @keyframes progressFill {
-        0%   { width: 0%;   margin-left: 0%; }
-        50%  { width: 60%;  margin-left: 20%; }
-        100% { width: 0%;   margin-left: 100%; }
+      @keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50%      { opacity: 0.7; }
       }
 
       /* ✅ Bloquer scroll pendant chargement */
@@ -208,9 +221,9 @@
 
       /* ✅ Responsive */
       @media (max-width: 768px) {
-        .loader-title { font-size: 42px; letter-spacing: 2px; }
-        .loader-tagline { font-size: 16px; }
-        .loader-animation lottie-player { width: 220px !important; height: 220px !important; }
+        .loader-logo { font-size: 48px; letter-spacing: 2px; }
+        .loader-spinner { width: 64px; height: 64px; }
+        .loader-tagline { font-size: 14px; }
       }
     </style>
   </head>
@@ -227,30 +240,13 @@
     </noscript>
 
     <!-- ═══════════════════════════════════════════════════════════
-        🎬 LOTTIE LOADER
+         🎬 LOADER ANIMATION - PUR CSS
     ═══════════════════════════════════════════════════════════ -->
     <div id="app-loader">
-      <div class="loader-animation">
-        <!-- ✅ ANIMATION LOTTIE (URL DIRECTE - PAS DE LOCAL) -->
-        <lottie-player
-          src="https://lottie.host/f0b5c70c-4e4d-4e77-9c6f-8e6f4b6d3a2c/animation.json"
-          background="transparent"
-          speed="1"
-          style="width: 280px; height: 280px; margin: 0 auto;"
-          loop
-          autoplay
-        ></lottie-player>
-      </div>
-
-      <!-- Logo Kilolab -->
-      <h1 class="loader-title">KILOLAB</h1>
-
-      <!-- Tagline -->
-      <p class="loader-tagline">Libérez votre temps</p>
-
-      <!-- Progress Bar (optionnel) -->
-      <div class="loader-progress">
-        <div class="loader-progress-bar"></div>
+      <div class="loader-container">
+        <div class="loader-logo">KILOLAB</div>
+        <div class="loader-spinner"></div>
+        <div class="loader-tagline">Libérez votre temps</div>
       </div>
     </div>
 
@@ -259,26 +255,24 @@
     <script type="module" src="/src/main.tsx"></script>
 
     <!-- ═══════════════════════════════════════════════════════════
-        📜 LOADER SCRIPT
+         📜 LOADER SCRIPT
     ═══════════════════════════════════════════════════════════ -->
     <script>
-      // Cacher le loader quand la page est chargée
       window.addEventListener('load', function() {
         setTimeout(function() {
           const loader = document.getElementById('app-loader');
           if (loader) loader.classList.add('loaded');
           document.body.classList.remove('loading');
-        }, 600); // Temps pour apprécier l'animation
+        }, 400);
       });
 
-      // Fallback : cacher après 4 secondes max
       setTimeout(function() {
         const loader = document.getElementById('app-loader');
         if (loader && !loader.classList.contains('loaded')) {
           loader.classList.add('loaded');
           document.body.classList.remove('loading');
         }
-      }, 4000);
+      }, 3000);
     </script>
   </body>
 </html>
