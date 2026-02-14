@@ -39,14 +39,11 @@ export default function BecomeWasher() {
     data_consent: false
   });
 
-  // ─────────────────────────────────────────────
-  // Upload ID Card (safe)
-  // ─────────────────────────────────────────────
   const uploadIdCard = async (file: File) => {
     try {
       if (!file) return;
 
-      const max = 10 * 1024 * 1024; // 10MB
+      const max = 10 * 1024 * 1024;
       if (file.size > max) {
         toast.error('Fichier trop lourd (max 10MB).');
         return;
@@ -75,9 +72,6 @@ export default function BecomeWasher() {
     }
   };
 
-  // ─────────────────────────────────────────────
-  // Geocode via Edge Function (safe)
-  // ─────────────────────────────────────────────
   const geocodeAddress = async (
     address: string,
     city: string,
@@ -105,9 +99,6 @@ export default function BecomeWasher() {
     }
   };
 
-  // ─────────────────────────────────────────────
-  // Check email exists (normalized)
-  // ─────────────────────────────────────────────
   const checkEmailExists = async (email: string): Promise<boolean> => {
     try {
       const e = normalizeEmail(email);
@@ -128,9 +119,6 @@ export default function BecomeWasher() {
     }
   };
 
-  // ─────────────────────────────────────────────
-  // Submit
-  // ─────────────────────────────────────────────
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (loading) return;
@@ -138,7 +126,6 @@ export default function BecomeWasher() {
     setLoading(true);
 
     try {
-      // validations (step 3 submit final)
       if (!formData.fullName.trim()) return toast.error('Nom complet requis.');
       const email = normalizeEmail(formData.email);
       if (!email) return toast.error('Email requis.');
@@ -206,7 +193,6 @@ export default function BecomeWasher() {
     }
   };
 
-  // Helpers for step navigation (optionnel mais propre)
   const canGoStep2 = () =>
     formData.fullName.trim() &&
     normalizeEmail(formData.email) &&
@@ -234,8 +220,10 @@ export default function BecomeWasher() {
                   avec votre machine à laver.
                 </span>
               </h1>
+
+              {/* ✅ CORRECTION HERO SUBTITLE : Sans "voisins" */}
               <p className="text-xl text-slate-600 max-w-2xl mx-auto leading-relaxed mb-8">
-                Transformez votre électroménager en actif rentable. Aidez vos voisins tout en générant
+                Transformez votre électroménager en actif rentable. Rejoignez le réseau national et générez
                 jusqu'à <strong>600€/mois</strong> depuis chez vous.
               </p>
 
@@ -247,37 +235,44 @@ export default function BecomeWasher() {
               </button>
             </div>
 
-            {/* BÉNÉFICES */}
+            {/* ═══════════════════════════════════════════════════════════
+                BÉNÉFICES - WORDING BUSINESS CORRIGÉ
+            ═══════════════════════════════════════════════════════════ */}
             <div className="grid md:grid-cols-3 gap-8 mb-16">
+
+              {/* ✅ BLOC 1 : Revenu Complémentaire */}
               <div className="bg-gradient-to-br from-slate-50 to-white p-8 rounded-3xl border border-slate-100 hover:shadow-xl transition-all duration-300 transform hover:scale-105">
                 <div className="w-14 h-14 bg-gradient-to-br from-teal-500 to-cyan-500 rounded-2xl flex items-center justify-center shadow-lg mb-6 text-white">
                   <DollarSign size={28} />
                 </div>
-                <h3 className="font-bold text-xl mb-3">Revenu flexible</h3>
+                <h3 className="font-bold text-xl mb-3">Revenu Complémentaire</h3>
                 <p className="text-slate-600 leading-relaxed">
-                  Jusqu'à <strong>600€/mois</strong> en complément. Idéal pour étudiants, freelances ou retraités.
+                  Générez jusqu'à <strong>600€/mois</strong> avec votre équipement. Transformez vos heures creuses en chiffre d'affaires.
                 </p>
               </div>
 
+              {/* ✅ BLOC 2 : 100% Flexible & Domicile */}
               <div className="bg-gradient-to-br from-slate-50 to-white p-8 rounded-3xl border border-slate-100 hover:shadow-xl transition-all duration-300 transform hover:scale-105">
                 <div className="w-14 h-14 bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center shadow-lg mb-6 text-white">
                   <Home size={28} />
                 </div>
-                <h3 className="font-bold text-xl mb-3">Depuis chez vous</h3>
+                <h3 className="font-bold text-xl mb-3">100% Flexible & Domicile</h3>
                 <p className="text-slate-600 leading-relaxed">
-                  Zéro déplacement. Travaillez à votre rythme, quand votre machine est disponible.
+                  Aucune contrainte horaire. Acceptez les missions qui vous arrangent et travaillez depuis votre salon.
                 </p>
               </div>
 
+              {/* ✅ BLOC 3 : Rejoignez le Réseau */}
               <div className="bg-gradient-to-br from-slate-50 to-white p-8 rounded-3xl border border-slate-100 hover:shadow-xl transition-all duration-300 transform hover:scale-105">
                 <div className="w-14 h-14 bg-gradient-to-br from-orange-500 to-red-500 rounded-2xl flex items-center justify-center shadow-lg mb-6 text-white">
                   <Users size={28} />
                 </div>
-                <h3 className="font-bold text-xl mb-3">Impact local</h3>
+                <h3 className="font-bold text-xl mb-3">Rejoignez le Réseau</h3>
                 <p className="text-slate-600 leading-relaxed">
-                  Aidez vos voisins qui manquent de temps. Créez du lien social dans votre quartier.
+                  Intégrez la première communauté nationale de Washers certifiés. Une plateforme sécurisée et une gestion simplifiée.
                 </p>
               </div>
+
             </div>
 
             {/* COMMENT ÇA MARCHE */}
