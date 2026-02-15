@@ -3,29 +3,40 @@ import { Link } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import {
-  ArrowRight, CheckCircle, Clock, MapPin,
-  Sparkles, Package, Zap, Droplet, AlertCircle,
-  TrendingUp, Shield
+  ArrowRight,
+  CheckCircle,
+  Clock,
+  MapPin,
+  Sparkles,
+  Package,
+  Zap,
+  Droplet,
+  AlertCircle,
+  TrendingUp,
+  Shield,
 } from 'lucide-react';
 import { useState } from 'react';
 
 export default function Landing() {
   const [weight, setWeight] = useState(5);
 
-  const diyWater = 1.80;
-  const diyElectricity = 0.90;
-  const diyDetergent = 1.20;
-  const diySoftener = 0.60;
-  const diyMachineWear = 0.80;
-  const diyDryer = 1.50;
+  // DIY costs (example simulation)
+  const diyWater = 1.8;
+  const diyElectricity = 0.9;
+  const diyDetergent = 1.2;
+  const diySoftener = 0.6;
+  const diyMachineWear = 0.8;
+  const diyDryer = 1.5;
 
-  const diyMaterialTotal = diyWater + diyElectricity + diyDetergent + diySoftener + diyMachineWear + diyDryer;
+  const diyMaterialTotal =
+    diyWater + diyElectricity + diyDetergent + diySoftener + diyMachineWear + diyDryer;
 
   const diyTimeHours = 2.5;
   const hourlyRate = 12;
   const diyTimeCost = diyTimeHours * hourlyRate;
-
   const diyTotalCost = diyMaterialTotal + diyTimeCost;
+
+  // Kilolab price (you can adjust to 3€/kg if needed)
   const kilolabPrice = weight * 5;
   const timeSaved = diyTimeHours;
 
@@ -43,9 +54,7 @@ export default function Landing() {
       <div className="min-h-screen bg-white font-sans text-slate-900">
         <Navbar />
 
-        {/* ═══════════════════════════════════════════════════════════
-            HERO - CORRIGÉ
-        ═══════════════════════════════════════════════════════════ */}
+        {/* HERO */}
         <section className="relative h-screen min-h-[700px] flex items-center justify-center overflow-hidden">
           <img
             src="https://images.unsplash.com/photo-1582735689369-4fe89db7114c?q=80&w=2400&auto=format&fit=crop"
@@ -53,26 +62,27 @@ export default function Landing() {
             alt="Linge propre et plié"
             style={{ objectPosition: 'center 40%' }}
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-slate-900/90"></div>
+          <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-slate-900/90" />
 
           <div className="relative z-20 max-w-6xl mx-auto px-4 sm:px-6 text-center pt-20">
             <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-md text-white rounded-full text-sm font-bold border border-white/20 mb-8">
-              <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
+              <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
               Disponible sur toute la France
             </div>
 
             <h1 className="text-4xl md:text-6xl lg:text-7xl font-black text-white mb-8 leading-[1.1] tracking-tight drop-shadow-2xl">
-              Libérez votre temps.<br />
+              Libérez votre temps.
+              <br />
               <span className="text-teal-400">On prend soin de votre linge.</span>
             </h1>
 
             <p className="text-xl md:text-2xl text-white/90 max-w-3xl mx-auto mb-4 leading-relaxed font-light drop-shadow-lg">
-              Lavage, séchage et pliage inclus.<br />
+              Lavage, séchage et pliage inclus.
+              <br />
               Simple, rapide et près de chez vous.
             </p>
-            <p className="text-3xl font-black text-teal-400 mb-12 drop-shadow-lg">
-              Dès 3€/kg
-            </p>
+
+            <p className="text-3xl font-black text-teal-400 mb-12 drop-shadow-lg">Dès 3€/kg</p>
 
             <div className="flex flex-col sm:flex-row gap-5 justify-center">
               <Link
@@ -83,12 +93,20 @@ export default function Landing() {
                 <ArrowRight className="group-hover:translate-x-1 transition-transform" size={20} />
               </Link>
 
-              <Link
-                to="#comment-ca-marche"
-                className="inline-flex items-center justify-center px-8 py-5 bg-white/10 backdrop-blur-md text-white border-2 border-white/20 rounded-full font-bold text-lg hover:bg-white hover:text-slate-900 transition-all"
+              {/* ✅ FIX SCROLL */}
+              <a
+                href="#comment-ca-marche"
+                onClick={(e) => {
+                  e.preventDefault();
+                  document.getElementById('comment-ca-marche')?.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start',
+                  });
+                }}
+                className="inline-flex items-center justify-center px-8 py-5 bg-white/10 backdrop-blur-md text-white border-2 border-white/20 rounded-full font-bold text-lg hover:bg-white hover:text-slate-900 transition-all cursor-pointer"
               >
                 Comment ça marche ?
-              </Link>
+              </a>
             </div>
 
             <div className="mt-8 flex justify-center items-center gap-4 text-white/90 text-sm font-medium flex-wrap">
@@ -104,7 +122,7 @@ export default function Landing() {
                   <div
                     key={i}
                     className="w-6 h-6 rounded-full bg-gradient-to-br from-teal-400 to-blue-500 border-2 border-white"
-                  ></div>
+                  />
                 ))}
               </div>
               <span>Rejoignez +500 clients heureux</span>
@@ -112,19 +130,35 @@ export default function Landing() {
           </div>
         </section>
 
-        {/* ═══════════════════════════════════════════════════════════
-            COMPARATIF
-        ═══════════════════════════════════════════════════════════ */}
+        {/* ✅ BANDEAU RECRUTEMENT WASHERS */}
+        <section className="bg-gradient-to-r from-orange-500 via-red-500 to-pink-500 py-8 px-4">
+          <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
+            <div className="text-white text-center md:text-left">
+              <h2 className="text-2xl md:text-3xl font-black mb-2">💰 Vous avez une machine à laver ?</h2>
+              <p className="text-lg md:text-xl text-white/90">
+                Rejoignez 500+ Washers et gagnez jusqu&apos;à <strong>600€/mois</strong>.
+              </p>
+            </div>
+
+            <Link
+              to="/become-washer"
+              className="px-8 py-4 bg-white text-orange-600 rounded-xl font-black text-lg hover:bg-orange-50 transition shadow-2xl flex-shrink-0 hover:scale-105 transform"
+            >
+              Devenir Washer Partenaire →
+            </Link>
+          </div>
+        </section>
+
+        {/* COMPARATIF */}
         <section className="py-24 bg-white">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-
             <div className="text-center mb-16">
               <h2 className="text-3xl md:text-5xl font-black mb-6 text-slate-900">
                 Le coût caché de votre lessive 🧐
               </h2>
               <p className="text-lg text-slate-600 max-w-2xl mx-auto">
-                Entre l'eau, l'électricité, les produits et votre temps...
-                faire sa lessive coûte plus cher qu'on ne le pense.
+                Entre l&apos;eau, l&apos;électricité, les produits et votre temps... faire sa lessive coûte
+                plus cher qu&apos;on ne le pense.
               </p>
             </div>
 
@@ -136,15 +170,17 @@ export default function Landing() {
                     {weight} kg
                   </span>
                 </label>
+
                 <input
                   type="range"
                   min="3"
                   max="15"
                   step="1"
                   value={weight}
-                  onChange={(e) => setWeight(parseInt(e.target.value))}
+                  onChange={(e) => setWeight(parseInt(e.target.value, 10))}
                   className="w-full h-3 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-teal-600"
                 />
+
                 <div className="flex justify-between text-xs text-slate-500 mt-2">
                   <span>Petit sac</span>
                   <span>Gros volume</span>
@@ -152,7 +188,7 @@ export default function Landing() {
               </div>
 
               <div className="grid lg:grid-cols-2 gap-8 items-start">
-                {/* COLONNE DIY */}
+                {/* DIY */}
                 <div className="bg-gradient-to-br from-orange-50 to-red-50 rounded-2xl p-6 border-2 border-orange-200">
                   <div className="flex items-center gap-3 mb-6">
                     <div className="p-3 bg-orange-100 rounded-xl">
@@ -222,9 +258,7 @@ export default function Landing() {
                       </div>
                       <span className="text-xl font-black text-orange-600">{diyTimeHours}h</span>
                     </div>
-                    <p className="text-xs text-slate-600 mb-2">
-                      Tri + Lavage + Séchage + Pliage
-                    </p>
+                    <p className="text-xs text-slate-600 mb-2">Tri + Lavage + Séchage + Pliage</p>
                     <div className="flex justify-between items-center pt-2 border-t">
                       <span className="text-xs text-slate-600">Valorisé à {hourlyRate}€/h</span>
                       <span className="font-bold text-orange-700">{diyTimeCost.toFixed(2)}€</span>
@@ -250,7 +284,7 @@ export default function Landing() {
                   </div>
                 </div>
 
-                {/* COLONNE KILOLAB */}
+                {/* KILOLAB */}
                 <div className="bg-gradient-to-br from-teal-50 to-cyan-50 rounded-2xl p-6 border-2 border-teal-200 relative">
                   <div className="absolute top-4 right-4 bg-yellow-400 text-slate-900 px-3 py-1 rounded-full text-xs font-black rotate-12 shadow-lg">
                     ⭐ RECOMMANDÉ
@@ -273,7 +307,10 @@ export default function Landing() {
                       'Séchage + Pliage impeccable',
                       'Livraison en 48h max',
                     ].map((t, i) => (
-                      <div key={i} className="flex items-center gap-3 p-4 bg-white rounded-xl border border-teal-100">
+                      <div
+                        key={i}
+                        className="flex items-center gap-3 p-4 bg-white rounded-xl border border-teal-100"
+                      >
                         <div className="w-8 h-8 bg-teal-500 rounded-full flex items-center justify-center shrink-0">
                           <CheckCircle size={18} className="text-white" />
                         </div>
@@ -297,7 +334,9 @@ export default function Landing() {
                   </div>
 
                   <div className="bg-gradient-to-r from-green-500 to-teal-500 p-5 rounded-xl text-white mb-6">
-                    <p className="text-xs font-bold mb-3 text-center uppercase tracking-wider">🎉 Vous économisez</p>
+                    <p className="text-xs font-bold mb-3 text-center uppercase tracking-wider">
+                      🎉 Vous économisez
+                    </p>
                     <div className="grid grid-cols-2 gap-3">
                       <div className="text-center bg-white/20 rounded-xl p-3">
                         <p className="text-2xl font-black mb-1">{timeSaved.toFixed(1)}h</p>
@@ -319,28 +358,35 @@ export default function Landing() {
                     ✅ Je choisis Kilolab
                   </Link>
 
+                  {/* ✅ VOUVOIEMENT */}
                   <p className="text-center text-xs text-slate-500 mt-3">
-                    💡 En gros, tu es <strong>payé {(diyTimeCost - (kilolabPrice - diyMaterialTotal)).toFixed(0)}€</strong> pour ne rien faire
+                    💡 En gros, vous êtes{' '}
+                    <strong>
+                      payé {(diyTimeCost - (kilolabPrice - diyMaterialTotal)).toFixed(0)}€
+                    </strong>{' '}
+                    pour ne rien faire
                   </p>
                 </div>
               </div>
             </div>
 
+            {/* ✅ VOUVOIEMENT */}
             <div className="mt-12 text-center">
               <div className="inline-block bg-gradient-to-r from-teal-600 to-cyan-600 text-white p-6 rounded-2xl max-w-2xl">
-                <h3 className="text-xl font-black mb-2">💎 Le vrai coût, c'est ton temps</h3>
+                <h3 className="text-xl font-black mb-2">💎 Le vrai coût, c&apos;est votre temps</h3>
                 <p className="text-teal-100">
-                  Pour seulement <strong className="text-white">{(kilolabPrice - diyMaterialTotal).toFixed(2)}€ de plus</strong>, tu récupères{' '}
-                  <strong className="text-white">{timeSaved}h de vie</strong>
+                  Pour seulement{' '}
+                  <strong className="text-white">
+                    {(kilolabPrice - diyMaterialTotal).toFixed(2)}€ de plus
+                  </strong>
+                  , vous récupérez <strong className="text-white">{timeSaved}h de vie</strong>
                 </p>
               </div>
             </div>
           </div>
         </section>
 
-        {/* ═══════════════════════════════════════════════════════════
-            COMMENT ÇA MARCHE
-        ═══════════════════════════════════════════════════════════ */}
+        {/* COMMENT ÇA MARCHE */}
         <section id="comment-ca-marche" className="py-24 bg-slate-50">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-16">
@@ -350,10 +396,30 @@ export default function Landing() {
 
             <div className="grid md:grid-cols-4 gap-8">
               {[
-                { step: "1", icon: <Package size={32} />, title: "Commande en ligne", desc: "Choisis ton créneau en 2 clics" },
-                { step: "2", icon: <MapPin size={32} />, title: "Enlèvement gratuit", desc: "Un Washer passe récupérer ton linge" },
-                { step: "3", icon: <Sparkles size={32} />, title: "Lavage pro", desc: "Lavé, séché, plié avec soin" },
-                { step: "4", icon: <CheckCircle size={32} />, title: "Livraison 48h", desc: "Reçois ton linge propre" }
+                {
+                  step: '1',
+                  icon: <Package size={32} />,
+                  title: 'Commande en ligne',
+                  desc: 'Choisissez votre créneau en 2 clics',
+                },
+                {
+                  step: '2',
+                  icon: <MapPin size={32} />,
+                  title: 'Enlèvement gratuit',
+                  desc: 'Un Washer passe récupérer votre linge',
+                },
+                {
+                  step: '3',
+                  icon: <Sparkles size={32} />,
+                  title: 'Lavage pro',
+                  desc: 'Lavé, séché, plié avec soin',
+                },
+                {
+                  step: '4',
+                  icon: <CheckCircle size={32} />,
+                  title: 'Livraison 48h',
+                  desc: 'Recevez votre linge propre',
+                },
               ].map((item, i) => (
                 <div key={i} className="relative">
                   <div className="bg-white p-6 rounded-2xl border border-slate-200 hover:shadow-lg transition-all hover:-translate-y-1">
@@ -388,7 +454,7 @@ export default function Landing() {
                   className="rounded-2xl shadow-xl transform rotate-2 hover:rotate-0 transition duration-500 mt-8"
                 />
               </div>
-              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-teal-100/50 rounded-full blur-3xl -z-10"></div>
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-teal-100/50 rounded-full blur-3xl -z-10" />
             </div>
 
             <div className="flex-1 text-left">
@@ -396,22 +462,22 @@ export default function Landing() {
                 Notre Histoire
               </span>
               <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-slate-900 mb-6 sm:mb-8 leading-tight">
-                De la douceur de Bali <br />à l'exigence de Paris.
+                De la douceur de Bali <br />à l&apos;exigence de Paris.
               </h2>
               <p className="text-slate-600 leading-relaxed text-base sm:text-lg mb-5 sm:mb-6">
-                Là-bas, le pressing au poids est la norme : simple, direct, sans artifices.
-                Nous avons importé ce concept pour en finir avec le casse-tête des tarifs à la pièce.
+                Là-bas, le pressing au poids est la norme : simple, direct, sans artifices. Nous avons
+                importé ce concept pour en finir avec le casse-tête des tarifs à la pièce.
               </p>
               <div className="bg-slate-50 p-5 sm:p-6 rounded-2xl border border-slate-100 shadow-sm inline-block mb-6 sm:mb-8 w-full md:w-auto">
                 <p className="text-slate-600 leading-relaxed text-base sm:text-lg font-medium">
-                  "Juste le poids du linge propre. Rien d'autre."
+                  &quot;Juste le poids du linge propre. Rien d&apos;autre.&quot;
                 </p>
               </div>
               <Link
                 to="/become-washer"
                 className="inline-flex items-center font-bold text-slate-900 hover:text-teal-600 transition-all gap-2 underline underline-offset-4 decoration-2 hover:decoration-teal-600 group"
               >
-                Envie de devenir Washer ? C'est par ici
+                Envie de devenir Washer ? C&apos;est par ici
                 <ArrowRight className="group-hover:translate-x-1 transition-transform" size={18} />
               </Link>
             </div>
@@ -421,11 +487,9 @@ export default function Landing() {
         {/* CTA FINAL */}
         <section className="py-20 bg-gradient-to-r from-teal-600 to-cyan-600 text-white">
           <div className="max-w-4xl mx-auto px-4 text-center">
-            <h2 className="text-4xl md:text-5xl font-black mb-4">
-              Prêt à récupérer ton temps libre ?
-            </h2>
+            <h2 className="text-4xl md:text-5xl font-black mb-4">Prêt à récupérer votre temps libre ?</h2>
             <p className="text-xl mb-8 text-teal-100">
-              Rejoins les 500+ utilisateurs qui ont déjà arrêté la corvée du linge
+              Rejoignez les 500+ utilisateurs qui ont déjà arrêté la corvée du linge
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
