@@ -25,10 +25,11 @@ export default function Trouver() {
   const [searching, setSearching] = useState(false);
   const [userCity, setUserCity] = useState('');
   const [userPostalCode, setUserPostalCode] = useState('');
-  const [hasSearched, setHasSearched] = useState(false); // ✅ NOUVEAU
+  const [hasSearched, setHasSearched] = useState(false);
 
   useEffect(() => {
     fetchAllWashers();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const enrichWashers = (data: any[]) =>
@@ -69,28 +70,40 @@ export default function Trouver() {
     }
 
     setSearching(true);
-    setHasSearched(true); // ✅ MARQUER LA RECHERCHE
+    setHasSearched(true);
     toast.loading('Recherche en cours...', { id: 'search' });
 
     try {
-      const { data, error } = await supabase
-        .from('washers')
-        .select('*')
-        .eq('status', 'approved');
-
+      const { data, error } = await supabase.from('washers').select('*').eq('status', 'approved');
       if (error) throw error;
 
+      // ✅ FIX RECHERCHE : ville OU CP OU département (2 premiers chiffres du CP)
+      const searchLower = searchTerm.toLowerCase();
+
       const filtered = (data || []).filter((w: any) => {
-        const cityMatch = (w.city || '').toLowerCase().includes(searchTerm.toLowerCase());
-        const postalMatch = (w.postal_code || '').includes(searchTerm);
-        return cityMatch || postalMatch;
+        const washerCity = (w.city || '').toLowerCase();
+        const washerCP = (w.postal_code || '').toString();
+
+        const postalMatch = washerCP.includes(searchTerm); // cp exact/partial
+        const cityMatch = washerCity.includes(searchLower); // ville
+        const userDept = searchTerm.length >= 2 ? searchTerm.substring(0, 2) : '';
+        const washerDept = washerCP.substring(0, 2);
+        const deptMatch = userDept && washerDept === userDept;
+
+        return cityMatch || postalMatch || deptMatch;
       });
+
+      console.log('🔍 Recherche:', searchTerm);
+      console.log('📍 Résultats trouvés:', filtered.length);
+      console.log(
+        '📋 Détails:',
+        filtered.map((w: any) => `${w.full_name} - ${w.city} (${w.postal_code})`)
+      );
 
       const enriched = enrichWashers(filtered);
       setWashers(enriched);
 
       toast.dismiss('search');
-
       if (enriched.length > 0) toast.success(`✅ ${enriched.length} Washer(s) trouvé(s) !`);
       else toast.error('❌ Aucun Washer trouvé dans cette zone');
     } catch (error: any) {
@@ -109,16 +122,15 @@ export default function Trouver() {
     }
   };
 
-  // ✅ CALCUL DU NOMBRE DE WASHERS DISPONIBLES
   const availableWashersCount = washers.filter((w) => w.is_available).length;
 
   return (
     <>
       <Helmet>
-        <title>Trouve ton Washer - Kilolab</title>
+        <title>Trouvez votre Washer - Kilolab</title>
         <meta
           name="description"
-          content="Trouve un Washer près de chez toi partout en France. Lavage professionnel à domicile."
+          content="Trouvez un Washer près de chez vous partout en France. Lavage professionnel à domicile."
         />
       </Helmet>
 
@@ -126,9 +138,8 @@ export default function Trouver() {
         <Navbar />
 
         <div className="pt-32 pb-20 px-4 max-w-7xl mx-auto">
-          {/* HERO */}
           <div className="text-center mb-12">
-            <h1 className="text-4xl md:text-5xl font-black mb-4">🗺️ Trouve ton Washer</h1>
+            <h1 className="text-4xl md:text-5xl font-black mb-4">🗺️ Trouvez votre Washer</h1>
             <p className="text-xl text-slate-600 max-w-2xl mx-auto">
               Des Washers disponibles partout en France
             </p>
@@ -139,7 +150,7 @@ export default function Trouver() {
             <div className="bg-white rounded-2xl shadow-lg p-6 border border-slate-200">
               <div className="flex gap-4">
                 <div className="flex-1">
-                  <label className="block text-sm font-bold text-slate-700 mb-2">📍 Ta ville</label>
+                  <label className="block text-sm font-bold text-slate-700 mb-2">📍 Votre ville</label>
                   <input
                     type="text"
                     placeholder="Ex: Lille, Paris, Nantes..."
@@ -175,12 +186,9 @@ export default function Trouver() {
             </div>
           </div>
 
-          {/* ═══════════════════════════════════════════════════════════
-              STATS - SANS AFFICHER "0" SI AUCUN WASHER
-          ═══════════════════════════════════════════════════════════ */}
+          {/* STATS */}
           <div className="grid grid-cols-3 gap-6 max-w-4xl mx-auto mb-12">
             <div className="bg-white rounded-xl p-6 text-center border border-slate-100">
-              {/* ✅ TEXTE CONDITIONNEL */}
               {!loading && washers.length === 0 && !hasSearched ? (
                 <>
                   <div className="text-3xl font-black text-teal-600 mb-1">
@@ -219,9 +227,7 @@ export default function Trouver() {
             </div>
           )}
 
-          {/* ═══════════════════════════════════════════════════════════
-              AUCUN WASHER - MESSAGE ENCOURAGEANT
-          ═══════════════════════════════════════════════════════════ */}
+          {/* EMPTY */}
           {!loading && washers.length === 0 && (
             <div className="text-center py-12 bg-white rounded-2xl border border-slate-200">
               <MapPin size={64} className="mx-auto mb-4 text-teal-500" />
@@ -240,7 +246,6 @@ export default function Trouver() {
                 >
                   💰 Devenir Washer
                 </Link>
-
                 {hasSearched && (
                   <Link
                     to="/new-order"
@@ -253,7 +258,7 @@ export default function Trouver() {
             </div>
           )}
 
-          {/* LISTE WASHERS */}
+          {/* LIST */}
           {!loading && washers.length > 0 && (
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
               {washers.map((washer) => (
@@ -322,19 +327,15 @@ export default function Trouver() {
             </div>
           )}
 
-          {/* ═══════════════════════════════════════════════════════════
-              CTA DEVENIR WASHER - SANS "VOISINS"
-          ═══════════════════════════════════════════════════════════ */}
+          {/* CTA */}
           <div className="mt-16 bg-gradient-to-r from-teal-600 to-cyan-600 rounded-2xl p-8 text-center text-white">
-            <h2 className="text-3xl font-black mb-4">Deviens Washer dans ton quartier 💰</h2>
-            <p className="text-xl mb-6 text-teal-100">
-              Gagne jusqu'à 600€/mois avec ta machine à laver
-            </p>
+            <h2 className="text-3xl font-black mb-4">Devenez Washer dans votre quartier 💰</h2>
+            <p className="text-xl mb-6 text-teal-100">Gagnez jusqu&apos;à 600€/mois avec votre machine à laver</p>
             <Link
               to="/become-washer"
               className="inline-block px-8 py-4 bg-white text-teal-600 rounded-xl font-bold hover:bg-slate-100 transition shadow-xl"
             >
-              Je m'inscris
+              Je m&apos;inscris
             </Link>
           </div>
         </div>
