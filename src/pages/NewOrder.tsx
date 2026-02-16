@@ -1,116 +1,145 @@
-import { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
-import { supabase } from '../lib/supabase';
-import Navbar from '../components/Navbar';
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { supabase } from "../lib/supabase";
+import Navbar from "../components/Navbar";
 import {
-  Scale, MapPin, ArrowRight, Sparkles, Tag, Search,
-  Loader2, Calendar as CalendarIcon, Info, CheckCircle, CreditCard, Gift
-} from 'lucide-react';
-import toast from 'react-hot-toast';
+  Scale,
+  MapPin,
+  ArrowRight,
+  Sparkles,
+  Tag,
+  Search,
+  Loader2,
+  Calendar as CalendarIcon,
+  Info,
+  CheckCircle,
+  CreditCard,
+  Gift,
+} from "lucide-react";
+import toast from "react-hot-toast";
 
 export default function NewOrder() {
   const navigate = useNavigate();
-  const location = useLocation();
+
   const [loading, setLoading] = useState(false);
   const [step, setStep] = useState(0);
 
-  const [formula, setFormula] = useState<'eco' | 'express'>('eco');
+  const [formula, setFormula] = useState<"eco" | "express">("eco");
   const [weight, setWeight] = useState(5);
 
-  const [pickupDate, setPickupDate] = useState('');
-  const [pickupSlot, setPickupSlot] = useState('');
+  const [pickupDate, setPickupDate] = useState("");
+  const [pickupSlot, setPickupSlot] = useState("");
   const [isWeekend, setIsWeekend] = useState(false);
 
-  const [allPartners, setAllPartners] = useState<any[]>([]);
-  const [searchQuery, setSearchQuery] = useState('');
+  // ✅ FIX : Recherche WASHERS (pas partners)
+  const [allWashers, setAllWashers] = useState<any[]>([]);
+  const [searchQuery, setSearchQuery] = useState("");
   const [isSearching, setIsSearching] = useState(false);
   const [searchDone, setSearchDone] = useState(false);
-  const [filteredPartners, setFilteredPartners] = useState<any[]>([]);
-  const [selectedPartnerId, setSelectedPartnerId] = useState<string>('');
-  const [finalAddress, setFinalAddress] = useState('');
+  const [filteredWashers, setFilteredWashers] = useState<any[]>([]);
+  const [selectedWasherId, setSelectedWasherId] = useState<string>("");
+
+  const [finalAddress, setFinalAddress] = useState("");
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
 
-  // ✅ COUPONS
-  const [couponCode, setCouponCode] = useState('');
+  // Coupons
+  const [couponCode, setCouponCode] = useState("");
   const [couponDiscount, setCouponDiscount] = useState(0);
   const [couponApplied, setCouponApplied] = useState(false);
   const [couponLoading, setCouponLoading] = useState(false);
 
   useEffect(() => {
-    fetchPartners();
+    fetchWashers(); // ✅ FIX
     requestGeolocation();
     restoreCartFromLocalStorage();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // ✅ Restaurer le panier depuis localStorage
   const restoreCartFromLocalStorage = async () => {
     try {
-      const pendingOrder = localStorage.getItem('kilolab_pending_order');
-      if (pendingOrder) {
-        const { data: { user } } = await supabase.auth.getUser();
+      const pendingOrder = localStorage.getItem("kilolab_pending_order");
+      if (!pendingOrder) return;
 
-        if (user) {
-          const order = JSON.parse(pendingOrder);
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
 
-          setFormula(order.formula || 'eco');
-          setWeight(order.weight || 5);
-          setPickupDate(order.pickup_date || '');
-          setPickupSlot(order.pickup_slot || '');
-          setSearchQuery(order.search_query || '');
-          setFinalAddress(order.final_address || '');
-          setStep(order.step || 0);
+      if (!user) return;
 
-          // coupons (si jamais tu veux restaurer plus tard)
-          if (order.coupon_code) setCouponCode(order.coupon_code);
-          if (order.coupon_discount) {
-            setCouponDiscount(order.coupon_discount);
-            setCouponApplied(true);
-          }
+      const order = JSON.parse(pendingOrder);
 
-          localStorage.removeItem('kilolab_pending_order');
-          toast.success("✅ Panier restauré ! Tu peux continuer ta commande.", { duration: 4000 });
-        }
+      setFormula(order.formula || "eco");
+      setWeight(order.weight || 5);
+      setPickupDate(order.pickup_date || "");
+      setPickupSlot(order.pickup_slot || "");
+      setSearchQuery(order.search_query || "");
+      setFinalAddress(order.final_address || "");
+      setStep(order.step || 0);
+
+      if (order.coupon_code) setCouponCode(order.coupon_code);
+      if (order.coupon_discount) {
+        setCouponDiscount(order.coupon_discount);
+        setCouponApplied(true);
       }
+
+      localStorage.removeItem("kilolab_pending_order");
+      toast.success("✅ Panier restauré !", { duration: 4000 });
     } catch (error) {
-      console.error('Erreur restauration panier:', error);
+      console.error("Erreur restauration panier:", error);
     }
   };
 
   const requestGeolocation = () => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          setUserLocation({
-            lat: position.coords.latitude,
-            lng: position.coords.longitude
-          });
-          toast.success("📍 Localisation détectée", { duration: 2000 });
-        },
-        (error) => {
-          console.log("Géoloc refusée:", error);
-        }
-      );
-    }
+    if (!navigator.geolocation) return;
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        setUserLocation({
+          lat: position.coords.latitude,
+          lng: position.coords.longitude,
+        });
+        toast.success("📍 Localisation détectée", { duration: 2000 });
+      },
+      (error) => {
+        console.log("Géoloc refusée:", error);
+      }
+    );
   };
 
   useEffect(() => {
-    if (pickupDate) {
-      const day = new Date(pickupDate).getDay();
-      const weekend = day === 0 || day === 6;
-      setIsWeekend(weekend);
-      if (weekend) toast('📅 Majoration Week-end (+5€) appliquée', { icon: '📅' });
+    if (!pickupDate) return;
+
+    const day = new Date(pickupDate).getDay();
+    const weekend = day === 0 || day === 6;
+    setIsWeekend(weekend);
+
+    if (weekend) {
+      toast("📅 Majoration Week-end (+5€) appliquée", { icon: "📅" });
     }
   }, [pickupDate]);
 
-  const fetchPartners = async () => {
-    const { data } = await supabase
-      .from('partners')
-      .select('id, company_name, address, city, postal_code, latitude, longitude')
-      .eq('is_active', true);
+  // ✅ FIX : Récupérer les WASHERS approuvés
+  const fetchWashers = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("washers")
+        .select("id, full_name, city, postal_code, lat, lng, is_available")
+        .eq("status", "approved")
+        .eq("is_available", true);
 
-    setAllPartners(data || []);
+      if (error) {
+        console.error("Erreur fetch washers:", error);
+        return;
+      }
+
+      console.log("✅ Washers chargés:", data?.length || 0);
+      setAllWashers(data || []);
+    } catch (error) {
+      console.error("Erreur fetchWashers:", error);
+    }
   };
 
+  // ✅ FIX : Recherche locale dans les washers
   const handleSearchLocally = () => {
     if (!searchQuery.trim()) {
       toast.error("Veuillez entrer un code postal ou une ville");
@@ -121,53 +150,65 @@ export default function NewOrder() {
     setSearchDone(false);
 
     setTimeout(() => {
-      const results = allPartners.filter(p =>
-        (p.city && p.city.toLowerCase().includes(searchQuery.toLowerCase())) ||
-        (p.postal_code && p.postal_code.includes(searchQuery)) ||
-        (p.address && p.address.toLowerCase().includes(searchQuery.toLowerCase()))
-      );
+      const searchLower = searchQuery.toLowerCase().trim();
 
-      setFilteredPartners(results);
+      // ✅ FIX : Matching amélioré (ville, CP, département)
+      const results = allWashers.filter((w) => {
+        const cityMatch = String(w.city || "").toLowerCase().includes(searchLower);
+        const postalMatch = String(w.postal_code || "").includes(searchQuery.trim());
+
+        const userDept = searchQuery.trim().length >= 2 ? searchQuery.trim().substring(0, 2) : "";
+        const washerDept = String(w.postal_code || "").substring(0, 2);
+        const deptMatch = userDept && washerDept === userDept;
+
+        return cityMatch || postalMatch || deptMatch;
+      });
+
+      console.log("🔍 Recherche:", searchQuery, "→", results.length, "résultats");
+
+      setFilteredWashers(results);
       setIsSearching(false);
       setSearchDone(true);
 
       if (results.length > 0) {
-        setSelectedPartnerId(results[0].id);
-        toast.success(`✅ ${results.length} pressing(s) trouvé(s) !`);
+        setSelectedWasherId(results[0].id);
+        toast.success(`✅ ${results.length} Washer(s) trouvé(s) !`);
       } else {
-        setSelectedPartnerId('waiting_list');
-        toast('ℹ️ Aucun pressing direct, le réseau Kilolab prendra en charge', {
-          icon: '🌐',
-          duration: 4000
+        setSelectedWasherId("waiting_list");
+        toast("ℹ️ Aucun Washer dans cette zone, la plateforme prendra en charge", {
+          icon: "🌐",
+          duration: 4000,
         });
       }
-    }, 1500);
+    }, 900);
   };
 
   useEffect(() => {
     if (searchDone) setSearchDone(false);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchQuery]);
 
-  // ✅ PRIX
-  const basePrice = formula === 'eco' ? 3 : 5;
+  // Prix
+  const basePrice = formula === "eco" ? 3 : 5;
   let total = weight * basePrice;
   if (isWeekend) total += 5;
+
   const totalPrice = parseFloat(total.toFixed(2));
   const finalPrice = Math.max(0, parseFloat((totalPrice - couponDiscount).toFixed(2)));
 
-  // ✅ VALIDATION COUPON
+  // Validation coupon
   const validateCoupon = async () => {
     if (!couponCode.trim()) {
-      toast.error('Entrez un code promo');
+      toast.error("Entrez un code promo");
       return;
     }
 
     setCouponLoading(true);
     try {
-      const { data, error } = await supabase.rpc('validate_and_use_coupon', {
+      const { data, error } = await supabase.rpc("validate_and_use_coupon", {
         p_code: couponCode.toUpperCase(),
         p_order_amount: totalPrice,
-        p_user_id: null
+        p_user_id: null,
       });
 
       if (error) throw error;
@@ -178,15 +219,15 @@ export default function NewOrder() {
         setCouponApplied(true);
         toast.success(`✅ -${discount.toFixed(2)}€ appliqués !`);
       } else {
-        toast.error(data?.error || 'Code promo invalide');
-        setCouponCode('');
+        toast.error(data?.error || "Code promo invalide");
+        setCouponCode("");
         setCouponDiscount(0);
         setCouponApplied(false);
       }
     } catch (e: any) {
-      console.error('Erreur validation coupon:', e);
-      toast.error('❌ Erreur : ' + (e.message || 'validation coupon'));
-      setCouponCode('');
+      console.error("Erreur validation coupon:", e);
+      toast.error("❌ Erreur : " + (e.message || "validation coupon"));
+      setCouponCode("");
       setCouponDiscount(0);
       setCouponApplied(false);
     } finally {
@@ -196,14 +237,14 @@ export default function NewOrder() {
 
   const handlePayment = async (orderId: string, email: string) => {
     try {
-      toast.loading("🔄 Redirection vers le paiement...", { id: 'payment' });
+      toast.loading("🔄 Redirection vers le paiement…", { id: "payment" });
 
-      const { data, error } = await supabase.functions.invoke('create-checkout-session', {
+      const { data, error } = await supabase.functions.invoke("create-checkout-session", {
         body: {
           orderId,
           email,
-          finalAmount: finalPrice // ✅ envoie le montant final à Stripe (si ton Edge Function le gère)
-        }
+          finalAmount: finalPrice,
+        },
       });
 
       if (error) {
@@ -218,7 +259,7 @@ export default function NewOrder() {
       window.location.href = data.url;
     } catch (err: any) {
       console.error("Erreur paiement:", err);
-      toast.dismiss('payment');
+      toast.dismiss("payment");
       toast.error("❌ " + err.message);
       setLoading(false);
     }
@@ -228,9 +269,10 @@ export default function NewOrder() {
     setLoading(true);
 
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
 
-      // ✅ Si pas connecté, sauvegarder le panier et rediriger
       if (!user) {
         const cartData = {
           formula,
@@ -239,68 +281,63 @@ export default function NewOrder() {
           pickup_slot: pickupSlot,
           search_query: searchQuery,
           final_address: finalAddress,
-          step: step,
-
-          // coupons
+          step,
           coupon_code: couponApplied ? couponCode : null,
-          coupon_discount: couponApplied ? couponDiscount : 0
+          coupon_discount: couponApplied ? couponDiscount : 0,
         };
 
-        localStorage.setItem('kilolab_pending_order', JSON.stringify(cartData));
+        localStorage.setItem("kilolab_pending_order", JSON.stringify(cartData));
 
-        toast.error('🔐 Connectez-vous pour finaliser votre commande');
-        navigate('/login?redirect=/new-order');
+        toast.error("🔐 Connectez-vous pour finaliser votre commande");
+        navigate("/login?redirect=/new-order");
         setLoading(false);
         return;
       }
 
       if (!(user as any).email_confirmed_at) {
-        toast.error('⚠️ Veuillez confirmer votre email avant de commander');
+        toast.error("⚠️ Veuillez confirmer votre email avant de commander");
         setLoading(false);
         return;
       }
 
-      const isNetwork = !selectedPartnerId || selectedPartnerId === 'waiting_list';
-      const cleanDate = pickupDate || new Date().toISOString().split('T')[0];
+      // ✅ FIX : washer_id (pas partner_id)
+      const isNetwork = !selectedWasherId || selectedWasherId === "waiting_list";
+      const cleanDate = pickupDate || new Date().toISOString().split("T")[0];
       const fullAddressInfo = `${finalAddress} (${searchQuery}) - Créneau : ${pickupSlot}`;
 
       const { data: order, error } = await supabase
-        .from('orders')
+        .from("orders")
         .insert({
           client_id: user.id,
-          partner_id: isNetwork ? null : selectedPartnerId,
-          weight: weight,
+          washer_id: isNetwork ? null : selectedWasherId, // ✅ FIX
+          partner_id: null, // ✅ plus besoin de partner
+          weight,
           pickup_address: fullAddressInfo,
           pickup_lat: userLocation?.lat || null,
           pickup_lng: userLocation?.lng || null,
           pickup_date: cleanDate,
-
-          // ✅ prix final
           total_price: finalPrice,
-
-          status: 'pending',
-          formula: formula,
+          status: "pending",
+          formula,
           pickup_slot: pickupSlot,
-
-          // ✅ coupons
           coupon_code: couponApplied ? couponCode.toUpperCase() : null,
-          coupon_discount: couponApplied ? couponDiscount : 0
+          coupon_discount: couponApplied ? couponDiscount : 0,
         })
         .select()
         .single();
 
       if (error) {
-        console.error('Erreur création commande:', error);
+        console.error("Erreur création commande:", error);
         throw error;
       }
 
       if (order) {
-        localStorage.removeItem('kilolab_pending_order');
+        localStorage.removeItem("kilolab_pending_order");
         await handlePayment(order.id, user.email || "");
       }
     } catch (error: any) {
-      console.error('Erreur handleSubmit:', error);
-      toast.error('❌ Erreur : ' + error.message);
+      console.error("Erreur handleSubmit:", error);
+      toast.error("❌ Erreur : " + error.message);
       setLoading(false);
     }
   };
@@ -313,11 +350,11 @@ export default function NewOrder() {
         <h1 className="text-3xl font-bold mb-8 text-center">Nouvelle Commande</h1>
 
         <div className="flex justify-center mb-8 text-xs md:text-sm overflow-x-auto">
-          {['Formule', 'Poids', 'Localisation', 'Date', 'Paiement'].map((label, i) => (
+          {["Formule", "Poids", "Localisation", "Date", "Paiement"].map((label, i) => (
             <div
               key={i}
               className={`px-3 py-1 md:px-4 md:py-2 rounded-full whitespace-nowrap mx-1 transition-all ${
-                step >= i ? 'bg-teal-600 text-white font-bold shadow-lg' : 'bg-slate-200 text-slate-400'
+                step >= i ? "bg-teal-600 text-white font-bold shadow-lg" : "bg-slate-200 text-slate-400"
               }`}
             >
               {i + 1}. {label}
@@ -326,7 +363,6 @@ export default function NewOrder() {
         </div>
 
         <div className="bg-white rounded-3xl shadow-lg border border-slate-200 overflow-hidden min-h-[500px] p-6 md:p-8">
-
           {/* STEP 0: FORMULE */}
           {step === 0 && (
             <div className="animate-in slide-in-from-right-8 fade-in">
@@ -336,9 +372,11 @@ export default function NewOrder() {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                 <div
-                  onClick={() => setFormula('eco')}
+                  onClick={() => setFormula("eco")}
                   className={`group p-6 border-2 rounded-2xl cursor-pointer transition-all transform hover:scale-105 ${
-                    formula === 'eco' ? 'border-teal-500 bg-teal-50 shadow-xl' : 'border-slate-200 hover:border-teal-300 bg-white'
+                    formula === "eco"
+                      ? "border-teal-500 bg-teal-50 shadow-xl"
+                      : "border-slate-200 hover:border-teal-300 bg-white"
                   }`}
                 >
                   <div className="flex justify-between items-start mb-3">
@@ -365,9 +403,11 @@ export default function NewOrder() {
                 </div>
 
                 <div
-                  onClick={() => setFormula('express')}
+                  onClick={() => setFormula("express")}
                   className={`group p-6 border-2 rounded-2xl cursor-pointer transition-all transform hover:scale-105 relative ${
-                    formula === 'express' ? 'border-purple-500 bg-purple-50 shadow-xl' : 'border-slate-200 hover:border-purple-300 bg-white'
+                    formula === "express"
+                      ? "border-purple-500 bg-purple-50 shadow-xl"
+                      : "border-slate-200 hover:border-purple-300 bg-white"
                   }`}
                 >
                   <div className="absolute -top-3 -right-3 bg-purple-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg">
@@ -420,7 +460,7 @@ export default function NewOrder() {
                   {weight} <span className="text-3xl text-slate-400 font-normal">kg</span>
                 </div>
                 <p className="text-slate-500 text-lg">
-                  ~ {Math.ceil(weight / 5)} machine(s) • Formule {formula === 'eco' ? 'Standard' : 'Express'}
+                  ~ {Math.ceil(weight / 5)} machine(s) • Formule {formula === "eco" ? "Standard" : "Express"}
                 </p>
               </div>
 
@@ -430,7 +470,7 @@ export default function NewOrder() {
                 max="30"
                 step="1"
                 value={weight}
-                onChange={(e) => setWeight(parseInt(e.target.value))}
+                onChange={(e) => setWeight(parseInt(e.target.value, 10))}
                 className="w-full h-4 bg-slate-100 rounded-lg appearance-none cursor-pointer accent-teal-500 mb-8"
               />
 
@@ -440,11 +480,11 @@ export default function NewOrder() {
                   <div className="text-xs text-slate-500">Poids total</div>
                 </div>
                 <div className="bg-teal-50 p-4 rounded-xl border border-teal-200">
-                  <div className="font-bold text-teal-700 mb-1">{(weight * (formula === 'eco' ? 3 : 5)).toFixed(2)}€</div>
+                  <div className="font-bold text-teal-700 mb-1">{(weight * (formula === "eco" ? 3 : 5)).toFixed(2)}€</div>
                   <div className="text-xs text-teal-600">Prix estimé</div>
                 </div>
                 <div className="bg-slate-50 p-4 rounded-xl border">
-                  <div className="font-bold text-slate-900 mb-1">{formula === 'eco' ? '48-72h' : '24h'}</div>
+                  <div className="font-bold text-slate-900 mb-1">{formula === "eco" ? "48-72h" : "24h"}</div>
                   <div className="text-xs text-slate-500">Délai</div>
                 </div>
               </div>
@@ -489,7 +529,7 @@ export default function NewOrder() {
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className="w-full pl-10 p-3 bg-slate-50 border-2 border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 font-medium text-lg transition"
-                    onKeyDown={(e) => e.key === 'Enter' && handleSearchLocally()}
+                    onKeyDown={(e) => e.key === "Enter" && handleSearchLocally()}
                   />
                 </div>
                 <button
@@ -497,7 +537,7 @@ export default function NewOrder() {
                   disabled={!searchQuery || isSearching}
                   className="px-6 bg-teal-600 text-white rounded-xl font-bold disabled:opacity-50 disabled:cursor-not-allowed hover:bg-teal-500 transition shadow-lg"
                 >
-                  {isSearching ? <Loader2 className="animate-spin" size={20} /> : 'Chercher'}
+                  {isSearching ? <Loader2 className="animate-spin" size={20} /> : "Chercher"}
                 </button>
               </div>
 
@@ -514,12 +554,12 @@ export default function NewOrder() {
 
                   {!isSearching && searchDone && (
                     <div className="bg-white/95 backdrop-blur-lg p-8 rounded-2xl shadow-2xl border-2 border-teal-200 animate-in zoom-in duration-300 max-w-md">
-                      {filteredPartners.length > 0 ? (
+                      {filteredWashers.length > 0 ? (
                         <>
                           <Sparkles size={48} className="text-teal-500 mx-auto mb-4" />
                           <h3 className="text-2xl font-black text-slate-900 mb-2">Zone couverte ! 🎉</h3>
                           <p className="text-slate-600 font-medium mb-6">
-                            {filteredPartners.length} pressing(s) partenaire(s) disponible(s)
+                            {filteredWashers.length} Washer(s) disponible(s) près de chez vous
                           </p>
                         </>
                       ) : (
@@ -529,7 +569,7 @@ export default function NewOrder() {
                           </div>
                           <h3 className="text-2xl font-black text-slate-900 mb-2">Réseau Kilolab 🌐</h3>
                           <p className="text-slate-600 font-medium mb-6">
-                            Aucun pressing direct, mais notre réseau prend en charge votre commande !
+                            Aucun Washer dans cette zone, mais notre plateforme prend en charge votre commande !
                           </p>
                         </>
                       )}
@@ -552,10 +592,7 @@ export default function NewOrder() {
               </div>
 
               <div className="mt-6 flex justify-between">
-                <button
-                  onClick={() => setStep(1)}
-                  className="text-slate-500 font-bold hover:text-slate-700 transition"
-                >
+                <button onClick={() => setStep(1)} className="text-slate-500 font-bold hover:text-slate-700 transition">
                   ← Retour
                 </button>
               </div>
@@ -576,7 +613,7 @@ export default function NewOrder() {
                     type="date"
                     value={pickupDate}
                     onChange={(e) => setPickupDate(e.target.value)}
-                    min={new Date().toISOString().split('T')[0]}
+                    min={new Date().toISOString().split("T")[0]}
                     className="w-full p-4 bg-slate-50 border-2 border-slate-200 rounded-xl font-bold text-lg focus:ring-2 focus:ring-teal-500 outline-none"
                   />
                   {isWeekend && (
@@ -592,7 +629,7 @@ export default function NewOrder() {
                   <select
                     className="w-full p-4 bg-slate-50 border-2 border-slate-200 rounded-xl font-medium text-lg focus:ring-2 focus:ring-teal-500 outline-none"
                     value={pickupSlot}
-                    onChange={e => setPickupSlot(e.target.value)}
+                    onChange={(e) => setPickupSlot(e.target.value)}
                   >
                     <option value="">Choisir un créneau...</option>
                     <option value="Matin (09h - 12h)">☀️ Matin (09h - 12h)</option>
@@ -617,30 +654,28 @@ export default function NewOrder() {
                   />
                 </div>
 
-                {filteredPartners.length > 0 && (
+                {/* ✅ FIX : Liste des washers trouvés */}
+                {filteredWashers.length > 0 && (
                   <div>
-                    <label className="block text-sm font-bold text-slate-700 mb-2">🏪 Pressing (optionnel)</label>
+                    <label className="block text-sm font-bold text-slate-700 mb-2">👤 Washer (optionnel)</label>
                     <select
                       className="w-full p-4 bg-slate-50 border-2 border-slate-200 rounded-xl font-medium focus:ring-2 focus:ring-teal-500 outline-none"
-                      value={selectedPartnerId}
-                      onChange={(e) => setSelectedPartnerId(e.target.value)}
+                      value={selectedWasherId}
+                      onChange={(e) => setSelectedWasherId(e.target.value)}
                     >
-                      {filteredPartners.map(p => (
-                        <option key={p.id} value={p.id}>
-                          {p.company_name} - {p.city}
+                      {filteredWashers.map((w) => (
+                        <option key={w.id} value={w.id}>
+                          {w.full_name} - {w.city}
                         </option>
                       ))}
-                      <option value="waiting_list">✨ Confier au Réseau Kilolab</option>
+                      <option value="waiting_list">✨ Confier à un Washer disponible</option>
                     </select>
                   </div>
                 )}
               </div>
 
               <div className="mt-8 flex justify-between">
-                <button
-                  onClick={() => setStep(2)}
-                  className="text-slate-500 font-bold hover:text-slate-700 transition"
-                >
+                <button onClick={() => setStep(2)} className="text-slate-500 font-bold hover:text-slate-700 transition">
                   ← Retour
                 </button>
                 <button
@@ -664,9 +699,7 @@ export default function NewOrder() {
               <div className="bg-gradient-to-br from-slate-50 to-teal-50 p-6 rounded-2xl border-2 border-slate-200 space-y-4 mb-8 shadow-inner">
                 <div className="flex justify-between items-center pb-3 border-b border-slate-200">
                   <span className="text-slate-600 font-medium">Formule</span>
-                  <span className="font-black text-lg uppercase">
-                    {formula === 'eco' ? '🟢 Standard' : '⚡ Express'}
-                  </span>
+                  <span className="font-black text-lg uppercase">{formula === "eco" ? "🟢 Standard" : "⚡ Express"}</span>
                 </div>
 
                 <div className="flex justify-between items-center pb-3 border-b border-slate-200">
@@ -678,7 +711,9 @@ export default function NewOrder() {
                   <span className="text-slate-600 font-medium">Collecte</span>
                   <div className="text-right">
                     <div className="font-bold text-slate-900">
-                      {new Date(pickupDate).toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })}
+                      {pickupDate
+                        ? new Date(pickupDate).toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long" })
+                        : "-"}
                     </div>
                     <div className="text-sm text-slate-500">{pickupSlot}</div>
                   </div>
@@ -696,7 +731,6 @@ export default function NewOrder() {
                   </div>
                 )}
 
-                {/* ✅ COUPON */}
                 {!couponApplied ? (
                   <div className="p-4 bg-teal-50 rounded-xl border border-teal-200">
                     <label className="block text-sm font-bold text-teal-700 mb-2">
@@ -718,7 +752,7 @@ export default function NewOrder() {
                         disabled={couponLoading || !couponCode.trim()}
                         className="px-6 py-2 bg-teal-600 text-white rounded-lg font-bold hover:bg-teal-700 disabled:opacity-50 disabled:cursor-not-allowed transition flex items-center justify-center"
                       >
-                        {couponLoading ? <Loader2 className="animate-spin" size={18} /> : 'Valider'}
+                        {couponLoading ? <Loader2 className="animate-spin" size={18} /> : "Valider"}
                       </button>
                     </div>
                   </div>
@@ -735,7 +769,7 @@ export default function NewOrder() {
                         onClick={() => {
                           setCouponApplied(false);
                           setCouponDiscount(0);
-                          setCouponCode('');
+                          setCouponCode("");
                         }}
                         className="text-xs text-green-600 hover:text-green-800 underline mt-1"
                       >
@@ -745,7 +779,6 @@ export default function NewOrder() {
                   </div>
                 )}
 
-                {/* ✅ TOTAL */}
                 <div className="border-t-2 border-slate-300 pt-4 mt-4">
                   {couponApplied && (
                     <div className="flex justify-between items-center mb-2 text-slate-600">
@@ -769,10 +802,7 @@ export default function NewOrder() {
               </div>
 
               <div className="flex justify-between items-center gap-4">
-                <button
-                  onClick={() => setStep(3)}
-                  className="text-slate-500 font-bold hover:text-slate-700 transition"
-                >
+                <button onClick={() => setStep(3)} className="text-slate-500 font-bold hover:text-slate-700 transition">
                   ← Retour
                 </button>
                 <button
@@ -792,7 +822,6 @@ export default function NewOrder() {
               </div>
             </div>
           )}
-
         </div>
       </div>
     </div>
