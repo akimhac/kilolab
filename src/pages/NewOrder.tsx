@@ -31,14 +31,13 @@ export default function NewOrder() {
   const [pickupSlot, setPickupSlot] = useState("");
   const [isWeekend, setIsWeekend] = useState(false);
 
-  // ✅ FIX : Recherche WASHERS (pas partners)
+  // Washers
   const [allWashers, setAllWashers] = useState<any[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [isSearching, setIsSearching] = useState(false);
   const [searchDone, setSearchDone] = useState(false);
   const [filteredWashers, setFilteredWashers] = useState<any[]>([]);
-  const [selectedWasherId, setSelectedWasherId] = useState<string>("");
-
+  const [selectedWasherId, setSelectedWasherId] = useState("");
   const [finalAddress, setFinalAddress] = useState("");
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
 
@@ -49,7 +48,7 @@ export default function NewOrder() {
   const [couponLoading, setCouponLoading] = useState(false);
 
   useEffect(() => {
-    fetchWashers(); // ✅ FIX
+    fetchWashers();
     requestGeolocation();
     restoreCartFromLocalStorage();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -118,28 +117,31 @@ export default function NewOrder() {
     }
   }, [pickupDate]);
 
-  // ✅ FIX : Récupérer les WASHERS approuvés
+  // ✅ FIX CRITIQUE : récupérer TOUS les washers approuvés (SANS filtre is_available)
   const fetchWashers = async () => {
     try {
+      console.log("🔍 Chargement des Washers...");
+
       const { data, error } = await supabase
         .from("washers")
         .select("id, full_name, city, postal_code, lat, lng, is_available")
-        .eq("status", "approved")
-        .eq("is_available", true);
+        .eq("status", "approved");
+      // ✅ SUPPRIMÉ : .eq("is_available", true)
 
       if (error) {
-        console.error("Erreur fetch washers:", error);
+        console.error("❌ Erreur fetch washers:", error);
         return;
       }
 
       console.log("✅ Washers chargés:", data?.length || 0);
+      console.log("📊 Détails Washers:", data);
       setAllWashers(data || []);
     } catch (error) {
-      console.error("Erreur fetchWashers:", error);
+      console.error("❌ Erreur fetchWashers:", error);
     }
   };
 
-  // ✅ FIX : Recherche locale dans les washers
+  // Recherche locale dans les washers
   const handleSearchLocally = () => {
     if (!searchQuery.trim()) {
       toast.error("Veuillez entrer un code postal ou une ville");
@@ -152,12 +154,13 @@ export default function NewOrder() {
     setTimeout(() => {
       const searchLower = searchQuery.toLowerCase().trim();
 
-      // ✅ FIX : Matching amélioré (ville, CP, département)
+      // Matching amélioré (ville, CP, département)
       const results = allWashers.filter((w) => {
         const cityMatch = String(w.city || "").toLowerCase().includes(searchLower);
         const postalMatch = String(w.postal_code || "").includes(searchQuery.trim());
 
-        const userDept = searchQuery.trim().length >= 2 ? searchQuery.trim().substring(0, 2) : "";
+        const userDept =
+          searchQuery.trim().length >= 2 ? searchQuery.trim().substring(0, 2) : "";
         const washerDept = String(w.postal_code || "").substring(0, 2);
         const deptMatch = userDept && washerDept === userDept;
 
@@ -165,6 +168,7 @@ export default function NewOrder() {
       });
 
       console.log("🔍 Recherche:", searchQuery, "→", results.length, "résultats");
+      console.log("📊 Résultats détaillés:", results);
 
       setFilteredWashers(results);
       setIsSearching(false);
@@ -192,7 +196,6 @@ export default function NewOrder() {
   const basePrice = formula === "eco" ? 3 : 5;
   let total = weight * basePrice;
   if (isWeekend) total += 5;
-
   const totalPrice = parseFloat(total.toFixed(2));
   const finalPrice = Math.max(0, parseFloat((totalPrice - couponDiscount).toFixed(2)));
 
@@ -300,7 +303,6 @@ export default function NewOrder() {
         return;
       }
 
-      // ✅ FIX : washer_id (pas partner_id)
       const isNetwork = !selectedWasherId || selectedWasherId === "waiting_list";
       const cleanDate = pickupDate || new Date().toISOString().split("T")[0];
       const fullAddressInfo = `${finalAddress} (${searchQuery}) - Créneau : ${pickupSlot}`;
@@ -309,8 +311,8 @@ export default function NewOrder() {
         .from("orders")
         .insert({
           client_id: user.id,
-          washer_id: isNetwork ? null : selectedWasherId, // ✅ FIX
-          partner_id: null, // ✅ plus besoin de partner
+          washer_id: isNetwork ? null : selectedWasherId,
+          partner_id: null,
           weight,
           pickup_address: fullAddressInfo,
           pickup_lat: userLocation?.lat || null,
@@ -480,7 +482,9 @@ export default function NewOrder() {
                   <div className="text-xs text-slate-500">Poids total</div>
                 </div>
                 <div className="bg-teal-50 p-4 rounded-xl border border-teal-200">
-                  <div className="font-bold text-teal-700 mb-1">{(weight * (formula === "eco" ? 3 : 5)).toFixed(2)}€</div>
+                  <div className="font-bold text-teal-700 mb-1">
+                    {(weight * (formula === "eco" ? 3 : 5)).toFixed(2)}€
+                  </div>
                   <div className="text-xs text-teal-600">Prix estimé</div>
                 </div>
                 <div className="bg-slate-50 p-4 rounded-xl border">
@@ -541,6 +545,13 @@ export default function NewOrder() {
                 </button>
               </div>
 
+              {/* Debug */}
+              <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-xl text-xs">
+                <p className="font-bold mb-1">🔍 Debug Recherche:</p>
+                <p>Total Washers approuvés: {allWashers.length}</p>
+                <p>Résultats recherche: {filteredWashers.length}</p>
+              </div>
+
               <div className="flex-1 relative rounded-2xl overflow-hidden bg-slate-100 border-2 border-slate-200 min-h-[300px]">
                 <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1569336415962-a4bd9f69c07b?q=80&w=1000&auto=format&fit=crop')] bg-cover bg-center opacity-30 blur-sm" />
 
@@ -592,7 +603,10 @@ export default function NewOrder() {
               </div>
 
               <div className="mt-6 flex justify-between">
-                <button onClick={() => setStep(1)} className="text-slate-500 font-bold hover:text-slate-700 transition">
+                <button
+                  onClick={() => setStep(1)}
+                  className="text-slate-500 font-bold hover:text-slate-700 transition"
+                >
                   ← Retour
                 </button>
               </div>
@@ -654,7 +668,6 @@ export default function NewOrder() {
                   />
                 </div>
 
-                {/* ✅ FIX : Liste des washers trouvés */}
                 {filteredWashers.length > 0 && (
                   <div>
                     <label className="block text-sm font-bold text-slate-700 mb-2">👤 Washer (optionnel)</label>
@@ -675,7 +688,10 @@ export default function NewOrder() {
               </div>
 
               <div className="mt-8 flex justify-between">
-                <button onClick={() => setStep(2)} className="text-slate-500 font-bold hover:text-slate-700 transition">
+                <button
+                  onClick={() => setStep(2)}
+                  className="text-slate-500 font-bold hover:text-slate-700 transition"
+                >
                   ← Retour
                 </button>
                 <button
@@ -699,7 +715,9 @@ export default function NewOrder() {
               <div className="bg-gradient-to-br from-slate-50 to-teal-50 p-6 rounded-2xl border-2 border-slate-200 space-y-4 mb-8 shadow-inner">
                 <div className="flex justify-between items-center pb-3 border-b border-slate-200">
                   <span className="text-slate-600 font-medium">Formule</span>
-                  <span className="font-black text-lg uppercase">{formula === "eco" ? "🟢 Standard" : "⚡ Express"}</span>
+                  <span className="font-black text-lg uppercase">
+                    {formula === "eco" ? "🟢 Standard" : "⚡ Express"}
+                  </span>
                 </div>
 
                 <div className="flex justify-between items-center pb-3 border-b border-slate-200">
@@ -712,7 +730,11 @@ export default function NewOrder() {
                   <div className="text-right">
                     <div className="font-bold text-slate-900">
                       {pickupDate
-                        ? new Date(pickupDate).toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long" })
+                        ? new Date(pickupDate).toLocaleDateString("fr-FR", {
+                            weekday: "long",
+                            day: "numeric",
+                            month: "long",
+                          })
                         : "-"}
                     </div>
                     <div className="text-sm text-slate-500">{pickupSlot}</div>
@@ -802,7 +824,10 @@ export default function NewOrder() {
               </div>
 
               <div className="flex justify-between items-center gap-4">
-                <button onClick={() => setStep(3)} className="text-slate-500 font-bold hover:text-slate-700 transition">
+                <button
+                  onClick={() => setStep(3)}
+                  className="text-slate-500 font-bold hover:text-slate-700 transition"
+                >
                   ← Retour
                 </button>
                 <button
