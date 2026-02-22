@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { supabase } from "../lib/supabase";
 import { requestNotificationPermission } from "../lib/firebase";
 import Navbar from "../components/Navbar";
@@ -190,6 +190,9 @@ export default function WasherDashboard() {
   // UI helper
   const [refreshing, setRefreshing] = useState(false);
 
+  // Anti double-fetch overlap (optionnel mais utile)
+  const fetchLockRef = useRef(false);
+
   /* =========================================================
      AUTO REFRESH
   ========================================================= */
@@ -208,20 +211,15 @@ export default function WasherDashboard() {
   useEffect(() => {
     const setupNotifications = async () => {
       try {
-        console.log("🔔 Setup notifications...");
-
         const token = await requestNotificationPermission();
-
         if (token && washerId) {
           setFcmToken(token);
           setNotificationsEnabled(true);
 
           const { error } = await supabase.from("washers").update({ fcm_token: token }).eq("id", washerId);
-
           if (error) {
             console.error("❌ Error saving FCM token:", error);
           } else {
-            console.log("✅ FCM token saved");
             toast.success("🔔 Notifications activées !", { duration: 2000 });
           }
         }
@@ -267,6 +265,9 @@ export default function WasherDashboard() {
   ========================================================= */
 
   const fetchWasherData = async () => {
+    if (fetchLockRef.current) return;
+    fetchLockRef.current = true;
+
     try {
       setRefreshing(true);
 
@@ -280,7 +281,7 @@ export default function WasherDashboard() {
         return;
       }
 
-      // Fetch washer profile
+      // Washer profile
       const { data: washerProfile, error: washerError } = await supabase
         .from("washers")
         .select("*")
@@ -325,8 +326,6 @@ export default function WasherDashboard() {
                   last_location_update: new Date().toISOString(),
                 })
                 .eq("id", washerProfile.id);
-
-              console.log("📍 GPS position updated");
             } catch (e) {
               console.error("GPS update error:", e);
             }
@@ -337,7 +336,7 @@ export default function WasherDashboard() {
         );
       }
 
-      // If not approved: stop here (but keep UI for pending/rejected)
+      // Not approved => stop (pending/rejected UI)
       if (washerProfile.status !== "approved") {
         setLoading(false);
         return;
@@ -368,7 +367,7 @@ export default function WasherDashboard() {
       const missions = (myOrders || []) as Mission[];
       setMyMissions(missions);
 
-      // Stats compute
+      // Stats
       const completed = missions.filter((o) => o.status === "completed");
       const pending = missions.filter((o) => o.status === "assigned" || o.status === "in_progress");
 
@@ -388,7 +387,6 @@ export default function WasherDashboard() {
         completedOrders: completed.length,
         pendingOrders: pending.length,
         weekEarnings,
-        // rating not implemented here, kept for compatibility
         avgRating: prev.avgRating || 0,
         totalRatings: prev.totalRatings || 0,
       }));
@@ -398,6 +396,7 @@ export default function WasherDashboard() {
     } finally {
       setLoading(false);
       setRefreshing(false);
+      fetchLockRef.current = false;
     }
   };
 
@@ -406,6 +405,8 @@ export default function WasherDashboard() {
   ========================================================= */
 
   const toggleAvailability = async () => {
+    if (!washerId) return;
+
     // Stripe required when switching from OFF -> ON
     if (!isAvailable && !stripeConnectStatus.completed) {
       toast.error("⚠️ Configurez d'abord votre compte bancaire pour recevoir vos paiements");
@@ -415,7 +416,6 @@ export default function WasherDashboard() {
     try {
       const next = !isAvailable;
       const { error } = await supabase.from("washers").update({ is_available: next }).eq("id", washerId);
-
       if (error) throw error;
 
       setIsAvailable(next);
@@ -428,6 +428,8 @@ export default function WasherDashboard() {
   };
 
   const acceptMission = async (orderId: string) => {
+    if (!washerId) return;
+
     if (!isAvailable) {
       toast.error("Activez votre disponibilité d’abord");
       return;
@@ -456,6 +458,8 @@ export default function WasherDashboard() {
   };
 
   const updateMissionStatus = async (orderId: string, newStatus: OrderStatus) => {
+    if (!washerId) return;
+
     try {
       const updates: any = {
         status: newStatus,
@@ -467,7 +471,6 @@ export default function WasherDashboard() {
       }
 
       const { error } = await supabase.from("orders").update(updates).eq("id", orderId).eq("washer_id", washerId);
-
       if (error) throw error;
 
       toast.success(newStatus === "completed" ? "Mission terminée ! 🎉" : "Statut mis à jour !");
@@ -478,8 +481,9 @@ export default function WasherDashboard() {
     }
   };
 
-  // Stripe Connect onboarding
   const handleStripeConnect = async () => {
+    if (!washerId) return;
+
     try {
       toast.loading("Création de votre compte de paiement…", { id: "stripe" });
 
@@ -515,13 +519,44 @@ export default function WasherDashboard() {
         return;
       }
 
-      // If no onboardingUrl, assume already configured
       setStripeConnectStatus({ completed: !!data?.onboardingCompleted });
       toast.success("Compte déjà configuré !");
     } catch (error: any) {
       console.error("handleStripeConnect error:", error);
       toast.dismiss("stripe");
       toast.error("Erreur : " + (error?.message || "inconnue"));
+    }
+  };
+
+  /* =========================================================
+     PREFERENCES (NO TOAST SPAM)
+  ========================================================= */
+
+  const saveServiceRadius = async (newRadius: number) => {
+    if (!washerId) return;
+
+    const { error } = await supabase.from("washers").update({ service_radius: newRadius }).eq("id", washerId);
+    if (error) {
+      console.error("❌ Update radius error:", error);
+      toast.error("Erreur mise à jour rayon");
+      return;
+    }
+
+    // 1 seul toast au “lâcher”
+    toast.success(`✅ Rayon mis à jour : ${newRadius} km`);
+  };
+
+  const saveSameCityOnly = async (checked: boolean) => {
+    if (!washerId) return;
+
+    const { error } = await supabase.from("washers").update({ accept_same_city_only: checked }).eq("id", washerId);
+
+    if (!error) {
+      setWasherData((prev: any) => ({ ...prev, accept_same_city_only: checked }));
+      toast.success(checked ? `✅ Limité à ${washerData?.city ?? "votre ville"}` : "✅ Toutes villes acceptées");
+    } else {
+      console.error("❌ Update city error:", error);
+      toast.error("Erreur mise à jour préférence");
     }
   };
 
@@ -537,7 +572,7 @@ export default function WasherDashboard() {
   const historyMissions = useMemo(() => myMissions.filter((m) => m.status === "completed"), [myMissions]);
 
   /* =========================================================
-     UI STATES (loading / pending / rejected)
+     UI STATES
   ========================================================= */
 
   if (loading) {
@@ -596,7 +631,7 @@ export default function WasherDashboard() {
   }
 
   /* =========================================================
-     MAIN DASHBOARD UI (approved)
+     MAIN DASHBOARD UI
   ========================================================= */
 
   return (
@@ -612,7 +647,6 @@ export default function WasherDashboard() {
           </div>
 
           <div className="flex flex-wrap items-center gap-3">
-            {/* Refresh */}
             <button
               type="button"
               onClick={fetchWasherData}
@@ -624,7 +658,6 @@ export default function WasherDashboard() {
               {refreshing ? "Actualisation..." : "Rafraîchir"}
             </button>
 
-            {/* Notifications */}
             {notificationsEnabled ? (
               <div className="px-4 py-2 bg-green-50 border border-green-200 rounded-xl flex items-center gap-2">
                 <Bell size={16} className="text-green-600" />
@@ -637,12 +670,13 @@ export default function WasherDashboard() {
               </div>
             )}
 
-            {/* Availability */}
             <button
               type="button"
               onClick={toggleAvailability}
               className={`px-6 py-3 rounded-xl font-bold flex items-center gap-2 transition-all transform hover:scale-105 ${
-                isAvailable ? "bg-green-500 text-white hover:bg-green-600 shadow-lg" : "bg-slate-300 text-slate-600 hover:bg-slate-400"
+                isAvailable
+                  ? "bg-green-500 text-white hover:bg-green-600 shadow-lg"
+                  : "bg-slate-300 text-slate-600 hover:bg-slate-400"
               }`}
             >
               <div className={`w-3 h-3 rounded-full animate-pulse ${isAvailable ? "bg-white" : "bg-slate-500"}`} />
@@ -651,7 +685,6 @@ export default function WasherDashboard() {
           </div>
         </div>
 
-        {/* ALERTES */}
         {!isAvailable && (
           <div className="bg-orange-50 border-2 border-orange-200 rounded-xl p-4 mb-6 flex items-center gap-3">
             <AlertCircle className="text-orange-600 shrink-0" size={20} />
@@ -665,12 +698,12 @@ export default function WasherDashboard() {
           <div className="bg-blue-50 border-2 border-blue-200 rounded-xl p-4 mb-6 flex items-center gap-3">
             <AlertCircle className="text-blue-600 shrink-0" size={20} />
             <p className="text-blue-800 font-medium">
-              Les notifications sont désactivées. Rechargez la page et autorisez les notifications pour être alerté des nouvelles missions.
+              Les notifications sont désactivées. Rechargez la page et autorisez les notifications pour être alerté des
+              nouvelles missions.
             </p>
           </div>
         )}
 
-        {/* STRIPE SECTION */}
         {!stripeConnectStatus.completed ? (
           <div className="bg-gradient-to-r from-purple-500 to-pink-500 text-white p-8 rounded-3xl mb-8 shadow-2xl">
             <div className="flex items-start gap-4">
@@ -719,11 +752,10 @@ export default function WasherDashboard() {
             </div>
 
             <div className="space-y-6">
-              {/* Rayon */}
+              {/* Rayon (NO TOAST SPAM) */}
               <div>
                 <label className="block text-sm font-bold text-slate-700 mb-3">
-                  Rayon d'action :{" "}
-                  <span className="text-teal-600">{washerData.service_radius || 5} km</span>
+                  Rayon d'action : <span className="text-teal-600">{washerData.service_radius || 5} km</span>
                 </label>
 
                 <input
@@ -732,23 +764,15 @@ export default function WasherDashboard() {
                   max="50"
                   step="1"
                   value={washerData.service_radius || 5}
-                  onChange={async (e) => {
+                  onChange={(e) => {
                     const newRadius = parseInt(e.target.value, 10);
-
-                    const { error } = await supabase
-                      .from("washers")
-                      .update({ service_radius: newRadius })
-                      .eq("id", washerId);
-
-                    if (!error) {
-                      setWasherData((prev: any) => ({ ...prev, service_radius: newRadius }));
-                      toast.success(`Rayon mis à jour : ${newRadius} km`);
-                    } else {
-                      toast.error("Erreur mise à jour rayon");
-                    }
+                    setWasherData((prev: any) => ({ ...prev, service_radius: newRadius }));
                   }}
+                  onMouseUp={(e) => saveServiceRadius(parseInt((e.target as HTMLInputElement).value, 10))}
+                  onTouchEnd={(e) => saveServiceRadius(parseInt((e.target as HTMLInputElement).value, 10))}
                   className="w-full h-3 bg-teal-200 rounded-lg appearance-none cursor-pointer accent-teal-600"
                 />
+
                 <div className="flex justify-between text-xs text-slate-500 mt-2">
                   <span>1 km (hyper local)</span>
                   <span>25 km</span>
@@ -758,34 +782,18 @@ export default function WasherDashboard() {
 
               {/* Same city only */}
               <div>
-                <label className="block text-sm font-bold text-slate-700 mb-2">
-                  Zone d'intervention
-                </label>
+                <label className="block text-sm font-bold text-slate-700 mb-2">Zone d'intervention</label>
                 <div className="flex items-center gap-3 text-slate-600">
                   <input
                     type="checkbox"
                     checked={!!washerData.accept_same_city_only}
-                    onChange={async (e) => {
-                      const checked = e.target.checked;
-
-                      const { error } = await supabase
-                        .from("washers")
-                        .update({ accept_same_city_only: checked })
-                        .eq("id", washerId);
-
-                      if (!error) {
-                        setWasherData((prev: any) => ({ ...prev, accept_same_city_only: checked }));
-                        toast.success(checked ? `✅ Limité à ${washerData.city}` : "✅ Toutes villes acceptées");
-                      } else {
-                        toast.error("Erreur mise à jour préférence");
-                      }
-                    }}
+                    onChange={(e) => saveSameCityOnly(e.target.checked)}
                     className="w-5 h-5 accent-teal-600 cursor-pointer"
                   />
                   <span>Uniquement ma ville ({washerData.city})</span>
                 </div>
                 <p className="text-xs text-slate-500 mt-2">
-                  Si activé, seules les commandes de votre ville seront proposées (à utiliser si vous voulez rester local).
+                  Si activé, seules les commandes de votre ville seront proposées.
                 </p>
               </div>
             </div>
@@ -844,9 +852,7 @@ export default function WasherDashboard() {
                 <div className="flex justify-between items-start mb-4">
                   <div>
                     <p className="text-xs text-slate-400 mb-1">Vous gagnez</p>
-                    <p className="font-bold text-3xl text-teal-600">
-                      {commissionEarnings(mission.total_price)}€
-                    </p>
+                    <p className="font-bold text-3xl text-teal-600">{commissionEarnings(mission.total_price)}€</p>
                   </div>
 
                   <span
@@ -891,12 +897,6 @@ export default function WasherDashboard() {
                   <Check size={20} />
                   Accepter la mission
                 </button>
-
-                {!stripeConnectStatus.completed && (
-                  <p className="text-xs text-slate-500 mt-3">
-                    ⚠️ Stripe non configuré : vous ne pourrez pas passer “Disponible”.
-                  </p>
-                )}
               </div>
             ))}
 
@@ -921,9 +921,7 @@ export default function WasherDashboard() {
                       <p className="font-bold text-2xl text-teal-600">{commissionEarnings(mission.total_price)}€</p>
                       <span
                         className={`px-3 py-1 rounded-full text-xs font-bold ${
-                          mission.status === "assigned"
-                            ? "bg-blue-100 text-blue-700"
-                            : "bg-purple-100 text-purple-700"
+                          mission.status === "assigned" ? "bg-blue-100 text-blue-700" : "bg-purple-100 text-purple-700"
                         }`}
                       >
                         {mission.status === "assigned" ? "📦 Nouvelle mission" : "🔄 En cours"}
@@ -1014,9 +1012,7 @@ export default function WasherDashboard() {
                       <Package size={14} />
                       {mission.weight} kg
                     </p>
-                    <p className="flex items-center gap-2">
-                      {mission.formula === "express" ? "⚡ Express" : "🟢 Standard"}
-                    </p>
+                    <p className="flex items-center gap-2">{mission.formula === "express" ? "⚡ Express" : "🟢 Standard"}</p>
                   </div>
                 </div>
               </div>
@@ -1032,7 +1028,6 @@ export default function WasherDashboard() {
           </div>
         )}
 
-        {/* FOOTER SMALL NOTE */}
         <div className="mt-10 text-center text-xs text-slate-400">
           Dernière actualisation : {new Date().toLocaleTimeString("fr-FR")} • Mise à jour auto toutes les 30s
         </div>
