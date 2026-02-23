@@ -51,8 +51,11 @@ avgOrderValue: number;
 interface UserProfile {
 id: string;
 full_name: string | null;
+// Depuis table referral_codes
 referral_code: string | null;
-referral_count: number;
+uses_count: number;
+bonus_earned_cents: number;
+// Depuis table user_profiles
 referral_credit: number;
 }
 
@@ -601,12 +604,13 @@ return (
 
   <div className="grid grid-cols-2 gap-3">
     <div className="bg-white/10 rounded-xl p-3 text-center">
-      <p className="text-2xl font-black">{profile.referral_count ?? 0}</p>
+      <p className="text-2xl font-black">{profile.uses_count ?? 0}</p>
       <p className="text-purple-200 text-xs mt-0.5">Amis invités</p>
     </div>
     <div className="bg-white/10 rounded-xl p-3 text-center">
-      <p className="text-2xl font-black">{formatCurrency(profile.referral_credit ?? 0)}</p>
-      <p className="text-purple-200 text-xs mt-0.5">Crédits gagnés</p>
+      {/* bonus_earned_cents est en centimes → diviser par 100 */}
+      <p className="text-2xl font-black">{formatCurrency((profile.bonus_earned_cents ?? 0) / 100)}</p>
+      <p className="text-purple-200 text-xs mt-0.5">Bonus gagné</p>
     </div>
   </div>
 </div>
@@ -699,14 +703,30 @@ try {
     avgOrderValue: past.length > 0 ? totalSpent / past.length : 0,
   });
 
-  // Profil utilisateur (parrainage)
-  const { data: prof } = await supabase
-    .from('profiles')
-    .select('id, full_name, referral_code, referral_count, referral_credit')
-    .eq('id', user.id)
-    .single();
+  // Profil utilisateur (user_profiles + referral_codes)
+  const [{ data: prof }, { data: refCode }] = await Promise.all([
+    supabase
+      .from('user_profiles')
+      .select('id, full_name, referral_credit')
+      .eq('id', user.id)
+      .single(),
+    supabase
+      .from('referral_codes')
+      .select('code, uses_count, bonus_earned_cents')
+      .eq('user_id', user.id)
+      .single(),
+  ]);
 
-  if (prof) setProfile(prof as UserProfile);
+  if (prof) {
+    setProfile({
+      id: prof.id,
+      full_name: prof.full_name ?? null,
+      referral_code: refCode?.code ?? null,
+      uses_count: refCode?.uses_count ?? 0,
+      bonus_earned_cents: refCode?.bonus_earned_cents ?? 0,
+      referral_credit: prof.referral_credit ?? 0,
+    });
+  }
 
 } catch (err) {
   console.error('Erreur loadDashboard:', err);
