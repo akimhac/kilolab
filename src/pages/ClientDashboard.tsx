@@ -1,435 +1,496 @@
-import { useEffect, useState, useMemo } from "react";
-import { supabase } from "../lib/supabase";
-import Navbar from "../components/Navbar";
-import { 
-  Package, Clock, CheckCircle, ArrowRight, MapPin, Loader2, Plus, Gift, 
-  TrendingUp, Home, UserCheck, Award, BarChart3, DollarSign, Sparkles 
-} from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
-import toast from "react-hot-toast";
+import { useEffect, useState, useCallback } from ‘react’;
+import { supabase } from ‘../lib/supabase’;
+import Navbar from ‘../components/Navbar’;
+import {
+Package, Clock, CheckCircle, MapPin, Loader2, ArrowRight,
+Star, User, ChevronRight, RefreshCw, Plus, Sparkles,
+AlertCircle, Phone, MessageCircle, TrendingUp
+} from ‘lucide-react’;
+import toast from ‘react-hot-toast’;
 
-// ========================================
-// GRAPHIQUES SVG MAISON (Léger & Rapide)
-// ========================================
-function SimpleLineChart({ data }: { data: { date: string; value: number }[] }) {
-  if (data.length === 0) return null;
-  
-  const maxValue = Math.max(...data.map(d => d.value), 1);
-  const width = 400;
-  const height = 150;
-  const padding = 30;
+// ─── Interfaces ────────────────────────────────────────────────────────────────
 
-  const points = data.map((point, i) => {
-    const x = padding + (i / Math.max(data.length - 1, 1)) * (width - 2 * padding);
-    const y = height - padding - (point.value / maxValue) * (height - 2 * padding);
-    return `${x},${y}`;
-  }).join(" ");
-
-  return (
-    <svg width="100%" height={height} viewBox={`0 0 ${width} ${height}`} className="overflow-visible">
-      <line x1={padding} y1={padding} x2={padding} y2={height - padding} stroke="#e2e8f0" strokeWidth="2"/>
-      <line x1={padding} y1={height - padding} x2={width - padding} y2={height - padding} stroke="#e2e8f0" strokeWidth="2"/>
-      <polyline points={points} fill="none" stroke="#14b8a6" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
-      {data.map((point, i) => {
-        const x = padding + (i / Math.max(data.length - 1, 1)) * (width - 2 * padding);
-        const y = height - padding - (point.value / maxValue) * (height - 2 * padding);
-        return (
-          <g key={i}>
-            <circle cx={x} cy={y} r="5" fill="#14b8a6" stroke="white" strokeWidth="2"/>
-            <text x={x} y={height - 10} textAnchor="middle" fontSize="10" fill="#64748b">{point.date}</text>
-          </g>
-        );
-      })}
-    </svg>
-  );
+interface WasherInfo {
+id: string;
+first_name: string;
+last_name: string;
+avatar_url: string | null;
+avg_rating: number | null;
+total_ratings: number | null;
+phone: string | null;
 }
 
-function MiniBarChart({ data }: { data: { label: string; value: number; color: string }[] }) {
-  const maxValue = Math.max(...data.map(d => d.value), 1);
-
-  return (
-    <div className="space-y-3">
-      {data.map((item, i) => (
-        <div key={i}>
-          <div className="flex justify-between text-xs mb-1">
-            <span className="font-medium text-slate-600">{item.label}</span>
-            <span className="font-bold text-slate-900">{item.value}</span>
-          </div>
-          <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
-            <div 
-              className="h-full transition-all duration-500 rounded-full" 
-              style={{ width: `${(item.value / maxValue) * 100}%`, backgroundColor: item.color }}
-            />
-          </div>
-        </div>
-      ))}
-    </div>
-  );
+interface Order {
+id: string;
+created_at: string;
+completed_at: string | null;
+pickup_address: string;
+pickup_date: string | null;
+pickup_slot: string | null;
+weight: number;
+total_price: number;
+formula: string;
+status: string;
+washer_id: string | null;
+washer?: WasherInfo | null;
 }
 
-export default function ClientDashboard() {
-  const navigate = useNavigate();
-  const [orders, setOrders] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [user, setUser] = useState<any>(null);
-  const [showAnalytics, setShowAnalytics] = useState(false);
-  
-  useEffect(() => {
-    fetchData();
-  }, []);
+interface ClientStats {
+totalOrders: number;
+totalSpent: number;
+totalKg: number;
+activeOrders: number;
+}
 
-  // 🔔 ABONNEMENT TEMPS RÉEL
-  useEffect(() => {
-    if (!user) return;
+// ─── Helpers ───────────────────────────────────────────────────────────────────
 
-    const subscription = supabase
-      .channel("client-orders")
-      .on("postgres_changes", { 
-        event: "*", 
-        schema: "public", 
-        table: "orders", 
-        filter: `client_id=eq.${user.id}` 
-      }, (payload) => {
-        console.log("Mise à jour reçue:", payload);
-        fetchData(); 
-        
-        if (payload.eventType === "UPDATE") {
-          const newStatus = (payload.new as any).status;
-          const statusMessages: any = {
-            "assigned": "✅ Votre commande a été prise en charge !",
-            "in_progress": "🧼 Votre linge est en cours de lavage !",
-            "ready": "🎉 Votre commande est prête !",
-            "completed": "✨ Commande livrée ! Merci."
-          };
-          if (statusMessages[newStatus]) toast.success(statusMessages[newStatus], { duration: 5000 });
-        }
-      })
-      .subscribe();
+function formatCurrency(amount: number): string {
+return new Intl.NumberFormat(‘fr-FR’, { style: ‘currency’, currency: ‘EUR’ }).format(amount);
+}
 
-    return () => { subscription.unsubscribe(); };
-  }, [user]);
+function formatDate(dateStr: string): string {
+return new Date(dateStr).toLocaleDateString(‘fr-FR’, {
+day: ‘2-digit’, month: ‘short’, year: ‘numeric’
+});
+}
 
-  const fetchData = async () => {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) {
-      navigate("/login");
-      return;
-    }
-    setUser(user);
+function getFormulaLabel(formula: string): string {
+const labels: Record<string, string> = {
+eco: ‘Formule Éco’,
+standard: ‘Formule Standard’,
+premium: ‘Formule Premium’,
+express: ‘Formule Express’,
+};
+return labels[formula] ?? formula;
+}
 
-    const { data } = await supabase
-      .from("orders")
-      .select("*, partner:partners(company_name)") 
-      .eq("client_id", user.id)
-      .order("created_at", { ascending: false });
+// ─── Progress steps ───────────────────────────────────────────────────────────
 
-    if (data) setOrders(data);
-    setLoading(false);
-  };
+const STATUS_STEPS: { key: string; label: string; icon: string }[] = [
+{ key: ‘pending’,   label: ‘Reçu’,     icon: ‘📬’ },
+{ key: ‘assigned’,  label: ‘Expert’,   icon: ‘👤’ },
+{ key: ‘picked_up’, label: ‘Collecté’, icon: ‘📦’ },
+{ key: ‘washing’,   label: ‘Lavage’,   icon: ‘🫧’ },
+{ key: ‘ready’,     label: ‘Prêt’,     icon: ‘✅’ },
+{ key: ‘completed’, label: ‘Livré’,    icon: ‘🎉’ },
+];
 
-  // 📊 STATS CALCULÉES
-  const clientStats = useMemo(() => {
-    const completed = orders.filter(o => o.status === "completed");
-    const totalSpent = completed.reduce((sum, o) => sum + parseFloat(o.total_price || 0), 0);
-    const totalKg = completed.reduce((sum, o) => sum + parseFloat(o.weight || 0), 0);
-    const avgOrderValue = completed.length > 0 ? totalSpent / completed.length : 0;
-    const co2Saved = (totalKg * 0.5).toFixed(1);
+function getStepIndex(status: string): number {
+return STATUS_STEPS.findIndex((s) => s.key === status);
+}
 
-    return { 
-      totalOrders: orders.length, 
-      completedOrders: completed.length, 
-      totalSpent, 
-      totalKg, 
-      avgOrderValue,
-      co2Saved 
-    };
-  }, [orders]);
+function ProgressBar({ status }: { status: string }) {
+const currentIdx = getStepIndex(status);
+return (
+<div className="mt-4">
+{/* Labels desktop */}
+<div className="hidden sm:flex justify-between mb-2">
+{STATUS_STEPS.map((step, idx) => (
+<span
+key={step.key}
+className={`text-xs font-medium ${idx <= currentIdx ? 'text-teal-600' : 'text-slate-300'}`}
+>
+{step.label}
+</span>
+))}
+</div>
+{/* Barre */}
+<div className="relative h-2 bg-slate-100 rounded-full overflow-hidden">
+<div
+className=“absolute left-0 top-0 h-full bg-gradient-to-r from-teal-400 to-emerald-500 rounded-full transition-all duration-500”
+style={{ width: `${((currentIdx + 1) / STATUS_STEPS.length) * 100}%` }}
+/>
+</div>
+{/* Label mobile : étape courante seulement */}
+<div className="sm:hidden mt-2 text-center">
+<span className="text-sm font-bold text-teal-600">
+{STATUS_STEPS[currentIdx]?.icon} {STATUS_STEPS[currentIdx]?.label}
+</span>
+<span className="text-slate-400 text-xs ml-2">({currentIdx + 1}/{STATUS_STEPS.length})</span>
+</div>
+</div>
+);
+}
 
-  const loyaltyLevel = useMemo(() => {
-    const count = clientStats.completedOrders;
-    // On renvoie juste la clé de couleur, on gérera la classe CSS après
-    if (count >= 20) return { level: "Platine 💎", colorKey: "purple", progress: 100, next: "Max" };
-    if (count >= 10) return { level: "Gold 🏆", colorKey: "yellow", progress: (count / 20) * 100, next: "20 pour Platine" };
-    if (count >= 5) return { level: "Silver 🥈", colorKey: "slate", progress: (count / 10) * 100, next: "10 pour Gold" };
-    return { level: "Bronze 🥉", colorKey: "orange", progress: (count / 5) * 100, next: "5 pour Silver" };
-  }, [clientStats]);
+// ─── WasherCard ───────────────────────────────────────────────────────────────
 
-  // ✅ CORRECTION TAILWIND : Mapping des couleurs explicite
-  const loyaltyBadgeClasses: Record<string, string> = {
-    purple: "bg-purple-100 text-purple-700",
-    yellow: "bg-yellow-100 text-yellow-700",
-    slate: "bg-slate-100 text-slate-700",
-    orange: "bg-orange-100 text-orange-700"
-  };
+function WasherCard({ washer }: { washer: WasherInfo }) {
+return (
+<div className="bg-teal-50 border border-teal-100 rounded-2xl p-4 flex items-center gap-4">
+<div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-teal-400 to-emerald-500 flex items-center justify-center text-white font-black text-lg flex-shrink-0">
+{washer.avatar_url ? (
+<img src={washer.avatar_url} alt="" className="w-full h-full rounded-2xl object-cover" />
+) : (
+`${washer.first_name?.[0] ?? ''}${washer.last_name?.[0] ?? ''}`
+)}
+</div>
+<div className="flex-1 min-w-0">
+<p className="text-xs text-teal-600 font-semibold uppercase tracking-wide mb-0.5">Votre washer</p>
+<p className="font-black text-slate-800 truncate">{washer.first_name} {washer.last_name}</p>
+{washer.avg_rating && washer.avg_rating > 0 ? (
+<div className="flex items-center gap-1 mt-1">
+<Star size={12} className="text-yellow-400 fill-yellow-400" />
+<span className="text-xs text-slate-600 font-medium">
+{washer.avg_rating.toFixed(1)}
+{washer.total_ratings && washer.total_ratings > 0 && (
+<span className="text-slate-400 ml-1">({washer.total_ratings} avis)</span>
+)}
+</span>
+</div>
+) : (
+<span className="text-xs text-slate-400">Nouveau washer</span>
+)}
+</div>
+{washer.phone && (
+<a
+href={`tel:${washer.phone}`}
+className=“flex-shrink-0 w-10 h-10 bg-teal-500 rounded-xl flex items-center justify-center text-white hover:bg-teal-600 transition”
+>
+<Phone size={18} />
+</a>
+)}
+</div>
+);
+}
 
-  const monthlySpending = useMemo(() => {
-    const monthMap = new Map<string, number>();
-    orders.filter(o => o.status === "completed").forEach(order => {
-      const month = new Date(order.created_at).toLocaleDateString("fr-FR", { month: "short" });
-      monthMap.set(month, (monthMap.get(month) || 0) + parseFloat(order.total_price || 0));
-    });
-    return Array.from(monthMap.entries()).slice(-6).map(([date, value]) => ({ date, value: parseFloat(value.toFixed(2)) }));
-  }, [orders]);
+// ─── OrderCard active ─────────────────────────────────────────────────────────
 
-  const formulaDistribution = useMemo(() => {
-    const formulaMap = new Map<string, number>();
-    orders.forEach(order => {
-      const formula = order.formula || "Eco";
-      formulaMap.set(formula, (formulaMap.get(formula) || 0) + 1);
-    });
-    const colors: any = { "Eco": "#14b8a6", "Express": "#f59e0b", "Premium": "#8b5cf6" };
-    return Array.from(formulaMap.entries()).map(([label, value]) => ({ label, value, color: colors[label] || "#64748b" }));
-  }, [orders]);
+function ActiveOrderCard({ order, onCancel }: { order: Order; onCancel?: (id: string) => void }) {
+const isSearchingWasher = !order.washer_id;
 
-  const activeOrder = orders.find(o => o.status !== "completed" && o.status !== "cancelled");
-  
-  // ✅ CORRECTION PROGRESS BAR : Map simple
-  const progressMap: Record<string, number> = {
-    pending: 20,
-    assigned: 40,
-    in_progress: 70,
-    ready: 100,
-    completed: 100
-  };
+return (
+<div className="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden">
+{/* Header */}
+<div className="bg-gradient-to-r from-slate-900 to-slate-700 p-5 text-white">
+<div className="flex items-center justify-between mb-1">
+<span className="bg-yellow-400 text-yellow-900 text-xs font-black px-3 py-1 rounded-full uppercase">
+En cours
+</span>
+<span className="text-white/60 text-xs font-mono">#{order.id.slice(0, 8)}</span>
+</div>
+<p className="text-white/70 text-sm mt-2">{formatDate(order.created_at)}</p>
+</div>
 
-  if (loading) return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-50">
-      <Loader2 className="animate-spin text-teal-600" size={48}/>
-    </div>
-  );
+```
+  <div className="p-5 space-y-4">
+    {/* Progress */}
+    <ProgressBar status={order.status} />
 
-  return (
-    <div className="min-h-screen bg-slate-50 font-sans text-slate-900 pb-20">
-      <Navbar />
-
-      <div className="pt-32 px-4 max-w-6xl mx-auto">
-        
-        {/* HEADER */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 gap-4">
-          <div>
-            <div className="flex items-center gap-3 mb-1">
-              <h1 className="text-3xl font-black">Mon Espace Client 👋</h1>
-              <span className={`px-3 py-1 rounded-full text-xs font-bold ${loyaltyBadgeClasses[loyaltyLevel.colorKey]}`}>
-                {loyaltyLevel.level}
-              </span>
-            </div>
-            <p className="text-slate-500">Suivez vos commandes en temps réel.</p>
-          </div>
-          <div className="flex gap-3">
-            <button 
-              onClick={() => setShowAnalytics(!showAnalytics)}
-              className={`px-4 py-3 rounded-xl font-bold text-sm flex items-center gap-2 transition ${
-                showAnalytics ? "bg-teal-600 text-white shadow-lg shadow-teal-600/30" : "bg-white text-slate-700 border border-slate-200"
-              }`}
-            >
-              <BarChart3 size={18}/> {showAnalytics ? "Vue simple" : "Analytics"}
-            </button>
-            <Link to="/referral" className="bg-white text-teal-600 border border-teal-200 px-4 py-3 rounded-xl font-bold text-sm flex items-center gap-2 hover:bg-teal-50 transition">
-              <Gift size={18}/> Parrainage
-            </Link>
-            <Link to="/new-order" className="bg-slate-900 text-white px-6 py-3 rounded-xl font-bold text-sm flex items-center gap-2 hover:bg-slate-800 transition shadow-lg">
-              <Plus size={18}/> Commander
-            </Link>
-          </div>
+    {/* Washer ou recherche */}
+    {isSearchingWasher ? (
+      <div className="bg-orange-50 border border-orange-100 rounded-2xl p-4 flex items-center gap-3">
+        <div className="w-8 h-8 rounded-xl bg-orange-200 flex items-center justify-center flex-shrink-0">
+          <Loader2 size={16} className="text-orange-600 animate-spin" />
         </div>
-
-        {/* KPIs RAPIDES */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-          <div className="bg-white p-5 rounded-xl border border-slate-200 hover:shadow-md transition">
-            <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mb-2">
-              <Package className="text-blue-600" size={20}/>
-            </div>
-            <p className="text-xs text-slate-400 font-bold uppercase mb-1">Commandes</p>
-            <p className="text-2xl font-black text-slate-900">{clientStats.completedOrders}</p>
-          </div>
-          <div className="bg-white p-5 rounded-xl border border-slate-200 hover:shadow-md transition">
-            <div className="w-10 h-10 bg-teal-100 rounded-lg flex items-center justify-center mb-2">
-              <DollarSign className="text-teal-600" size={20}/>
-            </div>
-            <p className="text-xs text-slate-400 font-bold uppercase mb-1">Dépensé</p>
-            <p className="text-2xl font-black text-teal-600">{clientStats.totalSpent.toFixed(2)} €</p>
-          </div>
-          <div className="bg-white p-5 rounded-xl border border-slate-200 hover:shadow-md transition">
-            <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center mb-2">
-              <Package className="text-purple-600" size={20}/>
-            </div>
-            <p className="text-xs text-slate-400 font-bold uppercase mb-1">Kg lavés</p>
-            <p className="text-2xl font-black text-purple-600">{clientStats.totalKg.toFixed(1)} kg</p>
-          </div>
-          <div className="bg-white p-5 rounded-xl border border-slate-200 hover:shadow-md transition">
-            <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center mb-2">
-              <Award className="text-green-600" size={20}/>
-            </div>
-            <p className="text-xs text-slate-400 font-bold uppercase mb-1">Panier moyen</p>
-            <p className="text-2xl font-black text-green-600">{clientStats.avgOrderValue.toFixed(2)} €</p>
-          </div>
+        <div>
+          <p className="text-sm font-bold text-orange-700">Recherche d'un washer...</p>
+          <p className="text-xs text-orange-500">Vous serez notifié dès qu'un washer accepte</p>
         </div>
+      </div>
+    ) : order.washer ? (
+      <WasherCard washer={order.washer} />
+    ) : null}
 
-        {/* ANALYTICS MODE */}
-        {showAnalytics && (
-          <div className="mb-8 space-y-6 animate-in fade-in slide-in-from-top-4">
-            {/* CARTE FIDÉLITÉ */}
-            <div className="bg-gradient-to-br from-purple-500 to-purple-600 p-6 rounded-2xl text-white shadow-xl relative overflow-hidden">
-              <div className="absolute top-0 right-0 p-32 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl"></div>
-              <div className="flex items-center justify-between mb-4 relative z-10">
-                <div>
-                  <p className="text-purple-100 text-sm font-bold uppercase mb-1">Niveau de fidélité</p>
-                  <p className="text-2xl font-black">{loyaltyLevel.level}</p>
-                </div>
-                <Award size={40} className="text-white/30"/>
-              </div>
-              <div className="bg-white/20 rounded-full h-3 overflow-hidden mb-2 relative z-10">
-                <div className="bg-white h-full transition-all duration-1000 rounded-full" style={{ width: `${loyaltyLevel.progress}%` }} />
-              </div>
-              <p className="text-purple-100 text-sm relative z-10">
-                {loyaltyLevel.next !== "Max" ? `Plus que ${loyaltyLevel.next}` : "🎉 Niveau maximum atteint !"}
-              </p>
-            </div>
+    {/* Détails collecte */}
+    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+      <div className="bg-slate-50 rounded-xl p-3 flex items-start gap-2">
+        <MapPin size={16} className="text-slate-400 flex-shrink-0 mt-0.5" />
+        <div className="min-w-0">
+          <p className="text-xs text-slate-400 font-medium uppercase tracking-wide mb-0.5">Collecte</p>
+          <p className="text-sm text-slate-700 font-medium truncate">{order.pickup_address}</p>
+          {order.pickup_slot && (
+            <p className="text-xs text-slate-400 mt-1">🕐 {order.pickup_slot}</p>
+          )}
+        </div>
+      </div>
 
-            {/* GRAPHIQUES */}
-            <div className="grid md:grid-cols-2 gap-6">
-              <div className="bg-white p-6 rounded-2xl border border-slate-200">
-                <h3 className="font-bold text-lg mb-4 flex items-center gap-2">
-                  <TrendingUp className="text-teal-600" size={20}/>
-                  Dépenses mensuelles
-                </h3>
-                <SimpleLineChart data={monthlySpending} />
-              </div>
-              <div className="bg-white p-6 rounded-2xl border border-slate-200">
-                <h3 className="font-bold text-lg mb-4 flex items-center gap-2">
-                  <Package className="text-blue-600" size={20}/>
-                  Répartition par formule
-                </h3>
-                <MiniBarChart data={formulaDistribution} />
-              </div>
-            </div>
-
-            {/* IMPACT ÉCO */}
-            <div className="bg-gradient-to-br from-green-50 to-emerald-50 p-6 rounded-2xl border border-green-200">
-              <div className="flex items-center gap-4">
-                <div className="w-16 h-16 bg-green-500 rounded-2xl flex items-center justify-center text-white text-2xl shadow-lg shadow-green-200">🌱</div>
-                <div className="flex-1">
-                  <p className="text-green-600 font-bold text-sm uppercase mb-1">Impact Environnemental</p>
-                  <p className="text-2xl font-black text-green-900 mb-1">{clientStats.co2Saved} kg CO₂</p>
-                  <p className="text-green-700 text-sm">économisés grâce à Kilolab ! 🌍</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* COMMANDE ACTIVE */}
-        {activeOrder ? (
-          <div className="bg-white p-6 md:p-8 rounded-3xl shadow-xl shadow-teal-900/5 border border-teal-100 mb-12 relative overflow-hidden">
-            <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-teal-400 to-blue-500"></div>
-            
-            <div className="flex justify-between items-start mb-8">
-              <div>
-                <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider mb-3 inline-block 
-                  ${activeOrder.status === "pending" ? "bg-yellow-100 text-yellow-700" : 
-                    activeOrder.status === "assigned" ? "bg-purple-100 text-purple-700" :
-                    "bg-teal-100 text-teal-700"}`}>
-                  {activeOrder.status === "pending" ? "En attente" : 
-                   activeOrder.status === "assigned" ? "Prise en charge" :
-                   activeOrder.status === "cleaning" ? "Nettoyage" : "Prêt"}
-                </span>
-                <h2 className="text-2xl font-black">Commande #{activeOrder.id.toString().slice(0,6)}</h2>
-                <p className="text-slate-400 text-sm mt-1">{new Date(activeOrder.created_at).toLocaleDateString()}</p>
-              </div>
-              <div className="text-right hidden sm:block">
-                <div className="text-sm text-slate-400">Total estimé</div>
-                <div className="text-2xl font-black text-slate-900">{activeOrder.total_price} €</div>
-              </div>
-            </div>
-
-            {/* BARRE DE PROGRESSION CORRIGÉE */}
-            <div className="mb-8 relative">
-              <div className="flex justify-between text-xs font-bold text-slate-400 mb-3 uppercase tracking-wide px-1">
-                <span className={activeOrder.status ? "text-teal-600" : ""}>Reçu</span>
-                <span className={activeOrder.status === "assigned" || activeOrder.status === "in_progress" || activeOrder.status === "ready" ? "text-teal-600" : ""}>Expert</span>
-                <span className={activeOrder.status === "in_progress" || activeOrder.status === "ready" ? "text-teal-600" : ""}>Lavage</span>
-                <span className={activeOrder.status === "ready" ? "text-teal-600" : ""}>Prêt</span>
-              </div>
-              <div className="h-3 bg-slate-100 rounded-full overflow-hidden">
-                <div 
-                  className="h-full bg-teal-500 transition-all duration-1000 ease-out shadow-[0_0_10px_rgba(20,184,166,0.5)]"
-                  style={{ width: `${progressMap[activeOrder.status] || 5}%` }}
-                ></div>
-              </div>
-            </div>
-
-            {/* ✅ PARTENAIRE ASSIGNÉ ? LE MODE CONCIERGE */}
-            {activeOrder.status === 'assigned' && !activeOrder.partner ? (
-                <div className="mb-6 bg-blue-50 border border-blue-100 p-4 rounded-xl flex items-start gap-3 animate-pulse">
-                    <Loader2 className="text-blue-500 animate-spin mt-1" size={20}/>
-                    <div>
-                        <p className="text-blue-800 font-bold text-sm">Recherche de l'expert en cours...</p>
-                        <p className="text-blue-600 text-xs">Nous sélectionnons le meilleur artisan disponible sur votre zone. Vous recevrez une notification dès validation.</p>
-                    </div>
-                </div>
-            ) : activeOrder.partner ? (
-                <div className="mb-6 bg-purple-50 border border-purple-100 p-4 rounded-xl flex items-center gap-3">
-                    <div className="bg-purple-100 p-2 rounded-lg text-purple-600"><UserCheck size={20}/></div>
-                    <div>
-                        <p className="text-purple-900 font-bold text-sm">Pris en charge par {activeOrder.partner.company_name}</p>
-                        <p className="text-purple-600 text-xs">Partenaire certifié Kilolab</p>
-                    </div>
-                </div>
-            ) : null}
-
-            <div className="grid md:grid-cols-2 gap-4">
-              <div className="flex items-center gap-4 text-sm text-slate-600 bg-slate-50 p-4 rounded-xl border border-slate-100">
-                <div className="bg-white p-2 rounded-lg shadow-sm"><MapPin size={18} className="text-teal-500"/></div>
-                <div>
-                  <p className="text-xs text-slate-400 font-bold uppercase">Lieu de collecte</p>
-                  <p className="font-medium truncate">{activeOrder.pickup_address}</p>
-                </div>
-              </div>
-              <div className="flex items-center gap-4 text-sm text-slate-600 bg-slate-50 p-4 rounded-xl border border-slate-100">
-                <div className="bg-white p-2 rounded-lg shadow-sm"><Package size={18} className="text-teal-500"/></div>
-                <div>
-                  <p className="text-xs text-slate-400 font-bold uppercase">Détails</p>
-                  <p className="font-medium">{activeOrder.weight} kg • Formule {activeOrder.formula || "Eco"}</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        ) : (
-          <div className="bg-white p-10 rounded-3xl border-2 border-dashed border-slate-200 text-center mb-12 hover:border-teal-200 transition group cursor-pointer" onClick={() => navigate("/new-order")}>
-            <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4 text-slate-400 group-hover:bg-teal-50 group-hover:text-teal-500 transition">
-              <Package size={32}/>
-            </div>
-            <h3 className="font-bold text-lg mb-2 text-slate-900">Aucune commande en cours</h3>
-            <p className="text-slate-500 mb-6 text-sm">Votre panier à linge déborde ? C'est le moment.</p>
-            <span className="text-teal-600 font-bold flex items-center justify-center gap-2">Lancer une lessive <ArrowRight size={16}/></span>
-          </div>
-        )}
-
-        {/* HISTORIQUE */}
-        {orders.filter(o => o.status === "completed" || o.status === "cancelled").length > 0 && (
-          <>
-            <h3 className="font-bold text-xl mb-6 flex items-center gap-2"><Clock size={20}/> Historique</h3>
-            <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-              {orders.filter(o => o.status === "completed" || o.status === "cancelled").map(order => (
-                <div key={order.id} className="p-6 border-b border-slate-100 flex items-center justify-between hover:bg-slate-50 transition">
-                  <div className="flex items-center gap-4">
-                    <div className="bg-green-100 p-3 rounded-full text-green-600"><CheckCircle size={20}/></div>
-                    <div>
-                      <div className="font-bold text-slate-900">Commande #{order.id.toString().slice(0,6)}</div>
-                      <div className="text-xs text-slate-400">{new Date(order.created_at).toLocaleDateString()}</div>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <div className="font-bold">{order.total_price} €</div>
-                    <div className="text-xs text-slate-500">{order.weight} kg</div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </>
-        )}
-
+      <div className="bg-slate-50 rounded-xl p-3 flex items-start gap-2">
+        <Package size={16} className="text-slate-400 flex-shrink-0 mt-0.5" />
+        <div>
+          <p className="text-xs text-slate-400 font-medium uppercase tracking-wide mb-0.5">Détails</p>
+          <p className="text-sm text-slate-700 font-bold">{order.weight} kg</p>
+          <p className="text-xs text-slate-500">{getFormulaLabel(order.formula)}</p>
+        </div>
       </div>
     </div>
+
+    {/* Prix */}
+    <div className="flex items-center justify-between pt-2 border-t border-slate-100">
+      <span className="text-slate-500 text-sm">Total payé</span>
+      <span className="text-xl font-black text-slate-900">{formatCurrency(parseFloat(String(order.total_price)))}</span>
+    </div>
+
+    {/* Annulation si encore pending */}
+    {order.status === 'pending' && onCancel && (
+      <button
+        onClick={() => onCancel(order.id)}
+        className="w-full text-red-400 text-sm font-medium hover:text-red-600 transition py-2"
+      >
+        Annuler cette commande
+      </button>
+    )}
+  </div>
+</div>
+```
+
+);
+}
+
+// ─── Component principal ──────────────────────────────────────────────────────
+
+export default function ClientDashboard() {
+const [activeOrders, setActiveOrders] = useState<Order[]>([]);
+const [pastOrders, setPastOrders] = useState<Order[]>([]);
+const [stats, setStats] = useState<ClientStats>({ totalOrders: 0, totalSpent: 0, totalKg: 0, activeOrders: 0 });
+const [loading, setLoading] = useState(true);
+const [cancelling, setCancelling] = useState<string | null>(null);
+
+// ─── Chargement ─────────────────────────────────────────────────────────────
+
+const loadDashboard = useCallback(async () => {
+try {
+const { data: { user } } = await supabase.auth.getUser();
+if (!user) { window.location.href = ‘/login’; return; }
+
+```
+  const { data: orders, error } = await supabase
+    .from('orders')
+    .select(`
+      *,
+      washer:washers(
+        id,
+        first_name,
+        last_name,
+        avatar_url,
+        avg_rating,
+        total_ratings,
+        phone
+      )
+    `)
+    .eq('client_id', user.id)
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    console.error('Erreur chargement commandes:', error);
+    toast.error('Erreur lors du chargement');
+    return;
+  }
+
+  const allOrders = (orders ?? []) as Order[];
+
+  const active = allOrders.filter((o) =>
+    ['pending', 'assigned', 'picked_up', 'washing', 'ready'].includes(o.status)
   );
+  const past = allOrders.filter((o) => o.status === 'completed');
+
+  setActiveOrders(active);
+  setPastOrders(past);
+  setStats({
+    totalOrders: allOrders.length,
+    totalSpent: past.reduce((s, o) => s + (parseFloat(String(o.total_price)) || 0), 0),
+    totalKg: allOrders.reduce((s, o) => s + (parseFloat(String(o.weight)) || 0), 0),
+    activeOrders: active.length,
+  });
+} catch (err) {
+  console.error('Erreur loadDashboard:', err);
+} finally {
+  setLoading(false);
+}
+```
+
+}, []);
+
+useEffect(() => {
+loadDashboard();
+// Polling toutes les 30s pour les commandes actives
+const interval = setInterval(loadDashboard, 30000);
+return () => clearInterval(interval);
+}, [loadDashboard]);
+
+// Realtime subscription pour les mises à jour instantanées
+useEffect(() => {
+const sub = supabase
+.channel(‘client_orders’)
+.on(‘postgres_changes’, { event: ‘UPDATE’, schema: ‘public’, table: ‘orders’ }, () => {
+loadDashboard();
+})
+.subscribe();
+return () => { supabase.removeChannel(sub); };
+}, [loadDashboard]);
+
+// ─── Annulation ─────────────────────────────────────────────────────────────
+
+const cancelOrder = async (orderId: string) => {
+if (!window.confirm(‘Voulez-vous vraiment annuler cette commande ?’)) return;
+setCancelling(orderId);
+try {
+const { error } = await supabase
+.from(‘orders’)
+.update({ status: ‘cancelled’ })
+.eq(‘id’, orderId)
+.eq(‘status’, ‘pending’); // sécurité : on ne peut annuler que si encore pending
+
+```
+  if (error) throw error;
+  toast.success('Commande annulée');
+  await loadDashboard();
+} catch {
+  toast.error('Impossible d\'annuler cette commande');
+} finally {
+  setCancelling(null);
+}
+```
+
+};
+
+// ─── Loading ─────────────────────────────────────────────────────────────────
+
+if (loading) {
+return (
+<div className="min-h-screen bg-slate-50">
+<Navbar />
+<div className="flex items-center justify-center h-[80vh]">
+<div className="text-center">
+<Loader2 className="animate-spin mx-auto mb-4 text-teal-500" size={40} />
+<p className="text-slate-500 font-medium">Chargement de vos commandes…</p>
+</div>
+</div>
+</div>
+);
+}
+
+// ─── DASHBOARD ───────────────────────────────────────────────────────────────
+
+return (
+<div className="min-h-screen bg-slate-50">
+<Navbar />
+
+```
+  <div className="max-w-2xl mx-auto px-4 py-6 md:py-10">
+
+    {/* ── HEADER ───────────────────────────────────────────────────────────── */}
+    <div className="flex items-center justify-between mb-6">
+      <div>
+        <h1 className="text-2xl md:text-3xl font-black text-slate-900">Mes commandes</h1>
+        <p className="text-slate-400 text-sm mt-1">Suivez vos lavages en temps réel</p>
+      </div>
+      <button
+        onClick={() => window.location.href = '/new-order'}
+        className="flex items-center gap-2 bg-teal-500 text-white px-4 py-2.5 rounded-xl font-bold text-sm hover:bg-teal-600 transition shadow-sm"
+      >
+        <Plus size={16} /> Commander
+      </button>
+    </div>
+
+    {/* ── STATS ─────────────────────────────────────────────────────────────── */}
+    {stats.totalOrders > 0 && (
+      <div className="grid grid-cols-3 gap-3 mb-6">
+        <div className="bg-white rounded-2xl p-4 text-center shadow-sm border border-slate-100">
+          <p className="text-2xl font-black text-teal-600">{stats.totalOrders}</p>
+          <p className="text-xs text-slate-400 mt-1 font-medium">Commandes</p>
+        </div>
+        <div className="bg-white rounded-2xl p-4 text-center shadow-sm border border-slate-100">
+          <p className="text-2xl font-black text-purple-600">{stats.totalKg.toFixed(0)} kg</p>
+          <p className="text-xs text-slate-400 mt-1 font-medium">Lavés</p>
+        </div>
+        <div className="bg-white rounded-2xl p-4 text-center shadow-sm border border-slate-100">
+          <p className="text-2xl font-black text-green-600">{formatCurrency(stats.totalSpent)}</p>
+          <p className="text-xs text-slate-400 mt-1 font-medium">Dépensés</p>
+        </div>
+      </div>
+    )}
+
+    {/* ── COMMANDES ACTIVES ─────────────────────────────────────────────────── */}
+    {activeOrders.length > 0 && (
+      <div className="mb-8">
+        <h2 className="font-black text-lg text-slate-900 mb-4 flex items-center gap-2">
+          <span className="w-2 h-2 bg-teal-400 rounded-full animate-pulse" />
+          En cours ({activeOrders.length})
+        </h2>
+        <div className="space-y-4">
+          {activeOrders.map((order) => (
+            <ActiveOrderCard
+              key={order.id}
+              order={order}
+              onCancel={cancelling === order.id ? undefined : cancelOrder}
+            />
+          ))}
+        </div>
+      </div>
+    )}
+
+    {/* ── ÉTAT VIDE (0 commandes) ───────────────────────────────────────────── */}
+    {activeOrders.length === 0 && pastOrders.length === 0 && (
+      <div className="bg-white rounded-3xl p-10 text-center shadow-sm border border-slate-100 mb-8">
+        <div className="w-16 h-16 bg-teal-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
+          <Sparkles size={32} className="text-teal-500" />
+        </div>
+        <h3 className="text-xl font-black text-slate-800 mb-2">Bienvenue sur Kilolab !</h3>
+        <p className="text-slate-400 text-sm mb-6">
+          Votre linge lavé, séché et plié — sans bouger de chez vous.
+        </p>
+        <button
+          onClick={() => window.location.href = '/new-order'}
+          className="bg-gradient-to-r from-teal-500 to-emerald-500 text-white px-8 py-3.5 rounded-2xl font-black hover:shadow-lg transition flex items-center gap-2 mx-auto"
+        >
+          Lancer ma première lessive <ArrowRight size={16} />
+        </button>
+      </div>
+    )}
+
+    {/* ── HISTORIQUE ───────────────────────────────────────────────────────── */}
+    {pastOrders.length > 0 && (
+      <div>
+        <h2 className="font-black text-lg text-slate-900 mb-4 flex items-center gap-2">
+          <Clock size={18} className="text-slate-400" /> Historique
+        </h2>
+
+        <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+          {pastOrders.map((order, idx) => (
+            <div
+              key={order.id}
+              className={`p-4 sm:p-5 flex items-center justify-between gap-3 hover:bg-slate-50 transition ${
+                idx < pastOrders.length - 1 ? 'border-b border-slate-100' : ''
+              }`}
+            >
+              <div className="flex items-center gap-3 min-w-0">
+                <div className="bg-green-100 p-2.5 rounded-xl flex-shrink-0">
+                  <CheckCircle size={18} className="text-green-600" />
+                </div>
+                <div className="min-w-0">
+                  <p className="font-bold text-slate-800 text-sm">#{order.id.slice(0, 8)}</p>
+                  <p className="text-xs text-slate-400 truncate">
+                    {formatDate(order.completed_at ?? order.created_at)} · {order.weight} kg · {getFormulaLabel(order.formula)}
+                  </p>
+                </div>
+              </div>
+              <div className="text-right flex-shrink-0">
+                <p className="font-black text-slate-800">{formatCurrency(parseFloat(String(order.total_price)))}</p>
+                {order.washer && (
+                  <p className="text-xs text-slate-400 mt-0.5">
+                    par {order.washer.first_name}
+                  </p>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* CTA bas de page */}
+        <div className="mt-6 text-center">
+          <button
+            onClick={() => window.location.href = '/new-order'}
+            className="text-teal-500 font-bold text-sm hover:underline flex items-center gap-1 mx-auto"
+          >
+            Commander à nouveau <ArrowRight size={14} />
+          </button>
+        </div>
+      </div>
+    )}
+
+  </div>
+</div>
+```
+
+);
 }
