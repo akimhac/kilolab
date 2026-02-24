@@ -439,10 +439,10 @@ const toggleAvailability = async () => {
 if (!washerId) return;
 
 ```
-// Stripe required when switching from OFF -> ON
+// Stripe non configuré → warning sans blocage (le washer peut quand même s'activer)
 if (!isAvailable && !stripeConnectStatus.completed) {
-  toast.error("⚠️ Configurez d'abord votre compte bancaire pour recevoir vos paiements");
-  return;
+  toast("💳 Pensez à configurer votre compte bancaire pour recevoir vos paiements", { duration: 4000 });
+  // Pas de return — on ne bloque plus
 }
 
 try {
