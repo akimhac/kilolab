@@ -1,0 +1,152 @@
+{
+  "project_name": "KiloLab",
+  "design_philosophy": {
+    "identity": "Uber for Laundry - Trust, Speed, Cleanliness",
+    "core_principles": [
+      "Trust through Transparency: Clear pricing, clear process, clear status.",
+      "Tactile Cleanliness: Use white space, soft shadows, and rounded corners to evoke fresh laundry.",
+      "Efficiency First: Primary actions (Order, Track) are always accessible.",
+      "Human Connection: Showcase real people (Washers) and happy clients."
+    ],
+    "theme_strategy": "Light Mode Foundation (Cleanliness). Dark Mode optional for 'Night' contexts or heavy data usage.",
+    "emotional_tone": "Reliable, Fresh, Modern, Efficient."
+  },
+  "typography": {
+    "font_family": {
+      "headings": "Plus Jakarta Sans, sans-serif",
+      "body": "Inter, sans-serif",
+      "mono": "JetBrains Mono, monospace"
+    },
+    "scale": {
+      "h1": "text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight",
+      "h2": "text-3xl md:text-4xl font-semibold tracking-tight",
+      "h3": "text-2xl md:text-3xl font-semibold",
+      "body_lg": "text-lg md:text-xl leading-relaxed",
+      "body_base": "text-base leading-relaxed text-slate-600",
+      "caption": "text-sm text-slate-500 font-medium"
+    },
+    "rules": [
+      "Never use pure black (#000000) for text. Use Slate-900 (#0F172A).",
+      "Headings should be tight (tracking-tight).",
+      "Body text should be legible (leading-relaxed)."
+    ]
+  },
+  "colors": {
+    "primary": {
+      "base": "#0D9488",
+      "hover": "#0F766E",
+      "active": "#115E59",
+      "light": "#CCFBF1",
+      "text_on_primary": "#FFFFFF"
+    },
+    "secondary": {
+      "base": "#F8FAFC",
+      "surface": "#FFFFFF",
+      "border": "#E2E8F0"
+    },
+    "accent": {
+      "warning": "#F59E0B",
+      "success": "#10B981",
+      "error": "#EF4444"
+    },
+    "neutrals": {
+      "900": "#0F172A",
+      "800": "#1E293B",
+      "600": "#475569",
+      "400": "#94A3B8",
+      "100": "#F1F5F9",
+      "50": "#F8FAFC"
+    },
+    "gradients": {
+      "hero": "bg-gradient-to-b from-teal-50/50 to-white",
+      "subtle": "bg-gradient-to-br from-white to-slate-50"
+    }
+  },
+  "layout": {
+    "spacing_system": "4pt grid based (Tailwind default)",
+    "container": "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8",
+    "grid_strategies": {
+      "bento": "grid grid-cols-1 md:grid-cols-3 gap-6 auto-rows-[minmax(200px,auto)]",
+      "dashboard": "grid grid-cols-12 gap-6"
+    },
+    "z_index": {
+      "toast": 50,
+      "modal": 40,
+      "dropdown": 30,
+      "sticky_nav": 20,
+      "base": 1
+    }
+  },
+  "components": {
+    "buttons": {
+      "primary": "bg-teal-600 hover:bg-teal-700 text-white font-medium rounded-full px-6 py-3 transition-all duration-200 shadow-md hover:shadow-lg active:scale-95",
+      "secondary": "bg-white text-slate-900 border border-slate-200 hover:bg-slate-50 font-medium rounded-full px-6 py-3 transition-all duration-200",
+      "ghost": "text-teal-600 hover:bg-teal-50 hover:text-teal-700 font-medium rounded-lg px-4 py-2 transition-colors"
+    },
+    "cards": {
+      "base": "bg-white rounded-2xl border border-slate-100 shadow-[0_2px_8px_rgba(0,0,0,0.04)] hover:shadow-[0_12px_24px_rgba(0,0,0,0.08)] transition-shadow duration-300",
+      "interactive": "cursor-pointer active:scale-[0.99] transition-transform"
+    },
+    "inputs": {
+      "base": "w-full rounded-xl border-slate-200 bg-slate-50 px-4 py-3 text-slate-900 focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 transition-all outline-none",
+      "label": "block text-sm font-medium text-slate-700 mb-1.5"
+    },
+    "navigation": {
+      "header": "fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-xl border-b border-slate-100/50 h-16 flex items-center transition-all",
+      "mobile_nav": "fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-slate-200 pb-safe pt-2 px-6 flex justify-between items-center md:hidden"
+    }
+  },
+  "visual_enhancers": {
+    "shadows": {
+      "sm": "0 1px 2px 0 rgba(0, 0, 0, 0.05)",
+      "md": "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
+      "lg": "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)",
+      "soft": "0 20px 40px -12px rgba(0, 0, 0, 0.1)"
+    },
+    "glassmorphism": {
+      "heavy": "bg-white/70 backdrop-blur-2xl border border-white/20 shadow-lg",
+      "light": "bg-white/40 backdrop-blur-md border border-white/10"
+    },
+    "animation": {
+      "hover": "transition-all duration-200 ease-in-out",
+      "fade_in": "animate-in fade-in duration-500 slide-in-from-bottom-4"
+    }
+  },
+  "images": {
+    "hero": {
+      "url": "https://images.unsplash.com/photo-1713256728592-9a3c8a3287f5?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA2ODl8MHwxfHNlYXJjaHwxfHxtb2Rlcm4lMjBjbGVhbiUyMGxhdW5kcnklMjBzZXJ2aWNlJTIwZm9sZGVkJTIwY2xvdGhlcyUyMGhhcHB5JTIwcGVyc29ufGVufDB8fHx8MTc3MjA1NTE4N3ww&ixlib=rb-4.1.0&q=85",
+      "alt": "Happy customer with fresh laundry",
+      "usage": "Hero section background or split layout image"
+    },
+    "urban_lifestyle": {
+      "url": "https://images.pexels.com/photos/13970350/pexels-photo-13970350.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+      "alt": "Urban professional using app",
+      "usage": "Features section, 'How it works' for clients"
+    },
+    "washer_lifestyle": {
+      "url": "https://images.unsplash.com/photo-1544011527-9d132de79c84?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2NzZ8MHwxfHNlYXJjaHwyfHxwZXJzb24lMjB1c2luZyUyMHNtYXJ0cGhvbmUlMjB1cmJhbiUyMGNpdHklMjBzdHJlZXQlMjBtaW5pbWFsfGVufDB8fHx8MTc3MjA1NTE4OHww&ixlib=rb-4.1.0&q=85",
+      "alt": "Washer partner checking earnings",
+      "usage": "Become a Washer page"
+    }
+  },
+  "instructions_to_main_agent": [
+    "Respect the 'Teal' constraint but modernize it to Tailwind's Teal-600/700.",
+    "Maintain all existing texts and slogans ('Libérez votre temps...', 'Générez un revenu...').",
+    "Preserve all existing functionality (Simulators, Stripe, Supabase). DO NOT delete logic, only re-skin.",
+    "Use 'sonner' for toasts.",
+    "Use 'lucide-react' for icons.",
+    "Ensure the layout is responsive (Mobile First).",
+    "Replace generic cards with the 'Cards.Base' style defined above.",
+    "Apply 'Plus Jakarta Sans' to all Headings (h1-h6) and 'Inter' to body.",
+    "Add 'data-testid' to all interactive elements."
+  ],
+  "universal_guidelines": [
+    "Do not use generic centered layouts. Use asymmetry where possible.",
+    "Create depth through layered design elements (z-index hierarchy).",
+    "Use glass-morphism effects with backdrop filters (12-24px blur) for sticky elements.",
+    "Every interaction needs micro-animations (hover, active, focus).",
+    "Use 2-3x more spacing than feels comfortable.",
+    "Subtle grain textures or noise overlays can add a premium feel.",
+    "Never use AI assistant emojis for icons."
+  ]
+}
