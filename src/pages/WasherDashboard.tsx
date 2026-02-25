@@ -236,7 +236,6 @@ if (token && washerId) {
 setFcmToken(token);
 setNotificationsEnabled(true);
 
-```
       const { error } = await supabase.from("washers").update({ fcm_token: token }).eq("id", washerId);
       if (error) {
         console.error("❌ Error saving FCM token:", error);
@@ -252,7 +251,6 @@ setNotificationsEnabled(true);
 if (washerStatus === "approved" && washerId && !fcmToken) {
   setupNotifications();
 }
-```
 
 }, [washerId, washerStatus, fcmToken]);
 
@@ -264,7 +262,6 @@ useEffect(() => {
 const checkStripeConnect = async () => {
 if (!washerId || washerStatus !== "approved") return;
 
-```
   try {
     const { data, error } = await supabase.functions.invoke("check-stripe-connect-status", {
       body: { washerId },
@@ -282,7 +279,6 @@ if (!washerId || washerStatus !== "approved") return;
 };
 
 checkStripeConnect();
-```
 
 }, [washerId, washerStatus]);
 
@@ -294,7 +290,6 @@ const fetchWasherData = async () => {
 if (fetchLockRef.current) return;
 fetchLockRef.current = true;
 
-```
 try {
   setRefreshing(true);
 
@@ -427,7 +422,6 @@ try {
   setRefreshing(false);
   fetchLockRef.current = false;
 }
-```
 
 };
 
@@ -438,7 +432,6 @@ ACTIONS
 const toggleAvailability = async () => {
 if (!washerId) return;
 
-```
 // Stripe non configuré → warning sans blocage (le washer peut quand même s'activer)
 if (!isAvailable && !stripeConnectStatus.completed) {
   toast("💳 Pensez à configurer votre compte bancaire pour recevoir vos paiements", { duration: 4000 });
@@ -457,14 +450,12 @@ try {
   console.error("toggleAvailability error:", error);
   toast.error("Erreur");
 }
-```
 
 };
 
 const acceptMission = async (orderId: string) => {
 if (!washerId) return;
 
-```
 if (!isAvailable) {
   toast.error("Activez votre disponibilité d'abord");
   return;
@@ -491,14 +482,12 @@ try {
   console.error("acceptMission error:", error);
   toast.error("Mission déjà prise ou erreur");
 }
-```
 
 };
 
 const updateMissionStatus = async (orderId: string, newStatus: OrderStatus) => {
 if (!washerId) return;
 
-```
 try {
   const updates: any = {
     status: newStatus,
@@ -518,14 +507,12 @@ try {
   console.error("updateMissionStatus error:", error);
   toast.error("Erreur de mise à jour");
 }
-```
 
 };
 
 const handleStripeConnect = async () => {
 if (!washerId) return;
 
-```
 try {
   toast.loading("Création de votre compte de paiement…", { id: "stripe" });
 
@@ -568,7 +555,6 @@ try {
   toast.dismiss("stripe");
   toast.error("Erreur : " + (error?.message || "inconnue"));
 }
-```
 
 };
 
@@ -579,7 +565,6 @@ PREFERENCES
 const saveServiceRadius = async (newRadius: number) => {
 if (!washerId) return;
 
-```
 const { error } = await supabase.from("washers").update({ service_radius: newRadius }).eq("id", washerId);
 if (error) {
   console.error("❌ Update radius error:", error);
@@ -588,14 +573,12 @@ if (error) {
 }
 
 toast.success(`✅ Rayon mis à jour : ${newRadius} km`);
-```
 
 };
 
 const saveSameCityOnly = async (checked: boolean) => {
 if (!washerId) return;
 
-```
 const { error } = await supabase.from("washers").update({ accept_same_city_only: checked }).eq("id", washerId);
 
 if (!error) {
@@ -605,7 +588,6 @@ if (!error) {
   console.error("❌ Update city error:", error);
   toast.error("Erreur mise à jour préférence");
 }
-```
 
 };
 
@@ -687,7 +669,6 @@ return (
 <div className="min-h-screen bg-slate-50">
 <Navbar />
 
-```
   {/* ✅ FIX MOBILE: pt-24 sur mobile (Navbar moins haute), pt-32 sur desktop */}
   <div className="pt-24 md:pt-32 px-4 max-w-7xl mx-auto pb-12">
 
@@ -1089,7 +1070,6 @@ return (
     </div>
   </div>
 </div>
-```
 
 );
 }
