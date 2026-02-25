@@ -7,7 +7,7 @@ export default function CGU() {
       <Navbar />
 
       <div className="max-w-4xl mx-auto px-4 py-32">
-        <h1 className="text-4xl font-extrabold mb-2">Conditions Générales d’Utilisation</h1>
+        <h1 className="text-4xl font-extrabold mb-2">Conditions Générales d'Utilisation</h1>
         <p className="text-slate-500 mb-8">Dernière mise à jour : Février 2026</p>
 
         <div className="bg-white p-8 md:p-12 rounded-3xl shadow-sm border border-slate-200 space-y-8 text-slate-700 leading-relaxed text-sm md:text-base">
@@ -15,7 +15,7 @@ export default function CGU() {
           <section>
             <h2 className="text-xl font-bold text-slate-900 mb-2">1. Objet et Acceptation</h2>
             <p>
-              Les présentes Conditions Générales d’Utilisation (CGU) régissent l'accès et l'utilisation de la plateforme Kilolab (ci-après "la Plateforme"), 
+              Les présentes Conditions Générales d'Utilisation (CGU) régissent l'accès et l'utilisation de la plateforme Kilolab (ci-après "la Plateforme"), 
               mettant en relation des particuliers ou professionnels souhaitant faire laver leur linge ("Clients") 
               et des prestataires indépendants ou professionnels ("Washers" ou "Partenaires").
             </p>

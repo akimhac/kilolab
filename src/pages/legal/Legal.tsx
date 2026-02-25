@@ -41,7 +41,7 @@ export default function Legal() {
           <section>
             <h2 className="text-2xl font-bold text-white">Propriété intellectuelle</h2>
             <p>
-              L’ensemble du contenu du site (textes, images, logos) est protégé par le droit d’auteur.
+              L'ensemble du contenu du site (textes, images, logos) est protégé par le droit d'auteur.
             </p>
           </section>
 

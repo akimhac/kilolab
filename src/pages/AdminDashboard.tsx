@@ -116,7 +116,7 @@ export default function AdminDashboard() {
       // 1. Commandes
       const { data: o } = await supabase
         .from("orders")
-        .select(`*, partner:partners!orders_partner_id_fkey(company_name)`)
+        .select(`*, partner:partners(company_name)`)
         .order("created_at", { ascending: false });
 
       // 2. Partenaires
@@ -644,7 +644,7 @@ export default function AdminDashboard() {
               icon={<DollarSign size={24} />}
               color="teal"
             />
-            <StatCard title="Commandes" value={stats.completedOrders} icon={<ShoppingBag size={24} />} color="blue" />
+            <StatCard title="Commandes" value={stats.totalOrders} icon={<ShoppingBag size={24} />} color="blue" />
             <StatCard title="Clients" value={stats.totalClients} icon={<Users size={24} />} color="purple" />
             <StatCard title="Messages" value={stats.newMessages} icon={<MessageSquare size={24} />} badge={stats.newMessages} color="orange" />
           </div>
@@ -1092,7 +1092,7 @@ export default function AdminDashboard() {
                     {clients.map((client) => (
                       <tr key={client.id} className="border-b hover:bg-slate-50">
                         <td className="p-4 font-bold">
-                          {client.first_name} {client.last_name}
+                          {client.full_name || client.email}
                         </td>
                         <td className="p-4 text-sm">{client.email}</td>
                         <td className="p-4 text-sm">{client.city || "-"}</td>
@@ -1124,7 +1124,7 @@ export default function AdminDashboard() {
                       <tr key={order.id} className="border-b hover:bg-slate-50">
                         <td className="p-4 font-mono text-xs">{order.id.slice(0, 8)}</td>
                         <td className="p-4 font-bold text-sm">
-                          {order.partner?.company_name || <span className="text-slate-400">Non attribué</span>}
+                          {order.partner?.company_name || order.pickup_address?.slice(0,25) || <span className="text-slate-400">C2C</span>}
                         </td>
                         <td className="p-4 font-bold">{order.total_price} €</td>
                         <td className="p-4">

@@ -256,7 +256,7 @@ export default function WasherApp() {
             <Star className="text-yellow-600 mb-4" size={32} />
             <p className="text-slate-500 text-sm font-bold">Note moyenne</p>
             <p className="text-3xl font-black">
-              {stats.avgRating > 0 ? stats.avgRating.toFixed(1) : '—'}
+              {stats.avgRating > 0 ? stats.avgRating.toFixed(1) : '--'}
             </p>
           </div>
         </div>

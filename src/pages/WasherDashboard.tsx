@@ -1,8 +1,8 @@
-import React, { useEffect, useMemo, useRef, useState } from “react”;
-import { supabase } from “../lib/supabase”;
-import { requestNotificationPermission } from “../lib/firebase”;
-import Navbar from “../components/Navbar”;
-import toast from “react-hot-toast”;
+import React, { useEffect, useMemo, useRef, useState } from "react";
+import { supabase } from "../lib/supabase";
+import { requestNotificationPermission } from "../lib/firebase";
+import Navbar from "../components/Navbar";
+import toast from "react-hot-toast";
 import {
 DollarSign,
 Package,
@@ -20,13 +20,13 @@ CreditCard,
 RefreshCcw,
 Play,
 CheckCircle2,
-} from “lucide-react”;
+} from "lucide-react";
 
 /* =========================================================
 TYPES
 ========================================================= */
 
-type WasherStatus = “pending” | “approved” | “rejected”;
+type WasherStatus = "pending" | "approved" | "rejected";
 
 interface WasherStats {
 totalEarnings: number;
@@ -37,8 +37,8 @@ totalRatings: number;
 weekEarnings: number;
 }
 
-// ✅ FIX: Ajout de “pending” dans les statuts possibles
-type OrderStatus = “pending” | “confirmed” | “assigned” | “in_progress” | “completed” | string;
+// ✅ FIX: Ajout de "pending" dans les statuts possibles
+type OrderStatus = "pending" | "confirmed" | "assigned" | "in_progress" | "completed" | string;
 
 interface Mission {
 id: string;
@@ -100,15 +100,15 @@ return Number.isFinite(n) ? n : fallback;
 
 function formatDateFR(iso: string) {
 try {
-return new Date(iso).toLocaleDateString(“fr-FR”);
+return new Date(iso).toLocaleDateString("fr-FR");
 } catch {
 return iso;
 }
 }
 
 function trimAddress(addr?: string | null) {
-if (!addr) return “Adresse non définie”;
-return addr.split(” (”)[0];
+if (!addr) return "Adresse non définie";
+return addr.split(" (")[0];
 }
 
 function commissionEarnings(total_price: any, commission = 0.6) {
@@ -119,10 +119,10 @@ return (total * commission).toFixed(2);
 // ✅ NOUVEAU: Label lisible pour la formule (remplace le ternaire express/standard répété)
 function formulaLabel(formula: string): string {
 const map: Record<string, string> = {
-express: “⚡ Express”,
-eco: “🌿 Éco”,
-standard: “🟢 Standard”,
-premium: “⭐ Premium”,
+express: "⚡ Express",
+eco: "🌿 Éco",
+standard: "🟢 Standard",
+premium: "⭐ Premium",
 };
 return map[formula] ?? formula;
 }
@@ -130,11 +130,11 @@ return map[formula] ?? formula;
 // ✅ NOUVEAU: Couleur badge formule
 function formulaBadgeClass(formula: string): string {
 const map: Record<string, string> = {
-express: “bg-purple-100 text-purple-700”,
-eco: “bg-green-100 text-green-700”,
-premium: “bg-yellow-100 text-yellow-700”,
+express: "bg-purple-100 text-purple-700",
+eco: "bg-green-100 text-green-700",
+premium: "bg-yellow-100 text-yellow-700",
 };
-return map[formula] ?? “bg-blue-100 text-blue-700”;
+return map[formula] ?? "bg-blue-100 text-blue-700";
 }
 
 /* =========================================================
@@ -161,7 +161,7 @@ return (
 <button
 onClick={props.onClick}
 className={`pb-3 px-3 md:px-4 font-bold whitespace-nowrap text-sm md:text-base transition ${ props.active ? "text-teal-600 border-b-2 border-teal-600" : "text-slate-400 hover:text-slate-600" }`}
-type=“button”
+type="button"
 >
 {props.children}
 </button>
@@ -189,11 +189,11 @@ const [myMissions, setMyMissions] = useState<Mission[]>([]);
 
 // Washer state
 const [washerId, setWasherId] = useState<string | null>(null);
-const [washerStatus, setWasherStatus] = useState<WasherStatus>(“pending”);
+const [washerStatus, setWasherStatus] = useState<WasherStatus>("pending");
 const [washerData, setWasherData] = useState<any>(null);
 
 const [loading, setLoading] = useState(true);
-const [activeTab, setActiveTab] = useState<“available” | “active” | “history”>(“available”);
+const [activeTab, setActiveTab] = useState<"available" | "active" | "history">("available");
 
 const [isAvailable, setIsAvailable] = useState(true);
 
@@ -262,7 +262,7 @@ CHECK STRIPE CONNECT STATUS
 
 useEffect(() => {
 const checkStripeConnect = async () => {
-if (!washerId || washerStatus !== “approved”) return;
+if (!washerId || washerStatus !== "approved") return;
 
 ```
   try {
@@ -369,7 +369,7 @@ try {
     return;
   }
 
-  // ✅ FIX CRITIQUE — Bug principal : on filtrait sur "confirmed" uniquement
+  // ✅ FIX CRITIQUE -- Bug principal : on filtrait sur "confirmed" uniquement
   // mais les commandes créées via le flow Stripe arrivent avec le statut "pending".
   // On accepte les deux statuts pour couvrir les deux cas.
   const { data: available, error: availableError } = await supabase
@@ -442,7 +442,7 @@ if (!washerId) return;
 // Stripe non configuré → warning sans blocage (le washer peut quand même s'activer)
 if (!isAvailable && !stripeConnectStatus.completed) {
   toast("💳 Pensez à configurer votre compte bancaire pour recevoir vos paiements", { duration: 4000 });
-  // Pas de return — on ne bloque plus
+  // Pas de return -- on ne bloque plus
 }
 
 try {
@@ -614,11 +614,11 @@ DERIVED LISTS
 ========================================================= */
 
 const activeMissions = useMemo(
-() => myMissions.filter((m) => m.status === “assigned” || m.status === “in_progress”),
+() => myMissions.filter((m) => m.status === "assigned" || m.status === "in_progress"),
 [myMissions]
 );
 
-const historyMissions = useMemo(() => myMissions.filter((m) => m.status === “completed”), [myMissions]);
+const historyMissions = useMemo(() => myMissions.filter((m) => m.status === "completed"), [myMissions]);
 
 /* =========================================================
 UI STATES
@@ -635,7 +635,7 @@ return (
 );
 }
 
-if (washerStatus === “pending”) {
+if (washerStatus === "pending") {
 return (
 <div className="min-h-screen bg-slate-50">
 <Navbar />
@@ -657,7 +657,7 @@ Votre dossier est en cours de vérification par notre équipe. Nous vous contact
 );
 }
 
-if (washerStatus === “rejected”) {
+if (washerStatus === "rejected") {
 return (
 <div className="min-h-screen bg-slate-50">
 <Navbar />
@@ -665,13 +665,13 @@ return (
 <div className="bg-white rounded-2xl p-12 shadow-sm border">
 <AlertCircle className="text-red-600 mx-auto mb-6" size={64} />
 <h1 className="text-3xl font-black mb-4">Inscription non validée</h1>
-<p className="text-slate-600 mb-6">Votre candidature n’a pas pu être acceptée.</p>
+<p className="text-slate-600 mb-6">Votre candidature n'a pas pu être acceptée.</p>
 <p className="text-sm text-slate-500">
-Contactez-nous à{” “}
+Contactez-nous à{" "}
 <a href="mailto:support@kilolab.fr" className="text-teal-600 font-bold">
 support@kilolab.fr
-</a>{” “}
-pour plus d’informations.
+</a>{" "}
+pour plus d'informations.
 </p>
 </div>
 </div>
@@ -855,7 +855,7 @@ return (
       </div>
     )}
 
-    {/* STATS — ✅ FIX MOBILE: 2 colonnes sur mobile, 4 sur desktop */}
+    {/* STATS -- ✅ FIX MOBILE: 2 colonnes sur mobile, 4 sur desktop */}
     <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-6 mb-6 md:mb-8">
       <StatCard
         icon={<DollarSign className="text-green-600" size={28} />}
@@ -883,7 +883,7 @@ return (
       />
     </div>
 
-    {/* TABS — ✅ FIX MOBILE: scroll horizontal natif */}
+    {/* TABS -- ✅ FIX MOBILE: scroll horizontal natif */}
     <div className="flex gap-2 md:gap-4 mb-6 border-b overflow-x-auto scrollbar-hide">
       <TabButton active={activeTab === "available"} onClick={() => setActiveTab("available")}>
         📦 Disponibles ({availableMissions.length})
@@ -896,7 +896,7 @@ return (
       </TabButton>
     </div>
 
-    {/* TAB: DISPONIBLES — ✅ FIX MOBILE: 1 colonne mobile, 2 tablette, 3 desktop */}
+    {/* TAB: DISPONIBLES -- ✅ FIX MOBILE: 1 colonne mobile, 2 tablette, 3 desktop */}
     {activeTab === "available" && (
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
         {availableMissions.map((mission) => (

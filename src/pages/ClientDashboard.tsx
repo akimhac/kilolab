@@ -1,13 +1,13 @@
-import { useEffect, useState, useCallback, useRef } from ‘react’;
-import { supabase } from ‘../lib/supabase’;
-import Navbar from ‘../components/Navbar’;
+import { useEffect, useState, useCallback, useRef } from 'react';
+import { supabase } from '../lib/supabase';
+import Navbar from '../components/Navbar';
 import {
 Package, Clock, CheckCircle, MapPin, Loader2, ArrowRight,
 Star, RefreshCw, Plus, Sparkles, Phone, TrendingUp,
 Gift, Copy, ChevronDown, ChevronUp, ThumbsUp, X,
 RotateCcw, AlertCircle
-} from ‘lucide-react’;
-import toast from ‘react-hot-toast’;
+} from 'lucide-react';
+import toast from 'react-hot-toast';
 
 /* =========================================================
 INTERFACES
@@ -64,12 +64,12 @@ HELPERS
 ========================================================= */
 
 function formatCurrency(amount: number): string {
-return new Intl.NumberFormat(‘fr-FR’, { style: ‘currency’, currency: ‘EUR’ }).format(amount);
+return new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(amount);
 }
 
 function formatDate(dateStr: string): string {
-return new Date(dateStr).toLocaleDateString(‘fr-FR’, {
-day: ‘2-digit’, month: ‘short’, year: ‘numeric’
+return new Date(dateStr).toLocaleDateString('fr-FR', {
+day: '2-digit', month: 'short', year: 'numeric'
 });
 }
 
@@ -77,41 +77,41 @@ function formatDateRelative(dateStr: string): string {
 const date = new Date(dateStr);
 const now = new Date();
 const diffDays = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60 * 24));
-if (diffDays === 0) return “Aujourd’hui”;
-if (diffDays === 1) return ‘Hier’;
+if (diffDays === 0) return "Aujourd'hui";
+if (diffDays === 1) return 'Hier';
 if (diffDays < 7) return `Il y a ${diffDays} jours`;
 return formatDate(dateStr);
 }
 
 function getFormulaLabel(formula: string): string {
 const labels: Record<string, string> = {
-eco: ‘🌿 Éco’,
-standard: ‘🟢 Standard’,
-premium: ‘⭐ Premium’,
-express: ‘⚡ Express’,
+eco: '🌿 Éco',
+standard: '🟢 Standard',
+premium: '⭐ Premium',
+express: '⚡ Express',
 };
 return labels[formula] ?? formula;
 }
 
 function getFormulaBadgeClass(formula: string): string {
 const map: Record<string, string> = {
-express: ‘bg-purple-100 text-purple-700’,
-eco: ‘bg-green-100 text-green-700’,
-premium: ‘bg-yellow-100 text-yellow-700’,
+express: 'bg-purple-100 text-purple-700',
+eco: 'bg-green-100 text-green-700',
+premium: 'bg-yellow-100 text-yellow-700',
 };
-return map[formula] ?? ‘bg-blue-100 text-blue-700’;
+return map[formula] ?? 'bg-blue-100 text-blue-700';
 }
 
 function getStatusInfo(status: string): { label: string; color: string; bg: string } {
 const map: Record<string, { label: string; color: string; bg: string }> = {
-pending:   { label: “📬 En attente d’un washer”, color: ‘text-orange-700’,  bg: ‘bg-orange-50 border-orange-200’   },
-assigned:  { label: ‘👤 Washer assigné’,          color: ‘text-blue-700’,    bg: ‘bg-blue-50 border-blue-200’       },
-picked_up: { label: ‘📦 Linge collecté’,          color: ‘text-violet-700’,  bg: ‘bg-violet-50 border-violet-200’   },
-washing:   { label: ‘🫧 Lavage en cours’,         color: ‘text-teal-700’,    bg: ‘bg-teal-50 border-teal-200’       },
-ready:     { label: ‘✅ Prêt pour livraison’,     color: ‘text-emerald-700’, bg: ‘bg-emerald-50 border-emerald-200’ },
-completed: { label: ‘🎉 Livré !’,                 color: ‘text-green-700’,   bg: ‘bg-green-50 border-green-200’     },
+pending:   { label: "📬 En attente d'un washer", color: 'text-orange-700',  bg: 'bg-orange-50 border-orange-200'   },
+assigned:  { label: '👤 Washer assigné',          color: 'text-blue-700',    bg: 'bg-blue-50 border-blue-200'       },
+picked_up: { label: '📦 Linge collecté',          color: 'text-violet-700',  bg: 'bg-violet-50 border-violet-200'   },
+washing:   { label: '🫧 Lavage en cours',         color: 'text-teal-700',    bg: 'bg-teal-50 border-teal-200'       },
+ready:     { label: '✅ Prêt pour livraison',     color: 'text-emerald-700', bg: 'bg-emerald-50 border-emerald-200' },
+completed: { label: '🎉 Livré !',                 color: 'text-green-700',   bg: 'bg-green-50 border-green-200'     },
 };
-return map[status] ?? { label: status, color: ‘text-slate-700’, bg: ‘bg-slate-50 border-slate-200’ };
+return map[status] ?? { label: status, color: 'text-slate-700', bg: 'bg-slate-50 border-slate-200' };
 }
 
 /* =========================================================
@@ -119,12 +119,12 @@ PROGRESS BAR
 ========================================================= */
 
 const STATUS_STEPS = [
-{ key: ‘pending’,   label: ‘Reçu’,     icon: ‘📬’ },
-{ key: ‘assigned’,  label: ‘Washer’,   icon: ‘👤’ },
-{ key: ‘picked_up’, label: ‘Collecté’, icon: ‘📦’ },
-{ key: ‘washing’,   label: ‘Lavage’,   icon: ‘🫧’ },
-{ key: ‘ready’,     label: ‘Prêt’,     icon: ‘✅’ },
-{ key: ‘completed’, label: ‘Livré’,    icon: ‘🎉’ },
+{ key: 'pending',   label: 'Reçu',     icon: '📬' },
+{ key: 'assigned',  label: 'Washer',   icon: '👤' },
+{ key: 'picked_up', label: 'Collecté', icon: '📦' },
+{ key: 'washing',   label: 'Lavage',   icon: '🫧' },
+{ key: 'ready',     label: 'Prêt',     icon: '✅' },
+{ key: 'completed', label: 'Livré',    icon: '🎉' },
 ];
 
 function getStepIndex(status: string): number {
@@ -142,7 +142,7 @@ return (
 {STATUS_STEPS.map((step, idx) => (
 <div key={step.key} className="flex flex-col items-center gap-1">
 <div className={`w-7 h-7 rounded-full flex items-center justify-center text-sm transition-all ${ idx < currentIdx ? 'bg-teal-500 text-white' : idx === currentIdx ? 'bg-teal-500 text-white ring-4 ring-teal-100' : 'bg-slate-100 text-slate-300' }`}>
-{idx < currentIdx ? ‘✓’ : step.icon}
+{idx < currentIdx ? '✓' : step.icon}
 </div>
 <span className={`text-xs font-medium ${idx <= currentIdx ? 'text-teal-600' : 'text-slate-300'}`}>
 {step.label}
@@ -196,12 +196,12 @@ return (
 <Star
 key={star}
 size={10}
-className={star <= Math.round(washer.avg_rating!) ? ‘text-yellow-400 fill-yellow-400’ : ‘text-slate-200’}
+className={star <= Math.round(washer.avg_rating!) ? 'text-yellow-400 fill-yellow-400' : 'text-slate-200'}
 />
 ))}
 <span className="text-xs text-slate-500 ml-1">
 {washer.avg_rating.toFixed(1)}
-{washer.total_ratings ? ` (${washer.total_ratings})` : ‘’}
+{washer.total_ratings ? ` (${washer.total_ratings})` : ''}
 </span>
 </div>
 ) : (
@@ -211,8 +211,8 @@ className={star <= Math.round(washer.avg_rating!) ? ‘text-yellow-400 fill-yell
 {washer.phone && (
 <a
 href={`tel:${washer.phone}`}
-className=“flex-shrink-0 w-10 h-10 bg-teal-500 rounded-xl flex items-center justify-center text-white hover:bg-teal-600 transition shadow-sm”
-title=“Appeler le washer”
+className="flex-shrink-0 w-10 h-10 bg-teal-500 rounded-xl flex items-center justify-center text-white hover:bg-teal-600 transition shadow-sm"
+title="Appeler le washer"
 >
 <Phone size={18} />
 </a>
@@ -236,13 +236,13 @@ onSubmit: (orderId: string, rating: number, review: string) => Promise<void>;
 }) {
 const [rating, setRating] = useState(0);
 const [hover, setHover] = useState(0);
-const [review, setReview] = useState(’’);
+const [review, setReview] = useState('');
 const [submitting, setSubmitting] = useState(false);
 
-const labels = [’’, ‘Décevant 😕’, ‘Moyen 😐’, ‘Bien 🙂’, ‘Très bien 😊’, ‘Excellent ! 🤩’];
+const labels = ['', 'Décevant 😕', 'Moyen 😐', 'Bien 🙂', 'Très bien 😊', 'Excellent ! 🤩'];
 
 const handleSubmit = async () => {
-if (rating === 0) { toast.error(‘Choisissez une note’); return; }
+if (rating === 0) { toast.error('Choisissez une note'); return; }
 setSubmitting(true);
 await onSubmit(order.id, rating, review);
 setSubmitting(false);
@@ -251,7 +251,7 @@ onClose();
 
 return (
 <div className="fixed inset-0 bg-black/50 z-50 flex items-end sm:items-center justify-center p-4" onClick={onClose}>
-<div className=“bg-white rounded-3xl w-full max-w-sm p-6 shadow-2xl” onClick={(e) => e.stopPropagation()}>
+<div className="bg-white rounded-3xl w-full max-w-sm p-6 shadow-2xl" onClick={(e) => e.stopPropagation()}>
 <div className="flex items-center justify-between mb-5">
 <h3 className="text-lg font-black text-slate-900">Votre avis</h3>
 <button
@@ -340,7 +340,7 @@ onRate?: (order: Order) => void;
 }) {
 const isSearchingWasher = !order.washer_id;
 const statusInfo = getStatusInfo(order.status);
-const canRate = order.status === ‘completed’ && !order.client_rating && onRate;
+const canRate = order.status === 'completed' && !order.client_rating && onRate;
 
 return (
 <div className="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden">
@@ -416,7 +416,7 @@ En cours
         className="w-full py-3 bg-gradient-to-r from-yellow-400 to-orange-400 text-white rounded-xl font-bold hover:shadow-md transition flex items-center justify-center gap-2 text-sm"
       >
         <Star size={16} className="fill-white" />
-        Notez votre washer — ça l'aide beaucoup !
+        Notez votre washer -- ça l'aide beaucoup !
       </button>
     )}
 
@@ -460,9 +460,9 @@ const canRate = !order.client_rating && onRate;
 return (
 <div className="border-b border-slate-100 last:border-0">
 <button
-type=“button”
+type="button"
 onClick={() => setExpanded(!expanded)}
-className=“w-full p-4 sm:p-5 flex items-center justify-between gap-3 hover:bg-slate-50 transition text-left”
+className="w-full p-4 sm:p-5 flex items-center justify-between gap-3 hover:bg-slate-50 transition text-left"
 >
 <div className="flex items-center gap-3 min-w-0">
 <div className="bg-green-100 p-2.5 rounded-xl flex-shrink-0">
@@ -477,7 +477,7 @@ className=“w-full p-4 sm:p-5 flex items-center justify-between gap-3 hover:bg-
 {order.client_rating && (
 <div className="flex gap-0.5 mt-1">
 {[1, 2, 3, 4, 5].map((s) => (
-<Star key={s} size={10} className={s <= order.client_rating! ? ‘text-yellow-400 fill-yellow-400’ : ‘text-slate-200’} />
+<Star key={s} size={10} className={s <= order.client_rating! ? 'text-yellow-400 fill-yellow-400' : 'text-slate-200'} />
 ))}
 </div>
 )}
@@ -547,19 +547,19 @@ REFERRAL CARD
 ========================================================= */
 
 function ReferralCard({ profile }: { profile: UserProfile }) {
-const code = profile.referral_code ?? ‘—’;
+const code = profile.referral_code ?? '--';
 
 const copyCode = () => {
 navigator.clipboard.writeText(code);
-toast.success(‘Code copié ! 🎉’);
+toast.success('Code copié ! 🎉');
 };
 
 const share = () => {
 if (navigator.share) {
 navigator.share({
-title: ‘Kilolab — Le linge lavé à domicile’,
+title: 'Kilolab -- Le linge lavé à domicile',
 text: `Utilise mon code ${code} sur Kilolab et économise sur ta première commande !`,
-url: ‘https://kilolab.fr’,
+url: 'https://kilolab.fr',
 });
 } else {
 copyCode();
@@ -748,8 +748,8 @@ return () => clearInterval(interval);
 // Realtime subscription
 useEffect(() => {
 const sub = supabase
-.channel(‘client_orders_realtime’)
-.on(‘postgres_changes’, { event: ‘UPDATE’, schema: ‘public’, table: ‘orders’ }, () => {
+.channel('client_orders_realtime')
+.on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'orders' }, () => {
 loadDashboard();
 })
 .subscribe();
@@ -759,14 +759,14 @@ return () => { supabase.removeChannel(sub); };
 /* ─── Annulation ─────────────────────────────────────────────────────────── */
 
 const cancelOrder = async (orderId: string) => {
-if (!window.confirm(‘Voulez-vous vraiment annuler cette commande ?’)) return;
+if (!window.confirm('Voulez-vous vraiment annuler cette commande ?')) return;
 setCancelling(orderId);
 try {
 const { error } = await supabase
-.from(‘orders’)
-.update({ status: ‘cancelled’ })
-.eq(‘id’, orderId)
-.eq(‘status’, ‘pending’);
+.from('orders')
+.update({ status: 'cancelled' })
+.eq('id', orderId)
+.eq('status', 'pending');
 
 ```
   if (error) throw error;
@@ -786,9 +786,9 @@ const { error } = await supabase
 const submitRating = async (orderId: string, rating: number, review: string) => {
 try {
 const { error } = await supabase
-.from(‘orders’)
+.from('orders')
 .update({ client_rating: rating, client_review: review })
-.eq(‘id’, orderId);
+.eq('id', orderId);
 
 ```
   if (error) throw error;
@@ -916,7 +916,7 @@ return (
         </div>
         <h3 className="text-xl font-black text-slate-800 mb-2">Bienvenue sur Kilolab !</h3>
         <p className="text-slate-400 text-sm mb-6">
-          Votre linge lavé, séché et plié — sans bouger de chez vous.
+          Votre linge lavé, séché et plié -- sans bouger de chez vous.
         </p>
         <button
           type="button"

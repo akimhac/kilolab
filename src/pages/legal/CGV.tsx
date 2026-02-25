@@ -69,7 +69,7 @@ export default function CGV() {
           <section>
             <h2 className="text-xl font-bold text-slate-900 mb-2">5. Droit de Rétractation</h2>
             <p>
-              Conformément à l’article L.221-28 du Code de la consommation, le droit de rétractation ne peut être exercé 
+              Conformément à l'article L.221-28 du Code de la consommation, le droit de rétractation ne peut être exercé 
               pour les contrats de prestation de services pleinement exécutés avant la fin du délai de rétractation. 
               En validant la collecte du linge, le Client renonce expressément à son droit de rétractation pour que le lavage commence immédiatement.
             </p>
