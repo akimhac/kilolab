@@ -21,8 +21,14 @@ export default function PromoPopup() {
   if (!isVisible) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-6 z-50 animate-in fade-in duration-300">
-      <div className="bg-gradient-to-br from-blue-900 to-blue-900 rounded-3xl max-w-lg w-full p-8 border-2 border-yellow-400 relative overflow-hidden">
+    <div 
+      className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-6 z-50 animate-in fade-in duration-300"
+      onClick={handleClose}
+    >
+      <div 
+        className="bg-gradient-to-br from-blue-900 to-blue-900 rounded-3xl max-w-lg w-full p-8 border-2 border-yellow-400 relative overflow-hidden"
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className="absolute top-0 right-0 opacity-20">
           <Sparkles className="w-32 h-32 text-yellow-400" />
         </div>
