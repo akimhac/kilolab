@@ -17,6 +17,7 @@ import {
   Star,
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
+import HowItWorks from "../components/HowItWorks";
 
 export default function Landing() {
   const [weight, setWeight] = useState(5);
@@ -466,145 +467,7 @@ export default function Landing() {
           </div>
         </section>
 
-        {/* COMMENT ÇA MARCHE - VERSION PREMIUM ANIMÉE */}
-        <section id="comment-ca-marche" className="py-24 bg-slate-50 overflow-hidden">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            {/* Header */}
-            <div className="text-center mb-16 animate-in fade-in zoom-in duration-700">
-              <span className="inline-block px-4 py-2 bg-teal-100 text-teal-700 rounded-full text-sm font-bold mb-4">
-                ✨ Simple et efficace
-              </span>
-              <h2 className="text-4xl md:text-5xl font-black mb-4 text-transparent bg-clip-text bg-gradient-to-r from-teal-600 to-cyan-600">
-                Comment ça marche ?
-              </h2>
-              <p className="text-xl text-slate-600">4 étapes pour un linge impeccable</p>
-            </div>
-
-            <div className="grid md:grid-cols-4 gap-8 relative">
-              {/* Ligne desktop */}
-              <div className="hidden md:block absolute top-20 left-0 right-0 h-1 bg-gradient-to-r from-teal-200 via-teal-400 to-teal-200 opacity-30 z-0" />
-
-              {[
-                {
-                  step: "1",
-                  icon: <Package size={32} />,
-                  title: "Commandez",
-                  desc: "En 2 minutes chrono depuis votre canapé",
-                  color: "from-blue-500 to-cyan-500",
-                  delay: "0",
-                },
-                {
-                  step: "2",
-                  icon: <MapPin size={32} />,
-                  title: "On récupère",
-                  desc: "Enlèvement gratuit chez vous",
-                  color: "from-teal-500 to-green-500",
-                  delay: "100",
-                },
-                {
-                  step: "3",
-                  icon: <Sparkles size={32} />,
-                  title: "On lave",
-                  desc: "Lavage pro, séchage et pliage impeccable",
-                  color: "from-purple-500 to-pink-500",
-                  delay: "200",
-                },
-                {
-                  step: "4",
-                  icon: <CheckCircle size={32} />,
-                  title: "On livre",
-                  desc: "Retour sous 48h, frais et plié",
-                  color: "from-orange-500 to-red-500",
-                  delay: "300",
-                },
-              ].map((item, i) => (
-                <div
-                  key={i}
-                  className="relative z-10 animate-in fade-in slide-in-from-bottom-8 duration-700"
-                  style={{ animationDelay: `${item.delay}ms` }}
-                >
-                  <div className="group bg-white p-8 rounded-3xl border-2 border-slate-200 hover:border-teal-300 shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:scale-105 hover:-translate-y-3 relative overflow-hidden">
-                    <div className="absolute inset-0 bg-gradient-to-br from-white/0 via-white/5 to-white/0 opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
-
-                    <div
-                      className={`absolute -top-4 -left-4 w-14 h-14 bg-gradient-to-br ${item.color} rounded-2xl flex items-center justify-center text-white font-black text-2xl shadow-2xl transform group-hover:rotate-12 transition-transform duration-500 animate-pulse`}
-                    >
-                      {item.step}
-                    </div>
-
-                    <div
-                      className={`w-20 h-20 bg-gradient-to-br ${item.color} rounded-2xl flex items-center justify-center text-white mb-6 mx-auto shadow-lg transform group-hover:rotate-6 group-hover:scale-110 transition-all duration-500`}
-                    >
-                      {item.icon}
-                    </div>
-
-                    <h3 className="font-black text-2xl mb-3 text-slate-900 text-center group-hover:text-teal-600 transition-colors duration-300">
-                      {item.title}
-                    </h3>
-
-                    <p className="text-slate-600 leading-relaxed text-center text-sm">{item.desc}</p>
-
-                    <div
-                      className={`mt-6 h-1.5 bg-gradient-to-r ${item.color} rounded-full transform scale-x-0 group-hover:scale-x-100 transition-transform duration-700 origin-left`}
-                    />
-
-                    <div className="absolute top-4 right-4 w-2 h-2 bg-teal-400 rounded-full opacity-0 group-hover:opacity-100 group-hover:animate-ping" />
-                  </div>
-
-                  {i < 3 && (
-                    <div className="hidden md:block absolute top-1/2 -right-4 z-20">
-                      <ArrowRight className="text-teal-400 animate-pulse" size={24} />
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
-
-            <div className="mt-16 text-center animate-in fade-in slide-in-from-bottom-4 duration-700 delay-500">
-              <div className="inline-flex items-center gap-8 bg-gradient-to-r from-slate-50 to-teal-50 px-8 py-6 rounded-2xl border-2 border-teal-100 shadow-xl">
-                <div className="flex items-center gap-3 group cursor-pointer">
-                  <div className="text-4xl font-black text-teal-600 group-hover:scale-110 transition-transform">10k+</div>
-                  <div className="text-sm text-slate-600">
-                    <div className="font-bold">kilos lavés</div>
-                    <div className="text-xs">chaque mois</div>
-                  </div>
-                </div>
-
-                <div className="w-px h-12 bg-slate-300" />
-
-                <div className="flex items-center gap-3 group cursor-pointer">
-                  <div className="text-4xl font-black text-teal-600 group-hover:scale-110 transition-transform flex items-center">
-                    4.9 <Star size={28} className="text-yellow-500 fill-yellow-500 ml-1" />
-                  </div>
-                  <div className="text-sm text-slate-600">
-                    <div className="font-bold">satisfaction</div>
-                    <div className="text-xs">clients</div>
-                  </div>
-                </div>
-
-                <div className="w-px h-12 bg-slate-300" />
-
-                <div className="flex items-center gap-3 group cursor-pointer">
-                  <div className="text-4xl font-black text-teal-600 group-hover:scale-110 transition-transform">7j/7</div>
-                  <div className="text-sm text-slate-600">
-                    <div className="font-bold">disponible</div>
-                    <div className="text-xs">partout</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="mt-12 text-center animate-in fade-in zoom-in duration-700 delay-700">
-              <Link
-                to="/new-order"
-                className="inline-flex items-center gap-3 px-10 py-5 bg-gradient-to-r from-teal-600 to-cyan-600 text-white rounded-2xl font-black text-lg hover:from-teal-500 hover:to-cyan-500 transition-all shadow-2xl hover:scale-105 transform"
-              >
-                Confier mon linge maintenant <ArrowRight size={24} />
-              </Link>
-              <p className="text-sm text-slate-500 mt-4">✨ Premier lavage -5€ avec le code BIENVENUE5</p>
-            </div>
-          </div>
-        </section>
+        <HowItWorks />
 
         {/* NOTRE HISTOIRE */}
         <section className="bg-white py-20 px-4 overflow-hidden border-t border-slate-100">
