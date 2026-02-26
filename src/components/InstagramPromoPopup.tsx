@@ -2,14 +2,22 @@ import { useState, useEffect } from 'react';
 import { X, Instagram, Gift, Mail } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import toast from 'react-hot-toast';
+import { useLocation } from 'react-router-dom';
 
 export default function InstagramPromoPopup() {
   const [isVisible, setIsVisible] = useState(false);
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
   const [step, setStep] = useState<'initial' | 'emailForm' | 'success'>('initial');
+  const location = useLocation();
 
   useEffect(() => {
+    // NE PAS afficher sur les pages importantes (new-order, checkout, dashboards)
+    const excludedPaths = ['/new-order', '/checkout', '/dashboard', '/washer-dashboard', '/partner-dashboard', '/admin', '/login', '/signup'];
+    if (excludedPaths.some(path => location.pathname.startsWith(path))) {
+      return;
+    }
+
     // Vérifier si l'utilisateur a déjà vu le popup
     const hasSeenPopup = localStorage.getItem('kilolab_instagram_popup_seen');
     const lastShown = localStorage.getItem('kilolab_instagram_popup_last_shown');
@@ -17,18 +25,19 @@ export default function InstagramPromoPopup() {
     // Afficher uniquement si :
     // 1. Pas vu depuis 7 jours
     // 2. Ou jamais vu
+    // 3. Et après 15 secondes (pas 5) pour ne pas être intrusif
     const sevenDaysAgo = Date.now() - (7 * 24 * 60 * 60 * 1000);
     
     if (!hasSeenPopup || (lastShown && parseInt(lastShown) < sevenDaysAgo)) {
-      // Afficher après 5 secondes de navigation
+      // Afficher après 15 secondes (augmenté de 5)
       const timer = setTimeout(() => {
         setIsVisible(true);
         localStorage.setItem('kilolab_instagram_popup_last_shown', Date.now().toString());
-      }, 5000);
+      }, 15000);
 
       return () => clearTimeout(timer);
     }
-  }, []);
+  }, [location.pathname]);
 
   const handleClose = () => {
     setIsVisible(false);
