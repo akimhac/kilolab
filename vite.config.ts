@@ -7,71 +7,8 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: "autoUpdate",
-      includeAssets: ["favicon.svg", "icon.svg", "apple-touch-icon.png"],
-      manifest: {
-        name: "Kilolab - Laverie à Domicile",
-        short_name: "Kilolab",
-        description: "Le 1er service de laverie à domicile en France. Collecte, lavage et pliage dès 3€/kg.",
-        theme_color: "#0D9488",
-        background_color: "#ffffff",
-        display: "standalone",
-        orientation: "portrait",
-        scope: "/",
-        start_url: "/",
-        categories: ["lifestyle", "shopping", "utilities"],
-        icons: [
-          {
-            src: "/icon-192.png",
-            sizes: "192x192",
-            type: "image/png",
-            purpose: "any",
-          },
-          {
-            src: "/icon-512.png",
-            sizes: "512x512",
-            type: "image/png",
-            purpose: "any",
-          },
-          {
-            src: "/icon-maskable.png",
-            sizes: "512x512",
-            type: "image/png",
-            purpose: "maskable",
-          },
-        ],
-        screenshots: [
-          {
-            src: "/screenshot-wide.png",
-            sizes: "1280x720",
-            type: "image/png",
-            form_factor: "wide",
-            label: "Kilolab - Page d'accueil"
-          },
-          {
-            src: "/screenshot-narrow.png",
-            sizes: "750x1334",
-            type: "image/png",
-            form_factor: "narrow",
-            label: "Kilolab - Commande mobile"
-          }
-        ],
-        shortcuts: [
-          {
-            name: "Nouvelle commande",
-            short_name: "Commander",
-            description: "Créer une nouvelle commande de linge",
-            url: "/new-order",
-            icons: [{ src: "/icon-192.png", sizes: "192x192" }]
-          },
-          {
-            name: "Mes commandes",
-            short_name: "Commandes",
-            description: "Voir mes commandes en cours",
-            url: "/dashboard",
-            icons: [{ src: "/icon-192.png", sizes: "192x192" }]
-          }
-        ]
-      },
+      includeAssets: ["favicon.svg", "icon.svg"],
+      manifest: false, // Utilise le manifest.json existant dans /public
       workbox: {
         globPatterns: ["**/*.{js,css,html,svg,png,jpg,jpeg,webp,woff,woff2}"],
         cleanupOutdatedCaches: true,
