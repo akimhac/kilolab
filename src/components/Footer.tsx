@@ -1,110 +1,180 @@
-import { Link, useNavigate } from 'react-router-dom';
-import { Facebook, Instagram, MessageCircle, MapPin } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Instagram, Facebook, Twitter, Mail, MapPin, Phone } from 'lucide-react';
 
 export default function Footer() {
-  const navigate = useNavigate();
+  const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="bg-slate-900 text-slate-300 pt-16 pb-8">
-      <div className="max-w-7xl mx-auto px-4 grid md:grid-cols-4 gap-12 mb-12 border-b border-slate-800 pb-12">
-        
-        {/* Colonne 1 : Logo + Description + Réseaux sociaux */}
-        <div>
-          <div className="flex items-center gap-2 mb-6">
-            <div className="w-8 h-8 bg-teal-500 rounded-lg"></div>
-            <span className="text-2xl font-bold text-white">Kilolab</span>
-          </div>
-          <p className="text-sm leading-relaxed mb-6">
-            Le pressing au kilo, simple et transparent.
-          </p>
-          <div className="flex gap-4">
-            <a 
-              href="https://instagram.com/kilolab.fr" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="hover:text-teal-500 transition"
-              aria-label="Instagram"
-            >
-              <Instagram size={20}/>
-            </a>
-            <a 
-              href="https://facebook.com/kilolab.fr" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="hover:text-teal-500 transition"
-              aria-label="Facebook"
-            >
-              <Facebook size={20}/>
-            </a>
-          </div>
-        </div>
-
-        {/* Colonne 2 : Liens */}
-        <div>
-          <h3 className="text-white font-bold mb-6">Liens</h3>
-          <ul className="space-y-4 text-sm">
-            <li><Link to="/" className="hover:text-white transition">Accueil</Link></li>
-            <li><Link to="/tarifs" className="hover:text-white transition">Tarifs</Link></li>
-            <li><Link to="/trouver" className="hover:text-white transition">Trouver un pressing</Link></li>
-            <li><Link to="/partner" className="hover:text-white transition">Espace Pro</Link></li>
-            <li><Link to="/faq" className="hover:text-white transition">FAQ</Link></li>
-          </ul>
-        </div>
-
-        {/* Colonne 3 : Légal */}
-        <div>
-          <h3 className="text-white font-bold mb-6">Légal</h3>
-          <ul className="space-y-4 text-sm">
-            <li><Link to="/cgu" className="hover:text-white transition">CGU</Link></li>
-            <li><Link to="/cgv" className="hover:text-white transition">CGV</Link></li>
-            <li><Link to="/privacy" className="hover:text-white transition">Confidentialité</Link></li>
-            <li><Link to="/cookies" className="hover:text-white transition">Cookies</Link></li>
-            <li><Link to="/legal" className="hover:text-white transition">Mentions Légales</Link></li>
-          </ul>
-        </div>
-
-        {/* Colonne 4 : Aide */}
-        <div>
-          <h3 className="text-white font-bold mb-6">Aide</h3>
-          <ul className="space-y-4 text-sm">
-            <li>
-              <Link 
-                to="/contact" 
-                className="flex items-center gap-2 hover:text-white transition"
+    <footer className="bg-slate-900 text-slate-400">
+      {/* Main Footer */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8 lg:gap-12">
+          
+          {/* Brand Column */}
+          <div className="col-span-2 md:col-span-4 lg:col-span-1">
+            <Link to="/" className="flex items-center gap-2.5 mb-6">
+              <div className="w-10 h-10 bg-gradient-to-br from-teal-500 to-cyan-500 rounded-xl flex items-center justify-center">
+                <span className="text-white font-bold text-lg">K</span>
+              </div>
+              <span className="text-xl font-bold text-white">
+                Kilo<span className="text-teal-400">lab</span>
+              </span>
+            </Link>
+            <p className="text-sm leading-relaxed mb-6 max-w-xs">
+              Le 1er service de laverie à domicile en France. 
+              Collecte, lavage et pliage dès 3€/kg.
+            </p>
+            <div className="flex gap-3">
+              <a 
+                href="https://instagram.com/kilolab.fr" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="w-10 h-10 bg-slate-800 hover:bg-teal-600 rounded-lg flex items-center justify-center transition-colors"
+                aria-label="Instagram"
               >
-                <MessageCircle size={16}/> Nous contacter
-              </Link>
-            </li>
-            <li>
-              <Link to="/for-who" className="hover:text-white transition">
-                Comment ça marche
-              </Link>
-            </li>
-          </ul>
+                <Instagram size={18} />
+              </a>
+              <a 
+                href="https://facebook.com/kilolab.fr" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="w-10 h-10 bg-slate-800 hover:bg-teal-600 rounded-lg flex items-center justify-center transition-colors"
+                aria-label="Facebook"
+              >
+                <Facebook size={18} />
+              </a>
+              <a 
+                href="https://twitter.com/kilolab_fr" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="w-10 h-10 bg-slate-800 hover:bg-teal-600 rounded-lg flex items-center justify-center transition-colors"
+                aria-label="Twitter"
+              >
+                <Twitter size={18} />
+              </a>
+            </div>
+          </div>
+
+          {/* Services */}
+          <div>
+            <h3 className="text-white font-semibold mb-4 text-sm uppercase tracking-wider">Services</h3>
+            <ul className="space-y-3 text-sm">
+              <li>
+                <Link to="/new-order" className="hover:text-teal-400 transition-colors">
+                  Commander
+                </Link>
+              </li>
+              <li>
+                <Link to="/tarifs" className="hover:text-teal-400 transition-colors">
+                  Nos tarifs
+                </Link>
+              </li>
+              <li>
+                <Link to="/trouver" className="hover:text-teal-400 transition-colors">
+                  Trouver un Washer
+                </Link>
+              </li>
+              <li>
+                <Link to="/faq" className="hover:text-teal-400 transition-colors">
+                  FAQ
+                </Link>
+              </li>
+            </ul>
+          </div>
+
+          {/* Partenaires */}
+          <div>
+            <h3 className="text-white font-semibold mb-4 text-sm uppercase tracking-wider">Partenaires</h3>
+            <ul className="space-y-3 text-sm">
+              <li>
+                <Link to="/become-washer" className="hover:text-teal-400 transition-colors">
+                  Devenir Washer
+                </Link>
+              </li>
+              <li>
+                <Link to="/partner" className="hover:text-teal-400 transition-colors">
+                  Espace Pressing
+                </Link>
+              </li>
+              <li>
+                <Link to="/partner-dashboard" className="hover:text-teal-400 transition-colors">
+                  Dashboard Pro
+                </Link>
+              </li>
+            </ul>
+          </div>
+
+          {/* Légal */}
+          <div>
+            <h3 className="text-white font-semibold mb-4 text-sm uppercase tracking-wider">Légal</h3>
+            <ul className="space-y-3 text-sm">
+              <li>
+                <Link to="/cgu" className="hover:text-teal-400 transition-colors">
+                  CGU
+                </Link>
+              </li>
+              <li>
+                <Link to="/cgv" className="hover:text-teal-400 transition-colors">
+                  CGV
+                </Link>
+              </li>
+              <li>
+                <Link to="/privacy" className="hover:text-teal-400 transition-colors">
+                  Confidentialité
+                </Link>
+              </li>
+              <li>
+                <Link to="/cookies" className="hover:text-teal-400 transition-colors">
+                  Cookies
+                </Link>
+              </li>
+              <li>
+                <Link to="/legal" className="hover:text-teal-400 transition-colors">
+                  Mentions légales
+                </Link>
+              </li>
+            </ul>
+          </div>
+
+          {/* Contact */}
+          <div>
+            <h3 className="text-white font-semibold mb-4 text-sm uppercase tracking-wider">Contact</h3>
+            <ul className="space-y-3 text-sm">
+              <li>
+                <Link to="/contact" className="flex items-center gap-2 hover:text-teal-400 transition-colors">
+                  <Mail size={14} />
+                  Nous contacter
+                </Link>
+              </li>
+              <li className="flex items-center gap-2">
+                <Phone size={14} />
+                <span>01 00 00 00 00</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <MapPin size={14} className="mt-0.5 flex-shrink-0" />
+                <span>France métropolitaine</span>
+              </li>
+            </ul>
+          </div>
         </div>
       </div>
 
-      {/* SECTION SEO : Maillage interne des villes */}
-      <div className="max-w-7xl mx-auto px-4 text-xs text-slate-600 mb-8">
-        <p className="font-bold text-slate-500 mb-3 flex items-center gap-2 uppercase tracking-wider">
-          <MapPin size={12}/> Zones d'intervention principales
-        </p>
-        <div className="flex flex-wrap gap-x-6 gap-y-2">
+      {/* Bottom Bar */}
+      <div className="border-t border-slate-800">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+            <p className="text-xs text-slate-500">
+              © {currentYear} Kilolab SAS. Tous droits réservés.
+            </p>
+            <div className="flex items-center gap-6 text-xs text-slate-500">
+              <Link to="/admin" className="hover:text-slate-400 transition-colors">
+                Admin
+              </Link>
+              <span>•</span>
+              <span>Made with ❤️ in France</span>
+            </div>
+          </div>
         </div>
-      </div>
-
-      {/* Copyright & Accès Secret */}
-      <div className="max-w-7xl mx-auto px-4">
-        <p className="text-center text-slate-700 text-xs select-none">
-          <span 
-            onClick={() => navigate('/admin')} 
-            className="cursor-default hover:text-slate-600 transition-colors"
-            title=" " 
-          >
-            ©
-          </span>
-          {' '}{new Date().getFullYear()} Kilolab SAS. Tous droits réservés.
-        </p>
       </div>
     </footer>
   );
