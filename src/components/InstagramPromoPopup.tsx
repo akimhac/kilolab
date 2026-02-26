@@ -119,14 +119,16 @@ export default function InstagramPromoPopup() {
 
   return (
     <>
-      {/* Overlay */}
+      {/* Overlay - Cliquable pour fermer */}
       <div 
-        className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 animate-fade-in"
+        className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[100] animate-fade-in cursor-pointer"
         onClick={handleClose}
+        role="button"
+        aria-label="Fermer le popup"
       />
 
-      {/* Popup */}
-      <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 w-full max-w-md mx-4 animate-scale-in">
+      {/* Popup - z-index plus élevé que l'overlay */}
+      <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[101] w-full max-w-md mx-4 animate-scale-in pointer-events-auto">
         <div className="bg-white rounded-3xl shadow-2xl overflow-hidden">
           
           {/* Close Button */}
