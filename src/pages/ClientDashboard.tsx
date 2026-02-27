@@ -3,11 +3,14 @@ import { supabase } from '../lib/supabase';
 import Navbar from '../components/Navbar';
 import { FadeInOnScroll, StaggerChildren, CountUp } from '../components/animations/ScrollAnimations';
 import { ClientDashboardSkeleton } from '../components/animations/Skeleton';
+import { OrderTrackerMini } from '../components/OrderTracker';
+import { LoyaltyCard } from '../components/Loyalty';
+import { SubscriptionCard } from '../components/Subscription';
 import {
   Package, Clock, CheckCircle, MapPin, Loader2, ArrowRight,
   Star, RefreshCw, Plus, Sparkles, Phone, TrendingUp,
   Gift, Copy, ChevronDown, ChevronUp, ThumbsUp, X,
-  RotateCcw, Zap
+  RotateCcw, Zap, Crown, Repeat, MessageCircle
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
