@@ -507,7 +507,7 @@ export default function ClientDashboard() {
             </div>
           </FadeInOnScroll>
         )}
-        {profile && stats.totalOrders >= 1 && <div className="mb-8"><ReferralCard profile={profile} /></div>}
+        {profile && stats.totalOrders >= 1 && <FadeInOnScroll direction="up" delay={300}><div className="mb-8"><ReferralCard profile={profile} /></div></FadeInOnScroll>}
         {pastOrders.length > 0 && (
           <div>
             <div className="flex items-center justify-between mb-3">
