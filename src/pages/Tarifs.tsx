@@ -157,11 +157,13 @@ export default function Tarifs() {
               >
                 Choisir Express
               </Link>
-            </div>
+              </div>
+            </AnimateOnScroll>
           </div>
 
           {/* BADGES CONFIANCE */}
-          <div className="mt-12 flex justify-center items-center gap-6 flex-wrap text-sm font-medium text-slate-600">
+          <AnimateOnScroll delay={300}>
+            <div className="mt-12 flex justify-center items-center gap-6 flex-wrap text-sm font-medium text-slate-600">
             <div className="flex items-center gap-2">
               <Shield size={18} className="text-green-500" />
               <span>Paiement sécurisé</span>
