@@ -7,14 +7,14 @@
 | **Nom** | KiloLab |
 | **URL** | kilolab.fr |
 | **Deploiement** | Vercel |
-| **Version** | 3.3.0 |
+| **Version** | 3.4.0 |
 | **Date MAJ** | 13 Janvier 2026 |
 
 ---
 
-## MEGA UPDATE v3.3 - TOUTES FONCTIONNALITÉS COMPLÈTES
+## TOUTES FONCTIONNALITÉS COMPLÈTES (20/20 ✅)
 
-### Checklist Fonctionnalités (16/16 ✅)
+### Checklist Fonctionnalités
 
 | # | Fonctionnalité | Status | Composant |
 |---|----------------|--------|-----------|
@@ -26,55 +26,50 @@
 | 6 | Abonnements Récurrents | ✅ | `Subscription.tsx` |
 | 7 | Programme Fidélité | ✅ | `Loyalty.tsx` |
 | 8 | Multi-Services | ✅ | `Services.tsx` |
-| 9 | Express 2h | ✅ | Intégré dans NewOrder |
-| 10 | Pressing/Sneakers | ✅ | Dans `Services.tsx` |
+| 9 | Express 2h | ✅ | NewOrder |
+| 10 | Pressing/Sneakers | ✅ | `Services.tsx` |
 | 11 | Dashboard Admin Analytics | ✅ | `AdminAnalytics.tsx` |
 | 12 | API Partenaires B2B | ✅ | `/api/b2b.js` |
 | 13 | Estimation IA Poids | ✅ | `WeightEstimator.tsx` |
 | 14 | Heatmap Géographique | ✅ | `OrderHeatmap.tsx` |
 | 15 | Notifications Push | ✅ | `NotificationSettings.tsx` |
 | 16 | Tests E2E Playwright | ✅ | `tests/e2e/*.spec.ts` |
-| **17** | **Multi-langue FR/EN** | ✅ (v3.3) | `i18n.ts`, `LanguageSelector.tsx` |
-| **18** | **Tracking GPS Live** | ✅ (v3.3) | `LiveTracking.tsx` |
-| **19** | **Analytics Avancés** | ✅ (v3.3) | `AdvancedAnalytics.tsx` |
+| 17 | Multi-langue FR/EN | ✅ | `i18n.ts`, `LanguageSelector.tsx` |
+| 18 | Tracking GPS Live | ✅ | `LiveTracking.tsx` |
+| 19 | Analytics Avancés | ✅ | `AdvancedAnalytics.tsx` |
+| **20** | **Mode Sombre** | ✅ (v3.4) | `ThemeContext.tsx`, `ThemeToggle.tsx` |
 
 ---
 
-## Nouvelles fonctionnalités v3.3
+## Nouvelle fonctionnalité v3.4: Mode Sombre
 
-### 1. Multi-langue (i18next)
-- **Config**: `src/i18n.ts`
-- **Traductions**: `src/locales/fr.json`, `src/locales/en.json`
-- **UI**: `src/components/LanguageSelector.tsx` → Navbar
-- **Features**:
-  - Détection automatique de la langue du navigateur
-  - Persistance dans localStorage
-  - 3 variantes: dropdown, buttons, minimal
-  - Toutes les chaînes traduites (nav, auth, dashboard, etc.)
+### Implémentation
+- **Context**: `src/contexts/ThemeContext.tsx`
+- **Toggle**: `src/components/ThemeToggle.tsx`
+- **Config Tailwind**: `darkMode: 'class'`
 
-### 2. Tracking GPS Washers (temps réel)
-- **Composant**: `src/components/LiveTracking.tsx`
-- **Features**:
-  - Carte Leaflet avec position live du Washer
-  - Mise à jour en temps réel via Supabase Realtime
-  - Calcul automatique de l'ETA
-  - Ligne de route en pointillés
-  - Boutons Appeler / Message
-  - Version mini pour le dashboard
-- **SQL**: `supabase/KILOLAB_V6_TRACKING_ANALYTICS.sql`
+### Features
+- 3 modes: **Clair**, **Sombre**, **Automatique** (système)
+- Persistance dans localStorage
+- Transition fluide (300ms)
+- Toggle dans la Navbar (icône soleil/lune)
+- Onglet "Apparence" dans les Settings
+- Classes dark: pour tous les composants clés
 
-### 3. Analytics Avancés
-- **Composant**: `src/components/AdvancedAnalytics.tsx`
-- **Features**:
-  - **Funnel Analysis**: Visiteurs → Inscriptions → Commandes → Livraisons
-  - **Retention Cohort**: Grille de rétention par semaine
-  - **KPIs avancés**: LTV, Panier moyen, Taux de repeat, Cmd/client
-  - Sélecteur de période (7j, 30j, 90j)
-- **Intégration**: Lazy loaded dans AdminAnalytics
+### Utilisation
+```tsx
+// Dans un composant
+import { useTheme } from '../contexts/ThemeContext';
+
+const { theme, resolvedTheme, setTheme, toggleTheme } = useTheme();
+
+// Classes Tailwind
+<div className="bg-white dark:bg-slate-800 text-slate-900 dark:text-white">
+```
 
 ---
 
-## SQL Scripts À Exécuter
+## SQL Scripts
 
 | Script | Description | Status |
 |--------|-------------|--------|
@@ -82,6 +77,8 @@
 | `B2B_API_TABLES.sql` | Tables B2B | ✅ |
 | `KILOLAB_V5_NOTIFICATIONS.sql` | FCM tokens | ✅ |
 | `KILOLAB_V6_TRACKING_ANALYTICS.sql` | GPS live + analytics | ⏳ À exécuter |
+
+**Note**: La colonne `client_id` est utilisée (pas `user_id`) dans la table `orders`.
 
 ---
 
@@ -96,50 +93,33 @@
 - **i18n**: i18next + react-i18next
 - **Tests**: Playwright
 - **PWA**: vite-plugin-pwa
+- **Dark Mode**: Tailwind CSS class strategy
 
 ---
 
-## Architecture des fichiers
+## Architecture
 
 ```
 /app/src
-├── i18n.ts                    # Config i18next
-├── locales/
-│   ├── fr.json               # Traductions FR
-│   └── en.json               # Traductions EN
+├── contexts/
+│   └── ThemeContext.tsx      # Dark mode provider
 ├── components/
-│   ├── LanguageSelector.tsx  # Sélecteur de langue
-│   ├── LiveTracking.tsx      # Tracking GPS temps réel
-│   ├── AdvancedAnalytics.tsx # Funnel, Retention, KPIs
-│   └── ...
-└── ...
-```
-
----
-
-## Utilisation du tracking GPS
-
-Pour activer le tracking live d'un Washer:
-1. Le Washer doit partager sa position (géolocalisation navigateur)
-2. Le composant `LiveWasherTracking` s'abonne au channel Realtime
-3. L'ETA est calculée automatiquement
-
-```tsx
-<LiveWasherTracking
-  orderId="..."
-  washerId="..."
-  pickupLat={48.8566}
-  pickupLng={2.3522}
-  onChat={() => openChat()}
-/>
+│   ├── ThemeToggle.tsx       # Toggle button (3 variantes)
+│   ├── LanguageSelector.tsx  # FR/EN switcher
+│   ├── LiveTracking.tsx      # GPS temps réel
+│   └── AdvancedAnalytics.tsx # Funnel, Retention
+├── locales/
+│   ├── fr.json              # Traductions FR
+│   └── en.json              # Traductions EN
+└── i18n.ts                  # Config i18next
 ```
 
 ---
 
 ## Backlog Futur
 
-- [ ] App Mobile Native (React Native)
-- [ ] Tableau de bord Washer avec navigation GPS
+- [ ] App Mobile React Native
+- [ ] Navigation GPS pour Washers
 - [ ] Prédiction de demande par zone (ML)
 - [ ] Programme ambassadeur pour Washers
 
