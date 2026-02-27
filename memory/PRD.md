@@ -7,7 +7,7 @@
 | **Nom** | KiloLab |
 | **URL** | kilolab.fr |
 | **Deploiement** | Vercel |
-| **Version** | 2.6.0 |
+| **Version** | 3.0.0 |
 | **Date MAJ** | 27 Decembre 2025 |
 
 ---
@@ -16,118 +16,176 @@
 
 KiloLab est une marketplace de laverie qui connecte des clients avec des "Washers" (personnes qui lavent le linge a domicile) et des pressings partenaires. Le modele est similaire a Uber mais pour le lavage de linge au kilo.
 
-### Roles Utilisateurs
-- **Client** : Commande du lavage de linge
-- **Washer** : Particulier qui lave le linge des clients
-- **Partner** : Pressing professionnel partenaire
-- **Admin** : Gestion de la plateforme
+---
+
+## MEGA UPDATE v3.0 - Session 27/12/2025
+
+### 1. Tracking & Analytics - COMPLETE
+- [x] Hook `useAnalytics.ts` centralise pour Meta Pixel + GA4
+- [x] Events: signup, login, order_started, order_completed, payment, referral_shared, subscription_started
+- [x] Meta Pixel ID: 1573268523913279
+
+### 2. Social Proof Dynamique - COMPLETE
+- [x] `SocialProof.tsx` avec composants:
+  - `LiveStats`: Compteurs animes (commandes/semaine, clients, note, villes)
+  - `LiveReviews`: Avis clients en temps reel (rotation auto)
+  - `WasherVerifiedBadge`: Badge washer verifie avec photo
+  - `TrustBadges`: Badges confiance (SSL, verifies, garantie, suivi)
+- [x] Integre dans Landing.tsx
+
+### 3. Systeme de Parrainage - COMPLETE
+- [x] `ReferralSystem.tsx` avec:
+  - Niveaux: Bronze, Silver, Gold, Platinum
+  - Recompenses SANS ARGENT: badges, express gratuit, priorite
+  - Partage WhatsApp/SMS/Email one-click
+  - Widget compact pour dashboards
+  - Progression visuelle vers niveau suivant
+
+### 4. Suivi Commande Temps Reel - COMPLETE
+- [x] `OrderTracker.tsx` avec:
+  - Timeline live avec timestamps
+  - Photos avant/apres (optionnel)
+  - ETA livraison
+  - Infos washer (photo, note, tel)
+  - Mini tracker pour dashboard
+  - Supabase realtime subscriptions
+
+### 5. Chat In-App Client <-> Washer - COMPLETE
+- [x] `Chat.tsx` avec:
+  - Messages instantanes (Supabase realtime)
+  - Indicateurs lu/non-lu (double check)
+  - Photos/fichiers attaches
+  - Templates messages rapides
+  - Notifications push
+  - Bulle flottante
+
+### 6. Abonnements Recurrents - COMPLETE
+- [x] `Subscription.tsx` avec:
+  - Plans: Hebdo (-15%), Bi-mensuel (-10%), Mensuel (-5%)
+  - Configuration multi-etapes
+  - Pause/Reprise facile
+  - Gestion abonnement modal
+  - Calcul prix automatique
+
+### 7. Programme Fidelite - COMPLETE
+- [x] `Loyalty.tsx` avec:
+  - Points: 10pts/EUR (jusqu'a 30pts en Platinum)
+  - Niveaux: Bronze, Silver, Gold, Platinum
+  - Recompenses echangeables
+  - Carte fidelite visuelle
+  - Explainer "Comment ca marche"
+
+### 8. Multi-Services - COMPLETE
+- [x] `Services.tsx` avec:
+  - Lavage Standard (3EUR/kg, 48h)
+  - Lavage Express (5EUR/kg, 24h)
+  - Express 2h (8EUR/kg, collecte 2h) - NOUVEAU
+  - Pressing (5EUR/piece, 72h)
+  - Repassage seul (2EUR/piece, 48h)
+  - Nettoyage Sneakers (15EUR/paire, 5j) - NOUVEAU
+  - Selecteur de service avec cards
+  - Modal details service
+
+### 9. Animations & UI - COMPLETE
+- [x] Skeleton loading (ClientDashboard, WasherDashboard)
+- [x] RippleButton avec effet ripple
+- [x] Animations Tailwind: ripple, shimmer, pulseSoft
+- [x] CountUp pour stats animees
+- [x] FadeInOnScroll pour sections
 
 ---
 
-## Travail Complete (Session 27/12/2025)
+## Fichiers Crees
 
-### 1. Firebase Push Notifications - COMPLETE
-- [x] Cle VAPID configuree dans `.env`
-- [x] Service Worker Firebase cree (`/app/public/firebase-messaging-sw.js`)
-- [x] Configuration complete pour notifications background
-- [x] Gestion du clic sur notification
-
-### 2. Animations UI/UX - COMPLETE
-- [x] ClientDashboard : Animations CountUp pour stats, FadeInOnScroll pour sections
-- [x] WasherDashboard : Stats animees avec CountUp, hover effects ameliores
-- [x] BecomeWasher : Cards benefices avec stagger animation, simulateur anime
-- [x] NewOrder : Import FadeInOnScroll prepare
-
-### 3. Skeleton Loading Animations - COMPLETE
-- [x] Composant Skeleton generique cree (`/app/src/components/animations/Skeleton.tsx`)
-- [x] ClientDashboardSkeleton : Stats, order cards, history rows
-- [x] WasherDashboardSkeleton : Dark theme, stats cards, mission cards
-- [x] Animations shimmer pour effet premium
-
-### 4. Micro-interactions Boutons - COMPLETE
-- [x] RippleButton component (`/app/src/components/ui/RippleButton.tsx`)
-- [x] Animations ripple, shimmer, pulseSoft dans tailwind.config.js
-- [x] Classes btn-primary, btn-secondary, btn-ghost avec scale effects
-- [x] Cards avec hover lift et scale effects
-
-### 5. Scripts RLS Supabase - EXECUTES ET VERIFIES
-- [x] Script final execute par l'utilisateur avec toutes les policies
-- [x] Verification via CSV : 95% confidence - toutes tables critiques couvertes
-- [x] Policies admin, client, washer, partner fonctionnelles
-
-### 6. Nettoyage Code - COMPLETE
-- [x] Section debug supprimee de NewOrder.tsx
-- [x] Console.log de debug supprimes
+```
+/app/src/
+├── hooks/
+│   └── useAnalytics.ts          # Tracking Meta Pixel + GA4
+├── components/
+│   ├── SocialProof.tsx          # Stats live, reviews, badges
+│   ├── ReferralSystem.tsx       # Parrainage multi-niveaux
+│   ├── OrderTracker.tsx         # Suivi temps reel
+│   ├── Chat.tsx                 # Messagerie instantanee
+│   ├── Subscription.tsx         # Abonnements recurrents
+│   ├── Loyalty.tsx              # Programme fidelite
+│   ├── Services.tsx             # Multi-services
+│   └── animations/
+│       └── Skeleton.tsx         # Loading skeletons
+└── ...
+```
 
 ---
 
-## Tests Effectues (27/12/2025)
+## Tables Supabase Requises (a creer si inexistantes)
 
-### Resultats : 95% succes
-- [x] Landing page : video, CTAs, comparateur prix
-- [x] Tarifs : cards Standard/Express, badge Popular
-- [x] FAQ : 4 categories, accordeon fonctionnel
-- [x] Contact : formulaire complet
-- [x] BecomeWasher : simulateur revenus, formulaire inscription
-- [x] Login : toggle Connexion/Inscription
-- [x] NewOrder : flow multi-etapes complet
-- [x] Navigation mobile : menu hamburger responsive
-- [x] Skeleton loading : implemente correctement
-- [x] Animations scroll : fonctionnelles
+```sql
+-- Subscriptions
+CREATE TABLE IF NOT EXISTS subscriptions (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  user_id UUID REFERENCES auth.users(id),
+  plan TEXT NOT NULL, -- weekly, biweekly, monthly
+  status TEXT DEFAULT 'active', -- active, paused, cancelled
+  weight_kg INTEGER,
+  formula TEXT, -- standard, express
+  pickup_address TEXT,
+  preferred_day TEXT,
+  preferred_slot TEXT,
+  next_pickup TIMESTAMP,
+  price_per_order DECIMAL,
+  discount_percent INTEGER,
+  created_at TIMESTAMP DEFAULT NOW()
+);
 
-### Issue mineure identifiee
-- Supabase retourne 401 pour fetch washers (config env) - fallback "Reseau Kilolab" fonctionne
+-- Reward Redemptions
+CREATE TABLE IF NOT EXISTS reward_redemptions (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  user_id UUID REFERENCES auth.users(id),
+  reward_id TEXT,
+  reward_name TEXT,
+  points_used INTEGER,
+  created_at TIMESTAMP DEFAULT NOW()
+);
+
+-- Add loyalty_points to user_profiles if not exists
+ALTER TABLE user_profiles ADD COLUMN IF NOT EXISTS loyalty_points INTEGER DEFAULT 0;
+```
 
 ---
 
 ## Architecture Technique
 
-```
-/app
-├── api/                  # Vercel Serverless Functions (Stripe)
-├── public/               # Assets statiques, manifest.json, SW Firebase
-├── src/
-│   ├── components/       
-│   │   ├── animations/   # ScrollAnimations, Skeleton
-│   │   └── ui/           # RippleButton, autres composants
-│   ├── pages/            # Pages principales
-│   ├── lib/              # Supabase client, Firebase
-│   └── services/         # API clients
-├── supabase/             # Scripts SQL RLS
-├── .env                  # Variables d'environnement
-├── tailwind.config.js    # Config avec animations custom
-└── vite.config.ts        # Configuration Vite + PWA
-```
-
-### Stack Technique
+### Stack
 - **Frontend**: React 18, TypeScript, Vite, TailwindCSS
-- **Backend**: Supabase (PostgreSQL, Auth, Storage, RLS)
+- **Backend**: Supabase (PostgreSQL, Auth, Storage, RLS, Realtime)
 - **Serverless**: Vercel Serverless Functions
 - **PWA**: vite-plugin-pwa
+
+### Integrations 3rd Party
+- **Supabase** : BDD, Auth, Storage, Realtime
+- **Stripe** : Paiements
+- **Resend** : Emails transactionnels
+- **Firebase** : Push Notifications (PWA)
+- **Meta Pixel** : Tracking conversions
+- **Google Analytics 4** : Analytics (via GTM)
 
 ---
 
 ## Taches Restantes
 
-### P0 - Critique
-- [x] Scripts RLS executes et verifies
+### P0 - A faire
+- [ ] Creer tables Supabase (subscriptions, reward_redemptions)
+- [ ] Ajouter fonction RPC `deduct_loyalty_points`
+- [ ] Integrer OrderTracker dans ClientDashboard
+- [ ] Integrer Chat dans page commande
 
 ### P1 - Important  
-- [ ] Implementer Meta Pixel pour tracking marketing
-- [ ] Systeme Ambassadeur Washer (parrainage washers)
+- [ ] Dashboard Admin Avance (analytics, heatmap)
+- [ ] Estimation IA du poids (photo -> kg)
+- [ ] API Partenaires B2B
 
-### P2 - Ameliorations
-- [ ] Tests E2E avec Playwright
-- [ ] Ameliorer capacites offline PWA
-
----
-
-## Notes de Deploiement
-
-Le projet est concu pour Vercel :
-- Build : `yarn build`
-- Les variables `.env` doivent etre configurees dans Vercel Dashboard
-- Le service worker Firebase est dans `/public/firebase-messaging-sw.js`
+### P2 - Future
+- [ ] App Mobile Native (React Native)
+- [ ] Tests E2E Playwright
 
 ---
 
