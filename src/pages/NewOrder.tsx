@@ -492,7 +492,7 @@ export default function NewOrder() {
                   {weight} <span className="text-3xl text-slate-400 font-normal">kg</span>
                 </div>
                 <p className="text-slate-500 text-lg">
-                  ~ {Math.ceil(weight / 5)} machine(s) • Formule {formula === "eco" ? "Standard" : "Express"}
+                  ~ {Math.ceil(weight / 5)} machine(s) • Formule {formula === "eco" ? "Standard" : formula === "express" ? "Express" : "Express 2h"}
                 </p>
               </div>
 
