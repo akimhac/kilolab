@@ -739,7 +739,7 @@ export default function NewOrder() {
                 <div className="flex justify-between items-center pb-3 border-b border-slate-200">
                   <span className="text-slate-600 font-medium">Formule</span>
                   <span className="font-black text-lg uppercase">
-                    {formula === "eco" ? "🟢 Standard" : "⚡ Express"}
+                    {formula === "eco" ? "🟢 Standard" : formula === "express" ? "⚡ Express" : "🚀 Express 2h"}
                   </span>
                 </div>
 
