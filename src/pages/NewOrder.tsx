@@ -546,13 +546,6 @@ export default function NewOrder() {
                 </button>
               </div>
 
-              {/* Debug */}
-              <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-xl text-xs">
-                <p className="font-bold mb-1">🔍 Debug Recherche:</p>
-                <p>Total Washers approuvés: {allWashers.length}</p>
-                <p>Résultats recherche: {filteredWashers.length}</p>
-              </div>
-
               <div className="flex-1 relative rounded-2xl overflow-hidden bg-slate-100 border-2 border-slate-200 min-h-[300px]">
                 <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1569336415962-a4bd9f69c07b?q=80&w=1000&auto=format&fit=crop')] bg-cover bg-center opacity-30 blur-sm" />
 
