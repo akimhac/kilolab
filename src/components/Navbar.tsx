@@ -173,6 +173,9 @@ export default function Navbar() {
                 </Link>
               </>
             )}
+            
+            {/* Language Selector */}
+            <LanguageSelector variant="minimal" />
           </div>
 
           {/* MOBILE MENU BUTTON */}
