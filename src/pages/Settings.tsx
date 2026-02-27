@@ -256,13 +256,33 @@ export default function Settings() {
               </button>
             </div>
 
-            <div className="bg-white rounded-2xl p-6 shadow-sm border border-red-100">
-              <h2 className="font-bold text-red-600 mb-4">Zone dangereuse</h2>
-              <button className="w-full py-3 px-4 border border-red-200 rounded-xl text-red-600 font-medium hover:bg-red-50 transition-all flex items-center justify-center gap-2">
+            <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-sm border border-red-100 dark:border-red-900">
+              <h2 className="font-bold text-red-600 dark:text-red-400 mb-4">Zone dangereuse</h2>
+              <button className="w-full py-3 px-4 border border-red-200 dark:border-red-800 rounded-xl text-red-600 dark:text-red-400 font-medium hover:bg-red-50 dark:hover:bg-red-900/20 transition-all flex items-center justify-center gap-2">
                 <Trash2 size={16} />
                 Supprimer mon compte
               </button>
-              <p className="text-xs text-slate-500 mt-2 text-center">Cette action est irréversible</p>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-2 text-center">Cette action est irréversible</p>
+            </div>
+          </div>
+        )}
+
+        {/* Appearance Tab */}
+        {activeTab === 'appearance' && (
+          <div className="space-y-4">
+            <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-sm border border-slate-100 dark:border-slate-700">
+              <h2 className="font-bold text-slate-900 dark:text-white mb-4">Thème</h2>
+              <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">
+                Choisissez l'apparence de l'application. Le mode automatique s'adapte aux préférences de votre système.
+              </p>
+              <ThemeToggle variant="buttons" />
+            </div>
+
+            <div className="bg-gradient-to-r from-purple-500 to-pink-500 rounded-2xl p-6 text-white">
+              <h2 className="font-bold mb-2">Mode sombre activé !</h2>
+              <p className="text-sm text-white/80">
+                Profitez d'une expérience visuelle plus confortable la nuit et économisez la batterie sur les écrans OLED.
+              </p>
             </div>
           </div>
         )}
