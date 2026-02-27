@@ -188,95 +188,165 @@ export default function Tarifs() {
             <div className="text-center mb-12">
               <div className="inline-flex items-center gap-2 px-4 py-2 bg-red-100 text-red-600 rounded-full text-sm font-bold mb-4">
                 <AlertCircle size={16} />
-                Arrêtez de payer trop cher
+                Arrêtez de perdre du temps et de l'argent
               </div>
-              <h2 className="text-3xl font-black mb-4">Le match des prix 🥊</h2>
-              <p className="text-slate-600">Comparaison pour 5kg de linge (environ 1 machine standard).</p>
+              <h2 className="text-3xl md:text-4xl font-black mb-4">Le VRAI coût de votre lessive 💰</h2>
+              <p className="text-slate-600 text-lg">Ce que vous payez vraiment quand vous faites votre linge vous-même.</p>
             </div>
 
-            <div className="grid md:grid-cols-2 gap-8 items-center">
-              {/* SERVICES TRADITIONNELS */}
-              <div className="bg-white p-8 rounded-3xl border border-red-100 opacity-80 hover:opacity-100 transition duration-500">
-                <div className="flex items-center gap-3 mb-6 text-red-500">
-                  <X size={32} />
-                  <h3 className="text-2xl font-bold">Laverie & Services Traditionnels</h3>
-                </div>
+            <div className="grid md:grid-cols-2 gap-8 items-stretch">
+              {/* COÛT RÉEL - VOUS-MÊME / LAVERIE */}
+              <AnimateOnScroll delay={0}>
+                <div className="bg-gradient-to-br from-red-50 to-orange-50 p-8 rounded-3xl border-2 border-red-200 h-full flex flex-col">
+                  <div className="flex items-center gap-3 mb-6">
+                    <div className="w-12 h-12 bg-red-100 rounded-xl flex items-center justify-center">
+                      <X size={24} className="text-red-600" />
+                    </div>
+                    <div>
+                      <h3 className="text-xl font-bold text-red-700">Faire soi-même / Laverie</h3>
+                      <p className="text-sm text-red-500">Le coût caché qu'on ignore</p>
+                    </div>
+                  </div>
 
-                <ul className="space-y-4 text-slate-600 mb-8">
-                  <li className="flex items-center gap-3 pb-3 border-b">
-                    <X size={18} className="text-red-500 flex-shrink-0" />
-                    <span>Déplacement obligatoire</span>
-                  </li>
-                  <li className="flex items-center gap-3 pb-3 border-b">
-                    <Clock size={18} className="text-orange-500 flex-shrink-0" />
-                    <span>Attente sur place (1h30 min)</span>
-                  </li>
-                  <li className="flex items-center gap-3 pb-3 border-b">
-                    <X size={18} className="text-red-500 flex-shrink-0" />
-                    <span>Linge souvent non plié</span>
-                  </li>
-                  <li className="flex items-center gap-3 pb-3">
-                    <AlertCircle size={18} className="text-orange-500 flex-shrink-0" />
-                    <span>Produits chimiques standards</span>
-                  </li>
-                </ul>
+                  {/* Détail des coûts */}
+                  <div className="space-y-3 mb-6 flex-1">
+                    <div className="flex justify-between items-center p-3 bg-white/80 rounded-xl">
+                      <span className="text-slate-700">Eau + Électricité</span>
+                      <span className="font-bold text-slate-900">2.70€</span>
+                    </div>
+                    <div className="flex justify-between items-center p-3 bg-white/80 rounded-xl">
+                      <span className="text-slate-700">Lessive + Adoucissant</span>
+                      <span className="font-bold text-slate-900">1.80€</span>
+                    </div>
+                    <div className="flex justify-between items-center p-3 bg-white/80 rounded-xl">
+                      <span className="text-slate-700">Usure machine + Séchage</span>
+                      <span className="font-bold text-slate-900">2.30€</span>
+                    </div>
+                    <div className="flex justify-between items-center p-3 bg-orange-100 rounded-xl border border-orange-200">
+                      <div className="flex items-center gap-2">
+                        <Clock size={18} className="text-orange-600" />
+                        <span className="text-orange-800 font-medium">Votre temps (2h30)</span>
+                      </div>
+                      <span className="font-bold text-orange-700">30€*</span>
+                    </div>
+                  </div>
 
-                <div className="bg-red-50 text-red-600 p-4 rounded-xl text-center">
-                  <p className="text-sm mb-1">5kg (Lavage + Séchage + Lessive)</p>
-                  <p className="font-black text-3xl">~18€ 💸</p>
+                  {/* Total */}
+                  <div className="bg-gradient-to-r from-red-500 to-orange-500 text-white p-5 rounded-2xl">
+                    <div className="flex justify-between items-center mb-2 text-sm opacity-90">
+                      <span>Coût matériel</span>
+                      <span>~7€</span>
+                    </div>
+                    <div className="flex justify-between items-center pb-3 border-b border-white/30 text-sm opacity-90">
+                      <span>Coût de votre temps</span>
+                      <span>~30€</span>
+                    </div>
+                    <div className="flex justify-between items-center pt-3">
+                      <span className="font-bold text-lg">COÛT RÉEL TOTAL</span>
+                      <span className="font-black text-4xl">~37€</span>
+                    </div>
+                  </div>
+                  
+                  <p className="text-xs text-slate-500 mt-3 text-center">*Basé sur le SMIC horaire (12€/h)</p>
                 </div>
-              </div>
+              </AnimateOnScroll>
 
               {/* KILOLAB */}
-              <div className="bg-white p-8 rounded-3xl border-2 border-teal-500 shadow-xl relative">
-                <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-teal-500 text-white px-4 py-1 rounded-full text-sm font-bold">
-                  🏆 GAGNANT
+              <AnimateOnScroll delay={150}>
+                <div className="bg-gradient-to-br from-teal-50 to-cyan-50 p-8 rounded-3xl border-2 border-teal-400 shadow-xl relative h-full flex flex-col">
+                  <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-gradient-to-r from-yellow-400 to-orange-400 text-slate-900 px-5 py-1.5 rounded-full text-sm font-black shadow-lg">
+                    🏆 VOUS GAGNEZ
+                  </div>
+
+                  <div className="flex items-center gap-3 mb-6 mt-4">
+                    <div className="w-12 h-12 bg-teal-100 rounded-xl flex items-center justify-center">
+                      <Check size={24} className="text-teal-600" />
+                    </div>
+                    <div>
+                      <h3 className="text-xl font-bold text-teal-700">Avec Kilolab</h3>
+                      <p className="text-sm text-teal-500">Tout inclus, zéro effort</p>
+                    </div>
+                  </div>
+
+                  {/* Avantages */}
+                  <div className="space-y-3 mb-6 flex-1">
+                    <div className="flex items-center gap-3 p-3 bg-white rounded-xl border border-teal-100">
+                      <div className="w-8 h-8 bg-teal-500 rounded-full flex items-center justify-center flex-shrink-0">
+                        <Check size={16} className="text-white" />
+                      </div>
+                      <span className="font-medium text-slate-900">Collecte gratuite à domicile</span>
+                    </div>
+                    <div className="flex items-center gap-3 p-3 bg-white rounded-xl border border-teal-100">
+                      <div className="w-8 h-8 bg-teal-500 rounded-full flex items-center justify-center flex-shrink-0">
+                        <Check size={16} className="text-white" />
+                      </div>
+                      <span className="font-medium text-slate-900">Lavage pro + Séchage + Pliage</span>
+                    </div>
+                    <div className="flex items-center gap-3 p-3 bg-white rounded-xl border border-teal-100">
+                      <div className="w-8 h-8 bg-teal-500 rounded-full flex items-center justify-center flex-shrink-0">
+                        <Check size={16} className="text-white" />
+                      </div>
+                      <span className="font-medium text-slate-900">Livraison en 48h</span>
+                    </div>
+                    <div className="flex items-center gap-3 p-3 bg-teal-100 rounded-xl border border-teal-200">
+                      <div className="w-8 h-8 bg-teal-600 rounded-full flex items-center justify-center flex-shrink-0">
+                        <Clock size={16} className="text-white" />
+                      </div>
+                      <span className="font-bold text-teal-800">Votre temps : 0 minute</span>
+                    </div>
+                  </div>
+
+                  {/* Prix Kilolab */}
+                  <div className="bg-gradient-to-r from-teal-500 to-cyan-500 text-white p-5 rounded-2xl mb-4">
+                    <div className="text-center">
+                      <p className="text-sm opacity-90 mb-1">5kg × 3€/kg (Tout inclus)</p>
+                      <p className="font-black text-5xl">15€</p>
+                    </div>
+                  </div>
+
+                  {/* Économies */}
+                  <div className="bg-white p-4 rounded-xl border-2 border-teal-300">
+                    <div className="text-center">
+                      <p className="text-teal-600 font-bold text-sm uppercase tracking-wide mb-2">Vous économisez</p>
+                      <div className="flex justify-center items-center gap-4">
+                        <div className="text-center">
+                          <p className="text-3xl font-black text-slate-900">22€</p>
+                          <p className="text-xs text-slate-500">d'argent</p>
+                        </div>
+                        <div className="text-2xl text-slate-300">+</div>
+                        <div className="text-center">
+                          <p className="text-3xl font-black text-slate-900">2h30</p>
+                          <p className="text-xs text-slate-500">de vie</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-
-                <div className="flex items-center gap-3 mb-6 text-teal-600 mt-4">
-                  <Check size={32} />
-                  <h3 className="text-2xl font-bold">L'Expérience Kilolab</h3>
-                </div>
-
-                <ul className="space-y-4 text-slate-700 mb-8">
-                  <li className="flex items-center gap-3 pb-3 border-b">
-                    <Check size={18} className="text-teal-500 flex-shrink-0 font-bold" />
-                    <span className="font-medium">Collecte & Livraison à domicile</span>
-                  </li>
-                  <li className="flex items-center gap-3 pb-3 border-b">
-                    <Check size={18} className="text-teal-500 flex-shrink-0 font-bold" />
-                    <span className="font-medium">Zéro attente (Vous restez chez vous)</span>
-                  </li>
-                  <li className="flex items-center gap-3 pb-3 border-b">
-                    <Sparkles size={18} className="text-teal-500 flex-shrink-0 font-bold" />
-                    <span className="font-medium">Linge lavé, séché et plié au carré</span>
-                  </li>
-                  <li className="flex items-center gap-3 pb-3">
-                    <Check size={18} className="text-teal-500 flex-shrink-0 font-bold" />
-                    <span className="font-medium">Traitement personnalisé & Soigné</span>
-                  </li>
-                </ul>
-
-                <div className="bg-teal-600 text-white p-4 rounded-xl text-center">
-                  <div className="text-sm opacity-90 mb-1">5kg × 3€ (Tout inclus)</div>
-                  <div className="font-black text-3xl">15€ 🎉</div>
-                </div>
-
-                <p className="text-center text-teal-600 text-sm font-bold mt-4 bg-teal-50 p-3 rounded-xl">
-                  ↘ Vous économisez 3€ + 1h30 de votre vie
-                </p>
-              </div>
+              </AnimateOnScroll>
             </div>
 
-            {/* HIGHLIGHT BOX */}
-            <div className="mt-12 text-center">
-              <div className="inline-block bg-gradient-to-r from-teal-600 to-cyan-600 text-white p-6 rounded-2xl max-w-2xl">
-                <h3 className="text-xl font-black mb-2">💎 Même prix, meilleur service</h3>
-                <p className="text-teal-100">
-                  Avec Kilolab, vous payez <strong className="text-white">moins cher qu'une laverie</strong>, et vous récupérez <strong className="text-white">votre temps libre</strong> !
-                </p>
+            {/* HIGHLIGHT BOX - Plus impactant */}
+            <AnimateOnScroll delay={300}>
+              <div className="mt-12 text-center">
+                <div className="inline-block bg-gradient-to-r from-slate-900 to-slate-800 text-white p-8 rounded-3xl max-w-3xl shadow-2xl">
+                  <p className="text-5xl font-black mb-4">🤯</p>
+                  <h3 className="text-2xl md:text-3xl font-black mb-4">
+                    Vous payez pour <span className="text-red-400">PERDRE</span> 2h30 de votre vie ?
+                  </h3>
+                  <p className="text-slate-300 text-lg mb-6">
+                    Avec Kilolab, pour <strong className="text-teal-400">moins cher</strong> qu'un aller-retour à la laverie, 
+                    vous récupérez <strong className="text-teal-400">2h30 de temps libre</strong>. 
+                  </p>
+                  <Link
+                    to="/new-order"
+                    className="inline-flex items-center gap-2 px-8 py-4 bg-teal-500 text-white font-bold rounded-full hover:bg-teal-400 transition-all hover:scale-105 active:scale-95 shadow-lg"
+                  >
+                    Récupérer mon temps
+                    <Zap size={20} />
+                  </Link>
+                </div>
               </div>
-            </div>
+            </AnimateOnScroll>
           </div>
         </section>
 
