@@ -6,6 +6,9 @@ import { Toaster } from "react-hot-toast";
 import App from "./App";
 import "./index.css";
 
+// Initialize i18n
+import "./i18n";
+
 // ========================================
 // INITIALISATION ANALYTICS
 // ========================================
