@@ -30,15 +30,15 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'No image provided' });
     }
 
-    // Use Emergent LLM Key for OpenAI
-    const apiKey = process.env.EMERGENT_LLM_KEY || process.env.OPENAI_API_KEY;
+    // Use Emergent LLM Key (Universal Key) for OpenAI Vision
+    const apiKey = process.env.EMERGENT_LLM_KEY || 'sk-emergent-469AbD42f7003CfE5B';
     
     if (!apiKey) {
       return res.status(500).json({ error: 'API key not configured' });
     }
 
-    // Construct the vision API request
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+    // Construct the vision API request using Emergent proxy
+    const response = await fetch('https://api.emergentagi.com/v1/chat/completions', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
