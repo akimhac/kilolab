@@ -9,6 +9,9 @@ import "./index.css";
 // Initialize i18n
 import "./i18n";
 
+// Theme Provider
+import { ThemeProvider } from "./contexts/ThemeContext";
+
 // ========================================
 // INITIALISATION ANALYTICS
 // ========================================
