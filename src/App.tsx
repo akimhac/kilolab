@@ -267,6 +267,14 @@ export default function App() {
               </ProtectedAdminRoute>
             }
           />
+          <Route
+            path="/admin/analytics"
+            element={
+              <ProtectedAdminRoute>
+                <AdminAnalytics />
+              </ProtectedAdminRoute>
+            }
+          />
 
           <Route path="/legal" element={<Legal />} />
           <Route path="/cgu" element={<CGU />} />
