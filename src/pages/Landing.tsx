@@ -582,13 +582,13 @@ export default function Landing() {
               <Link
                 to="/become-washer"
                 data-testid="final-cta-washer"
-                className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-white/10 backdrop-blur-sm text-white rounded-full font-semibold text-lg hover:bg-white/20 transition-all duration-300 border border-white/20"
+                className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-white/10 backdrop-blur-sm text-white rounded-full font-semibold text-lg hover:bg-white/20 transition-all duration-300 border border-white/20 hover:scale-[1.02] active:scale-[0.98]"
               >
                 Devenir Washer
                 <TrendingUp size={20} />
               </Link>
             </div>
-          </div>
+          </AnimateOnScroll>
         </section>
 
         <Footer />
