@@ -25,7 +25,7 @@ export default function NewOrder() {
   const [loading, setLoading] = useState(false);
   const [step, setStep] = useState(0);
 
-  const [formula, setFormula] = useState<"eco" | "express">("eco");
+  const [formula, setFormula] = useState<"eco" | "express" | "express_2h">("eco");
   const [weight, setWeight] = useState(5);
 
   const [pickupDate, setPickupDate] = useState("");
