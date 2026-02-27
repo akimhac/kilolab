@@ -505,39 +505,42 @@ export default function Landing() {
           <div className="max-w-7xl mx-auto">
             <div className="grid md:grid-cols-2 gap-12 md:gap-20 items-center">
               {/* Images */}
-              <div className="relative">
-                <div className="grid grid-cols-2 gap-4 relative">
-                  <img
-                    src="https://images.unsplash.com/photo-1555400038-63f5ba517a47?w=800&auto=format&fit=crop"
-                    alt="Inspiration Bali"
-                    className="rounded-2xl shadow-soft transform -rotate-2 hover:rotate-0 transition-transform duration-500"
-                    loading="lazy"
-                  />
-                  <img
-                    src="https://images.unsplash.com/photo-1604335399105-a0c585fd81a1?w=800&auto=format&fit=crop"
-                    alt="Linge propre"
-                    className="rounded-2xl shadow-soft transform rotate-2 hover:rotate-0 transition-transform duration-500 mt-12"
-                    loading="lazy"
-                  />
+              <AnimateOnScroll delay={0}>
+                <div className="relative">
+                  <div className="grid grid-cols-2 gap-4 relative">
+                    <img
+                      src="https://images.unsplash.com/photo-1555400038-63f5ba517a47?w=800&auto=format&fit=crop"
+                      alt="Inspiration Bali"
+                      className="rounded-2xl shadow-soft transform -rotate-2 hover:rotate-0 transition-transform duration-500"
+                      loading="lazy"
+                    />
+                    <img
+                      src="https://images.unsplash.com/photo-1604335399105-a0c585fd81a1?w=800&auto=format&fit=crop"
+                      alt="Linge propre"
+                      className="rounded-2xl shadow-soft transform rotate-2 hover:rotate-0 transition-transform duration-500 mt-12"
+                      loading="lazy"
+                    />
+                  </div>
+                  <div className="absolute -z-10 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-gradient-to-br from-teal-100/50 to-cyan-100/50 rounded-full blur-3xl" />
                 </div>
-                <div className="absolute -z-10 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-gradient-to-br from-teal-100/50 to-cyan-100/50 rounded-full blur-3xl" />
-              </div>
+              </AnimateOnScroll>
 
               {/* Content */}
-              <div>
-                <span className="inline-block px-4 py-1.5 bg-teal-50 text-teal-700 rounded-full text-sm font-semibold mb-6 border border-teal-100">
-                  Notre Histoire
-                </span>
-                <h2 className="font-heading text-3xl md:text-5xl font-bold text-slate-900 mb-8 leading-tight">
-                  De la douceur de Bali <br />
-                  à l'exigence de Paris.
-                </h2>
-                <p className="text-slate-600 text-lg leading-relaxed mb-8">
-                  Là-bas, le soin du linge au poids est la norme : simple, direct, sans artifices. Nous avons importé ce concept
-                  pour en finir avec le casse-tête des tarifs à la pièce.
-                </p>
-                <blockquote className="bg-slate-50 p-6 rounded-2xl border-l-4 border-teal-500 mb-8">
-                  <p className="text-slate-700 font-medium italic">
+              <AnimateOnScroll delay={200}>
+                <div>
+                  <span className="inline-block px-4 py-1.5 bg-teal-50 text-teal-700 rounded-full text-sm font-semibold mb-6 border border-teal-100">
+                    Notre Histoire
+                  </span>
+                  <h2 className="font-heading text-3xl md:text-5xl font-bold text-slate-900 mb-8 leading-tight">
+                    De la douceur de Bali <br />
+                    à l'exigence de Paris.
+                  </h2>
+                  <p className="text-slate-600 text-lg leading-relaxed mb-8">
+                    Là-bas, le soin du linge au poids est la norme : simple, direct, sans artifices. Nous avons importé ce concept
+                    pour en finir avec le casse-tête des tarifs à la pièce.
+                  </p>
+                  <blockquote className="bg-slate-50 p-6 rounded-2xl border-l-4 border-teal-500 mb-8">
+                    <p className="text-slate-700 font-medium italic">
                     "Juste le poids du linge propre. Rien d'autre."
                   </p>
                 </blockquote>
