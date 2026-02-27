@@ -361,11 +361,14 @@ export default function ClientDashboard() {
   const [pastOrders, setPastOrders] = useState<Order[]>([]);
   const [stats, setStats] = useState({ totalOrders: 0, totalSpent: 0, totalKg: 0, avgOrderValue: 0 });
   const [profile, setProfile] = useState<UserProfile | null>(null);
+  const [subscription, setSubscription] = useState<Subscription | null>(null);
+  const [userId, setUserId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [cancelling, setCancelling] = useState<string | null>(null);
   const [ratingOrder, setRatingOrder] = useState<Order | null>(null);
   const [showAllHistory, setShowAllHistory] = useState(false);
+  const [activeTab, setActiveTab] = useState<'orders' | 'loyalty' | 'subscription'>('orders');
   const fetchLockRef = useRef(false);
 
   const loadDashboard = useCallback(async () => {
@@ -375,6 +378,8 @@ export default function ClientDashboard() {
       setRefreshing(true);
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) { window.location.href = '/login'; return; }
+      setUserId(user.id);
+      
       const { data: orders, error } = await supabase
         .from('orders')
         .select('*, washer:washers(id, first_name, last_name, avatar_url, avg_rating, total_ratings, phone)')
@@ -391,11 +396,23 @@ export default function ClientDashboard() {
       const totalKg = all.reduce((s, o) => s + (parseFloat(String(o.weight)) || 0), 0);
       const valid = all.filter(o => o.status !== 'cancelled');
       setStats({ totalOrders: valid.length, totalSpent, totalKg, avgOrderValue: past.length > 0 ? totalSpent / past.length : 0 });
-      const [{ data: prof }, { data: refCode }] = await Promise.all([
-        supabase.from('user_profiles').select('id, full_name, referral_credit').eq('id', user.id).single(),
+      
+      // Fetch profile with loyalty points
+      const [{ data: prof }, { data: refCode }, { data: sub }] = await Promise.all([
+        supabase.from('user_profiles').select('id, full_name, referral_credit, loyalty_points').eq('id', user.id).single(),
         supabase.from('referral_codes').select('code, uses_count, bonus_earned_cents').eq('user_id', user.id).single(),
+        supabase.from('subscriptions').select('*').eq('user_id', user.id).eq('status', 'active').single(),
       ]);
-      if (prof) setProfile({ id: prof.id, full_name: prof.full_name ?? null, referral_code: refCode?.code ?? null, uses_count: refCode?.uses_count ?? 0, bonus_earned_cents: refCode?.bonus_earned_cents ?? 0, referral_credit: prof.referral_credit ?? 0 });
+      if (prof) setProfile({ 
+        id: prof.id, 
+        full_name: prof.full_name ?? null, 
+        referral_code: refCode?.code ?? null, 
+        uses_count: refCode?.uses_count ?? 0, 
+        bonus_earned_cents: refCode?.bonus_earned_cents ?? 0, 
+        referral_credit: prof.referral_credit ?? 0,
+        loyalty_points: prof.loyalty_points ?? 0,
+      });
+      if (sub) setSubscription(sub);
     } catch (err) { console.error(err); }
     finally { setLoading(false); setRefreshing(false); fetchLockRef.current = false; }
   }, []);
