@@ -30,6 +30,7 @@ export default function NewOrder() {
 
   const [formula, setFormula] = useState<"eco" | "express" | "express_2h">("eco");
   const [weight, setWeight] = useState(5);
+  const [showWeightEstimator, setShowWeightEstimator] = useState(false);
 
   const [pickupDate, setPickupDate] = useState("");
   const [pickupSlot, setPickupSlot] = useState("");
