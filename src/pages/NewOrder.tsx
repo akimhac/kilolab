@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "../lib/supabase";
 import Navbar from "../components/Navbar";
 import { FadeInOnScroll } from "../components/animations/ScrollAnimations";
+import { WeightEstimator } from "../components/WeightEstimator";
 import {
   Scale,
   MapPin,
@@ -16,6 +17,8 @@ import {
   CheckCircle,
   CreditCard,
   Gift,
+  Camera,
+  X,
 } from "lucide-react";
 import toast from "react-hot-toast";
 
