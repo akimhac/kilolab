@@ -1,5 +1,5 @@
 // Dashboard Admin Avancé - Analytics, Heatmap, KPIs
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, lazy, Suspense } from 'react';
 import { supabase } from '../lib/supabase';
 import Navbar from '../components/Navbar';
 import { FadeInOnScroll, CountUp } from '../components/animations/ScrollAnimations';
@@ -7,10 +7,13 @@ import {
   TrendingUp, TrendingDown, Users, Package, DollarSign, Star,
   MapPin, Calendar, Clock, Filter, Download, RefreshCw,
   ChevronDown, ChevronUp, AlertCircle, CheckCircle, Loader2,
-  BarChart3, PieChart, Activity, Target, Zap, ArrowUpRight
+  BarChart3, PieChart, Activity, Target, Zap, ArrowUpRight, Map
 } from 'lucide-react';
 import { format, subDays, startOfWeek, endOfWeek, startOfMonth, endOfMonth, eachDayOfInterval } from 'date-fns';
 import { fr } from 'date-fns/locale';
+
+// Lazy load the heavy map component
+const OrderHeatmap = lazy(() => import('../components/OrderHeatmap'));
 
 interface DashboardStats {
   totalOrders: number;
