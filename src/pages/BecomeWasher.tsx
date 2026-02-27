@@ -4,6 +4,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
+import { FadeInOnScroll, CountUp } from '../components/animations/ScrollAnimations';
 import {
   Loader2,
   Upload,
