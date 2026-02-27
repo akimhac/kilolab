@@ -583,6 +583,7 @@ export default function Landing() {
               </Link>
             </div>
           </div>
+          </FadeInOnScroll>
         </section>
 
         <Footer />
