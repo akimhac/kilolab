@@ -186,7 +186,7 @@ export default function NewOrder() {
   }, [searchQuery]);
 
   // Prix
-  const basePrice = formula === "eco" ? 3 : 5;
+  const basePrice = formula === "eco" ? 3 : formula === "express" ? 5 : 8;
   let total = weight * basePrice;
   if (isWeekend) total += 5;
   const totalPrice = parseFloat(total.toFixed(2));
