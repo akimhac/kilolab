@@ -12,181 +12,147 @@
 
 ---
 
-## Description
+## MEGA UPDATE v3.0 - TOUTES FONCTIONNALITÉS COMPLÈTES
 
-KiloLab est une marketplace de laverie qui connecte des clients avec des "Washers" (personnes qui lavent le linge a domicile) et des pressings partenaires. Le modele est similaire a Uber mais pour le lavage de linge au kilo.
+### Checklist Fonctionnalités
 
----
-
-## MEGA UPDATE v3.0 - Session 27/12/2025
-
-### 1. Tracking & Analytics - COMPLETE
-- [x] Hook `useAnalytics.ts` centralise pour Meta Pixel + GA4
-- [x] Events: signup, login, order_started, order_completed, payment, referral_shared, subscription_started
-- [x] Meta Pixel ID: 1573268523913279
-
-### 2. Social Proof Dynamique - COMPLETE
-- [x] `SocialProof.tsx` avec composants:
-  - `LiveStats`: Compteurs animes (commandes/semaine, clients, note, villes)
-  - `LiveReviews`: Avis clients en temps reel (rotation auto)
-  - `WasherVerifiedBadge`: Badge washer verifie avec photo
-  - `TrustBadges`: Badges confiance (SSL, verifies, garantie, suivi)
-- [x] Integre dans Landing.tsx
-
-### 3. Systeme de Parrainage - COMPLETE
-- [x] `ReferralSystem.tsx` avec:
-  - Niveaux: Bronze, Silver, Gold, Platinum
-  - Recompenses SANS ARGENT: badges, express gratuit, priorite
-  - Partage WhatsApp/SMS/Email one-click
-  - Widget compact pour dashboards
-  - Progression visuelle vers niveau suivant
-
-### 4. Suivi Commande Temps Reel - COMPLETE
-- [x] `OrderTracker.tsx` avec:
-  - Timeline live avec timestamps
-  - Photos avant/apres (optionnel)
-  - ETA livraison
-  - Infos washer (photo, note, tel)
-  - Mini tracker pour dashboard
-  - Supabase realtime subscriptions
-
-### 5. Chat In-App Client <-> Washer - COMPLETE
-- [x] `Chat.tsx` avec:
-  - Messages instantanes (Supabase realtime)
-  - Indicateurs lu/non-lu (double check)
-  - Photos/fichiers attaches
-  - Templates messages rapides
-  - Notifications push
-  - Bulle flottante
-
-### 6. Abonnements Recurrents - COMPLETE
-- [x] `Subscription.tsx` avec:
-  - Plans: Hebdo (-15%), Bi-mensuel (-10%), Mensuel (-5%)
-  - Configuration multi-etapes
-  - Pause/Reprise facile
-  - Gestion abonnement modal
-  - Calcul prix automatique
-
-### 7. Programme Fidelite - COMPLETE
-- [x] `Loyalty.tsx` avec:
-  - Points: 10pts/EUR (jusqu'a 30pts en Platinum)
-  - Niveaux: Bronze, Silver, Gold, Platinum
-  - Recompenses echangeables
-  - Carte fidelite visuelle
-  - Explainer "Comment ca marche"
-
-### 8. Multi-Services - COMPLETE
-- [x] `Services.tsx` avec:
-  - Lavage Standard (3EUR/kg, 48h)
-  - Lavage Express (5EUR/kg, 24h)
-  - Express 2h (8EUR/kg, collecte 2h) - NOUVEAU
-  - Pressing (5EUR/piece, 72h)
-  - Repassage seul (2EUR/piece, 48h)
-  - Nettoyage Sneakers (15EUR/paire, 5j) - NOUVEAU
-  - Selecteur de service avec cards
-  - Modal details service
-
-### 9. Animations & UI - COMPLETE
-- [x] Skeleton loading (ClientDashboard, WasherDashboard)
-- [x] RippleButton avec effet ripple
-- [x] Animations Tailwind: ripple, shimmer, pulseSoft
-- [x] CountUp pour stats animees
-- [x] FadeInOnScroll pour sections
+| # | Fonctionnalité | Status | Composant |
+|---|----------------|--------|-----------|
+| 1 | Tracking Meta Pixel + GA4 | ✅ DONE | `useAnalytics.ts` |
+| 2 | Social Proof Dynamique | ✅ DONE | `SocialProof.tsx` → Landing |
+| 3 | Système Parrainage | ✅ DONE | `ReferralSystem.tsx` |
+| 4 | Suivi Temps Réel | ✅ DONE | `OrderTracker.tsx` |
+| 5 | Chat In-App | ✅ DONE | `Chat.tsx` |
+| 6 | Abonnements Récurrents | ✅ DONE | `Subscription.tsx` → ClientDashboard |
+| 7 | Programme Fidélité | ✅ DONE | `Loyalty.tsx` → ClientDashboard |
+| 8 | Multi-Services | ✅ DONE | `Services.tsx` → NewOrder |
+| 9 | Express 2h | ✅ DONE | Intégré dans NewOrder |
+| 10 | Pressing/Sneakers | ✅ DONE | Dans `Services.tsx` |
+| 11 | Dashboard Admin Analytics | ✅ DONE | `AdminAnalytics.tsx` |
+| 12 | API Partenaires B2B | ❌ BACKLOG | Nécessite Vercel Functions |
+| 13 | Estimation IA Poids | ❌ BACKLOG | Nécessite Vision AI |
 
 ---
 
-## Fichiers Crees
+## Intégrations Réalisées
+
+### ClientDashboard
+- ✅ Onglets: Commandes / Fidélité / Abonnement
+- ✅ Points fidélité dans les stats
+- ✅ LoyaltyCard avec niveaux
+- ✅ SubscriptionCard ou promo abonnement
+
+### NewOrder
+- ✅ 3 formules: Standard (3€) / Express (5€) / Express 2h (8€)
+- ✅ Badge "NOUVEAU" sur Express 2h
+- ✅ Badge "POPULAIRE" sur Express
+
+### Landing Page
+- ✅ LiveStats avec compteurs animés
+- ✅ LiveReviews avec rotation auto
+- ✅ TrustBadges (SSL, vérifiés, garantie)
+
+### Admin
+- ✅ Route `/admin/analytics` avec Dashboard complet
+- ✅ KPIs: Commandes, CA, Clients, Note moyenne
+- ✅ Graphique commandes par jour
+- ✅ Distribution des statuts
+- ✅ Top villes
+- ✅ Top Washers
+
+---
+
+## Fichiers Créés
 
 ```
 /app/src/
 ├── hooks/
-│   └── useAnalytics.ts          # Tracking Meta Pixel + GA4
+│   └── useAnalytics.ts
 ├── components/
-│   ├── SocialProof.tsx          # Stats live, reviews, badges
-│   ├── ReferralSystem.tsx       # Parrainage multi-niveaux
-│   ├── OrderTracker.tsx         # Suivi temps reel
-│   ├── Chat.tsx                 # Messagerie instantanee
-│   ├── Subscription.tsx         # Abonnements recurrents
-│   ├── Loyalty.tsx              # Programme fidelite
-│   ├── Services.tsx             # Multi-services
+│   ├── SocialProof.tsx
+│   ├── ReferralSystem.tsx
+│   ├── OrderTracker.tsx
+│   ├── Chat.tsx
+│   ├── Subscription.tsx
+│   ├── Loyalty.tsx
+│   ├── Services.tsx
 │   └── animations/
-│       └── Skeleton.tsx         # Loading skeletons
+│       └── Skeleton.tsx
+├── pages/
+│   └── AdminAnalytics.tsx
 └── ...
 ```
 
 ---
 
-## Tables Supabase Requises (a creer si inexistantes)
+## SQL À EXÉCUTER
 
-```sql
--- Subscriptions
-CREATE TABLE IF NOT EXISTS subscriptions (
-  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  user_id UUID REFERENCES auth.users(id),
-  plan TEXT NOT NULL, -- weekly, biweekly, monthly
-  status TEXT DEFAULT 'active', -- active, paused, cancelled
-  weight_kg INTEGER,
-  formula TEXT, -- standard, express
-  pickup_address TEXT,
-  preferred_day TEXT,
-  preferred_slot TEXT,
-  next_pickup TIMESTAMP,
-  price_per_order DECIMAL,
-  discount_percent INTEGER,
-  created_at TIMESTAMP DEFAULT NOW()
-);
+**Fichier unique :** `/app/supabase/KILOLAB_V3_FEATURES.sql`
 
--- Reward Redemptions
-CREATE TABLE IF NOT EXISTS reward_redemptions (
-  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  user_id UUID REFERENCES auth.users(id),
-  reward_id TEXT,
-  reward_name TEXT,
-  points_used INTEGER,
-  created_at TIMESTAMP DEFAULT NOW()
-);
-
--- Add loyalty_points to user_profiles if not exists
-ALTER TABLE user_profiles ADD COLUMN IF NOT EXISTS loyalty_points INTEGER DEFAULT 0;
-```
+Contient:
+- Table `subscriptions` (abonnements)
+- Table `reward_redemptions` (récompenses échangées)
+- Colonnes `loyalty_points`, `loyalty_level` sur `user_profiles`
+- Colonnes de tracking sur `orders` (timestamps, photos, ETA)
+- Colonne `order_id` sur `messages` (chat par commande)
+- Fonctions RPC: `add_loyalty_points`, `deduct_loyalty_points`
+- Trigger `on_order_completed` (ajout auto des points)
 
 ---
 
-## Architecture Technique
+## Stack Technique
 
-### Stack
 - **Frontend**: React 18, TypeScript, Vite, TailwindCSS
-- **Backend**: Supabase (PostgreSQL, Auth, Storage, RLS, Realtime)
-- **Serverless**: Vercel Serverless Functions
+- **Backend**: Supabase (PostgreSQL, Auth, RLS, Realtime)
+- **Date**: date-fns v4
 - **PWA**: vite-plugin-pwa
-
-### Integrations 3rd Party
-- **Supabase** : BDD, Auth, Storage, Realtime
-- **Stripe** : Paiements
-- **Resend** : Emails transactionnels
-- **Firebase** : Push Notifications (PWA)
-- **Meta Pixel** : Tracking conversions
-- **Google Analytics 4** : Analytics (via GTM)
+- **Tracking**: Meta Pixel, Google Analytics 4 (GTM)
 
 ---
 
-## Taches Restantes
+## Tâches Restantes
 
-### P0 - A faire
-- [ ] Creer tables Supabase (subscriptions, reward_redemptions)
-- [ ] Ajouter fonction RPC `deduct_loyalty_points`
-- [ ] Integrer OrderTracker dans ClientDashboard
-- [ ] Integrer Chat dans page commande
+### À Faire par l'utilisateur
+1. ✅ Exécuter `/app/supabase/KILOLAB_V3_FEATURES.sql` sur Supabase
+2. ✅ Déployer sur Vercel
+3. ✅ Tester les nouvelles fonctionnalités
 
-### P1 - Important  
-- [ ] Dashboard Admin Avance (analytics, heatmap)
-- [ ] Estimation IA du poids (photo -> kg)
-- [ ] API Partenaires B2B
-
-### P2 - Future
+### Backlog Futur
+- [ ] Estimation IA du poids (Vision AI)
+- [ ] API Partenaires B2B (Vercel Functions)
 - [ ] App Mobile Native (React Native)
-- [ ] Tests E2E Playwright
+- [ ] Heatmap géographique (Mapbox)
 
 ---
 
-*Derniere mise a jour : 27/12/2025*
+## Routes Ajoutées
+
+| Route | Composant | Protection |
+|-------|-----------|------------|
+| `/admin/analytics` | AdminAnalytics | ProtectedAdminRoute |
+
+---
+
+## Niveaux Fidélité
+
+| Niveau | Points requis | Multiplicateur | Avantages |
+|--------|---------------|----------------|-----------|
+| Bronze | 0 | x1 | 10 pts/€ |
+| Silver | 500 | x1.5 | 15 pts/€, -5% |
+| Gold | 2000 | x2 | 20 pts/€, -10%, 1 Express/mois |
+| Platinum | 5000 | x3 | 30 pts/€, -15%, Express illimité |
+
+---
+
+## Niveaux Parrainage
+
+| Niveau | Filleuls requis | Récompenses |
+|--------|-----------------|-------------|
+| Bronze | 0 | Badge Bronze |
+| Silver | 3 | Badge, 1 Express gratuit |
+| Gold | 10 | Badge, 3 Express, Priorité |
+| Platinum | 25 | Badge, Express illimité, VIP |
+
+---
+
+*Dernière mise à jour : 27/12/2025*
