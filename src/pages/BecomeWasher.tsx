@@ -285,36 +285,21 @@ export default function BecomeWasher() {
 
               {/* BÉNÉFICES */}
               <div className="grid md:grid-cols-3 gap-8 mb-16">
-                <div className="bg-gradient-to-br from-slate-50 to-white p-8 rounded-3xl border border-slate-100 hover:shadow-xl transition-all duration-300 transform hover:scale-105">
-                  <div className="w-14 h-14 bg-gradient-to-br from-teal-500 to-cyan-500 rounded-2xl flex items-center justify-center shadow-lg mb-6 text-white">
-                    <DollarSign size={28} />
-                  </div>
-                  <h3 className="font-bold text-xl mb-3">Revenu Complémentaire</h3>
-                  <p className="text-slate-600 leading-relaxed">
-                    Générez jusqu&apos;à <strong>600€/mois</strong> avec votre équipement. Transformez vos heures creuses en chiffre
-                    d&apos;affaires.
-                  </p>
-                </div>
-
-                <div className="bg-gradient-to-br from-slate-50 to-white p-8 rounded-3xl border border-slate-100 hover:shadow-xl transition-all duration-300 transform hover:scale-105">
-                  <div className="w-14 h-14 bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center shadow-lg mb-6 text-white">
-                    <Home size={28} />
-                  </div>
-                  <h3 className="font-bold text-xl mb-3">100% Flexible &amp; Domicile</h3>
-                  <p className="text-slate-600 leading-relaxed">
-                    Aucune contrainte horaire. Acceptez les missions qui vous arrangent et travaillez depuis votre salon.
-                  </p>
-                </div>
-
-                <div className="bg-gradient-to-br from-slate-50 to-white p-8 rounded-3xl border border-slate-100 hover:shadow-xl transition-all duration-300 transform hover:scale-105">
-                  <div className="w-14 h-14 bg-gradient-to-br from-orange-500 to-red-500 rounded-2xl flex items-center justify-center shadow-lg mb-6 text-white">
-                    <Users size={28} />
-                  </div>
-                  <h3 className="font-bold text-xl mb-3">Rejoignez le Réseau</h3>
-                  <p className="text-slate-600 leading-relaxed">
-                    Intégrez la première communauté nationale de Washers certifiés. Une plateforme sécurisée et une gestion simplifiée.
-                  </p>
-                </div>
+                {[
+                  { icon: <DollarSign size={28} />, title: 'Revenu Complémentaire', desc: "Générez jusqu'à 600€/mois avec votre équipement. Transformez vos heures creuses en chiffre d'affaires.", gradient: 'from-teal-500 to-cyan-500', delay: 100 },
+                  { icon: <Home size={28} />, title: '100% Flexible & Domicile', desc: "Aucune contrainte horaire. Acceptez les missions qui vous arrangent et travaillez depuis votre salon.", gradient: 'from-purple-500 to-pink-500', delay: 200 },
+                  { icon: <Users size={28} />, title: 'Rejoignez le Réseau', desc: "Intégrez la première communauté nationale de Washers certifiés. Une plateforme sécurisée et une gestion simplifiée.", gradient: 'from-orange-500 to-red-500', delay: 300 },
+                ].map((item, idx) => (
+                  <FadeInOnScroll key={idx} direction="up" delay={item.delay}>
+                    <div className="bg-gradient-to-br from-slate-50 to-white p-8 rounded-3xl border border-slate-100 hover:shadow-xl transition-all duration-300 transform hover:scale-105 hover:-translate-y-1">
+                      <div className={`w-14 h-14 bg-gradient-to-br ${item.gradient} rounded-2xl flex items-center justify-center shadow-lg mb-6 text-white`}>
+                        {item.icon}
+                      </div>
+                      <h3 className="font-bold text-xl mb-3">{item.title}</h3>
+                      <p className="text-slate-600 leading-relaxed">{item.desc}</p>
+                    </div>
+                  </FadeInOnScroll>
+                ))}
               </div>
 
               {/* COMMENT ÇA MARCHE */}
