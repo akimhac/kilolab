@@ -108,10 +108,12 @@ export default function Tarifs() {
               >
                 Choisir Standard
               </Link>
-            </div>
+              </div>
+            </AnimateOnScroll>
 
             {/* EXPRESS */}
-            <div className="bg-slate-900 text-white rounded-3xl p-8 shadow-2xl border-2 border-teal-500 flex flex-col relative transform md:scale-105 hover:scale-110 transition duration-300">
+            <AnimateOnScroll delay={150}>
+              <div className="bg-slate-900 text-white rounded-3xl p-8 shadow-2xl border-2 border-teal-500 flex flex-col relative transform md:scale-105 hover:scale-110 transition duration-300 h-full">
               <div className="absolute top-4 right-4 bg-teal-500 text-white text-xs font-bold px-3 py-1 rounded-full uppercase">
                 Populaire
               </div>
