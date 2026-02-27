@@ -467,21 +467,26 @@ export default function Landing() {
                     </Link>
                   </div>
                 </div>
+                </FadeInOnScroll>
               </div>
 
               {/* Bottom highlight */}
-              <div className="mt-12 text-center">
-                <div className="inline-flex items-center gap-4 bg-gradient-to-r from-teal-600 to-cyan-600 text-white px-8 py-5 rounded-2xl">
-                  <Sparkles size={24} />
-                  <div className="text-left">
-                    <p className="font-heading font-bold text-lg">Le vrai coût, c'est votre temps</p>
-                    <p className="text-teal-100 text-sm">
-                      Pour seulement <strong className="text-white">{(kilolabPrice - diyMaterialTotal).toFixed(2)}€ de plus</strong>, vous récupérez{" "}
-                      <strong className="text-white">{timeSaved}h de vie</strong>
-                    </p>
-                  </div>
+              <FadeInOnScroll delay={400}>
+                <div className="mt-12 text-center">
+                  <FloatingElement duration={4} distance={8}>
+                    <div className="inline-flex items-center gap-4 bg-gradient-to-r from-teal-600 to-cyan-600 text-white px-8 py-5 rounded-2xl shadow-xl">
+                      <Sparkles size={24} />
+                      <div className="text-left">
+                        <p className="font-heading font-bold text-lg">Le vrai coût, c'est votre temps</p>
+                        <p className="text-teal-100 text-sm">
+                          Pour seulement <strong className="text-white">{(kilolabPrice - diyMaterialTotal).toFixed(2)}€ de plus</strong>, vous récupérez{" "}
+                          <strong className="text-white">{timeSaved}h de vie</strong>
+                        </p>
+                      </div>
+                    </div>
+                  </FloatingElement>
                 </div>
-              </div>
+              </FadeInOnScroll>
             </div>
           </div>
         </section>
@@ -493,11 +498,12 @@ export default function Landing() {
           <div className="max-w-7xl mx-auto">
             <div className="grid md:grid-cols-2 gap-12 md:gap-20 items-center">
               {/* Images */}
-              <div className="relative">
-                <div className="grid grid-cols-2 gap-4 relative">
-                  <img
-                    src="https://images.unsplash.com/photo-1555400038-63f5ba517a47?w=800&auto=format&fit=crop"
-                    alt="Inspiration Bali"
+              <FadeInOnScroll direction="left">
+                <div className="relative">
+                  <div className="grid grid-cols-2 gap-4 relative">
+                    <img
+                      src="https://images.unsplash.com/photo-1555400038-63f5ba517a47?w=800&auto=format&fit=crop"
+                      alt="Inspiration Bali"
                     className="rounded-2xl shadow-soft transform -rotate-2 hover:rotate-0 transition-transform duration-500"
                     loading="lazy"
                   />
