@@ -149,9 +149,9 @@ function MissionModal({ mission, onClose, onAccept, onUpdate, isActive }: {
 }
 
 /* ── STAT CARD ── */
-function StatCard({ icon, label, value, accent }: { icon: React.ReactNode; label: string; value: string | number; accent: string }) {
+function StatCard({ icon, label, value, accent }: { icon: React.ReactNode; label: string; value: React.ReactNode; accent: string }) {
   return (
-    <div className="relative bg-[#0f1729] border border-white/8 rounded-2xl p-5 overflow-hidden group hover:border-white/15 transition-all">
+    <div className="relative bg-[#0f1729] border border-white/8 rounded-2xl p-5 overflow-hidden group hover:border-white/15 hover:scale-[1.02] transition-all duration-300">
       <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
         style={{ background: `radial-gradient(ellipse at 0% 0%, ${accent}15 0%, transparent 60%)` }} />
       <div className="relative">
