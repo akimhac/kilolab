@@ -414,11 +414,9 @@ export default function WasherDashboard() {
   const historyMissions = useMemo(() => myMissions.filter(m => m.status === "completed"), [myMissions]);
 
   if (loading) return (
-    <div className="min-h-screen bg-[#080e1d] flex items-center justify-center">
-      <div className="text-center">
-        <Loader2 className="animate-spin text-teal-500 mx-auto mb-4" size={48} />
-        <p className="text-white/50 font-medium">Chargement...</p>
-      </div>
+    <div className="min-h-screen bg-[#080e1d]">
+      <Navbar />
+      <WasherDashboardSkeleton />
     </div>
   );
 
