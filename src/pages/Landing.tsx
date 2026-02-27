@@ -504,18 +504,18 @@ export default function Landing() {
                     <img
                       src="https://images.unsplash.com/photo-1555400038-63f5ba517a47?w=800&auto=format&fit=crop"
                       alt="Inspiration Bali"
-                    className="rounded-2xl shadow-soft transform -rotate-2 hover:rotate-0 transition-transform duration-500"
-                    loading="lazy"
-                  />
-                  <img
-                    src="https://images.unsplash.com/photo-1604335399105-a0c585fd81a1?w=800&auto=format&fit=crop"
-                    alt="Linge propre"
-                    className="rounded-2xl shadow-soft transform rotate-2 hover:rotate-0 transition-transform duration-500 mt-12"
-                    loading="lazy"
-                  />
+                      className="rounded-2xl shadow-soft transform -rotate-2 hover:rotate-0 transition-transform duration-500"
+                      loading="lazy"
+                    />
+                    <img
+                      src="https://images.unsplash.com/photo-1604335399105-a0c585fd81a1?w=800&auto=format&fit=crop"
+                      alt="Linge propre"
+                      className="rounded-2xl shadow-soft transform rotate-2 hover:rotate-0 transition-transform duration-500 mt-12"
+                      loading="lazy"
+                    />
+                  </div>
+                  <div className="absolute -z-10 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-gradient-to-br from-teal-100/50 to-cyan-100/50 rounded-full blur-3xl" />
                 </div>
-                <div className="absolute -z-10 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-gradient-to-br from-teal-100/50 to-cyan-100/50 rounded-full blur-3xl" />
-              </div>
               </FadeInOnScroll>
 
               {/* Content */}
