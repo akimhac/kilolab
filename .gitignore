@@ -11,3 +11,7 @@ dist/
 node_modules
 dist
 .env*
+-e 
+# Environment files
+*.env
+*.env.*
