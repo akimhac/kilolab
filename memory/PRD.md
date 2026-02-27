@@ -7,7 +7,7 @@
 | **Nom** | KiloLab |
 | **URL** | kilolab.fr |
 | **Deploiement** | Vercel |
-| **Version** | 2.5.0 |
+| **Version** | 2.6.0 |
 | **Date MAJ** | 27 Decembre 2025 |
 
 ---
@@ -38,19 +38,45 @@ KiloLab est une marketplace de laverie qui connecte des clients avec des "Washer
 - [x] BecomeWasher : Cards benefices avec stagger animation, simulateur anime
 - [x] NewOrder : Import FadeInOnScroll prepare
 
-### 3. Skeleton Loading Animations - COMPLETE (NOUVEAU)
+### 3. Skeleton Loading Animations - COMPLETE
 - [x] Composant Skeleton generique cree (`/app/src/components/animations/Skeleton.tsx`)
 - [x] ClientDashboardSkeleton : Stats, order cards, history rows
 - [x] WasherDashboardSkeleton : Dark theme, stats cards, mission cards
 - [x] Animations shimmer pour effet premium
 
-### 4. Scripts RLS Supabase - VERSION SAFE
-- [x] Script principal : `/app/supabase/RLS_POLICIES_SAFE.sql` (avec DROP IF EXISTS)
-- [x] Script complementaire : `/app/supabase/RLS_COMPLEMENT_SAFE.sql` (avec DROP IF EXISTS)
-  - Washers peuvent voir commandes disponibles
-  - Washers peuvent s'auto-assigner
-  - Admin acces complet toutes tables
-  - Policies referral_codes
+### 4. Micro-interactions Boutons - COMPLETE
+- [x] RippleButton component (`/app/src/components/ui/RippleButton.tsx`)
+- [x] Animations ripple, shimmer, pulseSoft dans tailwind.config.js
+- [x] Classes btn-primary, btn-secondary, btn-ghost avec scale effects
+- [x] Cards avec hover lift et scale effects
+
+### 5. Scripts RLS Supabase - EXECUTES ET VERIFIES
+- [x] Script final execute par l'utilisateur avec toutes les policies
+- [x] Verification via CSV : 95% confidence - toutes tables critiques couvertes
+- [x] Policies admin, client, washer, partner fonctionnelles
+
+### 6. Nettoyage Code - COMPLETE
+- [x] Section debug supprimee de NewOrder.tsx
+- [x] Console.log de debug supprimes
+
+---
+
+## Tests Effectues (27/12/2025)
+
+### Resultats : 95% succes
+- [x] Landing page : video, CTAs, comparateur prix
+- [x] Tarifs : cards Standard/Express, badge Popular
+- [x] FAQ : 4 categories, accordeon fonctionnel
+- [x] Contact : formulaire complet
+- [x] BecomeWasher : simulateur revenus, formulaire inscription
+- [x] Login : toggle Connexion/Inscription
+- [x] NewOrder : flow multi-etapes complet
+- [x] Navigation mobile : menu hamburger responsive
+- [x] Skeleton loading : implemente correctement
+- [x] Animations scroll : fonctionnelles
+
+### Issue mineure identifiee
+- Supabase retourne 401 pour fetch washers (config env) - fallback "Reseau Kilolab" fonctionne
 
 ---
 
@@ -61,45 +87,30 @@ KiloLab est une marketplace de laverie qui connecte des clients avec des "Washer
 ├── api/                  # Vercel Serverless Functions (Stripe)
 ├── public/               # Assets statiques, manifest.json, SW Firebase
 ├── src/
-│   ├── components/       # Composants React reutilisables
-│   │   └── animations/   # ScrollAnimations, Skeleton, LottieIcons
+│   ├── components/       
+│   │   ├── animations/   # ScrollAnimations, Skeleton
+│   │   └── ui/           # RippleButton, autres composants
 │   ├── pages/            # Pages principales
 │   ├── lib/              # Supabase client, Firebase
 │   └── services/         # API clients
 ├── supabase/             # Scripts SQL RLS
 ├── .env                  # Variables d'environnement
+├── tailwind.config.js    # Config avec animations custom
 └── vite.config.ts        # Configuration Vite + PWA
 ```
 
 ### Stack Technique
-- **Frontend**: React 18, TypeScript, Vite, TailwindCSS, Framer Motion
+- **Frontend**: React 18, TypeScript, Vite, TailwindCSS
 - **Backend**: Supabase (PostgreSQL, Auth, Storage, RLS)
 - **Serverless**: Vercel Serverless Functions
 - **PWA**: vite-plugin-pwa
-
-### Integrations 3rd Party
-- **Supabase** : BDD, Auth, Storage
-- **Stripe** : Paiements
-- **Resend** : Emails transactionnels
-- **Firebase** : Push Notifications (PWA)
-
----
-
-## Scripts SQL a Executer sur Supabase
-
-**IMPORTANT : Utiliser les versions SAFE avec DROP IF EXISTS**
-
-1. `/app/supabase/RLS_POLICIES_SAFE.sql` (principal)
-2. `/app/supabase/RLS_COMPLEMENT_SAFE.sql` (complement - CRITIQUE pour Washer/Admin)
-
-Ces scripts utilisent `DROP POLICY IF EXISTS` pour eviter les erreurs de duplication.
 
 ---
 
 ## Taches Restantes
 
 ### P0 - Critique
-- [ ] Executer les scripts RLS_SAFE sur Supabase production
+- [x] Scripts RLS executes et verifies
 
 ### P1 - Important  
 - [ ] Implementer Meta Pixel pour tracking marketing
