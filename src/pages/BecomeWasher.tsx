@@ -303,25 +303,27 @@ export default function BecomeWasher() {
               </div>
 
               {/* COMMENT ÇA MARCHE */}
-              <div className="bg-slate-900 text-white rounded-3xl p-8 md:p-12 mb-16">
-                <h2 className="text-3xl font-black mb-8 text-center">Comment ça marche ?</h2>
-                <div className="grid md:grid-cols-4 gap-6">
-                  {[
-                    { n: 1, t: 'Inscrivez-vous', d: 'Remplissez le formulaire en 3 minutes' },
-                    { n: 2, t: 'Validation rapide', d: 'Nous vérifions votre profil sous 24h' },
-                    { n: 3, t: 'Recevez des missions', d: 'Acceptez les commandes près de chez vous' },
-                    { n: 4, t: 'Soyez payé', d: 'Virement automatique chaque dimanche' },
-                  ].map((s) => (
-                    <div key={s.n} className="text-center">
-                      <div className="w-16 h-16 bg-teal-500 rounded-full flex items-center justify-center text-2xl font-black mx-auto mb-4">
-                        {s.n}
+              <FadeInOnScroll direction="up" delay={400}>
+                <div className="bg-slate-900 text-white rounded-3xl p-8 md:p-12 mb-16">
+                  <h2 className="text-3xl font-black mb-8 text-center">Comment ça marche ?</h2>
+                  <div className="grid md:grid-cols-4 gap-6">
+                    {[
+                      { n: 1, t: 'Inscrivez-vous', d: 'Remplissez le formulaire en 3 minutes' },
+                      { n: 2, t: 'Validation rapide', d: 'Nous vérifions votre profil sous 24h' },
+                      { n: 3, t: 'Recevez des missions', d: 'Acceptez les commandes près de chez vous' },
+                      { n: 4, t: 'Soyez payé', d: 'Virement automatique chaque dimanche' },
+                    ].map((s, idx) => (
+                      <div key={s.n} className="text-center" style={{ animationDelay: `${idx * 150}ms` }}>
+                        <div className="w-16 h-16 bg-teal-500 rounded-full flex items-center justify-center text-2xl font-black mx-auto mb-4 hover:scale-110 transition-transform duration-300">
+                          {s.n}
+                        </div>
+                        <h3 className="font-bold mb-2">{s.t}</h3>
+                        <p className="text-slate-400 text-sm">{s.d}</p>
                       </div>
-                      <h3 className="font-bold mb-2">{s.t}</h3>
-                      <p className="text-slate-400 text-sm">{s.d}</p>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
                 </div>
-              </div>
+              </FadeInOnScroll>
 
               {/* SIMULATEUR */}
               <div className="bg-gradient-to-br from-teal-50 to-cyan-50 rounded-3xl p-8 md:p-12 border-2 border-teal-200">
