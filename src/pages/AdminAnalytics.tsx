@@ -62,6 +62,7 @@ export default function AdminAnalytics() {
   const [ordersByStatus, setOrdersByStatus] = useState<OrdersByStatus[]>([]);
   const [topWashers, setTopWashers] = useState<TopWasher[]>([]);
   const [refreshing, setRefreshing] = useState(false);
+  const [showHeatmap, setShowHeatmap] = useState(true);
 
   useEffect(() => {
     fetchAnalytics();
