@@ -391,10 +391,12 @@ export default function Landing() {
                     </div>
                   </div>
                 </div>
+                </FadeInOnScroll>
 
                 {/* Kilolab Card */}
-                <div className="relative bg-gradient-to-br from-teal-50 to-cyan-50 rounded-3xl p-6 md:p-8 border-2 border-teal-200 overflow-hidden">
-                  <div className="absolute top-0 right-0 w-40 h-40 bg-teal-200/30 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+                <FadeInOnScroll delay={300} direction="right">
+                  <div className="relative bg-gradient-to-br from-teal-50 to-cyan-50 rounded-3xl p-6 md:p-8 border-2 border-teal-200 overflow-hidden h-full">
+                    <div className="absolute top-0 right-0 w-40 h-40 bg-teal-200/30 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
                   
                   {/* Recommended badge */}
                   <div className="absolute top-4 right-4 bg-gradient-to-r from-yellow-400 to-orange-400 text-slate-900 px-3 py-1 rounded-full text-xs font-bold shadow-lg">
