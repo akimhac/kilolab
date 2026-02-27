@@ -509,27 +509,29 @@ export default function ClientDashboard() {
         )}
         {profile && stats.totalOrders >= 1 && <FadeInOnScroll direction="up" delay={300}><div className="mb-8"><ReferralCard profile={profile} /></div></FadeInOnScroll>}
         {pastOrders.length > 0 && (
-          <div>
-            <div className="flex items-center justify-between mb-3">
-              <h2 className="font-black text-slate-900 flex items-center gap-2">
-                <Clock size={16} className="text-slate-400" /> Historique
-                <span className="text-sm font-normal text-slate-400">({pastOrders.length})</span>
-              </h2>
+          <FadeInOnScroll direction="up" delay={400}>
+            <div>
+              <div className="flex items-center justify-between mb-3">
+                <h2 className="font-black text-slate-900 flex items-center gap-2">
+                  <Clock size={16} className="text-slate-400" /> Historique
+                  <span className="text-sm font-normal text-slate-400">({pastOrders.length})</span>
+                </h2>
+              </div>
+              <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden hover:shadow-md transition-all duration-300">
+                {displayed.map(order => <HistoryRow key={order.id} order={order} onRate={setRatingOrder} />)}
+              </div>
+              {pastOrders.length > 5 && (
+                <button onClick={() => setShowAllHistory(!showAllHistory)} className="w-full mt-3 py-3 bg-white border border-slate-200 rounded-2xl text-slate-500 font-bold text-sm hover:bg-slate-50 hover:scale-[1.02] transition-all duration-300 flex items-center justify-center gap-2">
+                  {showAllHistory ? <><ChevronUp size={15} /> Reduire</> : <><ChevronDown size={15} /> {pastOrders.length - 5} de plus</>}
+                </button>
+              )}
+              <div className="mt-5 text-center">
+                <button onClick={() => window.location.href = '/new-order'} className="text-teal-500 font-bold text-sm hover:underline inline-flex items-center gap-1 hover:gap-2 transition-all duration-300">
+                  Commander a nouveau <ArrowRight size={13} />
+                </button>
+              </div>
             </div>
-            <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-              {displayed.map(order => <HistoryRow key={order.id} order={order} onRate={setRatingOrder} />)}
-            </div>
-            {pastOrders.length > 5 && (
-              <button onClick={() => setShowAllHistory(!showAllHistory)} className="w-full mt-3 py-3 bg-white border border-slate-200 rounded-2xl text-slate-500 font-bold text-sm hover:bg-slate-50 transition flex items-center justify-center gap-2">
-                {showAllHistory ? <><ChevronUp size={15} /> Reduire</> : <><ChevronDown size={15} /> {pastOrders.length - 5} de plus</>}
-              </button>
-            )}
-            <div className="mt-5 text-center">
-              <button onClick={() => window.location.href = '/new-order'} className="text-teal-500 font-bold text-sm hover:underline inline-flex items-center gap-1">
-                Commander a nouveau <ArrowRight size={13} />
-              </button>
-            </div>
-          </div>
+          </FadeInOnScroll>
         )}
         {!hasNoOrders && <p className="text-center text-xs text-slate-300 mt-8">Mise a jour automatique toutes les 30s</p>}
       </div>
