@@ -153,7 +153,11 @@
   }
   
   .card-interactive {
-    @apply card cursor-pointer hover:-translate-y-1 active:scale-[0.99];
+    @apply card cursor-pointer hover:-translate-y-1 hover:scale-[1.01] active:scale-[0.99];
+  }
+  
+  .card-hover-lift {
+    @apply transition-all duration-300 hover:shadow-xl hover:-translate-y-2 hover:scale-[1.02];
   }
 }
 
