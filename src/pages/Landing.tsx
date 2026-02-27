@@ -268,46 +268,51 @@ export default function Landing() {
             </div>
 
             {/* Press mentions */}
-            <div className="text-center">
-              <p className="text-xs text-slate-400 uppercase tracking-widest font-semibold mb-6">
-                Ils parlent de nous
-              </p>
-              <div className="flex flex-wrap justify-center items-center gap-x-12 gap-y-4 opacity-30 grayscale">
-                {["TechCrunch", "Le Figaro", "BFM Business", "Les Échos"].map((name) => (
-                  <span key={name} className="text-xl md:text-2xl font-heading font-bold text-slate-700">
-                    {name}
-                  </span>
-                ))}
+            <FadeInOnScroll delay={400}>
+              <div className="text-center">
+                <p className="text-xs text-slate-400 uppercase tracking-widest font-semibold mb-6">
+                  Ils parlent de nous
+                </p>
+                <div className="flex flex-wrap justify-center items-center gap-x-12 gap-y-4 opacity-30 grayscale">
+                  {["TechCrunch", "Le Figaro", "BFM Business", "Les Échos"].map((name) => (
+                    <span key={name} className="text-xl md:text-2xl font-heading font-bold text-slate-700">
+                      {name}
+                    </span>
+                  ))}
+                </div>
               </div>
-            </div>
+            </FadeInOnScroll>
           </div>
         </section>
 
         {/* COST COMPARISON - Premium Card Style */}
         <section className="py-24 bg-white">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center mb-16">
-              <span className="inline-block px-4 py-1.5 bg-orange-100 text-orange-700 rounded-full text-sm font-semibold mb-4">
-                Calculateur
-              </span>
-              <h2 className="font-heading text-3xl md:text-5xl font-bold text-slate-900 mb-6">
-                Le coût caché de votre lessive
-              </h2>
-              <p className="text-lg text-slate-600 max-w-2xl mx-auto">
-                Entre l'eau, l'électricité, les produits et votre temps... faire sa lessive coûte plus cher qu'on ne le pense.
-              </p>
-            </div>
+            <FadeInOnScroll>
+              <div className="text-center mb-16">
+                <span className="inline-block px-4 py-1.5 bg-orange-100 text-orange-700 rounded-full text-sm font-semibold mb-4">
+                  Calculateur
+                </span>
+                <h2 className="font-heading text-3xl md:text-5xl font-bold text-slate-900 mb-6">
+                  Le coût caché de votre lessive
+                </h2>
+                <p className="text-lg text-slate-600 max-w-2xl mx-auto">
+                  Entre l'eau, l'électricité, les produits et votre temps... faire sa lessive coûte plus cher qu'on ne le pense.
+                </p>
+              </div>
+            </FadeInOnScroll>
 
             <div className="max-w-5xl mx-auto">
               {/* Weight Slider */}
-              <div className="bg-slate-50 rounded-2xl p-6 md:p-8 mb-8 border border-slate-100">
-                <div className="flex items-center justify-between mb-4">
-                  <span className="text-sm font-medium text-slate-600">Simulez avec votre volume</span>
-                  <span className="text-2xl font-heading font-bold text-teal-600">{weight} kg</span>
-                </div>
-                <input
-                  type="range"
-                  min="3"
+              <FadeInOnScroll delay={100}>
+                <div className="bg-slate-50 rounded-2xl p-6 md:p-8 mb-8 border border-slate-100">
+                  <div className="flex items-center justify-between mb-4">
+                    <span className="text-sm font-medium text-slate-600">Simulez avec votre volume</span>
+                    <span className="text-2xl font-heading font-bold text-teal-600">{weight} kg</span>
+                  </div>
+                  <input
+                    type="range"
+                    min="3"
                   max="15"
                   step="1"
                   value={weight}
