@@ -121,24 +121,19 @@ export default function NewOrder() {
   // ✅ FIX CRITIQUE : récupérer TOUS les washers approuvés (SANS filtre is_available)
   const fetchWashers = async () => {
     try {
-      console.log("🔍 Chargement des Washers...");
-
       const { data, error } = await supabase
         .from("washers")
         .select("id, full_name, city, postal_code, lat, lng, is_available")
         .eq("status", "approved");
-      // ✅ SUPPRIMÉ : .eq("is_available", true)
 
       if (error) {
-        console.error("❌ Erreur fetch washers:", error);
+        // Silently handle error - fallback to "Réseau Kilolab" will be shown
         return;
       }
 
-      console.log("✅ Washers chargés:", data?.length || 0);
-      console.log("📊 Détails Washers:", data);
       setAllWashers(data || []);
-    } catch (error) {
-      console.error("❌ Erreur fetchWashers:", error);
+    } catch {
+      // Silently handle error
     }
   };
 
