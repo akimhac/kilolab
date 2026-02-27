@@ -491,6 +491,15 @@ export default function NewOrder() {
                 <Scale className="text-teal-500" /> Quel poids de linge ?
               </h2>
 
+              {/* AI Estimation Button */}
+              <button
+                onClick={() => setShowWeightEstimator(true)}
+                className="mb-6 w-full py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-2xl font-bold flex items-center justify-center gap-2 hover:shadow-lg transition-all"
+              >
+                <Camera size={20} />
+                📸 Estimer avec une photo (IA)
+              </button>
+
               <div className="mb-8">
                 <div className="text-7xl font-black text-teal-600 mb-3">
                   {weight} <span className="text-3xl text-slate-400 font-normal">kg</span>
