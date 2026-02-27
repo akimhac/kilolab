@@ -417,11 +417,9 @@ export default function ClientDashboard() {
   };
 
   if (loading) return (
-    <div className="min-h-screen bg-slate-50"><Navbar />
-      <div className="flex items-center justify-center h-[80vh]">
-        <div className="text-center"><Loader2 className="animate-spin mx-auto mb-3 text-teal-500" size={36} />
-          <p className="text-slate-400 text-sm">Chargement...</p></div>
-      </div>
+    <div className="min-h-screen bg-slate-50">
+      <Navbar />
+      <ClientDashboardSkeleton />
     </div>
   );
 
