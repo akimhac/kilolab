@@ -1,0 +1,286 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "search": "Search",
+    "filter": "Filter",
+    "close": "Close",
+    "confirm": "Confirm",
+    "yes": "Yes",
+    "no": "No",
+    "or": "or",
+    "and": "and",
+    "error": "Error",
+    "success": "Success"
+  },
+  "nav": {
+    "home": "Home",
+    "pricing": "Pricing",
+    "faq": "FAQ",
+    "contact": "Contact",
+    "login": "Login",
+    "signup": "Sign up",
+    "dashboard": "Dashboard",
+    "newOrder": "New order",
+    "settings": "Settings",
+    "logout": "Logout",
+    "becomeWasher": "Become a Washer"
+  },
+  "landing": {
+    "hero": {
+      "title": "Your laundry, washed and delivered",
+      "subtitle": "Premium home laundry service. Pickup and delivery within 24 hours.",
+      "cta": "Order now",
+      "ctaSecondary": "View pricing"
+    },
+    "stats": {
+      "orders": "Orders",
+      "clients": "Happy clients",
+      "washers": "Active Washers",
+      "cities": "Cities"
+    },
+    "howItWorks": {
+      "title": "How it works",
+      "step1": {
+        "title": "Order",
+        "description": "Choose your plan and schedule your pickup"
+      },
+      "step2": {
+        "title": "Pickup",
+        "description": "A Washer picks up your laundry at home"
+      },
+      "step3": {
+        "title": "Washing",
+        "description": "Your laundry is carefully washed"
+      },
+      "step4": {
+        "title": "Delivery",
+        "description": "Your clean laundry is delivered to you"
+      }
+    },
+    "pricing": {
+      "title": "Our pricing",
+      "perKg": "/ kg",
+      "standard": {
+        "name": "Standard",
+        "time": "48h",
+        "description": "Delivery within 48 hours"
+      },
+      "express": {
+        "name": "Express",
+        "time": "24h",
+        "description": "Delivery within 24 hours",
+        "popular": "Popular"
+      },
+      "express2h": {
+        "name": "Express 2h",
+        "time": "2h",
+        "description": "Delivery in 2 hours",
+        "new": "New"
+      }
+    },
+    "trust": {
+      "title": "They trust us",
+      "secure": "Secure payment",
+      "verified": "Verified Washers",
+      "guarantee": "Satisfaction guaranteed"
+    }
+  },
+  "auth": {
+    "login": {
+      "title": "Login",
+      "email": "Email",
+      "password": "Password",
+      "submit": "Log in",
+      "forgotPassword": "Forgot password?",
+      "noAccount": "Don't have an account?",
+      "signupLink": "Sign up"
+    },
+    "signup": {
+      "title": "Sign up",
+      "firstName": "First name",
+      "lastName": "Last name",
+      "email": "Email",
+      "phone": "Phone",
+      "password": "Password",
+      "confirmPassword": "Confirm password",
+      "submit": "Sign up",
+      "hasAccount": "Already have an account?",
+      "loginLink": "Log in",
+      "terms": "By signing up, you agree to our",
+      "termsLink": "terms of service"
+    },
+    "forgotPassword": {
+      "title": "Forgot password",
+      "description": "Enter your email to receive a reset link",
+      "submit": "Send",
+      "backToLogin": "Back to login"
+    }
+  },
+  "order": {
+    "title": "New order",
+    "steps": {
+      "formula": "Plan",
+      "weight": "Weight",
+      "location": "Location",
+      "schedule": "Schedule",
+      "payment": "Payment"
+    },
+    "formula": {
+      "title": "Choose your plan",
+      "standard": "Standard",
+      "express": "Express",
+      "express2h": "Express 2h"
+    },
+    "weight": {
+      "title": "Estimate weight",
+      "kg": "kg",
+      "aiEstimate": "Estimate with a photo",
+      "aiDescription": "Take a photo of your laundry for an AI estimate"
+    },
+    "location": {
+      "title": "Pickup address",
+      "placeholder": "Enter your postal code or city",
+      "search": "Search"
+    },
+    "schedule": {
+      "title": "Choose a time slot",
+      "pickup": "Pickup",
+      "delivery": "Delivery"
+    },
+    "summary": {
+      "title": "Summary",
+      "formula": "Plan",
+      "weight": "Estimated weight",
+      "subtotal": "Subtotal",
+      "discount": "Discount",
+      "total": "Total",
+      "pay": "Pay"
+    }
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "tabs": {
+      "orders": "Orders",
+      "loyalty": "Loyalty",
+      "subscription": "Subscription",
+      "referral": "Referral"
+    },
+    "orders": {
+      "active": "Active orders",
+      "past": "Order history",
+      "empty": "No orders",
+      "emptyDescription": "You don't have any orders yet",
+      "newOrder": "New order"
+    },
+    "status": {
+      "pending": "Pending",
+      "assigned": "Assigned",
+      "picked_up": "Picked up",
+      "washing": "Washing",
+      "ready": "Ready",
+      "delivering": "Delivering",
+      "delivered": "Delivered",
+      "cancelled": "Cancelled"
+    },
+    "loyalty": {
+      "title": "Loyalty program",
+      "points": "Points",
+      "level": "Level",
+      "nextLevel": "Next level",
+      "rewards": "Available rewards"
+    },
+    "subscription": {
+      "title": "My subscription",
+      "noSubscription": "No active subscription",
+      "subscribe": "Subscribe",
+      "weekly": "Weekly",
+      "biweekly": "Bi-weekly",
+      "monthly": "Monthly"
+    },
+    "referral": {
+      "title": "Referral",
+      "code": "Your code",
+      "share": "Share",
+      "referrals": "Referrals",
+      "reward": "Earn 100 points per referral"
+    }
+  },
+  "tracking": {
+    "title": "Live tracking",
+    "washerOnWay": "Your Washer is on the way",
+    "eta": "Estimated arrival",
+    "minutes": "min",
+    "contactWasher": "Contact",
+    "liveLocation": "Live location"
+  },
+  "settings": {
+    "title": "Settings",
+    "tabs": {
+      "profile": "Profile",
+      "notifications": "Notifications",
+      "security": "Security"
+    },
+    "profile": {
+      "title": "Personal information",
+      "firstName": "First name",
+      "lastName": "Last name",
+      "email": "Email",
+      "phone": "Phone",
+      "address": "Default address"
+    },
+    "notifications": {
+      "title": "Push notifications",
+      "enabled": "Enabled",
+      "disabled": "Disabled",
+      "enable": "Enable",
+      "orderUpdates": "Order updates",
+      "washerAssigned": "Washer assigned",
+      "ready": "Laundry ready",
+      "messages": "New messages"
+    },
+    "security": {
+      "password": "Password",
+      "changePassword": "Change password",
+      "logout": "Logout",
+      "deleteAccount": "Delete my account",
+      "deleteWarning": "This action is irreversible"
+    },
+    "language": {
+      "title": "Language",
+      "fr": "Français",
+      "en": "English"
+    }
+  },
+  "chat": {
+    "title": "Messages",
+    "placeholder": "Write a message...",
+    "send": "Send",
+    "washer": "Washer"
+  },
+  "footer": {
+    "about": "About",
+    "legal": "Legal",
+    "cgu": "Terms of Service",
+    "cgv": "Sales Terms",
+    "privacy": "Privacy",
+    "cookies": "Cookies",
+    "contact": "Contact",
+    "followUs": "Follow us"
+  },
+  "errors": {
+    "generic": "An error occurred",
+    "network": "Connection error",
+    "unauthorized": "Unauthorized",
+    "notFound": "Page not found",
+    "invalidCredentials": "Invalid email or password",
+    "emailRequired": "Email required",
+    "passwordRequired": "Password required"
+  }
+}

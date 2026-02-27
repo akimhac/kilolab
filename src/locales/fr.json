@@ -1,0 +1,286 @@
+{
+  "common": {
+    "loading": "Chargement...",
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "back": "Retour",
+    "next": "Suivant",
+    "previous": "Précédent",
+    "search": "Rechercher",
+    "filter": "Filtrer",
+    "close": "Fermer",
+    "confirm": "Confirmer",
+    "yes": "Oui",
+    "no": "Non",
+    "or": "ou",
+    "and": "et",
+    "error": "Erreur",
+    "success": "Succès"
+  },
+  "nav": {
+    "home": "Accueil",
+    "pricing": "Tarifs",
+    "faq": "FAQ",
+    "contact": "Contact",
+    "login": "Connexion",
+    "signup": "Inscription",
+    "dashboard": "Tableau de bord",
+    "newOrder": "Nouvelle commande",
+    "settings": "Paramètres",
+    "logout": "Déconnexion",
+    "becomeWasher": "Devenir Washer"
+  },
+  "landing": {
+    "hero": {
+      "title": "Votre linge, lavé et livré",
+      "subtitle": "Service de blanchisserie premium à domicile. Collecte et livraison en 24h.",
+      "cta": "Commander maintenant",
+      "ctaSecondary": "Voir les tarifs"
+    },
+    "stats": {
+      "orders": "Commandes",
+      "clients": "Clients satisfaits",
+      "washers": "Washers actifs",
+      "cities": "Villes"
+    },
+    "howItWorks": {
+      "title": "Comment ça marche",
+      "step1": {
+        "title": "Commandez",
+        "description": "Choisissez votre formule et programmez votre collecte"
+      },
+      "step2": {
+        "title": "Collecte",
+        "description": "Un Washer récupère votre linge à domicile"
+      },
+      "step3": {
+        "title": "Lavage",
+        "description": "Votre linge est lavé avec soin en laverie"
+      },
+      "step4": {
+        "title": "Livraison",
+        "description": "Votre linge propre est livré chez vous"
+      }
+    },
+    "pricing": {
+      "title": "Nos tarifs",
+      "perKg": "/ kg",
+      "standard": {
+        "name": "Standard",
+        "time": "48h",
+        "description": "Livraison sous 48 heures"
+      },
+      "express": {
+        "name": "Express",
+        "time": "24h",
+        "description": "Livraison sous 24 heures",
+        "popular": "Populaire"
+      },
+      "express2h": {
+        "name": "Express 2h",
+        "time": "2h",
+        "description": "Livraison en 2 heures",
+        "new": "Nouveau"
+      }
+    },
+    "trust": {
+      "title": "Ils nous font confiance",
+      "secure": "Paiement sécurisé",
+      "verified": "Washers vérifiés",
+      "guarantee": "Satisfait ou remboursé"
+    }
+  },
+  "auth": {
+    "login": {
+      "title": "Connexion",
+      "email": "Email",
+      "password": "Mot de passe",
+      "submit": "Se connecter",
+      "forgotPassword": "Mot de passe oublié ?",
+      "noAccount": "Pas encore de compte ?",
+      "signupLink": "S'inscrire"
+    },
+    "signup": {
+      "title": "Inscription",
+      "firstName": "Prénom",
+      "lastName": "Nom",
+      "email": "Email",
+      "phone": "Téléphone",
+      "password": "Mot de passe",
+      "confirmPassword": "Confirmer le mot de passe",
+      "submit": "S'inscrire",
+      "hasAccount": "Déjà un compte ?",
+      "loginLink": "Se connecter",
+      "terms": "En vous inscrivant, vous acceptez nos",
+      "termsLink": "conditions générales"
+    },
+    "forgotPassword": {
+      "title": "Mot de passe oublié",
+      "description": "Entrez votre email pour recevoir un lien de réinitialisation",
+      "submit": "Envoyer",
+      "backToLogin": "Retour à la connexion"
+    }
+  },
+  "order": {
+    "title": "Nouvelle commande",
+    "steps": {
+      "formula": "Formule",
+      "weight": "Poids",
+      "location": "Localisation",
+      "schedule": "Horaire",
+      "payment": "Paiement"
+    },
+    "formula": {
+      "title": "Choisissez votre formule",
+      "standard": "Standard",
+      "express": "Express",
+      "express2h": "Express 2h"
+    },
+    "weight": {
+      "title": "Estimez le poids",
+      "kg": "kg",
+      "aiEstimate": "Estimer avec une photo",
+      "aiDescription": "Prenez une photo de votre linge pour une estimation IA"
+    },
+    "location": {
+      "title": "Adresse de collecte",
+      "placeholder": "Entrez votre code postal ou ville",
+      "search": "Rechercher"
+    },
+    "schedule": {
+      "title": "Choisissez un créneau",
+      "pickup": "Collecte",
+      "delivery": "Livraison"
+    },
+    "summary": {
+      "title": "Récapitulatif",
+      "formula": "Formule",
+      "weight": "Poids estimé",
+      "subtotal": "Sous-total",
+      "discount": "Réduction",
+      "total": "Total",
+      "pay": "Payer"
+    }
+  },
+  "dashboard": {
+    "title": "Tableau de bord",
+    "tabs": {
+      "orders": "Commandes",
+      "loyalty": "Fidélité",
+      "subscription": "Abonnement",
+      "referral": "Parrainage"
+    },
+    "orders": {
+      "active": "Commandes en cours",
+      "past": "Historique",
+      "empty": "Aucune commande",
+      "emptyDescription": "Vous n'avez pas encore de commande",
+      "newOrder": "Nouvelle commande"
+    },
+    "status": {
+      "pending": "En attente",
+      "assigned": "Assignée",
+      "picked_up": "Collectée",
+      "washing": "En lavage",
+      "ready": "Prête",
+      "delivering": "En livraison",
+      "delivered": "Livrée",
+      "cancelled": "Annulée"
+    },
+    "loyalty": {
+      "title": "Programme fidélité",
+      "points": "Points",
+      "level": "Niveau",
+      "nextLevel": "Prochain niveau",
+      "rewards": "Récompenses disponibles"
+    },
+    "subscription": {
+      "title": "Mon abonnement",
+      "noSubscription": "Pas d'abonnement actif",
+      "subscribe": "S'abonner",
+      "weekly": "Hebdomadaire",
+      "biweekly": "Bi-mensuel",
+      "monthly": "Mensuel"
+    },
+    "referral": {
+      "title": "Parrainage",
+      "code": "Votre code",
+      "share": "Partager",
+      "referrals": "Filleuls",
+      "reward": "Gagnez 100 points par filleul"
+    }
+  },
+  "tracking": {
+    "title": "Suivi en temps réel",
+    "washerOnWay": "Votre Washer est en route",
+    "eta": "Arrivée estimée",
+    "minutes": "min",
+    "contactWasher": "Contacter",
+    "liveLocation": "Position en direct"
+  },
+  "settings": {
+    "title": "Paramètres",
+    "tabs": {
+      "profile": "Profil",
+      "notifications": "Notifications",
+      "security": "Sécurité"
+    },
+    "profile": {
+      "title": "Informations personnelles",
+      "firstName": "Prénom",
+      "lastName": "Nom",
+      "email": "Email",
+      "phone": "Téléphone",
+      "address": "Adresse par défaut"
+    },
+    "notifications": {
+      "title": "Notifications push",
+      "enabled": "Activées",
+      "disabled": "Désactivées",
+      "enable": "Activer",
+      "orderUpdates": "Mises à jour commande",
+      "washerAssigned": "Attribution Washer",
+      "ready": "Linge prêt",
+      "messages": "Nouveaux messages"
+    },
+    "security": {
+      "password": "Mot de passe",
+      "changePassword": "Modifier le mot de passe",
+      "logout": "Déconnexion",
+      "deleteAccount": "Supprimer mon compte",
+      "deleteWarning": "Cette action est irréversible"
+    },
+    "language": {
+      "title": "Langue",
+      "fr": "Français",
+      "en": "English"
+    }
+  },
+  "chat": {
+    "title": "Messages",
+    "placeholder": "Écrivez un message...",
+    "send": "Envoyer",
+    "washer": "Washer"
+  },
+  "footer": {
+    "about": "À propos",
+    "legal": "Mentions légales",
+    "cgu": "CGU",
+    "cgv": "CGV",
+    "privacy": "Confidentialité",
+    "cookies": "Cookies",
+    "contact": "Contact",
+    "followUs": "Suivez-nous"
+  },
+  "errors": {
+    "generic": "Une erreur est survenue",
+    "network": "Erreur de connexion",
+    "unauthorized": "Non autorisé",
+    "notFound": "Page non trouvée",
+    "invalidCredentials": "Email ou mot de passe incorrect",
+    "emailRequired": "Email requis",
+    "passwordRequired": "Mot de passe requis"
+  }
+}
