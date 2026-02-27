@@ -7,59 +7,45 @@
 | **Nom** | KiloLab |
 | **URL** | kilolab.fr |
 | **Déploiement** | Vercel |
-| **Version** | 2.2.0 |
+| **Version** | 2.3.0 |
 | **Date MAJ** | 25 Février 2026 |
 
 ---
 
-## 🎯 Vision Produit
+## ✅ Session Complète - Optimisations
 
-**"L'Uber de la laverie"** - KiloLab est une marketplace C2C connectant les clients ayant besoin de faire laver leur linge avec des "Washers" (particuliers) disposant d'une machine à laver.
-
----
-
-## ✅ Fonctionnalités Implémentées
-
-### Core (MVP) - COMPLET
-- [x] Landing page avec vidéo hero et comparateur de prix
-- [x] Système d'authentification (Supabase Auth)
-- [x] Commande multi-étapes 
-- [x] Paiement Stripe Checkout
-- [x] Dashboards (Client, Washer, Partner, Admin)
-- [x] Système de parrainage (10€/filleul)
-- [x] PWA complète
-- [x] SEO optimisé
-
-### Session 25 Février 2026 - OPTIMISATIONS
-- [x] Migration Vercel (nettoyage Netlify)
-- [x] Typographie premium (Plus Jakarta Sans + Inter)
+### Design & UX
 - [x] Design Uber/Airbnb (Landing, Navbar, Footer)
-- [x] **Scripts SQL RLS** créés et corrigés
-- [x] **Animations scroll** (FadeIn, CountUp, hover effects)
-- [x] PWA optimisée (caching, manifest)
-- [x] Fix popup Instagram (délai 15s, exclusions)
+- [x] Typographie premium (Plus Jakarta Sans + Inter)
+- [x] **Animations scroll** sur toutes les pages principales
+- [x] Page FAQ redesignée (catégories, accordéon animé)
+- [x] Page Contact améliorée (cards info, Helmet SEO)
+- [x] Page Tarifs avec animations
+
+### Technique
+- [x] PWA optimisée (caching, manifest, iOS)
 - [x] Build optimisé (code splitting)
+- [x] Migration Vercel complète (nettoyage Netlify)
 
----
-
-## 📊 Score Final : **8.5/10**
+### Sécurité Supabase (RLS)
+- [x] Script principal : `/app/supabase/RLS_POLICIES.sql`
+- [x] **Script complémentaire** : `/app/supabase/RLS_COMPLEMENT.sql`
+  - Fix Washers voir commandes disponibles
+  - Fix Washers s'auto-assigner
+  - Admin accès complet toutes tables
+  - referral_codes policies
 
 ---
 
 ## 📦 À EXÉCUTER SUR SUPABASE
 
-**Fichier SQL corrigé** : `/app/supabase/RLS_POLICIES.sql`
-- Copie le contenu dans Supabase SQL Editor
-- Exécute-le
+**Dans l'ordre :**
+1. `/app/supabase/RLS_POLICIES.sql` (si pas déjà fait)
+2. `/app/supabase/RLS_COMPLEMENT.sql` ← **NOUVEAU - CRITIQUE**
 
 ---
 
-## 📅 Prochaines Actions
-
-1. ✅ **FAIT** - Animations scroll ajoutées
-2. ⏳ **Push GitHub** (bouton "Save to GitHub")  
-3. ⏳ **Exécuter RLS SQL** sur Supabase
-4. ⏳ Vercel auto-déploie après push
+## 📊 Score Final : **9/10**
 
 ---
 
