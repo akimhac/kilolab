@@ -219,17 +219,12 @@ export default function Contact() {
               </button>
             </div>
           )}
+          </div>
+          </AnimateOnScroll>
         </div>
-
-        <div className="mt-12 text-center text-slate-500 text-sm">
-          <p className="mb-2">Vous pouvez aussi nous écrire directement :</p>
-          <a href="mailto:contact@kilolab.fr" className="text-teal-600 font-bold hover:underline text-lg">
-            contact@kilolab.fr
-          </a>
-        </div>
+        
+        <Footer />
       </div>
-      
-      <Footer />
-    </div>
+    </>
   );
 }
