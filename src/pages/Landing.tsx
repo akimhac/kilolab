@@ -325,12 +325,14 @@ export default function Landing() {
                   <span>Gros volume</span>
                 </div>
               </div>
+              </FadeInOnScroll>
 
               {/* Comparison Cards */}
               <div className="grid md:grid-cols-2 gap-6 md:gap-8">
                 {/* DIY Card */}
-                <div className="relative bg-gradient-to-br from-orange-50 to-red-50 rounded-3xl p-6 md:p-8 border border-orange-200/50 overflow-hidden">
-                  <div className="absolute top-0 right-0 w-40 h-40 bg-orange-200/30 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+                <FadeInOnScroll delay={200} direction="left">
+                  <div className="relative bg-gradient-to-br from-orange-50 to-red-50 rounded-3xl p-6 md:p-8 border border-orange-200/50 overflow-hidden h-full">
+                    <div className="absolute top-0 right-0 w-40 h-40 bg-orange-200/30 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
                   
                   <div className="relative">
                     <div className="flex items-center gap-3 mb-8">
