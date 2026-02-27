@@ -885,6 +885,22 @@ export default function NewOrder() {
           )}
         </div>
       </div>
+
+      {/* Weight Estimator Modal */}
+      {showWeightEstimator && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+          <div className="w-full max-w-lg">
+            <WeightEstimator
+              onClose={() => setShowWeightEstimator(false)}
+              onEstimationComplete={(estimatedWeight) => {
+                setWeight(Math.round(estimatedWeight));
+                setShowWeightEstimator(false);
+                toast.success(`Poids estimé: ${Math.round(estimatedWeight)} kg`);
+              }}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }
