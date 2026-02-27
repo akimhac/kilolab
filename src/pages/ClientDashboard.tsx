@@ -370,7 +370,9 @@ export default function ClientDashboard() {
   const [cancelling, setCancelling] = useState<string | null>(null);
   const [ratingOrder, setRatingOrder] = useState<Order | null>(null);
   const [showAllHistory, setShowAllHistory] = useState(false);
-  const [activeTab, setActiveTab] = useState<'orders' | 'loyalty' | 'subscription'>('orders');
+  const [activeTab, setActiveTab] = useState<'orders' | 'loyalty' | 'subscription' | 'referral'>('orders');
+  const [showChat, setShowChat] = useState(false);
+  const [chatOrder, setChatOrder] = useState<Order | null>(null);
   const fetchLockRef = useRef(false);
 
   const loadDashboard = useCallback(async () => {
