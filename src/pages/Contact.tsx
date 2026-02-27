@@ -92,13 +92,64 @@ export default function Contact() {
   };
 
   return (
-    <div className="bg-slate-50 min-h-screen font-sans text-slate-900 flex flex-col">
-      <Navbar />
-      
-      <div className="flex-grow pt-32 pb-20 px-4 max-w-2xl mx-auto w-full">
-        <h1 className="text-4xl font-black text-center mb-8">Contactez-nous</h1>
+    <>
+      <Helmet>
+        <title>Contact - Kilolab | Service Client</title>
+        <meta name="description" content="Contactez l'équipe Kilolab pour toute question sur votre commande, un partenariat ou une suggestion. Réponse sous 24h." />
+        <link rel="canonical" href="https://kilolab.fr/contact" />
+      </Helmet>
+
+      <div className="bg-slate-50 min-h-screen font-sans text-slate-900 flex flex-col">
+        <Navbar />
         
-        <div className="bg-white rounded-3xl shadow-xl shadow-slate-200 border border-slate-100 p-8">
+        {/* Hero */}
+        <header className="pt-32 pb-12 bg-gradient-to-b from-slate-900 to-slate-800 text-white">
+          <div className="max-w-4xl mx-auto px-4 text-center">
+            <AnimateOnScroll>
+              <h1 className="text-4xl md:text-5xl font-bold mb-4">Contactez-nous</h1>
+              <p className="text-xl text-slate-400">Notre équipe vous répond sous 24h</p>
+            </AnimateOnScroll>
+          </div>
+        </header>
+
+        {/* Contact Cards */}
+        <section className="-mt-8 px-4 mb-12">
+          <div className="max-w-4xl mx-auto grid md:grid-cols-3 gap-4">
+            <AnimateOnScroll delay={0}>
+              <div className="bg-white rounded-2xl p-6 shadow-lg border border-slate-100 text-center hover:-translate-y-1 transition">
+                <div className="w-12 h-12 bg-teal-100 rounded-xl flex items-center justify-center mx-auto mb-4">
+                  <Mail className="text-teal-600" size={24} />
+                </div>
+                <h3 className="font-bold text-slate-900 mb-1">Email</h3>
+                <a href="mailto:contact@kilolab.fr" className="text-teal-600 hover:underline text-sm">
+                  contact@kilolab.fr
+                </a>
+              </div>
+            </AnimateOnScroll>
+            <AnimateOnScroll delay={100}>
+              <div className="bg-white rounded-2xl p-6 shadow-lg border border-slate-100 text-center hover:-translate-y-1 transition">
+                <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mx-auto mb-4">
+                  <Clock className="text-blue-600" size={24} />
+                </div>
+                <h3 className="font-bold text-slate-900 mb-1">Horaires</h3>
+                <p className="text-slate-600 text-sm">Lun-Ven : 9h-18h</p>
+              </div>
+            </AnimateOnScroll>
+            <AnimateOnScroll delay={200}>
+              <div className="bg-white rounded-2xl p-6 shadow-lg border border-slate-100 text-center hover:-translate-y-1 transition">
+                <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center mx-auto mb-4">
+                  <MapPin className="text-purple-600" size={24} />
+                </div>
+                <h3 className="font-bold text-slate-900 mb-1">Zone</h3>
+                <p className="text-slate-600 text-sm">France métropolitaine</p>
+              </div>
+            </AnimateOnScroll>
+          </div>
+        </section>
+        
+        <div className="flex-grow pb-20 px-4 max-w-2xl mx-auto w-full">
+          <AnimateOnScroll delay={300}>
+            <div className="bg-white rounded-3xl shadow-xl shadow-slate-200 border border-slate-100 p-8">
           {!sent ? (
             <form onSubmit={handleSubmit} className="space-y-6">
               <div>
