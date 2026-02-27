@@ -39,6 +39,7 @@ const UserProfile = lazy(() => import('./pages/UserProfile'));
 const ClientDashboard = lazy(() => import('./pages/ClientDashboard'));
 const PartnerDashboard = lazy(() => import('./pages/PartnerDashboard'));
 const AdminDashboard = lazy(() => import('./pages/AdminDashboard'));
+const AdminAnalytics = lazy(() => import('./pages/AdminAnalytics'));
 const SuperAccess = lazy(() => import('./pages/SuperAccess'));
 const PartnerLanding = lazy(() => import('./pages/PartnerLanding'));
 const BecomePartner = lazy(() => import('./pages/BecomePartner'));
