@@ -513,7 +513,7 @@ export default function NewOrder() {
                 </div>
                 <div className="bg-teal-50 p-4 rounded-xl border border-teal-200">
                   <div className="font-bold text-teal-700 mb-1">
-                    {(weight * (formula === "eco" ? 3 : 5)).toFixed(2)}€
+                    {(weight * basePrice).toFixed(2)}€
                   </div>
                   <div className="text-xs text-teal-600">Prix estimé</div>
                 </div>
