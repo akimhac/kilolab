@@ -494,14 +494,18 @@ export default function ClientDashboard() {
           </FadeInOnScroll>
         )}
         {hasNoOrders && (
-          <div className="bg-white rounded-3xl p-10 text-center shadow-sm border border-slate-100 mb-8">
-            <div className="w-16 h-16 bg-teal-50 rounded-2xl flex items-center justify-center mx-auto mb-4"><Sparkles size={30} className="text-teal-500" /></div>
-            <h3 className="text-xl font-black text-slate-800 mb-2">Bienvenue sur Kilolab !</h3>
-            <p className="text-slate-400 text-sm mb-6">Votre linge lave, seche et plie -- sans bouger.</p>
-            <button onClick={() => window.location.href = '/new-order'} className="bg-gradient-to-r from-teal-500 to-emerald-500 text-white px-8 py-3.5 rounded-2xl font-black hover:shadow-lg transition inline-flex items-center gap-2">
-              Lancer ma premiere lessive <ArrowRight size={15} />
-            </button>
-          </div>
+          <FadeInOnScroll direction="up" delay={100}>
+            <div className="bg-white rounded-3xl p-10 text-center shadow-sm border border-slate-100 mb-8 hover:shadow-lg transition-all duration-300">
+              <div className="w-16 h-16 bg-teal-50 rounded-2xl flex items-center justify-center mx-auto mb-4 animate-bounce">
+                <Sparkles size={30} className="text-teal-500" />
+              </div>
+              <h3 className="text-xl font-black text-slate-800 mb-2">Bienvenue sur Kilolab !</h3>
+              <p className="text-slate-400 text-sm mb-6">Votre linge lave, seche et plie -- sans bouger.</p>
+              <button onClick={() => window.location.href = '/new-order'} className="bg-gradient-to-r from-teal-500 to-emerald-500 text-white px-8 py-3.5 rounded-2xl font-black hover:shadow-lg hover:scale-105 transition-all duration-300 inline-flex items-center gap-2">
+                Lancer ma premiere lessive <ArrowRight size={15} />
+              </button>
+            </div>
+          </FadeInOnScroll>
         )}
         {profile && stats.totalOrders >= 1 && <div className="mb-8"><ReferralCard profile={profile} /></div>}
         {pastOrders.length > 0 && (
