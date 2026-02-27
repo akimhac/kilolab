@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import HowItWorks from "../components/HowItWorks";
+import { FadeInOnScroll, CountUp, FloatingElement } from "../components/animations/ScrollAnimations";
 
 export default function Landing() {
   const [weight, setWeight] = useState(5);
