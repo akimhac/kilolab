@@ -17,7 +17,6 @@ import {
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import HowItWorks from "../components/HowItWorks";
-import { FadeInOnScroll, CountUp, FloatingElement } from "../components/animations/ScrollAnimations";
 
 export default function Landing() {
   const [weight, setWeight] = useState(5);
@@ -219,100 +218,78 @@ export default function Landing() {
         {/* SOCIAL PROOF - Bento Grid Style */}
         <section className="py-24 bg-gradient-to-b from-slate-50 to-white">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <FadeInOnScroll>
-              <div className="text-center mb-16">
-                <h2 className="font-heading text-3xl md:text-4xl font-bold text-slate-900 mb-4">
-                  La plateforme n°1 en France
-                </h2>
-                <p className="text-lg text-slate-600 max-w-2xl mx-auto">
-                  Des milliers de clients nous font déjà confiance
-                </p>
-              </div>
-            </FadeInOnScroll>
-
-            {/* Stats Grid - Bento Style with animations */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mb-16">
-              <FadeInOnScroll delay={0} className="group bg-white p-6 md:p-8 rounded-2xl border border-slate-100 shadow-card hover:shadow-card-hover transition-all duration-300 hover:-translate-y-1">
-                <div className="flex items-center gap-2 mb-2">
-                  <span className="text-3xl md:text-4xl">🇫🇷</span>
-                </div>
-                <p className="text-sm font-semibold text-slate-900">Partout en France</p>
-                <p className="text-xs text-slate-500 mt-1">Couverture nationale</p>
-              </FadeInOnScroll>
-              
-              <FadeInOnScroll delay={100} className="group bg-white p-6 md:p-8 rounded-2xl border border-slate-100 shadow-card hover:shadow-card-hover transition-all duration-300 hover:-translate-y-1">
-                <div className="flex items-center gap-2 mb-2">
-                  <CountUp end={10000} suffix="+" className="text-3xl md:text-4xl font-heading font-bold text-slate-900" />
-                </div>
-                <p className="text-sm font-semibold text-slate-900">Kilos lavés</p>
-                <p className="text-xs text-slate-500 mt-1">Et ce n'est que le début</p>
-              </FadeInOnScroll>
-              
-              <FadeInOnScroll delay={200} className="group bg-white p-6 md:p-8 rounded-2xl border border-slate-100 shadow-card hover:shadow-card-hover transition-all duration-300 hover:-translate-y-1">
-                <div className="flex items-center gap-2 mb-2">
-                  <span className="text-3xl md:text-4xl font-heading font-bold text-slate-900">4.9</span>
-                  <Star size={24} className="text-yellow-500 fill-yellow-500" />
-                </div>
-                <p className="text-sm font-semibold text-slate-900">Note moyenne</p>
-                <p className="text-xs text-slate-500 mt-1">Sur 500+ avis</p>
-              </FadeInOnScroll>
-              
-              <FadeInOnScroll delay={300} className="group bg-white p-6 md:p-8 rounded-2xl border border-slate-100 shadow-card hover:shadow-card-hover transition-all duration-300 hover:-translate-y-1">
-                <div className="flex items-center gap-2 mb-2">
-                  <span className="text-3xl md:text-4xl font-heading font-bold text-slate-900">7j/7</span>
-                </div>
-                <p className="text-sm font-semibold text-slate-900">Service disponible</p>
-                <p className="text-xs text-slate-500 mt-1">Toujours là pour vous</p>
-              </FadeInOnScroll>
+            <div className="text-center mb-16">
+              <h2 className="font-heading text-3xl md:text-4xl font-bold text-slate-900 mb-4">
+                La plateforme n°1 en France
+              </h2>
+              <p className="text-lg text-slate-600 max-w-2xl mx-auto">
+                Des milliers de clients nous font déjà confiance
+              </p>
             </div>
+
+            {/* Stats Grid - Bento Style */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mb-16">
+              {[
+                { value: "🇫🇷", label: "Partout en France", sublabel: "Couverture nationale" },
+                { value: "10k+", label: "Kilos lavés", sublabel: "Et ce n'est que le début" },
+                { value: "4.9", label: "Note moyenne", sublabel: "Sur 500+ avis", star: true },
+                { value: "7j/7", label: "Service disponible", sublabel: "Toujours là pour vous" },
+              ].map((stat, i) => (
+                <div
+                  key={i}
+                  className="group bg-white p-6 md:p-8 rounded-2xl border border-slate-100 shadow-card hover:shadow-card-hover transition-all duration-300 hover:-translate-y-1"
+                >
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="text-3xl md:text-4xl font-heading font-bold text-slate-900">{stat.value}</span>
+                    {stat.star && <Star size={24} className="text-yellow-500 fill-yellow-500" />}
+                  </div>
+                  <p className="text-sm font-semibold text-slate-900">{stat.label}</p>
+                  <p className="text-xs text-slate-500 mt-1">{stat.sublabel}</p>
+                </div>
+              ))}
             </div>
 
             {/* Press mentions */}
-            <FadeInOnScroll delay={400}>
-              <div className="text-center">
-                <p className="text-xs text-slate-400 uppercase tracking-widest font-semibold mb-6">
-                  Ils parlent de nous
-                </p>
-                <div className="flex flex-wrap justify-center items-center gap-x-12 gap-y-4 opacity-30 grayscale">
-                  {["TechCrunch", "Le Figaro", "BFM Business", "Les Échos"].map((name) => (
-                    <span key={name} className="text-xl md:text-2xl font-heading font-bold text-slate-700">
-                      {name}
-                    </span>
-                  ))}
-                </div>
+            <div className="text-center">
+              <p className="text-xs text-slate-400 uppercase tracking-widest font-semibold mb-6">
+                Ils parlent de nous
+              </p>
+              <div className="flex flex-wrap justify-center items-center gap-x-12 gap-y-4 opacity-30 grayscale">
+                {["TechCrunch", "Le Figaro", "BFM Business", "Les Échos"].map((name) => (
+                  <span key={name} className="text-xl md:text-2xl font-heading font-bold text-slate-700">
+                    {name}
+                  </span>
+                ))}
               </div>
-            </FadeInOnScroll>
+            </div>
           </div>
         </section>
 
         {/* COST COMPARISON - Premium Card Style */}
         <section className="py-24 bg-white">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <FadeInOnScroll>
-              <div className="text-center mb-16">
-                <span className="inline-block px-4 py-1.5 bg-orange-100 text-orange-700 rounded-full text-sm font-semibold mb-4">
-                  Calculateur
-                </span>
-                <h2 className="font-heading text-3xl md:text-5xl font-bold text-slate-900 mb-6">
-                  Le coût caché de votre lessive
-                </h2>
-                <p className="text-lg text-slate-600 max-w-2xl mx-auto">
-                  Entre l'eau, l'électricité, les produits et votre temps... faire sa lessive coûte plus cher qu'on ne le pense.
-                </p>
-              </div>
-            </FadeInOnScroll>
+            <div className="text-center mb-16">
+              <span className="inline-block px-4 py-1.5 bg-orange-100 text-orange-700 rounded-full text-sm font-semibold mb-4">
+                Calculateur
+              </span>
+              <h2 className="font-heading text-3xl md:text-5xl font-bold text-slate-900 mb-6">
+                Le coût caché de votre lessive
+              </h2>
+              <p className="text-lg text-slate-600 max-w-2xl mx-auto">
+                Entre l'eau, l'électricité, les produits et votre temps... faire sa lessive coûte plus cher qu'on ne le pense.
+              </p>
+            </div>
 
             <div className="max-w-5xl mx-auto">
               {/* Weight Slider */}
-              <FadeInOnScroll delay={100}>
-                <div className="bg-slate-50 rounded-2xl p-6 md:p-8 mb-8 border border-slate-100">
-                  <div className="flex items-center justify-between mb-4">
-                    <span className="text-sm font-medium text-slate-600">Simulez avec votre volume</span>
-                    <span className="text-2xl font-heading font-bold text-teal-600">{weight} kg</span>
-                  </div>
-                  <input
-                    type="range"
-                    min="3"
+              <div className="bg-slate-50 rounded-2xl p-6 md:p-8 mb-8 border border-slate-100">
+                <div className="flex items-center justify-between mb-4">
+                  <span className="text-sm font-medium text-slate-600">Simulez avec votre volume</span>
+                  <span className="text-2xl font-heading font-bold text-teal-600">{weight} kg</span>
+                </div>
+                <input
+                  type="range"
+                  min="3"
                   max="15"
                   step="1"
                   value={weight}
@@ -325,14 +302,12 @@ export default function Landing() {
                   <span>Gros volume</span>
                 </div>
               </div>
-              </FadeInOnScroll>
 
               {/* Comparison Cards */}
               <div className="grid md:grid-cols-2 gap-6 md:gap-8">
                 {/* DIY Card */}
-                <FadeInOnScroll delay={200} direction="left">
-                  <div className="relative bg-gradient-to-br from-orange-50 to-red-50 rounded-3xl p-6 md:p-8 border border-orange-200/50 overflow-hidden h-full">
-                    <div className="absolute top-0 right-0 w-40 h-40 bg-orange-200/30 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+                <div className="relative bg-gradient-to-br from-orange-50 to-red-50 rounded-3xl p-6 md:p-8 border border-orange-200/50 overflow-hidden">
+                  <div className="absolute top-0 right-0 w-40 h-40 bg-orange-200/30 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
                   
                   <div className="relative">
                     <div className="flex items-center gap-3 mb-8">
@@ -391,12 +366,10 @@ export default function Landing() {
                     </div>
                   </div>
                 </div>
-                </FadeInOnScroll>
 
                 {/* Kilolab Card */}
-                <FadeInOnScroll delay={300} direction="right">
-                  <div className="relative bg-gradient-to-br from-teal-50 to-cyan-50 rounded-3xl p-6 md:p-8 border-2 border-teal-200 overflow-hidden h-full">
-                    <div className="absolute top-0 right-0 w-40 h-40 bg-teal-200/30 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+                <div className="relative bg-gradient-to-br from-teal-50 to-cyan-50 rounded-3xl p-6 md:p-8 border-2 border-teal-200 overflow-hidden">
+                  <div className="absolute top-0 right-0 w-40 h-40 bg-teal-200/30 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
                   
                   {/* Recommended badge */}
                   <div className="absolute top-4 right-4 bg-gradient-to-r from-yellow-400 to-orange-400 text-slate-900 px-3 py-1 rounded-full text-xs font-bold shadow-lg">
@@ -467,26 +440,21 @@ export default function Landing() {
                     </Link>
                   </div>
                 </div>
-                </FadeInOnScroll>
               </div>
 
               {/* Bottom highlight */}
-              <FadeInOnScroll delay={400}>
-                <div className="mt-12 text-center">
-                  <FloatingElement duration={4} distance={8}>
-                    <div className="inline-flex items-center gap-4 bg-gradient-to-r from-teal-600 to-cyan-600 text-white px-8 py-5 rounded-2xl shadow-xl">
-                      <Sparkles size={24} />
-                      <div className="text-left">
-                        <p className="font-heading font-bold text-lg">Le vrai coût, c'est votre temps</p>
-                        <p className="text-teal-100 text-sm">
-                          Pour seulement <strong className="text-white">{(kilolabPrice - diyMaterialTotal).toFixed(2)}€ de plus</strong>, vous récupérez{" "}
-                          <strong className="text-white">{timeSaved}h de vie</strong>
-                        </p>
-                      </div>
-                    </div>
-                  </FloatingElement>
+              <div className="mt-12 text-center">
+                <div className="inline-flex items-center gap-4 bg-gradient-to-r from-teal-600 to-cyan-600 text-white px-8 py-5 rounded-2xl">
+                  <Sparkles size={24} />
+                  <div className="text-left">
+                    <p className="font-heading font-bold text-lg">Le vrai coût, c'est votre temps</p>
+                    <p className="text-teal-100 text-sm">
+                      Pour seulement <strong className="text-white">{(kilolabPrice - diyMaterialTotal).toFixed(2)}€ de plus</strong>, vous récupérez{" "}
+                      <strong className="text-white">{timeSaved}h de vie</strong>
+                    </p>
+                  </div>
                 </div>
-              </FadeInOnScroll>
+              </div>
             </div>
           </div>
         </section>
@@ -498,54 +466,50 @@ export default function Landing() {
           <div className="max-w-7xl mx-auto">
             <div className="grid md:grid-cols-2 gap-12 md:gap-20 items-center">
               {/* Images */}
-              <FadeInOnScroll direction="left">
-                <div className="relative">
-                  <div className="grid grid-cols-2 gap-4 relative">
-                    <img
-                      src="https://images.unsplash.com/photo-1555400038-63f5ba517a47?w=800&auto=format&fit=crop"
-                      alt="Inspiration Bali"
-                      className="rounded-2xl shadow-soft transform -rotate-2 hover:rotate-0 transition-transform duration-500"
-                      loading="lazy"
-                    />
-                    <img
-                      src="https://images.unsplash.com/photo-1604335399105-a0c585fd81a1?w=800&auto=format&fit=crop"
-                      alt="Linge propre"
-                      className="rounded-2xl shadow-soft transform rotate-2 hover:rotate-0 transition-transform duration-500 mt-12"
-                      loading="lazy"
-                    />
-                  </div>
-                  <div className="absolute -z-10 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-gradient-to-br from-teal-100/50 to-cyan-100/50 rounded-full blur-3xl" />
+              <div className="relative">
+                <div className="grid grid-cols-2 gap-4 relative">
+                  <img
+                    src="https://images.unsplash.com/photo-1555400038-63f5ba517a47?w=800&auto=format&fit=crop"
+                    alt="Inspiration Bali"
+                    className="rounded-2xl shadow-soft transform -rotate-2 hover:rotate-0 transition-transform duration-500"
+                    loading="lazy"
+                  />
+                  <img
+                    src="https://images.unsplash.com/photo-1604335399105-a0c585fd81a1?w=800&auto=format&fit=crop"
+                    alt="Linge propre"
+                    className="rounded-2xl shadow-soft transform rotate-2 hover:rotate-0 transition-transform duration-500 mt-12"
+                    loading="lazy"
+                  />
                 </div>
-              </FadeInOnScroll>
+                <div className="absolute -z-10 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-gradient-to-br from-teal-100/50 to-cyan-100/50 rounded-full blur-3xl" />
+              </div>
 
               {/* Content */}
-              <FadeInOnScroll direction="right" delay={200}>
-                <div>
-                  <span className="inline-block px-4 py-1.5 bg-teal-50 text-teal-700 rounded-full text-sm font-semibold mb-6 border border-teal-100">
-                    Notre Histoire
-                  </span>
-                  <h2 className="font-heading text-3xl md:text-5xl font-bold text-slate-900 mb-8 leading-tight">
-                    De la douceur de Bali <br />
-                    à l'exigence de Paris.
-                  </h2>
-                  <p className="text-slate-600 text-lg leading-relaxed mb-8">
-                    Là-bas, le soin du linge au poids est la norme : simple, direct, sans artifices. Nous avons importé ce concept
-                    pour en finir avec le casse-tête des tarifs à la pièce.
+              <div>
+                <span className="inline-block px-4 py-1.5 bg-teal-50 text-teal-700 rounded-full text-sm font-semibold mb-6 border border-teal-100">
+                  Notre Histoire
+                </span>
+                <h2 className="font-heading text-3xl md:text-5xl font-bold text-slate-900 mb-8 leading-tight">
+                  De la douceur de Bali <br />
+                  à l'exigence de Paris.
+                </h2>
+                <p className="text-slate-600 text-lg leading-relaxed mb-8">
+                  Là-bas, le soin du linge au poids est la norme : simple, direct, sans artifices. Nous avons importé ce concept
+                  pour en finir avec le casse-tête des tarifs à la pièce.
+                </p>
+                <blockquote className="bg-slate-50 p-6 rounded-2xl border-l-4 border-teal-500 mb-8">
+                  <p className="text-slate-700 font-medium italic">
+                    "Juste le poids du linge propre. Rien d'autre."
                   </p>
-                  <blockquote className="bg-slate-50 p-6 rounded-2xl border-l-4 border-teal-500 mb-8">
-                    <p className="text-slate-700 font-medium italic">
-                      "Juste le poids du linge propre. Rien d'autre."
-                    </p>
-                  </blockquote>
-                  <Link
-                    to="/become-washer"
-                    className="inline-flex items-center gap-2 text-slate-900 font-semibold hover:text-teal-600 transition-colors group"
-                  >
-                    Envie de devenir Washer ? C'est par ici
-                    <ArrowRight className="group-hover:translate-x-1 transition-transform" size={18} />
-                  </Link>
-                </div>
-              </FadeInOnScroll>
+                </blockquote>
+                <Link
+                  to="/become-washer"
+                  className="inline-flex items-center gap-2 text-slate-900 font-semibold hover:text-teal-600 transition-colors group"
+                >
+                  Envie de devenir Washer ? C'est par ici
+                  <ArrowRight className="group-hover:translate-x-1 transition-transform" size={18} />
+                </Link>
+              </div>
             </div>
           </div>
         </section>
@@ -556,22 +520,21 @@ export default function Landing() {
           <div className="absolute top-0 left-1/4 w-96 h-96 bg-teal-500/10 rounded-full blur-3xl" />
           <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl" />
           
-          <FadeInOnScroll>
-            <div className="max-w-4xl mx-auto px-4 text-center relative">
-              <h2 className="font-heading text-4xl md:text-6xl font-bold mb-6">
-                Prêt à récupérer votre temps libre ?
-              </h2>
-              <p className="text-xl text-slate-400 mb-10 max-w-2xl mx-auto">
-                Rejoignez les milliers d'utilisateurs qui ont déjà arrêté la corvée du linge
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Link
-                  to="/new-order"
-                  data-testid="final-cta-order"
-                  className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-white text-slate-900 rounded-full font-semibold text-lg hover:bg-teal-50 transition-all duration-300 shadow-soft hover:shadow-lg hover:scale-[1.02] active:scale-[0.98]"
-                >
-                  Commander maintenant
-                  <ArrowRight size={20} />
+          <div className="max-w-4xl mx-auto px-4 text-center relative">
+            <h2 className="font-heading text-4xl md:text-6xl font-bold mb-6">
+              Prêt à récupérer votre temps libre ?
+            </h2>
+            <p className="text-xl text-slate-400 mb-10 max-w-2xl mx-auto">
+              Rejoignez les milliers d'utilisateurs qui ont déjà arrêté la corvée du linge
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Link
+                to="/new-order"
+                data-testid="final-cta-order"
+                className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-white text-slate-900 rounded-full font-semibold text-lg hover:bg-teal-50 transition-all duration-300 shadow-soft hover:shadow-lg"
+              >
+                Commander maintenant
+                <ArrowRight size={20} />
               </Link>
               <Link
                 to="/become-washer"
@@ -583,7 +546,6 @@ export default function Landing() {
               </Link>
             </div>
           </div>
-          </FadeInOnScroll>
         </section>
 
         <Footer />
