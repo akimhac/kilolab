@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Instagram, Facebook, Twitter, Mail, MapPin, Phone } from 'lucide-react';
+import { Instagram, Facebook, Twitter, Mail, MapPin, MessageCircle } from 'lucide-react';
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
@@ -142,17 +142,19 @@ export default function Footer() {
             <ul className="space-y-3 text-sm">
               <li>
                 <Link to="/contact" className="flex items-center gap-2 hover:text-teal-400 transition-colors">
-                  <Mail size={14} />
+                  <MessageCircle size={14} />
                   Nous contacter
                 </Link>
               </li>
-              <li className="flex items-center gap-2">
-                <Phone size={14} />
-                <span>01 00 00 00 00</span>
+              <li>
+                <Link to="/contact" className="flex items-center gap-2 hover:text-teal-400 transition-colors">
+                  <Mail size={14} />
+                  contact@kilolab.fr
+                </Link>
               </li>
               <li className="flex items-start gap-2">
                 <MapPin size={14} className="mt-0.5 flex-shrink-0" />
-                <span>France métropolitaine</span>
+                <span>Lille • Nantes • Bordeaux</span>
               </li>
             </ul>
           </div>
