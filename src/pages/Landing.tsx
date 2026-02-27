@@ -516,33 +516,36 @@ export default function Landing() {
                 </div>
                 <div className="absolute -z-10 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-gradient-to-br from-teal-100/50 to-cyan-100/50 rounded-full blur-3xl" />
               </div>
+              </FadeInOnScroll>
 
               {/* Content */}
-              <div>
-                <span className="inline-block px-4 py-1.5 bg-teal-50 text-teal-700 rounded-full text-sm font-semibold mb-6 border border-teal-100">
-                  Notre Histoire
-                </span>
-                <h2 className="font-heading text-3xl md:text-5xl font-bold text-slate-900 mb-8 leading-tight">
-                  De la douceur de Bali <br />
-                  à l'exigence de Paris.
-                </h2>
-                <p className="text-slate-600 text-lg leading-relaxed mb-8">
-                  Là-bas, le soin du linge au poids est la norme : simple, direct, sans artifices. Nous avons importé ce concept
-                  pour en finir avec le casse-tête des tarifs à la pièce.
-                </p>
-                <blockquote className="bg-slate-50 p-6 rounded-2xl border-l-4 border-teal-500 mb-8">
-                  <p className="text-slate-700 font-medium italic">
-                    "Juste le poids du linge propre. Rien d'autre."
+              <FadeInOnScroll direction="right" delay={200}>
+                <div>
+                  <span className="inline-block px-4 py-1.5 bg-teal-50 text-teal-700 rounded-full text-sm font-semibold mb-6 border border-teal-100">
+                    Notre Histoire
+                  </span>
+                  <h2 className="font-heading text-3xl md:text-5xl font-bold text-slate-900 mb-8 leading-tight">
+                    De la douceur de Bali <br />
+                    à l'exigence de Paris.
+                  </h2>
+                  <p className="text-slate-600 text-lg leading-relaxed mb-8">
+                    Là-bas, le soin du linge au poids est la norme : simple, direct, sans artifices. Nous avons importé ce concept
+                    pour en finir avec le casse-tête des tarifs à la pièce.
                   </p>
-                </blockquote>
-                <Link
-                  to="/become-washer"
-                  className="inline-flex items-center gap-2 text-slate-900 font-semibold hover:text-teal-600 transition-colors group"
-                >
-                  Envie de devenir Washer ? C'est par ici
-                  <ArrowRight className="group-hover:translate-x-1 transition-transform" size={18} />
-                </Link>
-              </div>
+                  <blockquote className="bg-slate-50 p-6 rounded-2xl border-l-4 border-teal-500 mb-8">
+                    <p className="text-slate-700 font-medium italic">
+                      "Juste le poids du linge propre. Rien d'autre."
+                    </p>
+                  </blockquote>
+                  <Link
+                    to="/become-washer"
+                    className="inline-flex items-center gap-2 text-slate-900 font-semibold hover:text-teal-600 transition-colors group"
+                  >
+                    Envie de devenir Washer ? C'est par ici
+                    <ArrowRight className="group-hover:translate-x-1 transition-transform" size={18} />
+                  </Link>
+                </div>
+              </FadeInOnScroll>
             </div>
           </div>
         </section>
@@ -553,21 +556,22 @@ export default function Landing() {
           <div className="absolute top-0 left-1/4 w-96 h-96 bg-teal-500/10 rounded-full blur-3xl" />
           <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl" />
           
-          <div className="max-w-4xl mx-auto px-4 text-center relative">
-            <h2 className="font-heading text-4xl md:text-6xl font-bold mb-6">
-              Prêt à récupérer votre temps libre ?
-            </h2>
-            <p className="text-xl text-slate-400 mb-10 max-w-2xl mx-auto">
-              Rejoignez les milliers d'utilisateurs qui ont déjà arrêté la corvée du linge
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link
-                to="/new-order"
-                data-testid="final-cta-order"
-                className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-white text-slate-900 rounded-full font-semibold text-lg hover:bg-teal-50 transition-all duration-300 shadow-soft hover:shadow-lg"
-              >
-                Commander maintenant
-                <ArrowRight size={20} />
+          <FadeInOnScroll>
+            <div className="max-w-4xl mx-auto px-4 text-center relative">
+              <h2 className="font-heading text-4xl md:text-6xl font-bold mb-6">
+                Prêt à récupérer votre temps libre ?
+              </h2>
+              <p className="text-xl text-slate-400 mb-10 max-w-2xl mx-auto">
+                Rejoignez les milliers d'utilisateurs qui ont déjà arrêté la corvée du linge
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <Link
+                  to="/new-order"
+                  data-testid="final-cta-order"
+                  className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-white text-slate-900 rounded-full font-semibold text-lg hover:bg-teal-50 transition-all duration-300 shadow-soft hover:shadow-lg hover:scale-[1.02] active:scale-[0.98]"
+                >
+                  Commander maintenant
+                  <ArrowRight size={20} />
               </Link>
               <Link
                 to="/become-washer"
