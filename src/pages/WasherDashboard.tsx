@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import { supabase } from "../lib/supabase";
 import { requestNotificationPermission } from "../lib/firebase";
 import Navbar from "../components/Navbar";
+import { FadeInOnScroll, CountUp } from "../components/animations/ScrollAnimations";
 import toast from "react-hot-toast";
 import {
   DollarSign, Package, Clock, MapPin, Check, TrendingUp, Loader2,
