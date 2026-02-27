@@ -71,7 +71,8 @@ export default function Tarifs() {
         <section className="py-20 px-4 -mt-10">
           <div className="max-w-5xl mx-auto grid md:grid-cols-2 gap-8">
             {/* STANDARD */}
-            <div className="bg-white rounded-3xl p-8 shadow-xl border border-slate-200 flex flex-col hover:-translate-y-2 transition duration-300">
+            <AnimateOnScroll delay={0}>
+              <div className="bg-white rounded-3xl p-8 shadow-xl border border-slate-200 flex flex-col hover:-translate-y-2 transition duration-300 h-full">
               <div className="mb-6">
                 <span className="bg-slate-100 text-slate-600 px-3 py-1 rounded-full text-xs font-bold uppercase">
                   Standard
