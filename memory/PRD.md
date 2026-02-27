@@ -7,12 +7,12 @@
 | **Nom** | KiloLab |
 | **URL** | kilolab.fr |
 | **Deploiement** | Vercel |
-| **Version** | 3.1.0 |
+| **Version** | 3.2.0 |
 | **Date MAJ** | 13 Janvier 2026 |
 
 ---
 
-## MEGA UPDATE v3.1 - TOUTES FONCTIONNALITÉS COMPLÈTES
+## MEGA UPDATE v3.2 - TOUTES FONCTIONNALITÉS COMPLÈTES
 
 ### Checklist Fonctionnalités
 
@@ -29,33 +29,52 @@
 | 9 | Express 2h | ✅ DONE | Intégré dans NewOrder |
 | 10 | Pressing/Sneakers | ✅ DONE | Dans `Services.tsx` |
 | 11 | Dashboard Admin Analytics | ✅ DONE | `AdminAnalytics.tsx` |
-| 12 | API Partenaires B2B | ✅ DONE | `/api/b2b.js` + `/app/supabase/B2B_API_TABLES.sql` |
+| 12 | API Partenaires B2B | ✅ DONE | `/api/b2b.js` + SQL |
 | 13 | Estimation IA Poids | ✅ DONE | `/api/estimate-weight.js` + `WeightEstimator.tsx` |
+| 14 | **Heatmap Géographique** | ✅ DONE (v3.2) | `OrderHeatmap.tsx` → AdminAnalytics |
+| 15 | **Notifications Push** | ✅ DONE (v3.2) | `pushNotifications.tsx` + `NotificationSettings.tsx` |
+| 16 | **Tests E2E Playwright** | ✅ DONE (v3.2) | `/tests/e2e/*.spec.ts` |
 
 ---
 
-## Intégrations Réalisées (v3.1)
+## Nouvelles fonctionnalités v3.2
 
-### ClientDashboard - Nouveau
-- ✅ Onglet Parrainage avec `ReferralSystem` complet
-- ✅ Chat In-App intégré (bulle flottante pour commandes actives)
-- ✅ 4 onglets: Commandes / Fidélité / Abonnement / Parrainage
+### 1. Heatmap Géographique (Leaflet/OpenStreetMap)
+- **Composant**: `src/components/OrderHeatmap.tsx`
+- **Intégration**: `AdminAnalytics.tsx` (lazy loaded)
+- **Features**:
+  - Carte interactive avec clusters par ville
+  - Code couleur par intensité (vert → rouge)
+  - Popup avec stats (commandes, CA)
+  - Top 5 villes en footer
+  - Géocodage des villes françaises intégré
+  - 100% gratuit (OpenStreetMap)
 
-### NewOrder
-- ✅ Estimation IA du poids par photo (modal `WeightEstimator`)
-- ✅ 3 formules: Standard (3€) / Express (5€) / Express 2h (8€)
+### 2. Notifications Push Firebase
+- **Service**: `src/services/pushNotifications.tsx`
+- **UI**: `src/components/NotificationSettings.tsx`
+- **Service Worker**: `public/firebase-messaging-sw.js`
+- **Features**:
+  - Permission request
+  - FCM token management
+  - Foreground/Background notifications
+  - Deep linking on click
+  - Intégré dans `/settings`
+- **SQL**: `supabase/KILOLAB_V5_NOTIFICATIONS.sql`
 
-### API B2B
-- ✅ `/api/b2b.js` avec endpoints:
-  - `create-order`: Créer commande pour un partenaire
-  - `get-order`: Consulter statut
-  - `list-orders`: Lister toutes les commandes
-  - `get-pricing`: Tarifs avec remise partenaire
-  - `get-coverage`: Zones couvertes
-
-### API Estimation IA
-- ✅ `/api/estimate-weight.js` avec GPT-4o Vision
-- ✅ Utilise Emergent LLM Key (clé universelle)
+### 3. Tests E2E Playwright
+- **Config**: `playwright.config.ts`
+- **Tests**: `tests/e2e/`
+  - `landing.spec.ts` - Page d'accueil
+  - `auth.spec.ts` - Authentification
+  - `order.spec.ts` - Flux commande
+  - `navigation.spec.ts` - Routing
+  - `accessibility.spec.ts` - A11y + Performance
+- **Scripts npm**:
+  - `yarn test:e2e` - Run tous les tests
+  - `yarn test:e2e:ui` - Mode UI interactif
+  - `yarn test:e2e:headed` - Mode visible
+  - `yarn test:e2e:report` - Voir le rapport
 
 ---
 
@@ -65,6 +84,7 @@
 |--------|-------------|--------|
 | `KILOLAB_V3_FEATURES.sql` | Fidélité, abonnements, tracking | ✅ Exécuté |
 | `B2B_API_TABLES.sql` | Tables B2B partenaires | ⏳ À exécuter |
+| `KILOLAB_V5_NOTIFICATIONS.sql` | FCM tokens, notifications | ⏳ À exécuter |
 
 ---
 
@@ -74,32 +94,46 @@
 - **Backend**: Supabase (PostgreSQL, Auth, RLS, Realtime)
 - **Serverless**: Vercel Functions (AI, B2B)
 - **AI**: OpenAI GPT-4o Vision via Emergent LLM Key
+- **Maps**: Leaflet + OpenStreetMap (gratuit)
+- **Push**: Firebase Cloud Messaging
+- **Tests**: Playwright
 - **PWA**: vite-plugin-pwa
 
 ---
 
-## Tâches Restantes
+## Page Settings améliorée
 
-### À Faire par l'utilisateur
-1. ⏳ Exécuter `/app/supabase/B2B_API_TABLES.sql` sur Supabase
-2. ⏳ Tester l'API B2B avec un partenaire de test
-3. ⏳ Tester l'estimation IA (déjà intégré dans NewOrder)
-
-### Backlog Futur
-- [ ] Heatmap géographique (Leaflet/OpenStreetMap - gratuit)
-- [ ] App Mobile Native (React Native)
-- [ ] Tests E2E avec Playwright
-- [ ] Notifications Push Firebase (en cours)
+La page `/settings` a été entièrement refaite avec 3 onglets:
+1. **Profil** - Infos personnelles, téléphone, adresse
+2. **Notifications** - Push notifications + préférences email
+3. **Sécurité** - Mot de passe, déconnexion, suppression compte
 
 ---
 
-## Routes
+## Architecture des tests E2E
 
-| Route | Composant | Protection |
-|-------|-----------|------------|
-| `/admin/analytics` | AdminAnalytics | ProtectedAdminRoute |
-| `/dashboard` | ClientDashboard | PrivateRoute |
-| `/new-order` | NewOrder | - |
+```
+/app
+├── playwright.config.ts    # Configuration Playwright
+├── tests/
+│   └── e2e/
+│       ├── landing.spec.ts     # Tests landing page
+│       ├── auth.spec.ts        # Tests authentification
+│       ├── order.spec.ts       # Tests flux commande
+│       ├── navigation.spec.ts  # Tests navigation/routing
+│       └── accessibility.spec.ts # Tests a11y/perf
+└── test-reports/
+    └── playwright/             # Rapports HTML
+```
+
+---
+
+## Backlog Futur
+
+- [ ] App Mobile Native (React Native)
+- [ ] Analytics avancés (funnel, retention)
+- [ ] A/B Testing
+- [ ] Multi-langue (EN)
 
 ---
 
