@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { supabase } from '../lib/supabase';
 import Navbar from '../components/Navbar';
+import { FadeInOnScroll, StaggerChildren, CountUp } from '../components/animations/ScrollAnimations';
 import {
   Package, Clock, CheckCircle, MapPin, Loader2, ArrowRight,
   Star, RefreshCw, Plus, Sparkles, Phone, TrendingUp,
