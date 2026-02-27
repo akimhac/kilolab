@@ -552,6 +552,7 @@ export default function Landing() {
                   <ArrowRight className="group-hover:translate-x-1 transition-transform" size={18} />
                 </Link>
               </div>
+              </AnimateOnScroll>
             </div>
           </div>
         </section>
@@ -562,7 +563,7 @@ export default function Landing() {
           <div className="absolute top-0 left-1/4 w-96 h-96 bg-teal-500/10 rounded-full blur-3xl" />
           <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl" />
           
-          <div className="max-w-4xl mx-auto px-4 text-center relative">
+          <AnimateOnScroll className="max-w-4xl mx-auto px-4 text-center relative">
             <h2 className="font-heading text-4xl md:text-6xl font-bold mb-6">
               Prêt à récupérer votre temps libre ?
             </h2>
