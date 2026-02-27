@@ -703,8 +703,82 @@ export default function ClientDashboard() {
           </FadeInOnScroll>
         )}
 
+        {/* Tab Content - Referral */}
+        {activeTab === 'referral' && userId && (
+          <FadeInOnScroll direction="up" delay={100}>
+            <div className="space-y-6">
+              <ReferralSystem userId={userId} />
+              <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
+                <h3 className="font-black text-slate-900 mb-4 flex items-center gap-2">
+                  <Gift size={18} className="text-purple-500" /> Comment ça marche
+                </h3>
+                <div className="space-y-3">
+                  <div className="flex items-center gap-3 p-3 bg-purple-50 rounded-xl">
+                    <span className="w-8 h-8 bg-purple-500 text-white rounded-full flex items-center justify-center font-bold">1</span>
+                    <div>
+                      <p className="font-bold text-slate-900">Partagez votre code</p>
+                      <p className="text-sm text-slate-500">Via WhatsApp, SMS ou Email</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3 p-3 bg-purple-50 rounded-xl">
+                    <span className="w-8 h-8 bg-purple-500 text-white rounded-full flex items-center justify-center font-bold">2</span>
+                    <div>
+                      <p className="font-bold text-slate-900">Votre ami commande</p>
+                      <p className="text-sm text-slate-500">Il obtient -20% sur sa 1ère commande</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3 p-3 bg-purple-50 rounded-xl">
+                    <span className="w-8 h-8 bg-purple-500 text-white rounded-full flex items-center justify-center font-bold">3</span>
+                    <div>
+                      <p className="font-bold text-slate-900">Vous gagnez des récompenses</p>
+                      <p className="text-sm text-slate-500">+100 points fidélité par filleul</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </FadeInOnScroll>
+        )}
+
         {!hasNoOrders && <p className="text-center text-xs text-slate-300 mt-8">Mise a jour automatique toutes les 30s</p>}
       </div>
+
+      {/* Chat Bubble - Show only when there's an active order with a washer */}
+      {activeOrders.filter(o => o.washer_id && ['assigned', 'picked_up', 'washing', 'ready'].includes(o.status)).length > 0 && !showChat && (
+        <ChatBubble
+          orderId={activeOrders.find(o => o.washer_id)?.id || ''}
+          participantName={activeOrders.find(o => o.washer_id)?.washer?.first_name || 'Washer'}
+          onClick={() => {
+            const orderWithWasher = activeOrders.find(o => o.washer_id);
+            if (orderWithWasher) {
+              setChatOrder(orderWithWasher);
+              setShowChat(true);
+            }
+          }}
+        />
+      )}
+
+      {/* Chat Modal */}
+      {showChat && chatOrder && chatOrder.washer && userId && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-end sm:items-center justify-center p-4">
+          <div className="w-full max-w-lg h-[80vh] sm:h-[600px]">
+            <Chat
+              orderId={chatOrder.id}
+              currentUserId={userId}
+              participant={{
+                id: chatOrder.washer.id,
+                name: `${chatOrder.washer.first_name} ${chatOrder.washer.last_name}`,
+                avatar_url: chatOrder.washer.avatar_url || undefined,
+                role: 'washer',
+              }}
+              onClose={() => {
+                setShowChat(false);
+                setChatOrder(null);
+              }}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }
