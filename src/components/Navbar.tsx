@@ -177,6 +177,9 @@ export default function Navbar() {
             
             {/* Language Selector */}
             <LanguageSelector variant="minimal" />
+            
+            {/* Theme Toggle */}
+            <ThemeToggle variant="icon" />
           </div>
 
           {/* MOBILE MENU BUTTON */}
