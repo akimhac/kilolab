@@ -326,31 +326,35 @@ export default function BecomeWasher() {
               </FadeInOnScroll>
 
               {/* SIMULATEUR */}
-              <div className="bg-gradient-to-br from-teal-50 to-cyan-50 rounded-3xl p-8 md:p-12 border-2 border-teal-200">
-                <h2 className="text-3xl font-black mb-6 text-center">Simulez vos revenus</h2>
-                <div className="max-w-2xl mx-auto">
-                  <div className="mb-6">
-                    <div className="flex justify-between items-center mb-3">
-                      <span className="text-slate-600 font-bold">Volume hebdomadaire estimé</span>
-                      <span className="text-3xl font-black text-teal-600">{volume}kg</span>
+              <FadeInOnScroll direction="up" delay={500}>
+                <div className="bg-gradient-to-br from-teal-50 to-cyan-50 rounded-3xl p-8 md:p-12 border-2 border-teal-200">
+                  <h2 className="text-3xl font-black mb-6 text-center">Simulez vos revenus</h2>
+                  <div className="max-w-2xl mx-auto">
+                    <div className="mb-6">
+                      <div className="flex justify-between items-center mb-3">
+                        <span className="text-slate-600 font-bold">Volume hebdomadaire estimé</span>
+                        <span className="text-3xl font-black text-teal-600">{volume}kg</span>
+                      </div>
+                      <input
+                        type="range"
+                        min="10"
+                        max="100"
+                        step="5"
+                        value={volume}
+                        onChange={(e) => setVolume(parseInt(e.target.value, 10))}
+                        className="w-full h-3 bg-teal-200 rounded-lg appearance-none cursor-pointer accent-teal-600"
+                      />
                     </div>
-                    <input
-                      type="range"
-                      min="10"
-                      max="100"
-                      step="5"
-                      value={volume}
-                      onChange={(e) => setVolume(parseInt(e.target.value, 10))}
-                      className="w-full h-3 bg-teal-200 rounded-lg appearance-none cursor-pointer accent-teal-600"
-                    />
-                  </div>
-                  <div className="bg-white p-8 rounded-2xl border-2 border-teal-300 text-center">
-                    <p className="text-slate-500 text-sm uppercase tracking-wider mb-2">Revenus mensuels estimés</p>
-                    <p className="text-6xl font-black text-teal-600 mb-2">{revenue}€</p>
-                    <p className="text-slate-600 text-sm">Soit {(parseFloat(revenue) / 4).toFixed(0)}€/semaine</p>
+                    <div className="bg-white p-8 rounded-2xl border-2 border-teal-300 text-center hover:shadow-lg transition-all duration-300">
+                      <p className="text-slate-500 text-sm uppercase tracking-wider mb-2">Revenus mensuels estimés</p>
+                      <p className="text-6xl font-black text-teal-600 mb-2">
+                        <CountUp end={parseInt(revenue)} suffix="€" duration={1000} />
+                      </p>
+                      <p className="text-slate-600 text-sm">Soit {(parseFloat(revenue) / 4).toFixed(0)}€/semaine</p>
+                    </div>
                   </div>
                 </div>
-              </div>
+              </FadeInOnScroll>
 
               {/* CTA FINAL */}
               <div className="text-center mt-16">
