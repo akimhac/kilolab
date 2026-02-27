@@ -518,7 +518,7 @@ export default function NewOrder() {
                   <div className="text-xs text-teal-600">Prix estimé</div>
                 </div>
                 <div className="bg-slate-50 p-4 rounded-xl border">
-                  <div className="font-bold text-slate-900 mb-1">{formula === "eco" ? "48-72h" : "24h"}</div>
+                  <div className="font-bold text-slate-900 mb-1">{formula === "eco" ? "48-72h" : formula === "express" ? "24h" : "Collecte 2h"}</div>
                   <div className="text-xs text-slate-500">Délai</div>
                 </div>
               </div>
