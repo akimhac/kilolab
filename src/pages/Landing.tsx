@@ -219,35 +219,52 @@ export default function Landing() {
         {/* SOCIAL PROOF - Bento Grid Style */}
         <section className="py-24 bg-gradient-to-b from-slate-50 to-white">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center mb-16">
-              <h2 className="font-heading text-3xl md:text-4xl font-bold text-slate-900 mb-4">
-                La plateforme n°1 en France
-              </h2>
-              <p className="text-lg text-slate-600 max-w-2xl mx-auto">
-                Des milliers de clients nous font déjà confiance
-              </p>
-            </div>
+            <FadeInOnScroll>
+              <div className="text-center mb-16">
+                <h2 className="font-heading text-3xl md:text-4xl font-bold text-slate-900 mb-4">
+                  La plateforme n°1 en France
+                </h2>
+                <p className="text-lg text-slate-600 max-w-2xl mx-auto">
+                  Des milliers de clients nous font déjà confiance
+                </p>
+              </div>
+            </FadeInOnScroll>
 
-            {/* Stats Grid - Bento Style */}
+            {/* Stats Grid - Bento Style with animations */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mb-16">
-              {[
-                { value: "🇫🇷", label: "Partout en France", sublabel: "Couverture nationale" },
-                { value: "10k+", label: "Kilos lavés", sublabel: "Et ce n'est que le début" },
-                { value: "4.9", label: "Note moyenne", sublabel: "Sur 500+ avis", star: true },
-                { value: "7j/7", label: "Service disponible", sublabel: "Toujours là pour vous" },
-              ].map((stat, i) => (
-                <div
-                  key={i}
-                  className="group bg-white p-6 md:p-8 rounded-2xl border border-slate-100 shadow-card hover:shadow-card-hover transition-all duration-300 hover:-translate-y-1"
-                >
-                  <div className="flex items-center gap-2 mb-2">
-                    <span className="text-3xl md:text-4xl font-heading font-bold text-slate-900">{stat.value}</span>
-                    {stat.star && <Star size={24} className="text-yellow-500 fill-yellow-500" />}
-                  </div>
-                  <p className="text-sm font-semibold text-slate-900">{stat.label}</p>
-                  <p className="text-xs text-slate-500 mt-1">{stat.sublabel}</p>
+              <FadeInOnScroll delay={0} className="group bg-white p-6 md:p-8 rounded-2xl border border-slate-100 shadow-card hover:shadow-card-hover transition-all duration-300 hover:-translate-y-1">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-3xl md:text-4xl">🇫🇷</span>
                 </div>
-              ))}
+                <p className="text-sm font-semibold text-slate-900">Partout en France</p>
+                <p className="text-xs text-slate-500 mt-1">Couverture nationale</p>
+              </FadeInOnScroll>
+              
+              <FadeInOnScroll delay={100} className="group bg-white p-6 md:p-8 rounded-2xl border border-slate-100 shadow-card hover:shadow-card-hover transition-all duration-300 hover:-translate-y-1">
+                <div className="flex items-center gap-2 mb-2">
+                  <CountUp end={10000} suffix="+" className="text-3xl md:text-4xl font-heading font-bold text-slate-900" />
+                </div>
+                <p className="text-sm font-semibold text-slate-900">Kilos lavés</p>
+                <p className="text-xs text-slate-500 mt-1">Et ce n'est que le début</p>
+              </FadeInOnScroll>
+              
+              <FadeInOnScroll delay={200} className="group bg-white p-6 md:p-8 rounded-2xl border border-slate-100 shadow-card hover:shadow-card-hover transition-all duration-300 hover:-translate-y-1">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-3xl md:text-4xl font-heading font-bold text-slate-900">4.9</span>
+                  <Star size={24} className="text-yellow-500 fill-yellow-500" />
+                </div>
+                <p className="text-sm font-semibold text-slate-900">Note moyenne</p>
+                <p className="text-xs text-slate-500 mt-1">Sur 500+ avis</p>
+              </FadeInOnScroll>
+              
+              <FadeInOnScroll delay={300} className="group bg-white p-6 md:p-8 rounded-2xl border border-slate-100 shadow-card hover:shadow-card-hover transition-all duration-300 hover:-translate-y-1">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-3xl md:text-4xl font-heading font-bold text-slate-900">7j/7</span>
+                </div>
+                <p className="text-sm font-semibold text-slate-900">Service disponible</p>
+                <p className="text-xs text-slate-500 mt-1">Toujours là pour vous</p>
+              </FadeInOnScroll>
+            </div>
             </div>
 
             {/* Press mentions */}
