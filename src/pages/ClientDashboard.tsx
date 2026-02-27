@@ -543,6 +543,14 @@ export default function ClientDashboard() {
             >
               <Repeat size={16} /> Abonnement
             </button>
+            <button 
+              onClick={() => setActiveTab('referral')}
+              className={`flex items-center gap-2 px-4 py-2 rounded-xl font-bold text-sm whitespace-nowrap transition-all ${
+                activeTab === 'referral' ? 'bg-violet-500 text-white' : 'bg-white text-slate-600 border border-slate-200'
+              }`}
+            >
+              <Users size={16} /> Parrainage
+            </button>
           </div>
         )}
 
