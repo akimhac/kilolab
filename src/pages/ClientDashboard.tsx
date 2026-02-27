@@ -492,7 +492,7 @@ export default function ClientDashboard() {
                 { label: 'Commandes', value: stats.totalOrders, color: 'text-teal-600', isCount: true },
                 { label: 'Kg laves', value: stats.totalKg, color: 'text-purple-600', suffix: ' kg', isCount: true },
                 { label: 'Total', value: stats.totalSpent, color: 'text-green-600', prefix: '', suffix: ' EUR', isCount: true },
-                { label: 'Panier moy.', value: stats.avgOrderValue, color: 'text-orange-500', prefix: '', suffix: ' EUR', isCount: true },
+                { label: 'Points', value: profile?.loyalty_points || 0, color: 'text-amber-500', suffix: ' pts', isCount: true },
               ].map((s, i) => (
                 <div key={s.label} className="bg-white rounded-2xl p-3 text-center shadow-sm border border-slate-100 hover:shadow-md hover:scale-105 transition-all duration-300">
                   <p className={`font-black text-base ${s.color}`}>
@@ -511,6 +511,40 @@ export default function ClientDashboard() {
             </div>
           </FadeInOnScroll>
         )}
+
+        {/* Tabs Navigation */}
+        {stats.totalOrders > 0 && (
+          <div className="flex gap-2 mb-6 overflow-x-auto pb-2">
+            <button 
+              onClick={() => setActiveTab('orders')}
+              className={`flex items-center gap-2 px-4 py-2 rounded-xl font-bold text-sm whitespace-nowrap transition-all ${
+                activeTab === 'orders' ? 'bg-teal-500 text-white' : 'bg-white text-slate-600 border border-slate-200'
+              }`}
+            >
+              <Package size={16} /> Commandes
+            </button>
+            <button 
+              onClick={() => setActiveTab('loyalty')}
+              className={`flex items-center gap-2 px-4 py-2 rounded-xl font-bold text-sm whitespace-nowrap transition-all ${
+                activeTab === 'loyalty' ? 'bg-amber-500 text-white' : 'bg-white text-slate-600 border border-slate-200'
+              }`}
+            >
+              <Crown size={16} /> Fidélité
+            </button>
+            <button 
+              onClick={() => setActiveTab('subscription')}
+              className={`flex items-center gap-2 px-4 py-2 rounded-xl font-bold text-sm whitespace-nowrap transition-all ${
+                activeTab === 'subscription' ? 'bg-purple-500 text-white' : 'bg-white text-slate-600 border border-slate-200'
+              }`}
+            >
+              <Repeat size={16} /> Abonnement
+            </button>
+          </div>
+        )}
+
+        {/* Tab Content - Orders */}
+        {activeTab === 'orders' && (
+          <>
         {activeOrders.length > 0 && (
           <FadeInOnScroll direction="up" delay={200}>
             <div className="mb-8 space-y-4">
