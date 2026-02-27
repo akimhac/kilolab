@@ -504,6 +504,17 @@ export default function AdminAnalytics() {
             <p className="text-2xl font-black">{stats?.growthRate && stats.growthRate >= 0 ? '+' : ''}{(stats?.growthRate || 0).toFixed(0)}%</p>
           </div>
         </div>
+
+        {/* Advanced Analytics Section */}
+        <div className="mt-12">
+          <Suspense fallback={
+            <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 flex items-center justify-center h-96">
+              <Loader2 className="animate-spin text-teal-500" size={40} />
+            </div>
+          }>
+            <AdvancedAnalyticsDashboard />
+          </Suspense>
+        </div>
       </div>
     </div>
   );
