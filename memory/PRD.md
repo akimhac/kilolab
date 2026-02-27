@@ -7,7 +7,7 @@
 | **Nom** | KiloLab |
 | **URL** | kilolab.fr |
 | **Deploiement** | Vercel |
-| **Version** | 2.4.0 |
+| **Version** | 2.5.0 |
 | **Date MAJ** | 27 Decembre 2025 |
 
 ---
@@ -38,9 +38,15 @@ KiloLab est une marketplace de laverie qui connecte des clients avec des "Washer
 - [x] BecomeWasher : Cards benefices avec stagger animation, simulateur anime
 - [x] NewOrder : Import FadeInOnScroll prepare
 
-### 3. Scripts RLS Supabase - PRETS
-- [x] Script principal : `/app/supabase/RLS_POLICIES.sql`
-- [x] Script complementaire : `/app/supabase/RLS_COMPLEMENT.sql`
+### 3. Skeleton Loading Animations - COMPLETE (NOUVEAU)
+- [x] Composant Skeleton generique cree (`/app/src/components/animations/Skeleton.tsx`)
+- [x] ClientDashboardSkeleton : Stats, order cards, history rows
+- [x] WasherDashboardSkeleton : Dark theme, stats cards, mission cards
+- [x] Animations shimmer pour effet premium
+
+### 4. Scripts RLS Supabase - VERSION SAFE
+- [x] Script principal : `/app/supabase/RLS_POLICIES_SAFE.sql` (avec DROP IF EXISTS)
+- [x] Script complementaire : `/app/supabase/RLS_COMPLEMENT_SAFE.sql` (avec DROP IF EXISTS)
   - Washers peuvent voir commandes disponibles
   - Washers peuvent s'auto-assigner
   - Admin acces complet toutes tables
@@ -56,7 +62,7 @@ KiloLab est une marketplace de laverie qui connecte des clients avec des "Washer
 ├── public/               # Assets statiques, manifest.json, SW Firebase
 ├── src/
 │   ├── components/       # Composants React reutilisables
-│   │   └── animations/   # ScrollAnimations, LottieIcons
+│   │   └── animations/   # ScrollAnimations, Skeleton, LottieIcons
 │   ├── pages/            # Pages principales
 │   ├── lib/              # Supabase client, Firebase
 │   └── services/         # API clients
@@ -81,17 +87,19 @@ KiloLab est une marketplace de laverie qui connecte des clients avec des "Washer
 
 ## Scripts SQL a Executer sur Supabase
 
-**IMPORTANT : A executer dans l'ordre**
+**IMPORTANT : Utiliser les versions SAFE avec DROP IF EXISTS**
 
-1. `/app/supabase/RLS_POLICIES.sql` (si pas deja fait)
-2. `/app/supabase/RLS_COMPLEMENT.sql` (CRITIQUE pour le fonctionnement Washer/Admin)
+1. `/app/supabase/RLS_POLICIES_SAFE.sql` (principal)
+2. `/app/supabase/RLS_COMPLEMENT_SAFE.sql` (complement - CRITIQUE pour Washer/Admin)
+
+Ces scripts utilisent `DROP POLICY IF EXISTS` pour eviter les erreurs de duplication.
 
 ---
 
 ## Taches Restantes
 
 ### P0 - Critique
-- [ ] Verifier que les scripts RLS sont executes sur Supabase production
+- [ ] Executer les scripts RLS_SAFE sur Supabase production
 
 ### P1 - Important  
 - [ ] Implementer Meta Pixel pour tracking marketing
