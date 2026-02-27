@@ -1,52 +1,115 @@
 # KiloLab - Product Requirements Document (PRD)
 
-## 📋 Informations Projet
+## Informations Projet
 
 | Attribut | Valeur |
 |----------|--------|
 | **Nom** | KiloLab |
 | **URL** | kilolab.fr |
-| **Déploiement** | Vercel |
-| **Version** | 2.3.0 |
-| **Date MAJ** | 25 Février 2026 |
+| **Deploiement** | Vercel |
+| **Version** | 2.4.0 |
+| **Date MAJ** | 27 Decembre 2025 |
 
 ---
 
-## ✅ Session Complète - Optimisations
+## Description
 
-### Design & UX
-- [x] Design Uber/Airbnb (Landing, Navbar, Footer)
-- [x] Typographie premium (Plus Jakarta Sans + Inter)
-- [x] **Animations scroll** sur toutes les pages principales
-- [x] Page FAQ redesignée (catégories, accordéon animé)
-- [x] Page Contact améliorée (cards info, Helmet SEO)
-- [x] Page Tarifs avec animations
+KiloLab est une marketplace de laverie qui connecte des clients avec des "Washers" (personnes qui lavent le linge a domicile) et des pressings partenaires. Le modele est similaire a Uber mais pour le lavage de linge au kilo.
 
-### Technique
-- [x] PWA optimisée (caching, manifest, iOS)
-- [x] Build optimisé (code splitting)
-- [x] Migration Vercel complète (nettoyage Netlify)
+### Roles Utilisateurs
+- **Client** : Commande du lavage de linge
+- **Washer** : Particulier qui lave le linge des clients
+- **Partner** : Pressing professionnel partenaire
+- **Admin** : Gestion de la plateforme
 
-### Sécurité Supabase (RLS)
+---
+
+## Travail Complete (Session 27/12/2025)
+
+### 1. Firebase Push Notifications - COMPLETE
+- [x] Cle VAPID configuree dans `.env`
+- [x] Service Worker Firebase cree (`/app/public/firebase-messaging-sw.js`)
+- [x] Configuration complete pour notifications background
+- [x] Gestion du clic sur notification
+
+### 2. Animations UI/UX - COMPLETE
+- [x] ClientDashboard : Animations CountUp pour stats, FadeInOnScroll pour sections
+- [x] WasherDashboard : Stats animees avec CountUp, hover effects ameliores
+- [x] BecomeWasher : Cards benefices avec stagger animation, simulateur anime
+- [x] NewOrder : Import FadeInOnScroll prepare
+
+### 3. Scripts RLS Supabase - PRETS
 - [x] Script principal : `/app/supabase/RLS_POLICIES.sql`
-- [x] **Script complémentaire** : `/app/supabase/RLS_COMPLEMENT.sql`
-  - Fix Washers voir commandes disponibles
-  - Fix Washers s'auto-assigner
-  - Admin accès complet toutes tables
-  - referral_codes policies
+- [x] Script complementaire : `/app/supabase/RLS_COMPLEMENT.sql`
+  - Washers peuvent voir commandes disponibles
+  - Washers peuvent s'auto-assigner
+  - Admin acces complet toutes tables
+  - Policies referral_codes
 
 ---
 
-## 📦 À EXÉCUTER SUR SUPABASE
+## Architecture Technique
 
-**Dans l'ordre :**
-1. `/app/supabase/RLS_POLICIES.sql` (si pas déjà fait)
-2. `/app/supabase/RLS_COMPLEMENT.sql` ← **NOUVEAU - CRITIQUE**
+```
+/app
+├── api/                  # Vercel Serverless Functions (Stripe)
+├── public/               # Assets statiques, manifest.json, SW Firebase
+├── src/
+│   ├── components/       # Composants React reutilisables
+│   │   └── animations/   # ScrollAnimations, LottieIcons
+│   ├── pages/            # Pages principales
+│   ├── lib/              # Supabase client, Firebase
+│   └── services/         # API clients
+├── supabase/             # Scripts SQL RLS
+├── .env                  # Variables d'environnement
+└── vite.config.ts        # Configuration Vite + PWA
+```
+
+### Stack Technique
+- **Frontend**: React 18, TypeScript, Vite, TailwindCSS, Framer Motion
+- **Backend**: Supabase (PostgreSQL, Auth, Storage, RLS)
+- **Serverless**: Vercel Serverless Functions
+- **PWA**: vite-plugin-pwa
+
+### Integrations 3rd Party
+- **Supabase** : BDD, Auth, Storage
+- **Stripe** : Paiements
+- **Resend** : Emails transactionnels
+- **Firebase** : Push Notifications (PWA)
 
 ---
 
-## 📊 Score Final : **9/10**
+## Scripts SQL a Executer sur Supabase
+
+**IMPORTANT : A executer dans l'ordre**
+
+1. `/app/supabase/RLS_POLICIES.sql` (si pas deja fait)
+2. `/app/supabase/RLS_COMPLEMENT.sql` (CRITIQUE pour le fonctionnement Washer/Admin)
 
 ---
 
-*Dernière mise à jour : 25/02/2026*
+## Taches Restantes
+
+### P0 - Critique
+- [ ] Verifier que les scripts RLS sont executes sur Supabase production
+
+### P1 - Important  
+- [ ] Implementer Meta Pixel pour tracking marketing
+- [ ] Systeme Ambassadeur Washer (parrainage washers)
+
+### P2 - Ameliorations
+- [ ] Tests E2E avec Playwright
+- [ ] Ameliorer capacites offline PWA
+
+---
+
+## Notes de Deploiement
+
+Le projet est concu pour Vercel :
+- Build : `yarn build`
+- Les variables `.env` doivent etre configurees dans Vercel Dashboard
+- Le service worker Firebase est dans `/public/firebase-messaging-sw.js`
+
+---
+
+*Derniere mise a jour : 27/12/2025*
