@@ -601,6 +601,96 @@ export default function ClientDashboard() {
             </div>
           </FadeInOnScroll>
         )}
+          </>
+        )}
+
+        {/* Tab Content - Loyalty */}
+        {activeTab === 'loyalty' && userId && (
+          <FadeInOnScroll direction="up" delay={100}>
+            <div className="space-y-6">
+              <LoyaltyCard userId={userId} />
+              <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
+                <h3 className="font-black text-slate-900 mb-4 flex items-center gap-2">
+                  <Gift size={18} className="text-teal-500" /> Comment gagner des points
+                </h3>
+                <div className="space-y-3">
+                  <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-xl">
+                    <span className="text-2xl">🛒</span>
+                    <div>
+                      <p className="font-bold text-slate-900">Commander du lavage</p>
+                      <p className="text-sm text-slate-500">10 points par euro dépensé</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-xl">
+                    <span className="text-2xl">⭐</span>
+                    <div>
+                      <p className="font-bold text-slate-900">Laisser un avis</p>
+                      <p className="text-sm text-slate-500">+50 points par avis</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-xl">
+                    <span className="text-2xl">👥</span>
+                    <div>
+                      <p className="font-bold text-slate-900">Parrainer un ami</p>
+                      <p className="text-sm text-slate-500">+100 points par filleul</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </FadeInOnScroll>
+        )}
+
+        {/* Tab Content - Subscription */}
+        {activeTab === 'subscription' && (
+          <FadeInOnScroll direction="up" delay={100}>
+            <div className="space-y-6">
+              {subscription ? (
+                <SubscriptionCard 
+                  subscription={subscription} 
+                  onManage={() => {/* TODO: open manager modal */}} 
+                />
+              ) : (
+                <div className="bg-gradient-to-br from-purple-500 to-pink-500 rounded-3xl p-6 text-white">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center text-2xl">
+                      🔄
+                    </div>
+                    <div>
+                      <h3 className="font-black text-lg">Passez à l'abonnement</h3>
+                      <p className="text-white/70 text-sm">Économisez jusqu'à 15%</p>
+                    </div>
+                  </div>
+                  <p className="text-white/90 mb-4">
+                    Programmez vos lavages et profitez de réductions automatiques. 
+                    Plus besoin d'y penser !
+                  </p>
+                  <div className="grid grid-cols-3 gap-2 mb-4">
+                    <div className="bg-white/10 rounded-xl p-3 text-center">
+                      <p className="font-black text-lg">-15%</p>
+                      <p className="text-xs text-white/70">Hebdo</p>
+                    </div>
+                    <div className="bg-white/10 rounded-xl p-3 text-center">
+                      <p className="font-black text-lg">-10%</p>
+                      <p className="text-xs text-white/70">Bi-mensuel</p>
+                    </div>
+                    <div className="bg-white/10 rounded-xl p-3 text-center">
+                      <p className="font-black text-lg">-5%</p>
+                      <p className="text-xs text-white/70">Mensuel</p>
+                    </div>
+                  </div>
+                  <button 
+                    onClick={() => window.location.href = '/new-order?subscription=true'}
+                    className="w-full py-3 bg-white text-purple-600 rounded-2xl font-bold hover:bg-white/90 transition-all flex items-center justify-center gap-2"
+                  >
+                    Créer mon abonnement <ArrowRight size={16} />
+                  </button>
+                </div>
+              )}
+            </div>
+          </FadeInOnScroll>
+        )}
+
         {!hasNoOrders && <p className="text-center text-xs text-slate-300 mt-8">Mise a jour automatique toutes les 30s</p>}
       </div>
     </div>
