@@ -44,34 +44,36 @@ if (!rootEl) {
 } else {
   ReactDOM.createRoot(rootEl).render(
     <React.Fragment>
-      <BrowserRouter>
-        <Toaster 
-          position="top-center"
-          toastOptions={{
-            duration: 3000,
-            style: {
-              background: '#0f172a',
-              color: '#fff',
-              fontWeight: '600',
-              borderRadius: '12px',
-              padding: '12px 20px',
-            },
-            success: {
-              iconTheme: {
-                primary: '#14b8a6',
-                secondary: '#fff',
+      <ThemeProvider>
+        <BrowserRouter>
+          <Toaster 
+            position="top-center"
+            toastOptions={{
+              duration: 3000,
+              style: {
+                background: '#0f172a',
+                color: '#fff',
+                fontWeight: '600',
+                borderRadius: '12px',
+                padding: '12px 20px',
               },
-            },
-            error: {
-              iconTheme: {
-                primary: '#ef4444',
-                secondary: '#fff',
+              success: {
+                iconTheme: {
+                  primary: '#14b8a6',
+                  secondary: '#fff',
+                },
               },
-            },
-          }}
-        />
-        <App />
-      </BrowserRouter>
+              error: {
+                iconTheme: {
+                  primary: '#ef4444',
+                  secondary: '#fff',
+                },
+              },
+            }}
+          />
+          <App />
+        </BrowserRouter>
+      </ThemeProvider>
     </React.Fragment>
   );
 }
