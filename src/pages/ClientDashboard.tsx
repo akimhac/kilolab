@@ -478,16 +478,20 @@ export default function ClientDashboard() {
           </FadeInOnScroll>
         )}
         {activeOrders.length > 0 && (
-          <div className="mb-8 space-y-4">
-            <div className="flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-teal-400 animate-pulse" />
-              <h2 className="font-black text-slate-900">En cours</h2>
-              <span className="text-sm text-slate-400">({activeOrders.filter(o => ['pending','assigned','picked_up','washing','ready'].includes(o.status)).length})</span>
+          <FadeInOnScroll direction="up" delay={200}>
+            <div className="mb-8 space-y-4">
+              <div className="flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-teal-400 animate-pulse" />
+                <h2 className="font-black text-slate-900">En cours</h2>
+                <span className="text-sm text-slate-400">({activeOrders.filter(o => ['pending','assigned','picked_up','washing','ready'].includes(o.status)).length})</span>
+              </div>
+              {activeOrders.map((order, idx) => (
+                <div key={order.id} style={{ animationDelay: `${idx * 100}ms` }} className="animate-in fade-in slide-in-from-bottom-4">
+                  <ActiveOrderCard order={order} onCancel={cancelling === order.id ? undefined : cancelOrder} onRate={setRatingOrder} />
+                </div>
+              ))}
             </div>
-            {activeOrders.map(order => (
-              <ActiveOrderCard key={order.id} order={order} onCancel={cancelling === order.id ? undefined : cancelOrder} onRate={setRatingOrder} />
-            ))}
-          </div>
+          </FadeInOnScroll>
         )}
         {hasNoOrders && (
           <div className="bg-white rounded-3xl p-10 text-center shadow-sm border border-slate-100 mb-8">
