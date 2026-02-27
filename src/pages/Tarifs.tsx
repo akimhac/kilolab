@@ -177,6 +177,7 @@ export default function Tarifs() {
               <span>Support client disponible</span>
             </div>
           </div>
+          </AnimateOnScroll>
         </section>
 
         {/* ═══════════════════════════════════════════════════════════
