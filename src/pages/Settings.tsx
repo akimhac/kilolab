@@ -87,10 +87,10 @@ export default function Settings() {
   }
 
   return (
-    <div className="bg-slate-50 min-h-screen">
+    <div className="bg-slate-50 dark:bg-slate-900 min-h-screen transition-colors">
       <Navbar />
       <div className="max-w-2xl mx-auto px-4 pt-24 pb-12">
-        <h1 className="text-2xl font-black text-slate-900 mb-6">Paramètres</h1>
+        <h1 className="text-2xl font-black text-slate-900 dark:text-white mb-6">Paramètres</h1>
 
         {/* Tabs */}
         <div className="flex gap-2 mb-6 overflow-x-auto pb-2">
