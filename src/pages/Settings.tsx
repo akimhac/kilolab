@@ -2,7 +2,8 @@ import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import Navbar from '../components/Navbar';
 import NotificationSettings from '../components/NotificationSettings';
-import { User, Mail, Phone, MapPin, Bell, Shield, Trash2, LogOut, Loader2, Save, ChevronRight } from 'lucide-react';
+import { ThemeToggle } from '../components/ThemeToggle';
+import { User, Mail, Phone, MapPin, Bell, Shield, Trash2, LogOut, Loader2, Save, ChevronRight, Palette } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 interface UserProfile {
