@@ -163,9 +163,6 @@ export default function NewOrder() {
         return cityMatch || postalMatch || deptMatch;
       });
 
-      console.log("🔍 Recherche:", searchQuery, "→", results.length, "résultats");
-      console.log("📊 Résultats détaillés:", results);
-
       setFilteredWashers(results);
       setIsSearching(false);
       setSearchDone(true);
