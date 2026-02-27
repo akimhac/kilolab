@@ -582,12 +582,14 @@ export default function WasherDashboard() {
         )}
 
         {/* STATS */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
-          <StatCard icon={<DollarSign className="text-green-400" size={24} />} label="Gains totaux" value={`${stats.totalEarnings.toFixed(2)} EUR`} accent="#22c55e" />
-          <StatCard icon={<TrendingUp className="text-teal-400" size={24} />} label="Cette semaine" value={`${stats.weekEarnings.toFixed(2)} EUR`} accent="#14b8a6" />
-          <StatCard icon={<Package className="text-blue-400" size={24} />} label="Terminees" value={stats.completedOrders} accent="#3b82f6" />
-          <StatCard icon={<Clock className="text-orange-400" size={24} />} label="En cours" value={stats.pendingOrders} accent="#f97316" />
-        </div>
+        <FadeInOnScroll direction="up" delay={100}>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
+            <StatCard icon={<DollarSign className="text-green-400" size={24} />} label="Gains totaux" value={<CountUp end={Math.round(stats.totalEarnings)} suffix=" EUR" duration={1500} />} accent="#22c55e" />
+            <StatCard icon={<TrendingUp className="text-teal-400" size={24} />} label="Cette semaine" value={<CountUp end={Math.round(stats.weekEarnings)} suffix=" EUR" duration={1500} />} accent="#14b8a6" />
+            <StatCard icon={<Package className="text-blue-400" size={24} />} label="Terminees" value={<CountUp end={stats.completedOrders} duration={1500} />} accent="#3b82f6" />
+            <StatCard icon={<Clock className="text-orange-400" size={24} />} label="En cours" value={<CountUp end={stats.pendingOrders} duration={1500} />} accent="#f97316" />
+          </div>
+        </FadeInOnScroll>
 
         {/* TABS */}
         <div className="flex gap-1 mb-6 bg-white/5 border border-white/8 rounded-2xl p-1">
