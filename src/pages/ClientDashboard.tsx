@@ -29,6 +29,21 @@ interface Order {
 interface UserProfile {
   id: string; full_name: string | null; referral_code: string | null;
   uses_count: number; bonus_earned_cents: number; referral_credit: number;
+  loyalty_points?: number;
+}
+
+interface Subscription {
+  id: string;
+  plan: 'weekly' | 'biweekly' | 'monthly';
+  status: 'active' | 'paused' | 'cancelled';
+  weight_kg: number;
+  formula: 'standard' | 'express';
+  pickup_address: string;
+  preferred_day: string;
+  preferred_slot: string;
+  next_pickup: string;
+  price_per_order: number;
+  discount_percent: number;
 }
 
 function formatCurrency(a: number) {
