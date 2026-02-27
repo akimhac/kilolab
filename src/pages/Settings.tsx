@@ -113,10 +113,18 @@ export default function Settings() {
           <button
             onClick={() => setActiveTab('security')}
             className={`flex items-center gap-2 px-4 py-2 rounded-xl font-bold text-sm whitespace-nowrap transition-all ${
-              activeTab === 'security' ? 'bg-teal-500 text-white' : 'bg-white text-slate-600 border border-slate-200'
+              activeTab === 'security' ? 'bg-teal-500 text-white' : 'bg-white text-slate-600 border border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700'
             }`}
           >
             <Shield size={16} /> Sécurité
+          </button>
+          <button
+            onClick={() => setActiveTab('appearance')}
+            className={`flex items-center gap-2 px-4 py-2 rounded-xl font-bold text-sm whitespace-nowrap transition-all ${
+              activeTab === 'appearance' ? 'bg-teal-500 text-white' : 'bg-white text-slate-600 border border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700'
+            }`}
+          >
+            <Palette size={16} /> Apparence
           </button>
         </div>
 
