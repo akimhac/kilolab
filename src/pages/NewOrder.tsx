@@ -365,10 +365,11 @@ export default function NewOrder() {
                 <Tag className="text-teal-500" /> Choisissez votre formule
               </h2>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+                {/* Standard */}
                 <div
                   onClick={() => setFormula("eco")}
-                  className={`group p-6 border-2 rounded-2xl cursor-pointer transition-all transform hover:scale-105 ${
+                  className={`group p-5 border-2 rounded-2xl cursor-pointer transition-all transform hover:scale-105 ${
                     formula === "eco"
                       ? "border-teal-500 bg-teal-50 shadow-xl"
                       : "border-slate-200 hover:border-teal-300 bg-white"
@@ -376,58 +377,94 @@ export default function NewOrder() {
                 >
                   <div className="flex justify-between items-start mb-3">
                     <div>
-                      <span className="font-black text-xl uppercase text-slate-900">Standard</span>
+                      <span className="font-black text-lg uppercase text-slate-900">Standard</span>
                       <p className="text-xs text-slate-500 mt-1">Le choix malin</p>
                     </div>
                     <div className="text-right">
-                      <div className="text-3xl font-black text-slate-900">3€</div>
+                      <div className="text-2xl font-black text-slate-900">3€</div>
                       <span className="text-xs text-slate-400">/kg</span>
                     </div>
                   </div>
-                  <ul className="space-y-2 text-sm text-slate-600 mb-4">
+                  <ul className="space-y-1.5 text-sm text-slate-600 mb-3">
                     <li className="flex items-center gap-2">
-                      <CheckCircle size={16} className="text-green-500" /> Lavage soigné
+                      <CheckCircle size={14} className="text-green-500" /> Lavage soigné
                     </li>
                     <li className="flex items-center gap-2">
-                      <CheckCircle size={16} className="text-green-500" /> Séchage & Pliage
+                      <CheckCircle size={14} className="text-green-500" /> Séchage & Pliage
                     </li>
                   </ul>
-                  <div className="bg-white rounded-xl p-3 border border-slate-200 text-center">
-                    <span className="text-xs font-bold text-slate-500">⏱️ Prêt en 48h-72h</span>
+                  <div className="bg-white rounded-xl p-2 border border-slate-200 text-center">
+                    <span className="text-xs font-bold text-slate-500">⏱️ Prêt en 48-72h</span>
                   </div>
                 </div>
 
+                {/* Express 24h */}
                 <div
                   onClick={() => setFormula("express")}
-                  className={`group p-6 border-2 rounded-2xl cursor-pointer transition-all transform hover:scale-105 relative ${
+                  className={`group p-5 border-2 rounded-2xl cursor-pointer transition-all transform hover:scale-105 relative ${
                     formula === "express"
                       ? "border-purple-500 bg-purple-50 shadow-xl"
                       : "border-slate-200 hover:border-purple-300 bg-white"
                   }`}
                 >
-                  <div className="absolute -top-3 -right-3 bg-purple-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg">
-                    ⚡ Rapide
+                  <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 bg-purple-500 text-white text-xs font-bold px-3 py-0.5 rounded-full shadow-lg">
+                    POPULAIRE
                   </div>
                   <div className="flex justify-between items-start mb-3">
                     <div>
-                      <span className="font-black text-xl uppercase text-slate-900">Express</span>
-                      <p className="text-xs text-slate-500 mt-1">Pour les pressés</p>
+                      <span className="font-black text-lg uppercase text-slate-900">Express</span>
+                      <p className="text-xs text-slate-500 mt-1">24h chrono</p>
                     </div>
                     <div className="text-right">
-                      <div className="text-3xl font-black text-slate-900">5€</div>
+                      <div className="text-2xl font-black text-slate-900">5€</div>
                       <span className="text-xs text-slate-400">/kg</span>
                     </div>
                   </div>
-                  <ul className="space-y-2 text-sm text-slate-600 mb-4">
+                  <ul className="space-y-1.5 text-sm text-slate-600 mb-3">
                     <li className="flex items-center gap-2">
-                      <CheckCircle size={16} className="text-purple-500" /> Lavage prioritaire
+                      <CheckCircle size={14} className="text-purple-500" /> Priorité absolue
                     </li>
                     <li className="flex items-center gap-2">
-                      <CheckCircle size={16} className="text-purple-500" /> Pliage soigné "Boutique"
+                      <CheckCircle size={14} className="text-purple-500" /> Pliage "Boutique"
                     </li>
                   </ul>
-                  <div className="bg-purple-100 rounded-xl p-3 border border-purple-200 text-center">
-                    <span className="text-xs font-bold text-purple-700">⚡ Prêt en 24h chrono</span>
+                  <div className="bg-purple-100 rounded-xl p-2 border border-purple-200 text-center">
+                    <span className="text-xs font-bold text-purple-700">⚡ Prêt en 24h</span>
+                  </div>
+                </div>
+
+                {/* Express 2h */}
+                <div
+                  onClick={() => setFormula("express_2h")}
+                  className={`group p-5 border-2 rounded-2xl cursor-pointer transition-all transform hover:scale-105 relative ${
+                    formula === "express_2h"
+                      ? "border-red-500 bg-red-50 shadow-xl"
+                      : "border-slate-200 hover:border-red-300 bg-white"
+                  }`}
+                >
+                  <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 bg-gradient-to-r from-red-500 to-pink-500 text-white text-xs font-bold px-3 py-0.5 rounded-full shadow-lg animate-pulse">
+                    NOUVEAU
+                  </div>
+                  <div className="flex justify-between items-start mb-3">
+                    <div>
+                      <span className="font-black text-lg uppercase text-slate-900">Express 2h</span>
+                      <p className="text-xs text-slate-500 mt-1">Collecte ultra-rapide</p>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-2xl font-black text-slate-900">8€</div>
+                      <span className="text-xs text-slate-400">/kg</span>
+                    </div>
+                  </div>
+                  <ul className="space-y-1.5 text-sm text-slate-600 mb-3">
+                    <li className="flex items-center gap-2">
+                      <CheckCircle size={14} className="text-red-500" /> Collecte en 2h
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <CheckCircle size={14} className="text-red-500" /> Washer dédié
+                    </li>
+                  </ul>
+                  <div className="bg-red-100 rounded-xl p-2 border border-red-200 text-center">
+                    <span className="text-xs font-bold text-red-700">🚀 Collecte en 2h</span>
                   </div>
                 </div>
               </div>
