@@ -452,19 +452,30 @@ export default function ClientDashboard() {
           </div>
         </div>
         {stats.totalOrders > 0 && (
-          <div className="grid grid-cols-4 gap-2 mb-6">
-            {[
-              { label: 'Commandes', value: stats.totalOrders, color: 'text-teal-600' },
-              { label: 'Kg laves', value: `${stats.totalKg.toFixed(0)} kg`, color: 'text-purple-600' },
-              { label: 'Total', value: formatCurrency(stats.totalSpent), color: 'text-green-600' },
-              { label: 'Panier moy.', value: formatCurrency(stats.avgOrderValue), color: 'text-orange-500' },
-            ].map(s => (
-              <div key={s.label} className="bg-white rounded-2xl p-3 text-center shadow-sm border border-slate-100">
-                <p className={`font-black text-base ${s.color}`}>{s.value}</p>
-                <p className="text-[10px] text-slate-400 mt-0.5 font-medium">{s.label}</p>
-              </div>
-            ))}
-          </div>
+          <FadeInOnScroll direction="up" delay={100}>
+            <div className="grid grid-cols-4 gap-2 mb-6">
+              {[
+                { label: 'Commandes', value: stats.totalOrders, color: 'text-teal-600', isCount: true },
+                { label: 'Kg laves', value: stats.totalKg, color: 'text-purple-600', suffix: ' kg', isCount: true },
+                { label: 'Total', value: stats.totalSpent, color: 'text-green-600', prefix: '', suffix: ' EUR', isCount: true },
+                { label: 'Panier moy.', value: stats.avgOrderValue, color: 'text-orange-500', prefix: '', suffix: ' EUR', isCount: true },
+              ].map((s, i) => (
+                <div key={s.label} className="bg-white rounded-2xl p-3 text-center shadow-sm border border-slate-100 hover:shadow-md hover:scale-105 transition-all duration-300">
+                  <p className={`font-black text-base ${s.color}`}>
+                    {s.isCount ? (
+                      <CountUp 
+                        end={typeof s.value === 'number' ? Math.round(s.value) : 0} 
+                        prefix={s.prefix || ''} 
+                        suffix={s.suffix || ''} 
+                        duration={1500} 
+                      />
+                    ) : s.value}
+                  </p>
+                  <p className="text-[10px] text-slate-400 mt-0.5 font-medium">{s.label}</p>
+                </div>
+              ))}
+            </div>
+          </FadeInOnScroll>
         )}
         {activeOrders.length > 0 && (
           <div className="mb-8 space-y-4">
