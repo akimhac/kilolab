@@ -252,14 +252,16 @@ export default function Landing() {
         {/* SOCIAL PROOF - Bento Grid Style */}
         <section className="py-24 bg-gradient-to-b from-slate-50 to-white">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center mb-16">
-              <h2 className="font-heading text-3xl md:text-4xl font-bold text-slate-900 mb-4">
-                La plateforme n°1 en France
-              </h2>
-              <p className="text-lg text-slate-600 max-w-2xl mx-auto">
-                Des milliers de clients nous font déjà confiance
-              </p>
-            </div>
+            <AnimateOnScroll>
+              <div className="text-center mb-16">
+                <h2 className="font-heading text-3xl md:text-4xl font-bold text-slate-900 mb-4">
+                  La plateforme n°1 en France
+                </h2>
+                <p className="text-lg text-slate-600 max-w-2xl mx-auto">
+                  Des milliers de clients nous font déjà confiance
+                </p>
+              </div>
+            </AnimateOnScroll>
 
             {/* Stats Grid - Bento Style */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mb-16">
@@ -269,17 +271,16 @@ export default function Landing() {
                 { value: "4.9", label: "Note moyenne", sublabel: "Sur 500+ avis", star: true },
                 { value: "7j/7", label: "Service disponible", sublabel: "Toujours là pour vous" },
               ].map((stat, i) => (
-                <div
-                  key={i}
-                  className="group bg-white p-6 md:p-8 rounded-2xl border border-slate-100 shadow-card hover:shadow-card-hover transition-all duration-300 hover:-translate-y-1"
-                >
-                  <div className="flex items-center gap-2 mb-2">
-                    <span className="text-3xl md:text-4xl font-heading font-bold text-slate-900">{stat.value}</span>
-                    {stat.star && <Star size={24} className="text-yellow-500 fill-yellow-500" />}
+                <AnimateOnScroll key={i} delay={i * 100}>
+                  <div className="group bg-white p-6 md:p-8 rounded-2xl border border-slate-100 shadow-card hover:shadow-card-hover transition-all duration-300 hover:-translate-y-1 h-full">
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="text-3xl md:text-4xl font-heading font-bold text-slate-900">{stat.value}</span>
+                      {stat.star && <Star size={24} className="text-yellow-500 fill-yellow-500" />}
+                    </div>
+                    <p className="text-sm font-semibold text-slate-900">{stat.label}</p>
+                    <p className="text-xs text-slate-500 mt-1">{stat.sublabel}</p>
                   </div>
-                  <p className="text-sm font-semibold text-slate-900">{stat.label}</p>
-                  <p className="text-xs text-slate-500 mt-1">{stat.sublabel}</p>
-                </div>
+                </AnimateOnScroll>
               ))}
             </div>
 
