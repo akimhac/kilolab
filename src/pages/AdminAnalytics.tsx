@@ -12,8 +12,9 @@ import {
 import { format, subDays, startOfWeek, endOfWeek, startOfMonth, endOfMonth, eachDayOfInterval } from 'date-fns';
 import { fr } from 'date-fns/locale';
 
-// Lazy load the heavy map component
+// Lazy load the heavy components
 const OrderHeatmap = lazy(() => import('../components/OrderHeatmap'));
+const AdvancedAnalyticsDashboard = lazy(() => import('../components/AdvancedAnalytics').then(m => ({ default: m.AdvancedAnalyticsDashboard })));
 
 interface DashboardStats {
   totalOrders: number;
