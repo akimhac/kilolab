@@ -6,11 +6,13 @@ import { ClientDashboardSkeleton } from '../components/animations/Skeleton';
 import { OrderTrackerMini } from '../components/OrderTracker';
 import { LoyaltyCard } from '../components/Loyalty';
 import { SubscriptionCard } from '../components/Subscription';
+import { ReferralSystem } from '../components/ReferralSystem';
+import { Chat, ChatBubble } from '../components/Chat';
 import {
   Package, Clock, CheckCircle, MapPin, Loader2, ArrowRight,
   Star, RefreshCw, Plus, Sparkles, Phone, TrendingUp,
   Gift, Copy, ChevronDown, ChevronUp, ThumbsUp, X,
-  RotateCcw, Zap, Crown, Repeat, MessageCircle
+  RotateCcw, Zap, Crown, Repeat, MessageCircle, Users
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
