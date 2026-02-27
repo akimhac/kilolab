@@ -40,7 +40,7 @@ CREATE POLICY "Clients can view assigned washer location" ON washer_locations
     EXISTS (
       SELECT 1 FROM orders 
       WHERE orders.washer_id = washer_locations.washer_id 
-      AND orders.user_id = auth.uid()
+      AND orders.client_id = auth.uid()
       AND orders.status IN ('assigned', 'picked_up', 'washing', 'ready', 'delivering')
     )
   );
