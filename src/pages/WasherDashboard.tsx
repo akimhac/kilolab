@@ -3,6 +3,7 @@ import { supabase } from "../lib/supabase";
 import { requestNotificationPermission } from "../lib/firebase";
 import Navbar from "../components/Navbar";
 import { FadeInOnScroll, CountUp } from "../components/animations/ScrollAnimations";
+import { WasherDashboardSkeleton } from "../components/animations/Skeleton";
 import toast from "react-hot-toast";
 import {
   DollarSign, Package, Clock, MapPin, Check, TrendingUp, Loader2,
