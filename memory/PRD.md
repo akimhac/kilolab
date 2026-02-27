@@ -7,74 +7,70 @@
 | **Nom** | KiloLab |
 | **URL** | kilolab.fr |
 | **Deploiement** | Vercel |
-| **Version** | 3.2.0 |
+| **Version** | 3.3.0 |
 | **Date MAJ** | 13 Janvier 2026 |
 
 ---
 
-## MEGA UPDATE v3.2 - TOUTES FONCTIONNALITÉS COMPLÈTES
+## MEGA UPDATE v3.3 - TOUTES FONCTIONNALITÉS COMPLÈTES
 
-### Checklist Fonctionnalités
+### Checklist Fonctionnalités (16/16 ✅)
 
 | # | Fonctionnalité | Status | Composant |
 |---|----------------|--------|-----------|
-| 1 | Tracking Meta Pixel + GA4 | ✅ DONE | `useAnalytics.ts` |
-| 2 | Social Proof Dynamique | ✅ DONE | `SocialProof.tsx` → Landing |
-| 3 | Système Parrainage | ✅ DONE | `ReferralSystem.tsx` → ClientDashboard (onglet) |
-| 4 | Suivi Temps Réel | ✅ DONE | `OrderTracker.tsx` |
-| 5 | Chat In-App | ✅ DONE | `Chat.tsx` → ClientDashboard (intégré) |
-| 6 | Abonnements Récurrents | ✅ DONE | `Subscription.tsx` → ClientDashboard |
-| 7 | Programme Fidélité | ✅ DONE | `Loyalty.tsx` → ClientDashboard |
-| 8 | Multi-Services | ✅ DONE | `Services.tsx` → NewOrder |
-| 9 | Express 2h | ✅ DONE | Intégré dans NewOrder |
-| 10 | Pressing/Sneakers | ✅ DONE | Dans `Services.tsx` |
-| 11 | Dashboard Admin Analytics | ✅ DONE | `AdminAnalytics.tsx` |
-| 12 | API Partenaires B2B | ✅ DONE | `/api/b2b.js` + SQL |
-| 13 | Estimation IA Poids | ✅ DONE | `/api/estimate-weight.js` + `WeightEstimator.tsx` |
-| 14 | **Heatmap Géographique** | ✅ DONE (v3.2) | `OrderHeatmap.tsx` → AdminAnalytics |
-| 15 | **Notifications Push** | ✅ DONE (v3.2) | `pushNotifications.tsx` + `NotificationSettings.tsx` |
-| 16 | **Tests E2E Playwright** | ✅ DONE (v3.2) | `/tests/e2e/*.spec.ts` |
+| 1 | Tracking Meta Pixel + GA4 | ✅ | `useAnalytics.ts` |
+| 2 | Social Proof Dynamique | ✅ | `SocialProof.tsx` |
+| 3 | Système Parrainage | ✅ | `ReferralSystem.tsx` |
+| 4 | Suivi Temps Réel | ✅ | `OrderTracker.tsx` |
+| 5 | Chat In-App | ✅ | `Chat.tsx` |
+| 6 | Abonnements Récurrents | ✅ | `Subscription.tsx` |
+| 7 | Programme Fidélité | ✅ | `Loyalty.tsx` |
+| 8 | Multi-Services | ✅ | `Services.tsx` |
+| 9 | Express 2h | ✅ | Intégré dans NewOrder |
+| 10 | Pressing/Sneakers | ✅ | Dans `Services.tsx` |
+| 11 | Dashboard Admin Analytics | ✅ | `AdminAnalytics.tsx` |
+| 12 | API Partenaires B2B | ✅ | `/api/b2b.js` |
+| 13 | Estimation IA Poids | ✅ | `WeightEstimator.tsx` |
+| 14 | Heatmap Géographique | ✅ | `OrderHeatmap.tsx` |
+| 15 | Notifications Push | ✅ | `NotificationSettings.tsx` |
+| 16 | Tests E2E Playwright | ✅ | `tests/e2e/*.spec.ts` |
+| **17** | **Multi-langue FR/EN** | ✅ (v3.3) | `i18n.ts`, `LanguageSelector.tsx` |
+| **18** | **Tracking GPS Live** | ✅ (v3.3) | `LiveTracking.tsx` |
+| **19** | **Analytics Avancés** | ✅ (v3.3) | `AdvancedAnalytics.tsx` |
 
 ---
 
-## Nouvelles fonctionnalités v3.2
+## Nouvelles fonctionnalités v3.3
 
-### 1. Heatmap Géographique (Leaflet/OpenStreetMap)
-- **Composant**: `src/components/OrderHeatmap.tsx`
-- **Intégration**: `AdminAnalytics.tsx` (lazy loaded)
+### 1. Multi-langue (i18next)
+- **Config**: `src/i18n.ts`
+- **Traductions**: `src/locales/fr.json`, `src/locales/en.json`
+- **UI**: `src/components/LanguageSelector.tsx` → Navbar
 - **Features**:
-  - Carte interactive avec clusters par ville
-  - Code couleur par intensité (vert → rouge)
-  - Popup avec stats (commandes, CA)
-  - Top 5 villes en footer
-  - Géocodage des villes françaises intégré
-  - 100% gratuit (OpenStreetMap)
+  - Détection automatique de la langue du navigateur
+  - Persistance dans localStorage
+  - 3 variantes: dropdown, buttons, minimal
+  - Toutes les chaînes traduites (nav, auth, dashboard, etc.)
 
-### 2. Notifications Push Firebase
-- **Service**: `src/services/pushNotifications.tsx`
-- **UI**: `src/components/NotificationSettings.tsx`
-- **Service Worker**: `public/firebase-messaging-sw.js`
+### 2. Tracking GPS Washers (temps réel)
+- **Composant**: `src/components/LiveTracking.tsx`
 - **Features**:
-  - Permission request
-  - FCM token management
-  - Foreground/Background notifications
-  - Deep linking on click
-  - Intégré dans `/settings`
-- **SQL**: `supabase/KILOLAB_V5_NOTIFICATIONS.sql`
+  - Carte Leaflet avec position live du Washer
+  - Mise à jour en temps réel via Supabase Realtime
+  - Calcul automatique de l'ETA
+  - Ligne de route en pointillés
+  - Boutons Appeler / Message
+  - Version mini pour le dashboard
+- **SQL**: `supabase/KILOLAB_V6_TRACKING_ANALYTICS.sql`
 
-### 3. Tests E2E Playwright
-- **Config**: `playwright.config.ts`
-- **Tests**: `tests/e2e/`
-  - `landing.spec.ts` - Page d'accueil
-  - `auth.spec.ts` - Authentification
-  - `order.spec.ts` - Flux commande
-  - `navigation.spec.ts` - Routing
-  - `accessibility.spec.ts` - A11y + Performance
-- **Scripts npm**:
-  - `yarn test:e2e` - Run tous les tests
-  - `yarn test:e2e:ui` - Mode UI interactif
-  - `yarn test:e2e:headed` - Mode visible
-  - `yarn test:e2e:report` - Voir le rapport
+### 3. Analytics Avancés
+- **Composant**: `src/components/AdvancedAnalytics.tsx`
+- **Features**:
+  - **Funnel Analysis**: Visiteurs → Inscriptions → Commandes → Livraisons
+  - **Retention Cohort**: Grille de rétention par semaine
+  - **KPIs avancés**: LTV, Panier moyen, Taux de repeat, Cmd/client
+  - Sélecteur de période (7j, 30j, 90j)
+- **Intégration**: Lazy loaded dans AdminAnalytics
 
 ---
 
@@ -82,9 +78,10 @@
 
 | Script | Description | Status |
 |--------|-------------|--------|
-| `KILOLAB_V3_FEATURES.sql` | Fidélité, abonnements, tracking | ✅ Exécuté |
-| `B2B_API_TABLES.sql` | Tables B2B partenaires | ⏳ À exécuter |
-| `KILOLAB_V5_NOTIFICATIONS.sql` | FCM tokens, notifications | ⏳ À exécuter |
+| `KILOLAB_V3_FEATURES.sql` | Fidélité, abonnements | ✅ |
+| `B2B_API_TABLES.sql` | Tables B2B | ✅ |
+| `KILOLAB_V5_NOTIFICATIONS.sql` | FCM tokens | ✅ |
+| `KILOLAB_V6_TRACKING_ANALYTICS.sql` | GPS live + analytics | ⏳ À exécuter |
 
 ---
 
@@ -92,38 +89,49 @@
 
 - **Frontend**: React 18, TypeScript, Vite, TailwindCSS
 - **Backend**: Supabase (PostgreSQL, Auth, RLS, Realtime)
-- **Serverless**: Vercel Functions (AI, B2B)
-- **AI**: OpenAI GPT-4o Vision via Emergent LLM Key
-- **Maps**: Leaflet + OpenStreetMap (gratuit)
+- **Serverless**: Vercel Functions
+- **AI**: OpenAI GPT-4o Vision (Emergent LLM Key)
+- **Maps**: Leaflet + OpenStreetMap
 - **Push**: Firebase Cloud Messaging
+- **i18n**: i18next + react-i18next
 - **Tests**: Playwright
 - **PWA**: vite-plugin-pwa
 
 ---
 
-## Page Settings améliorée
+## Architecture des fichiers
 
-La page `/settings` a été entièrement refaite avec 3 onglets:
-1. **Profil** - Infos personnelles, téléphone, adresse
-2. **Notifications** - Push notifications + préférences email
-3. **Sécurité** - Mot de passe, déconnexion, suppression compte
+```
+/app/src
+├── i18n.ts                    # Config i18next
+├── locales/
+│   ├── fr.json               # Traductions FR
+│   └── en.json               # Traductions EN
+├── components/
+│   ├── LanguageSelector.tsx  # Sélecteur de langue
+│   ├── LiveTracking.tsx      # Tracking GPS temps réel
+│   ├── AdvancedAnalytics.tsx # Funnel, Retention, KPIs
+│   └── ...
+└── ...
+```
 
 ---
 
-## Architecture des tests E2E
+## Utilisation du tracking GPS
 
-```
-/app
-├── playwright.config.ts    # Configuration Playwright
-├── tests/
-│   └── e2e/
-│       ├── landing.spec.ts     # Tests landing page
-│       ├── auth.spec.ts        # Tests authentification
-│       ├── order.spec.ts       # Tests flux commande
-│       ├── navigation.spec.ts  # Tests navigation/routing
-│       └── accessibility.spec.ts # Tests a11y/perf
-└── test-reports/
-    └── playwright/             # Rapports HTML
+Pour activer le tracking live d'un Washer:
+1. Le Washer doit partager sa position (géolocalisation navigateur)
+2. Le composant `LiveWasherTracking` s'abonne au channel Realtime
+3. L'ETA est calculée automatiquement
+
+```tsx
+<LiveWasherTracking
+  orderId="..."
+  washerId="..."
+  pickupLat={48.8566}
+  pickupLng={2.3522}
+  onChat={() => openChat()}
+/>
 ```
 
 ---
@@ -131,9 +139,9 @@ La page `/settings` a été entièrement refaite avec 3 onglets:
 ## Backlog Futur
 
 - [ ] App Mobile Native (React Native)
-- [ ] Analytics avancés (funnel, retention)
-- [ ] A/B Testing
-- [ ] Multi-langue (EN)
+- [ ] Tableau de bord Washer avec navigation GPS
+- [ ] Prédiction de demande par zone (ML)
+- [ ] Programme ambassadeur pour Washers
 
 ---
 
