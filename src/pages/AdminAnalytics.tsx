@@ -399,6 +399,30 @@ export default function AdminAnalytics() {
           </FadeInOnScroll>
         </div>
 
+        {/* Heatmap Section */}
+        <div className="mb-8">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-xl font-black text-slate-900 flex items-center gap-2">
+              <Map size={24} className="text-red-500" /> Carte de chaleur
+            </h2>
+            <button
+              onClick={() => setShowHeatmap(!showHeatmap)}
+              className="text-sm text-slate-500 hover:text-slate-700 font-medium"
+            >
+              {showHeatmap ? 'Masquer' : 'Afficher'}
+            </button>
+          </div>
+          {showHeatmap && (
+            <Suspense fallback={
+              <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 flex items-center justify-center h-64">
+                <Loader2 className="animate-spin text-teal-500" size={40} />
+              </div>
+            }>
+              <OrderHeatmap dateRange={dateRange} />
+            </Suspense>
+          )}
+        </div>
+
         {/* Bottom Row */}
         <div className="grid md:grid-cols-2 gap-6">
           {/* Top Cities */}
