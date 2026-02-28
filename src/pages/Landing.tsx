@@ -222,16 +222,34 @@ export default function Landing() {
             </AnimateOnScroll>
             <AnimateOnScroll delay={150}>
               <div className="relative rounded-3xl overflow-hidden shadow-2xl border border-slate-200 aspect-video bg-slate-900">
-                <iframe
-                  src="https://www.youtube.com/embed/dQw4w9WgXcQ?rel=0&modestbranding=1&showinfo=0"
-                  title="Kilolab - Comment ça marche"
-                  className="absolute inset-0 w-full h-full"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
-                  loading="lazy"
-                />
+                <video 
+                  autoPlay 
+                  loop 
+                  muted 
+                  playsInline 
+                  className="absolute inset-0 w-full h-full object-cover"
+                  poster="https://images.unsplash.com/photo-1582735689369-4fe89db7114c?q=80&w=2400&auto=format&fit=crop"
+                >
+                  <source src="https://cdn.coverr.co/videos/coverr-clothes-being-washed-in-a-laundry-machine-1674/1080p.mp4" type="video/mp4" />
+                </video>
+                {/* Overlay with play indicator */}
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 via-transparent to-transparent pointer-events-none" />
+                <div className="absolute bottom-6 left-6 right-6 flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center">
+                      <Play size={20} className="text-white fill-white ml-1" />
+                    </div>
+                    <div>
+                      <p className="text-white font-bold text-sm">Votre linge, notre priorité</p>
+                      <p className="text-white/70 text-xs">Collecte • Lavage • Livraison</p>
+                    </div>
+                  </div>
+                  <div className="bg-white/20 backdrop-blur-sm rounded-full px-4 py-2">
+                    <p className="text-white text-sm font-semibold">Dès 3€/kg</p>
+                  </div>
+                </div>
               </div>
-              <p className="text-center text-sm text-slate-500 mt-4">Remplacez cette vidéo par votre propre contenu marketing dans le code source</p>
+              <p className="text-center text-sm text-slate-500 mt-4">Vidéo de démonstration • Uploadez votre propre contenu marketing</p>
             </AnimateOnScroll>
           </div>
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

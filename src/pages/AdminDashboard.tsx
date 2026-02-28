@@ -33,6 +33,7 @@ import {
   Plus,
   FileText,
 } from "lucide-react";
+import { OrderHeatmap } from "../components/OrderHeatmap";
 import {
   LineChart,
   Line,
@@ -1514,38 +1515,9 @@ export default function AdminDashboard() {
                   <h3 className="text-2xl font-bold flex items-center gap-2">
                     <MapPin size={20} className="text-teal-600" /> Carte des commandes
                   </h3>
-                  <div className="flex gap-2">
-                    <select className="px-3 py-2 border rounded-xl text-sm font-medium">
-                      <option>7 derniers jours</option>
-                      <option>30 derniers jours</option>
-                      <option>3 derniers mois</option>
-                    </select>
-                  </div>
                 </div>
-                <div className="bg-white rounded-2xl border p-6">
-                  <div className="bg-slate-900 rounded-2xl overflow-hidden" style={{ height: 500 }}>
-                    <div className="h-full flex items-center justify-center text-slate-400">
-                      <div className="text-center">
-                        <MapPin size={48} className="mx-auto mb-4 text-teal-500" />
-                        <p className="text-lg font-bold text-white mb-2">Heatmap des commandes</p>
-                        <p className="text-sm text-slate-500 max-w-md">Visualisez la densité des commandes par zone géographique. Activez PostGIS sur Supabase pour les données en temps réel.</p>
-                        <div className="mt-6 grid grid-cols-3 gap-4 max-w-sm mx-auto">
-                          {[
-                            { city: "Lille", count: orders.filter(o => o.city?.toLowerCase?.() === "lille").length || Math.floor(Math.random() * 30 + 10), color: "bg-teal-500" },
-                            { city: "Nantes", count: orders.filter(o => o.city?.toLowerCase?.() === "nantes").length || Math.floor(Math.random() * 20 + 5), color: "bg-cyan-500" },
-                            { city: "Bordeaux", count: orders.filter(o => o.city?.toLowerCase?.() === "bordeaux").length || Math.floor(Math.random() * 15 + 3), color: "bg-violet-500" },
-                          ].map((c, i) => (
-                            <div key={i} className="bg-white/10 rounded-xl p-3 text-center">
-                              <div className={`w-3 h-3 ${c.color} rounded-full mx-auto mb-1`} />
-                              <p className="text-white font-bold text-sm">{c.city}</p>
-                              <p className="text-slate-400 text-xs">{c.count} commandes</p>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                {/* Real Heatmap Component with Leaflet */}
+                <OrderHeatmap dateRange={timeRange === '7d' ? '7d' : timeRange === '90d' ? '90d' : '30d'} />
                 <div className="grid md:grid-cols-3 gap-4">
                   <div className="bg-white rounded-2xl border p-6 text-center">
                     <p className="text-3xl font-black text-teal-600">{orders.length}</p>
