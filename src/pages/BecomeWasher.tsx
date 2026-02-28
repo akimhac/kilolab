@@ -71,7 +71,7 @@ export default function BecomeWasher() {
       if (error) throw error;
       const { data } = supabase.storage.from('documents').getPublicUrl(filePath);
       setFormData((prev) => ({ ...prev, idCardUrl: data.publicUrl }));
-      toast.success("Piece d'identite recue !");
+      toast.success("Pièce d'identité reçue !");
     } catch (error: any) { toast.error('Erreur upload: ' + (error?.message ?? 'inconnue')); }
   };
 
@@ -102,9 +102,9 @@ export default function BecomeWasher() {
       if (!formData.city.trim()) return toast.error('Ville requise.');
       if (!isPostalCodeValid(formData.postalCode)) return toast.error('Code postal invalide.');
       if (!formData.address.trim()) return toast.error('Adresse complete requise.');
-      if (!formData.idCardUrl) return toast.error("Merci d'uploader votre piece d'identite.");
-      if (!formData.has_machine || !formData.has_scale || !formData.use_hypoallergenic) return toast.error('Validez les engagements qualite');
-      if (!formData.legal_capacity || !formData.accept_terms || !formData.data_consent) return toast.error('Acceptez les conditions legales');
+      if (!formData.idCardUrl) return toast.error("Merci d'uploader votre pièce d'identité.");
+      if (!formData.has_machine || !formData.has_scale || !formData.use_hypoallergenic) return toast.error('Validez les engagements qualité');
+      if (!formData.legal_capacity || !formData.accept_terms || !formData.data_consent) return toast.error('Acceptez les conditions légales');
       if (await checkEmailExists(email)) return toast.error('Cet email est deja inscrit.');
       toast.loading("Geolocalisation...", { id: 'geo' });
       const coords = await geocodeAddress(formData.address, formData.city, formData.postalCode);
@@ -205,7 +205,7 @@ export default function BecomeWasher() {
                 <span className="flex items-center gap-2"><Star size={16} className="text-yellow-300 fill-yellow-300" /> 4.9/5 note moyenne</span>
                 <span className="flex items-center gap-2"><MapPin size={16} /> 45+ villes en France</span>
                 <span className="flex items-center gap-2"><Users size={16} /> 500+ Washers actifs</span>
-                <span className="flex items-center gap-2"><Zap size={16} /> Paye chaque semaine</span>
+                <span className="flex items-center gap-2"><Zap size={16} /> Payé chaque semaine</span>
               </div>
             </section>
 
@@ -412,7 +412,7 @@ export default function BecomeWasher() {
               {step === 1 && (
                 <div className="bg-white/[0.04] border border-white/[0.08] rounded-3xl p-8 md:p-12 backdrop-blur-sm animate-fade-in">
                   <h2 className="text-2xl font-bold text-white mb-2">Vos informations</h2>
-                  <p className="text-slate-400 mb-8">Completez votre profil en quelques minutes.</p>
+                  <p className="text-slate-400 mb-8">Complétez votre profil en quelques minutes.</p>
                   <div className="space-y-5">
                     <div>
                       <label className="block text-sm font-semibold text-slate-300 mb-2">Nom complet *</label>
@@ -466,8 +466,8 @@ export default function BecomeWasher() {
               {/* STEP 2 */}
               {step === 2 && (
                 <div className="bg-white/[0.04] border border-white/[0.08] rounded-3xl p-8 md:p-12 backdrop-blur-sm animate-fade-in">
-                  <h2 className="text-2xl font-bold text-white mb-2">Verification d'identite</h2>
-                  <p className="text-slate-400 mb-8">Obligatoire pour la securite de la communaute.</p>
+                  <h2 className="text-2xl font-bold text-white mb-2">Vérification d'identité</h2>
+                  <p className="text-slate-400 mb-8">Obligatoire pour la sécurité de la communauté.</p>
                   <div className="mb-8 border-2 border-dashed border-white/20 rounded-2xl p-12 text-center hover:border-teal-500/50 hover:bg-teal-500/5 transition-all cursor-pointer relative group">
                     {!formData.idCardUrl ? (
                       <>
@@ -510,20 +510,20 @@ export default function BecomeWasher() {
                       <div className="bg-white/15 backdrop-blur-sm p-6 rounded-2xl border border-white/20 text-center">
                         <p className="text-teal-100 text-xs uppercase tracking-widest mb-1">Revenus mensuels</p>
                         <p className="text-5xl font-black text-white mb-1">{revenue}&euro;</p>
-                        <p className="text-teal-200 text-sm">Paye chaque semaine</p>
+                        <p className="text-teal-200 text-sm">Payé chaque semaine</p>
                       </div>
                     </div>
                   </div>
 
                   <div className="bg-white/[0.04] border border-white/[0.08] rounded-3xl p-8 backdrop-blur-sm">
-                    <h2 className="text-2xl font-bold text-white mb-6">Charte Qualite & Legal</h2>
+                    <h2 className="text-2xl font-bold text-white mb-6">Charte Qualité & Légal</h2>
                     <div className="space-y-4 mb-8">
                       <div className="p-5 bg-white/[0.04] rounded-xl border border-white/[0.08]">
-                        <h4 className="font-bold text-white mb-4 flex items-center gap-2"><Sparkles size={18} className="text-teal-400" /> Materiel requis</h4>
+                        <h4 className="font-bold text-white mb-4 flex items-center gap-2"><Sparkles size={18} className="text-teal-400" /> Matériel requis</h4>
                         {[
-                          { key: 'has_machine', label: 'Machine a laver propre et entretenue' },
-                          { key: 'has_scale', label: "J'acheterai un peson digital (~10eur)" },
-                          { key: 'use_hypoallergenic', label: 'Lessive hypoallergenique uniquement' },
+                          { key: 'has_machine', label: 'Machine à laver propre et entretenue' },
+                          { key: 'has_scale', label: "J'achèterai un peson digital (~10€)" },
+                          { key: 'use_hypoallergenic', label: 'Lessive hypoallergénique uniquement' },
                         ].map((item) => (
                           <label key={item.key} className="flex items-start gap-3 mb-3 cursor-pointer group">
                             <input type="checkbox" className="mt-1 w-5 h-5 accent-teal-500 cursor-pointer"
@@ -534,11 +534,11 @@ export default function BecomeWasher() {
                       </div>
 
                       <div className="p-5 bg-orange-500/10 rounded-xl border border-orange-500/20">
-                        <h4 className="font-bold text-orange-300 mb-4 flex items-center gap-2"><ShieldCheck size={18} /> Mentions legales</h4>
+                        <h4 className="font-bold text-orange-300 mb-4 flex items-center gap-2"><ShieldCheck size={18} /> Mentions légales</h4>
                         {[
-                          { key: 'legal_capacity', label: "Je suis majeur(e) et apte a exercer une activite independante" },
-                          { key: 'accept_terms', label: 'J\'accepte les CGU/CGV et le statut d\'independant' },
-                          { key: 'data_consent', label: 'J\'accepte le traitement de mes donnees (RGPD)' },
+                          { key: 'legal_capacity', label: "Je suis majeur(e) et apte à exercer une activité indépendante" },
+                          { key: 'accept_terms', label: 'J\'accepte les CGU/CGV et le statut d\'indépendant' },
+                          { key: 'data_consent', label: 'J\'accepte le traitement de mes données (RGPD)' },
                         ].map((item) => (
                           <label key={item.key} className="flex items-start gap-3 mb-3 cursor-pointer group">
                             <input type="checkbox" className="mt-1 w-5 h-5 accent-orange-500 cursor-pointer"
@@ -569,17 +569,17 @@ export default function BecomeWasher() {
               <div className="w-24 h-24 bg-teal-500/20 text-teal-400 rounded-full flex items-center justify-center mx-auto mb-6">
                 <Check size={48} />
               </div>
-              <h2 className="text-3xl font-black text-white mb-4">Candidature recue !</h2>
-              <p className="text-lg text-slate-400 mb-8">Notre equipe vous contactera sous <strong className="text-white">24h</strong>.</p>
+              <h2 className="text-3xl font-black text-white mb-4">Candidature reçue !</h2>
+              <p className="text-lg text-slate-400 mb-8">Notre équipe vous contactera sous <strong className="text-white">24h</strong>.</p>
               <div className="bg-teal-500/10 border border-teal-500/20 rounded-xl p-6 mb-8 text-left">
-                <p className="text-sm font-bold text-teal-300 mb-3">Preparez votre materiel :</p>
+                <p className="text-sm font-bold text-teal-300 mb-3">Préparez votre matériel :</p>
                 <ul className="text-sm text-teal-200/70 space-y-2">
-                  <li className="flex items-center gap-2"><Check size={14} className="text-teal-400" /> Peson digital (~10eur)</li>
-                  <li className="flex items-center gap-2"><Check size={14} className="text-teal-400" /> Lessive hypoallergenique</li>
-                  <li className="flex items-center gap-2"><Check size={14} className="text-teal-400" /> Machine a laver propre</li>
+                  <li className="flex items-center gap-2"><Check size={14} className="text-teal-400" /> Peson digital (~10€)</li>
+                  <li className="flex items-center gap-2"><Check size={14} className="text-teal-400" /> Lessive hypoallergénique</li>
+                  <li className="flex items-center gap-2"><Check size={14} className="text-teal-400" /> Machine à laver propre</li>
                 </ul>
               </div>
-              <button onClick={() => navigate('/')} className="px-8 py-4 bg-white text-slate-900 rounded-xl font-bold hover:bg-slate-100 transition">Retour a l'accueil</button>
+              <button onClick={() => navigate('/')} className="px-8 py-4 bg-white text-slate-900 rounded-xl font-bold hover:bg-slate-100 transition">Retour à l'accueil</button>
             </div>
           </div>
         )}
