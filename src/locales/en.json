@@ -334,5 +334,148 @@
     "invalidCredentials": "Invalid email or password",
     "emailRequired": "Email required",
     "passwordRequired": "Password required"
+  },
+  "faq": {
+    "title": "Frequently Asked Questions",
+    "subtitle": "Everything you need to know about Kilolab",
+    "badge": "Help Center",
+    "ctaTitle": "Didn't find your answer?",
+    "ctaSubtitle": "Our team is available to help you",
+    "ctaButton": "Contact us",
+    "categories": {
+      "service": "Service",
+      "delivery": "Delivery",
+      "payment": "Payment",
+      "issues": "Issues"
+    },
+    "questions": {
+      "howItWorks": "How does Kilolab work?",
+      "howItWorksAnswer": "It's simple! Place an order, a Washer picks up your laundry, washes, dries and folds it, then delivers it within 48h. You pay by weight (from €3/kg).",
+      "sorting": "Do I need to sort my laundry?",
+      "sortingAnswer": "No! That's the advantage of Kilolab. Our Washers handle sorting by color and fabric. Put everything in a bag, we take care of the rest.",
+      "clothes": "What clothes can I have washed?",
+      "clothesAnswer": "All your everyday clothes: t-shirts, pants, underwear, sheets, towels... For delicate items (silk, cashmere), we recommend a traditional dry cleaner.",
+      "deliveryTime": "What is the delivery time?",
+      "deliveryTimeAnswer": "Standard: 48-72h. Express: 24h. You receive notifications at each step.",
+      "pickup": "How does pickup work?",
+      "pickupAnswer": "Choose a pickup slot when ordering. The Washer comes directly to your home to collect your laundry bag.",
+      "chooseWasher": "Can I choose my Washer?",
+      "chooseWasherAnswer": "Yes! When ordering, you can select a Washer near you or let our algorithm assign one.",
+      "billing": "How does billing work?",
+      "billingAnswer": "You pay by weight. The final price is calculated after weighing by the Washer. 100% secure payment via Stripe.",
+      "promo": "Can I use a promo code?",
+      "promoAnswer": "Yes! Enter your code at checkout. Codes can be combined with referrals.",
+      "referral": "How does referral work?",
+      "referralAnswer": "Share your unique code with friends. You get €10 credit per referral, and your friend also gets €10 on their first order.",
+      "orderIssue": "What if I have a problem with my order?",
+      "orderIssueAnswer": "Contact us within 48h via contact@kilolab.fr or from your dashboard. We handle all claims within 24 business hours.",
+      "insurance": "Is my laundry insured?",
+      "insuranceAnswer": "Yes, all clothes are covered by our insurance up to €500 per order in case of damage."
+    }
+  },
+  "contact": {
+    "title": "Contact us",
+    "subtitle": "Our team responds within 24h",
+    "emailTitle": "Email",
+    "emailAddress": "contact@kilolab.fr",
+    "hoursTitle": "Hours",
+    "hoursValue": "Mon-Fri: 9am-6pm",
+    "zoneTitle": "Zone",
+    "zoneValue": "Metropolitan France",
+    "form": {
+      "emailLabel": "Your Email",
+      "emailPlaceholder": "customer@kilolab.fr",
+      "subjectLabel": "Subject",
+      "subjectPlaceholder": "Order, Partnership...",
+      "messageLabel": "Your Message",
+      "messagePlaceholder": "A question about an order? A partnership?",
+      "submit": "Send"
+    },
+    "success": {
+      "title": "Message sent!",
+      "description": "Our team has received your request and will respond within 24h.",
+      "sendAnother": "Send another message"
+    }
+  },
+  "pricing": {
+    "heroTitle": "Simple pricing.",
+    "heroTitle2": "No surprises.",
+    "heroSubtitle": "Two clear plans. No hidden fees.",
+    "standard": {
+      "badge": "Standard",
+      "price": "€3/kg",
+      "description": "Perfect for everyday use.",
+      "washing": "Washing",
+      "drying": "Drying",
+      "folding": "Careful folding",
+      "time": "Ready in 48-72h",
+      "cta": "Choose Standard"
+    },
+    "express": {
+      "badge": "Premium",
+      "popular": "Popular",
+      "price": "€5/kg",
+      "description": "Perfect if you're in a hurry.",
+      "washing": "Priority washing",
+      "drying": "Express drying",
+      "folding": "Boutique folding",
+      "stain": "Stain treatment",
+      "time": "24h guaranteed",
+      "cta": "Choose Express"
+    },
+    "trust": {
+      "secure": "Secure payment",
+      "verified": "Verified Washers",
+      "support": "Customer support available"
+    },
+    "comparison": {
+      "badge": "Stop wasting time and money",
+      "title": "The TRUE cost of your laundry",
+      "subtitle": "What you really pay when doing your laundry yourself.",
+      "diy": {
+        "title": "DIY / Laundromat",
+        "subtitle": "The hidden cost we ignore",
+        "waterElec": "Water + Electricity",
+        "detergent": "Detergent + Softener",
+        "machine": "Machine wear + Drying",
+        "timeLabel": "Your time (2h30)",
+        "materialCost": "Material cost",
+        "timeCost": "Cost of your time",
+        "totalCost": "REAL TOTAL COST",
+        "note": "*Based on minimum wage (€12/h)"
+      },
+      "kilolab": {
+        "title": "With Kilolab",
+        "badge": "YOU WIN",
+        "subtitle": "All-inclusive, zero effort",
+        "pickup": "Free home pickup",
+        "washing": "Pro wash + Dry + Fold",
+        "delivery": "48h delivery",
+        "time": "Your time: 0 minutes"
+      },
+      "savings": {
+        "title": "You save",
+        "money": "in money",
+        "time": "of life"
+      },
+      "ctaTitle": "You pay to LOSE 2h30 of your life?",
+      "ctaDesc": "With Kilolab, for less than a round trip to the laundromat, you get 2h30 of free time back.",
+      "ctaButton": "Get my time back"
+    },
+    "faq": {
+      "title": "Frequently asked questions",
+      "weight": {
+        "q": "How is weight calculated?",
+        "a": "The Washer weighs your bag in front of you with a digital scale during pickup. You validate the weight together."
+      },
+      "minimum": {
+        "q": "Is there a minimum order?",
+        "a": "Yes, the minimum is 3kg (€9 in Standard). That's roughly equivalent to a small machine load."
+      },
+      "difference": {
+        "q": "What's the difference between Standard and Express?",
+        "a": "Standard (€3/kg): 48-72h, perfect for everyday. Express (€5/kg): 24h guaranteed, stain treatment included, boutique folding."
+      }
+    }
   }
 }
