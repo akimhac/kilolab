@@ -98,9 +98,9 @@ export default function HowItWorks() {
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-teal-500/10 border border-teal-500/20 text-teal-400 text-xs font-bold tracking-widest uppercase mb-6">
                 <span className="w-1.5 h-1.5 rounded-full bg-teal-400 animate-pulse" /> Simple et efficace
               </div>
-              <h2 className="text-4xl lg:text-5xl font-black text-white leading-none mb-4">
-                Comment<br />
-                <span className="bg-gradient-to-r from-teal-400 to-cyan-400 bg-clip-text text-transparent">ca marche ?</span>
+              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white leading-tight mb-4">
+                <span className="block">Comment</span>
+                <span className="bg-gradient-to-r from-teal-400 to-cyan-400 bg-clip-text text-transparent">ça marche ?</span>
               </h2>
               <p className="text-white/50 text-base leading-relaxed mb-8">4 etapes simples pour un linge impeccable -- sans effort.</p>
               <div className="space-y-3 mb-10">
