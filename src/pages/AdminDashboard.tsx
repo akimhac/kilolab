@@ -69,6 +69,20 @@ type WasherFilter = "all" | "pending" | "approved" | "rejected";
 
 type CouponType = "percentage" | "fixed";
 
+// B2B Partner interface
+interface B2BPartner {
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+  plan: "starter" | "business" | "enterprise";
+  status: "active" | "trial" | "inactive";
+  api_key: string;
+  api_calls: number;
+  monthly_revenue: number;
+  created_at: string;
+}
+
 export default function AdminDashboard() {
   // --- ÉTATS ---
   const [orders, setOrders] = useState<any[]>([]);
@@ -78,6 +92,17 @@ export default function AdminDashboard() {
   const [washers, setWashers] = useState<any[]>([]);
   const [errorLogs, setErrorLogs] = useState<any[]>([]);
   const [coupons, setCoupons] = useState<any[]>([]);
+  
+  // B2B State
+  const [b2bPartners, setB2bPartners] = useState<B2BPartner[]>([]);
+  const [showB2BModal, setShowB2BModal] = useState(false);
+  const [editingB2B, setEditingB2B] = useState<B2BPartner | null>(null);
+  const [newB2BPartner, setNewB2BPartner] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    plan: "starter" as "starter" | "business" | "enterprise",
+  });
   const [loading, setLoading] = useState(true);
 
   // Filtres & UI
