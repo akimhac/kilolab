@@ -1853,9 +1853,9 @@ export default function AdminDashboard() {
               {selectedWasher.is_blocked && (
                 <button
                   onClick={() => unblockWasher(selectedWasher.id)}
-                  className="px-6 py-3 bg-green-600 text-white rounded-xl font-bold hover:bg-green-700 shadow-lg"
+                  className="px-6 py-3 bg-emerald-500 text-white rounded-xl font-bold hover:bg-emerald-600 shadow-lg shadow-emerald-500/30 transition"
                 >
-                  ✅ Débloquer ce Washer
+                  Débloquer ce Washer
                 </button>
               )}
             </div>
