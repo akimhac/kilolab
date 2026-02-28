@@ -1,458 +1,454 @@
 # Page snapshot
 
 ```yaml
-- generic [active] [ref=e1]:
-  - generic [ref=e3]:
-    - generic [ref=e4]: KILOLAB
-    - generic [ref=e6]: Libérez votre temps
-  - generic [ref=e8]:
-    - navigation [ref=e9]:
-      - generic [ref=e11]:
-        - link "K Kilolab" [ref=e12] [cursor=pointer]:
-          - /url: /
-          - generic [ref=e14]: K
-          - generic [ref=e15]: Kilolab
-        - button [ref=e16] [cursor=pointer]:
-          - img [ref=e17]
+- generic [ref=e3]:
+  - navigation [ref=e4]:
+    - generic [ref=e6]:
+      - link "K Kilolab" [ref=e7] [cursor=pointer]:
+        - /url: /
+        - generic [ref=e9]: K
+        - generic [ref=e10]: Kilolab
+      - button [ref=e11] [cursor=pointer]:
+        - img [ref=e12]
+    - generic [ref=e13]:
+      - link "Tarifs" [ref=e14] [cursor=pointer]:
+        - /url: /tarifs
+      - link "Trouver un Washer" [ref=e15] [cursor=pointer]:
+        - /url: /trouver
+      - link "FAQ" [ref=e16] [cursor=pointer]:
+        - /url: /faq
+      - link "Contact" [ref=e17] [cursor=pointer]:
+        - /url: /contact
       - generic [ref=e18]:
-        - link "Tarifs" [ref=e19] [cursor=pointer]:
-          - /url: /tarifs
-        - link "Trouver un Washer" [ref=e20] [cursor=pointer]:
-          - /url: /trouver
-        - link "FAQ" [ref=e21] [cursor=pointer]:
-          - /url: /faq
-        - link "Contact" [ref=e22] [cursor=pointer]:
-          - /url: /contact
+        - link "Connexion" [ref=e19] [cursor=pointer]:
+          - /url: /login
+        - link "Devenir Washer" [ref=e20] [cursor=pointer]:
+          - /url: /washers
+        - link "Commander" [ref=e21] [cursor=pointer]:
+          - /url: /new-order
         - generic [ref=e23]:
-          - link "Connexion" [ref=e24] [cursor=pointer]:
-            - /url: /login
-          - link "Devenir Washer" [ref=e25] [cursor=pointer]:
-            - /url: /washers
-          - link "Commander" [ref=e26] [cursor=pointer]:
-            - /url: /new-order
-          - generic [ref=e28]:
-            - button "🇫🇷FR" [ref=e29] [cursor=pointer]
-            - button "🇬🇧EN" [ref=e30] [cursor=pointer]
-    - generic [ref=e36]:
-      - generic [ref=e37]: Disponible partout en France
-      - heading "Libérez votre temps. On prend soin de votre linge." [level=1] [ref=e41]:
-        - text: Libérez votre temps.
-        - text: On prend soin de votre linge.
-      - paragraph [ref=e42]: Collecte, lavage et pliage inclus. Simple, rapide et partout en France.
-      - generic [ref=e43]:
-        - generic [ref=e44]: Dès 3€
-        - generic [ref=e45]: /kg
-      - generic [ref=e46]:
-        - link "Confier mon linge" [ref=e47] [cursor=pointer]:
-          - /url: /new-order
-          - text: Confier mon linge
-          - img [ref=e48]
-        - link "Comment ça marche ?" [ref=e50] [cursor=pointer]:
-          - /url: "#comment-ca-marche"
-          - img [ref=e51]
-          - text: Comment ça marche ?
+          - button "🇫🇷FR" [ref=e24] [cursor=pointer]
+          - button "🇬🇧EN" [ref=e25] [cursor=pointer]
+  - generic [ref=e31]:
+    - generic [ref=e32]: Disponible partout en France
+    - heading "Libérez votre temps. On prend soin de votre linge." [level=1] [ref=e36]:
+      - text: Libérez votre temps.
+      - text: On prend soin de votre linge.
+    - paragraph [ref=e37]: Collecte, lavage et pliage inclus. Simple, rapide et partout en France.
+    - generic [ref=e38]:
+      - generic [ref=e39]: Dès 3€
+      - generic [ref=e40]: /kg
+    - generic [ref=e41]:
+      - link "Confier mon linge" [ref=e42] [cursor=pointer]:
+        - /url: /new-order
+        - text: Confier mon linge
+        - img [ref=e43]
+      - link "Comment ça marche ?" [ref=e45] [cursor=pointer]:
+        - /url: "#comment-ca-marche"
+        - img [ref=e46]
+        - text: Comment ça marche ?
+    - generic [ref=e48]:
+      - generic [ref=e49]:
+        - img [ref=e50]
+        - generic [ref=e52]: Paiement sécurisé
       - generic [ref=e53]:
-        - generic [ref=e54]:
-          - img [ref=e55]
-          - generic [ref=e57]: Paiement sécurisé
-        - generic [ref=e58]:
-          - img [ref=e59]
-          - generic [ref=e62]: Livraison 48h
-        - generic [ref=e63]:
-          - img [ref=e64]
-          - generic [ref=e66]: 4.9/5 (500+ avis)
-    - generic [ref=e72]:
-      - generic [ref=e74]:
-        - paragraph [ref=e75]: Vous avez une machine à laver ?
-        - paragraph [ref=e76]: Rejoignez 500+ Washers et gagnez jusqu'à 600€/mois
-      - link "Devenir Washer Partenaire" [ref=e77] [cursor=pointer]:
-        - /url: /become-washer
-        - text: Devenir Washer Partenaire
-        - img [ref=e78]
-    - generic [ref=e81]:
-      - generic [ref=e83]:
-        - heading "La plateforme n°1 en France" [level=2] [ref=e84]
-        - paragraph [ref=e85]: Des milliers de clients nous font déjà confiance
-      - generic [ref=e87]:
-        - generic [ref=e90]:
-          - paragraph [ref=e91]: 1850+
-          - paragraph [ref=e92]: Clients satisfaits
-        - generic [ref=e95]:
-          - paragraph [ref=e96]: 4.9/5
-          - paragraph [ref=e97]: Note moyenne
-        - generic [ref=e100]:
-          - paragraph [ref=e101]: 500+
-          - paragraph [ref=e102]: Washers actifs
-        - generic [ref=e105]:
-          - paragraph [ref=e106]: 45+
-          - paragraph [ref=e107]: Villes couvertes
-      - generic [ref=e109]:
-        - heading "Nos engagements qualité" [level=3] [ref=e112]
-        - generic [ref=e113]:
-          - generic [ref=e114]:
-            - img [ref=e116]
-            - heading "Satisfaction garantie" [level=4] [ref=e118]
-            - paragraph [ref=e119]: Pas satisfait ? On relave gratuitement ou on vous rembourse.
-          - generic [ref=e120]:
-            - img [ref=e122]
-            - heading "Washers vérifiés" [level=4] [ref=e125]
-            - paragraph [ref=e126]: Chaque Washer est vérifié et noté par la communauté.
-          - generic [ref=e127]:
-            - img [ref=e129]
-            - heading "Délais respectés" [level=4] [ref=e132]
-            - paragraph [ref=e133]: 48h Standard, 24h Express. Retard ? -50% sur votre commande.
-      - generic [ref=e135]:
-        - generic [ref=e136]:
-          - img [ref=e137]
-          - generic [ref=e139]:
-            - paragraph [ref=e140]: Paiement sécurisé
-            - paragraph [ref=e141]: SSL & Stripe
-        - generic [ref=e142]:
-          - img [ref=e143]
-          - generic [ref=e146]:
-            - paragraph [ref=e147]: Washers vérifiés
-            - paragraph [ref=e148]: Identité contrôlée
-        - generic [ref=e149]:
-          - img [ref=e150]
-          - generic [ref=e152]:
-            - paragraph [ref=e153]: Satisfait ou remboursé
-            - paragraph [ref=e154]: Garantie 48h
-        - generic [ref=e155]:
-          - img [ref=e156]
-          - generic [ref=e159]:
-            - paragraph [ref=e160]: Suivi temps réel
-            - paragraph [ref=e161]: Notifications live
-    - generic [ref=e162]:
+        - img [ref=e54]
+        - generic [ref=e57]: Livraison 48h
+      - generic [ref=e58]:
+        - img [ref=e59]
+        - generic [ref=e61]: 4.9/5 (500+ avis)
+  - generic [ref=e67]:
+    - generic [ref=e69]:
+      - paragraph [ref=e70]: Vous avez une machine à laver ?
+      - paragraph [ref=e71]: Rejoignez 500+ Washers et gagnez jusqu'à 600€/mois
+    - link "Devenir Washer Partenaire" [ref=e72] [cursor=pointer]:
+      - /url: /become-washer
+      - text: Devenir Washer Partenaire
+      - img [ref=e73]
+  - generic [ref=e76]:
+    - generic [ref=e78]:
+      - heading "La plateforme n°1 en France" [level=2] [ref=e79]
+      - paragraph [ref=e80]: Des milliers de clients nous font déjà confiance
+    - generic [ref=e82]:
+      - generic [ref=e85]:
+        - paragraph [ref=e86]: 1850+
+        - paragraph [ref=e87]: Clients satisfaits
+      - generic [ref=e90]:
+        - paragraph [ref=e91]: 4.9/5
+        - paragraph [ref=e92]: Note moyenne
+      - generic [ref=e95]:
+        - paragraph [ref=e96]: 500+
+        - paragraph [ref=e97]: Washers actifs
+      - generic [ref=e100]:
+        - paragraph [ref=e101]: 45+
+        - paragraph [ref=e102]: Villes couvertes
+    - generic [ref=e104]:
+      - heading "Nos engagements qualité" [level=3] [ref=e107]
+      - generic [ref=e108]:
+        - generic [ref=e109]:
+          - img [ref=e111]
+          - heading "Satisfaction garantie" [level=4] [ref=e113]
+          - paragraph [ref=e114]: Pas satisfait ? On relave gratuitement ou on vous rembourse.
+        - generic [ref=e115]:
+          - img [ref=e117]
+          - heading "Washers vérifiés" [level=4] [ref=e120]
+          - paragraph [ref=e121]: Chaque Washer est vérifié et noté par la communauté.
+        - generic [ref=e122]:
+          - img [ref=e124]
+          - heading "Délais respectés" [level=4] [ref=e127]
+          - paragraph [ref=e128]: 48h Standard, 24h Express. Retard ? -50% sur votre commande.
+    - generic [ref=e130]:
+      - generic [ref=e131]:
+        - img [ref=e132]
+        - generic [ref=e134]:
+          - paragraph [ref=e135]: Paiement sécurisé
+          - paragraph [ref=e136]: SSL & Stripe
+      - generic [ref=e137]:
+        - img [ref=e138]
+        - generic [ref=e141]:
+          - paragraph [ref=e142]: Washers vérifiés
+          - paragraph [ref=e143]: Identité contrôlée
+      - generic [ref=e144]:
+        - img [ref=e145]
+        - generic [ref=e147]:
+          - paragraph [ref=e148]: Satisfait ou remboursé
+          - paragraph [ref=e149]: Garantie 48h
+      - generic [ref=e150]:
+        - img [ref=e151]
+        - generic [ref=e154]:
+          - paragraph [ref=e155]: Suivi temps réel
+          - paragraph [ref=e156]: Notifications live
+  - generic [ref=e157]:
+    - generic [ref=e158]:
+      - generic [ref=e159]:
+        - generic [ref=e160]: En 60 secondes
+        - heading "Découvrez Kilolab en vidéo" [level=2] [ref=e161]
+        - paragraph [ref=e162]: Comment ça marche, du canapé à la livraison.
       - generic [ref=e163]:
-        - generic [ref=e164]:
-          - generic [ref=e165]: En 60 secondes
-          - heading "Découvrez Kilolab en vidéo" [level=2] [ref=e166]
-          - paragraph [ref=e167]: Comment ça marche, du canapé à la livraison.
-        - generic [ref=e168]:
-          - iframe [ref=e170]:
-            - generic "YouTube Video Player" [ref=f1e3]:
-              - generic [ref=f1e5]:
-                - link "Photo image of Rick Astley" [ref=f1e8] [cursor=pointer]:
-                  - /url: https://www.youtube.com/channel/UCuAXFkgsw1L7xaCfnd5JJOw?embeds_referring_euri=http%3A%2F%2Flocalhost%3A3000%2F
-                - link "Rick Astley - Never Gonna Give You Up (Official Video) (4K Remaster)" [ref=f1e11] [cursor=pointer]:
-                  - /url: https://www.youtube.com/watch?v=dQw4w9WgXcQ
-                - button "More" [ref=f1e13] [cursor=pointer]:
-                  - generic [ref=f1e14]:
-                    - img
-              - button "Play" [ref=f1e17] [cursor=pointer]:
+        - iframe [ref=e165]:
+          - generic "YouTube Video Player" [ref=f1e3]:
+            - generic [ref=f1e5]:
+              - link "Photo image of Rick Astley" [ref=f1e8] [cursor=pointer]:
+                - /url: https://www.youtube.com/channel/UCuAXFkgsw1L7xaCfnd5JJOw?embeds_referring_euri=http%3A%2F%2Flocalhost%3A3000%2F
+              - link "Rick Astley - Never Gonna Give You Up (Official Video) (4K Remaster)" [ref=f1e11] [cursor=pointer]:
+                - /url: https://www.youtube.com/watch?v=dQw4w9WgXcQ
+              - button "More" [ref=f1e13] [cursor=pointer]:
+                - generic [ref=f1e14]:
+                  - img
+            - button "Play" [ref=f1e17] [cursor=pointer]:
+              - img
+        - paragraph [ref=e166]: Remplacez cette vidéo par votre propre contenu marketing dans le code source
+    - generic [ref=e167]:
+      - generic [ref=e169]:
+        - generic [ref=e170]: Arrêtez de perdre de l'argent
+        - heading "Combien vous coûte vraiment votre lessive ?" [level=2] [ref=e171]
+        - paragraph [ref=e172]:
+          - text: Eau, électricité, produits, usure machine...
+          - strong [ref=e173]: Le coût réel est bien plus élevé que vous ne le pensez.
+      - generic [ref=e174]:
+        - generic [ref=e176]:
+          - generic [ref=e177]:
+            - generic [ref=e178]: Votre volume de linge par semaine
+            - generic [ref=e179]:
+              - generic [ref=e180]: "5"
+              - generic [ref=e181]: kg
+          - slider [ref=e182] [cursor=pointer]: "5"
+          - generic [ref=e183]:
+            - generic [ref=e184]: 3kg (1 personne)
+            - generic [ref=e185]: 15kg (famille)
+        - generic [ref=e186]:
+          - generic [ref=e190]:
+            - generic [ref=e191]:
+              - img [ref=e193]
+              - generic [ref=e195]:
+                - heading "Faire soi-même" [level=3] [ref=e196]
+                - paragraph [ref=e197]: Le piège du "gratuit"
+            - generic [ref=e198]:
+              - generic [ref=e199]:
+                - generic [ref=e200]: Eau (60L/machine)
+                - generic [ref=e201]: 1.80€
+              - generic [ref=e202]:
+                - generic [ref=e203]: Électricité
+                - generic [ref=e204]: 0.90€
+              - generic [ref=e205]:
+                - generic [ref=e206]: Lessive + Adoucissant
+                - generic [ref=e207]: 1.80€
+              - generic [ref=e208]:
+                - generic [ref=e209]: Usure machine + Séchage
+                - generic [ref=e210]: 2.30€
+            - generic [ref=e212]:
+              - generic [ref=e213]:
+                - paragraph [ref=e214]: "Temps perdu : 2.5h"
+                - paragraph [ref=e215]: Tri + Lavage + Séchage + Pliage + Rangement
+              - generic [ref=e216]:
+                - paragraph [ref=e217]: 30€
+                - paragraph [ref=e218]: (12€/h)
+            - generic [ref=e219]:
+              - generic [ref=e220]:
+                - generic [ref=e221]: Coûts matériels
+                - generic [ref=e222]: 6.80€
+              - generic [ref=e223]:
+                - generic [ref=e224]: Valeur de votre temps
+                - generic [ref=e225]: 30.00€
+              - generic [ref=e226]:
+                - generic [ref=e227]: COÛT RÉEL
+                - generic [ref=e228]: 37€
+          - generic [ref=e230]:
+            - generic [ref=e232]: ÉCONOMISEZ
+            - generic [ref=e233]:
+              - generic [ref=e234]:
+                - img [ref=e236]
+                - generic [ref=e238]:
+                  - heading "Avec Kilolab" [level=3] [ref=e239]
+                  - paragraph [ref=e240]: Tout inclus, zéro effort
+              - generic [ref=e241]:
+                - generic [ref=e242]:
+                  - img [ref=e244]
+                  - generic [ref=e247]: Collecte gratuite à domicile
+                - generic [ref=e248]:
+                  - img [ref=e250]
+                  - generic [ref=e253]: Lavage professionnel (lessive premium)
+                - generic [ref=e254]:
+                  - img [ref=e256]
+                  - generic [ref=e259]: Séchage + Pliage impeccable
+                - generic [ref=e260]:
+                  - img [ref=e262]
+                  - generic [ref=e265]: Livraison en 48h max
+              - generic [ref=e267]:
+                - generic [ref=e268]:
+                  - paragraph [ref=e269]: "Temps passé : 0 minute"
+                  - paragraph [ref=e270]: On s'occupe de tout !
+                - paragraph [ref=e272]: 0€
+              - generic [ref=e274]:
+                - generic [ref=e275]:
+                  - generic [ref=e276]: 5kg x 3€/kg
+                  - paragraph [ref=e277]: PRIX KILOLAB
+                - generic [ref=e278]: 15€
+              - generic [ref=e279]:
+                - paragraph [ref=e280]: VOS ÉCONOMIES
+                - generic [ref=e281]:
+                  - generic [ref=e282]:
+                    - paragraph [ref=e283]: 22€
+                    - paragraph [ref=e284]: économisés
+                  - generic [ref=e285]:
+                    - paragraph [ref=e286]: 2.5h
+                    - paragraph [ref=e287]: récupérées
+        - generic [ref=e289]:
+          - link "Économiser 22€ maintenant" [ref=e290] [cursor=pointer]:
+            - /url: /new-order
+            - generic [ref=e291]: Économiser 22€ maintenant
+            - img [ref=e292]
+          - paragraph [ref=e294]: Première commande ? Profitez de -20% avec le code BIENVENUE
+  - generic [ref=e298]:
+    - generic [ref=e299]:
+      - generic [ref=e300]: Simple et efficace
+      - heading "Comment ça marche ?" [level=2] [ref=e302]:
+        - generic [ref=e303]: Comment
+        - text: ça marche ?
+      - paragraph [ref=e304]: 4 étapes simples pour un linge impeccable — sans effort.
+      - generic [ref=e305]:
+        - generic [ref=e306] [cursor=pointer]:
+          - generic [ref=e307]: "1"
+          - generic [ref=e308]: Commandez en 2 min
+          - generic [ref=e309]: Actif
+        - generic [ref=e311] [cursor=pointer]:
+          - generic [ref=e312]: "2"
+          - generic [ref=e313]: On vient chercher
+        - generic [ref=e314] [cursor=pointer]:
+          - generic [ref=e315]: "3"
+          - generic [ref=e316]: Lavage premium
+        - generic [ref=e317] [cursor=pointer]:
+          - generic [ref=e318]: "4"
+          - generic [ref=e319]: Livré chez vous
+      - link "Commander maintenant" [ref=e320] [cursor=pointer]:
+        - /url: /new-order
+        - text: Commander maintenant
+        - img [ref=e321]
+    - generic [ref=e323]:
+      - generic [ref=e325]:
+        - generic [ref=e328]:
+          - generic [ref=e329]:
+            - img [ref=e333]
+            - generic [ref=e341]: "1"
+          - generic [ref=e342]:
+            - generic [ref=e343]: ÉTAPE 01
+            - heading "Commandez en 2 min" [level=3] [ref=e344]
+            - paragraph [ref=e345]: Depuis votre canapé
+            - paragraph [ref=e346]: Choisissez votre formule, indiquez votre adresse et sélectionnez un créneau. Paiement sécurisé en ligne.
+        - generic [ref=e353]:
+          - button [disabled] [ref=e354]:
+            - img [ref=e355]
+          - button [ref=e357] [cursor=pointer]:
+            - img [ref=e358]
+      - generic:
+        - generic:
+          - generic:
+            - generic:
+              - generic:
+                - generic:
+                  - img
+              - generic: "2"
+            - generic:
+              - generic: ÉTAPE 02
+              - heading "On vient chercher" [level=3]
+              - paragraph: Enlèvement gratuit
+              - paragraph: Un washer vérifié près de chez vous vient collecter votre linge à l'heure choisie. Pas besoin d'être présent.
+          - generic:
+            - generic:
+              - button [disabled]:
                 - img
-          - paragraph [ref=e171]: Remplacez cette vidéo par votre propre contenu marketing dans le code source
-      - generic [ref=e172]:
-        - generic [ref=e174]:
-          - generic [ref=e175]: Arrêtez de perdre de l'argent
-          - heading "Combien vous coûte vraiment votre lessive ?" [level=2] [ref=e176]
-          - paragraph [ref=e177]:
-            - text: Eau, électricité, produits, usure machine...
-            - strong [ref=e178]: Le coût réel est bien plus élevé que vous ne le pensez.
-        - generic [ref=e179]:
-          - generic [ref=e181]:
-            - generic [ref=e182]:
-              - generic [ref=e183]: Votre volume de linge par semaine
-              - generic [ref=e184]:
-                - generic [ref=e185]: "5"
-                - generic [ref=e186]: kg
-            - slider [ref=e187] [cursor=pointer]: "5"
-            - generic [ref=e188]:
-              - generic [ref=e189]: 3kg (1 personne)
-              - generic [ref=e190]: 15kg (famille)
-          - generic [ref=e191]:
-            - generic [ref=e195]:
-              - generic [ref=e196]:
-                - img [ref=e198]
-                - generic [ref=e200]:
-                  - heading "Faire soi-même" [level=3] [ref=e201]
-                  - paragraph [ref=e202]: Le piège du "gratuit"
-              - generic [ref=e203]:
-                - generic [ref=e204]:
-                  - generic [ref=e205]: Eau (60L/machine)
-                  - generic [ref=e206]: 1.80€
-                - generic [ref=e207]:
-                  - generic [ref=e208]: Électricité
-                  - generic [ref=e209]: 0.90€
-                - generic [ref=e210]:
-                  - generic [ref=e211]: Lessive + Adoucissant
-                  - generic [ref=e212]: 1.80€
-                - generic [ref=e213]:
-                  - generic [ref=e214]: Usure machine + Séchage
-                  - generic [ref=e215]: 2.30€
-              - generic [ref=e217]:
-                - generic [ref=e218]:
-                  - paragraph [ref=e219]: "Temps perdu : 2.5h"
-                  - paragraph [ref=e220]: Tri + Lavage + Séchage + Pliage + Rangement
-                - generic [ref=e221]:
-                  - paragraph [ref=e222]: 30€
-                  - paragraph [ref=e223]: (12€/h)
-              - generic [ref=e224]:
-                - generic [ref=e225]:
-                  - generic [ref=e226]: Coûts matériels
-                  - generic [ref=e227]: 6.80€
-                - generic [ref=e228]:
-                  - generic [ref=e229]: Valeur de votre temps
-                  - generic [ref=e230]: 30.00€
-                - generic [ref=e231]:
-                  - generic [ref=e232]: COÛT RÉEL
-                  - generic [ref=e233]: 37€
-            - generic [ref=e235]:
-              - generic [ref=e237]: ÉCONOMISEZ
-              - generic [ref=e238]:
-                - generic [ref=e239]:
-                  - img [ref=e241]
-                  - generic [ref=e243]:
-                    - heading "Avec Kilolab" [level=3] [ref=e244]
-                    - paragraph [ref=e245]: Tout inclus, zéro effort
-                - generic [ref=e246]:
-                  - generic [ref=e247]:
-                    - img [ref=e249]
-                    - generic [ref=e252]: Collecte gratuite à domicile
-                  - generic [ref=e253]:
-                    - img [ref=e255]
-                    - generic [ref=e258]: Lavage professionnel (lessive premium)
-                  - generic [ref=e259]:
-                    - img [ref=e261]
-                    - generic [ref=e264]: Séchage + Pliage impeccable
-                  - generic [ref=e265]:
-                    - img [ref=e267]
-                    - generic [ref=e270]: Livraison en 48h max
-                - generic [ref=e272]:
-                  - generic [ref=e273]:
-                    - paragraph [ref=e274]: "Temps passé : 0 minute"
-                    - paragraph [ref=e275]: On s'occupe de tout !
-                  - paragraph [ref=e277]: 0€
-                - generic [ref=e279]:
-                  - generic [ref=e280]:
-                    - generic [ref=e281]: 5kg x 3€/kg
-                    - paragraph [ref=e282]: PRIX KILOLAB
-                  - generic [ref=e283]: 15€
-                - generic [ref=e284]:
-                  - paragraph [ref=e285]: VOS ÉCONOMIES
-                  - generic [ref=e286]:
-                    - generic [ref=e287]:
-                      - paragraph [ref=e288]: 22€
-                      - paragraph [ref=e289]: économisés
-                    - generic [ref=e290]:
-                      - paragraph [ref=e291]: 2.5h
-                      - paragraph [ref=e292]: récupérées
-          - generic [ref=e294]:
-            - link "Économiser 22€ maintenant" [ref=e295] [cursor=pointer]:
+              - button:
+                - img
+      - generic:
+        - generic:
+          - generic:
+            - generic:
+              - generic:
+                - generic:
+                  - img
+              - generic: "3"
+            - generic:
+              - generic: ÉTAPE 03
+              - heading "Lavage premium" [level=3]
+              - paragraph: Pro, séché, plié
+              - paragraph: Votre linge est lavé, séché et minutieusement plié. Produits premium, soin professionnel garanti.
+          - generic:
+            - generic:
+              - button [disabled]:
+                - img
+              - button:
+                - img
+      - generic:
+        - generic:
+          - generic:
+            - generic:
+              - generic:
+                - generic:
+                  - img
+              - generic: "4"
+            - generic:
+              - generic: ÉTAPE 04
+              - heading "Livré chez vous" [level=3]
+              - paragraph: Propre et plié
+              - paragraph: Votre linge vous est retourné propre, séché et soigneusement plié. Suivez la livraison en temps réel.
+          - generic:
+            - generic:
+              - button [disabled]:
+                - img
+              - button:
+                - img
+  - generic [ref=e362]:
+    - generic [ref=e365]:
+      - img "Inspiration Bali"
+      - img "Linge propre"
+    - generic [ref=e368]:
+      - generic [ref=e369]: Notre Histoire
+      - heading "De la douceur de Bali à l'exigence de Paris." [level=2] [ref=e370]:
+        - text: De la douceur de Bali
+        - text: à l'exigence de Paris.
+      - paragraph [ref=e371]: "Là-bas, le soin du linge au poids est la norme : simple, direct, sans artifices. Nous avons importé ce concept pour en finir avec le casse-tête des tarifs à la pièce."
+      - blockquote [ref=e372]:
+        - paragraph [ref=e373]: "\"Juste le poids du linge propre. Rien d'autre.\""
+      - link "Envie de devenir Washer ? C'est par ici" [ref=e374] [cursor=pointer]:
+        - /url: /become-washer
+        - text: Envie de devenir Washer ? C'est par ici
+        - img [ref=e375]
+  - generic [ref=e381]:
+    - heading "Prêt à récupérer votre temps libre ?" [level=2] [ref=e382]
+    - paragraph [ref=e383]: Rejoignez les milliers d'utilisateurs qui ont déjà arrêté la corvée du linge
+    - generic [ref=e384]:
+      - link "Commander maintenant" [ref=e385] [cursor=pointer]:
+        - /url: /new-order
+        - text: Commander maintenant
+        - img [ref=e386]
+      - link "Devenir Washer" [ref=e388] [cursor=pointer]:
+        - /url: /become-washer
+        - text: Devenir Washer
+        - img [ref=e389]
+  - contentinfo [ref=e392]:
+    - generic [ref=e394]:
+      - generic [ref=e395]:
+        - link "K Kilolab" [ref=e396] [cursor=pointer]:
+          - /url: /
+          - generic [ref=e398]: K
+          - generic [ref=e399]: Kilolab
+        - paragraph [ref=e400]: Le 1er service de laverie à domicile en France. Collecte, lavage et pliage dès 3€/kg.
+        - generic [ref=e401]:
+          - link "Instagram" [ref=e402] [cursor=pointer]:
+            - /url: https://instagram.com/kilolab.fr
+            - img [ref=e403]
+          - link "Facebook" [ref=e406] [cursor=pointer]:
+            - /url: https://facebook.com/kilolab.fr
+            - img [ref=e407]
+          - link "Twitter" [ref=e409] [cursor=pointer]:
+            - /url: https://twitter.com/kilolab_fr
+            - img [ref=e410]
+      - generic [ref=e412]:
+        - heading "Services" [level=3] [ref=e413]
+        - list [ref=e414]:
+          - listitem [ref=e415]:
+            - link "Commander" [ref=e416] [cursor=pointer]:
               - /url: /new-order
-              - generic [ref=e296]: Économiser 22€ maintenant
-              - img [ref=e297]
-            - paragraph [ref=e299]: Première commande ? Profitez de -20% avec le code BIENVENUE
-    - generic [ref=e303]:
-      - generic [ref=e304]:
-        - generic [ref=e305]: Simple et efficace
-        - heading "Comment ça marche ?" [level=2] [ref=e307]:
-          - generic [ref=e308]: Comment
-          - text: ça marche ?
-        - paragraph [ref=e309]: 4 étapes simples pour un linge impeccable — sans effort.
-        - generic [ref=e310]:
-          - generic [ref=e311] [cursor=pointer]:
-            - generic [ref=e312]: "1"
-            - generic [ref=e313]: Commandez en 2 min
-            - generic [ref=e314]: Actif
-          - generic [ref=e316] [cursor=pointer]:
-            - generic [ref=e317]: "2"
-            - generic [ref=e318]: On vient chercher
-          - generic [ref=e319] [cursor=pointer]:
-            - generic [ref=e320]: "3"
-            - generic [ref=e321]: Lavage premium
-          - generic [ref=e322] [cursor=pointer]:
-            - generic [ref=e323]: "4"
-            - generic [ref=e324]: Livré chez vous
-        - link "Commander maintenant" [ref=e325] [cursor=pointer]:
-          - /url: /new-order
-          - text: Commander maintenant
-          - img [ref=e326]
-      - generic [ref=e328]:
-        - generic [ref=e330]:
-          - generic [ref=e333]:
-            - generic [ref=e334]:
-              - img [ref=e338]
-              - generic [ref=e346]: "1"
-            - generic [ref=e347]:
-              - generic [ref=e348]: ÉTAPE 01
-              - heading "Commandez en 2 min" [level=3] [ref=e349]
-              - paragraph [ref=e350]: Depuis votre canapé
-              - paragraph [ref=e351]: Choisissez votre formule, indiquez votre adresse et sélectionnez un créneau. Paiement sécurisé en ligne.
-          - generic [ref=e358]:
-            - button [disabled] [ref=e359]:
-              - img [ref=e360]
-            - button [ref=e362] [cursor=pointer]:
-              - img [ref=e363]
-        - generic:
-          - generic:
-            - generic:
-              - generic:
-                - generic:
-                  - generic:
-                    - img
-                - generic: "2"
-              - generic:
-                - generic: ÉTAPE 02
-                - heading "On vient chercher" [level=3]
-                - paragraph: Enlèvement gratuit
-                - paragraph: Un washer vérifié près de chez vous vient collecter votre linge à l'heure choisie. Pas besoin d'être présent.
-            - generic:
-              - generic:
-                - button [disabled]:
-                  - img
-                - button:
-                  - img
-        - generic:
-          - generic:
-            - generic:
-              - generic:
-                - generic:
-                  - generic:
-                    - img
-                - generic: "3"
-              - generic:
-                - generic: ÉTAPE 03
-                - heading "Lavage premium" [level=3]
-                - paragraph: Pro, séché, plié
-                - paragraph: Votre linge est lavé, séché et minutieusement plié. Produits premium, soin professionnel garanti.
-            - generic:
-              - generic:
-                - button [disabled]:
-                  - img
-                - button:
-                  - img
-        - generic:
-          - generic:
-            - generic:
-              - generic:
-                - generic:
-                  - generic:
-                    - img
-                - generic: "4"
-              - generic:
-                - generic: ÉTAPE 04
-                - heading "Livré chez vous" [level=3]
-                - paragraph: Propre et plié
-                - paragraph: Votre linge vous est retourné propre, séché et soigneusement plié. Suivez la livraison en temps réel.
-            - generic:
-              - generic:
-                - button [disabled]:
-                  - img
-                - button:
-                  - img
-    - generic [ref=e367]:
-      - generic [ref=e370]:
-        - img "Inspiration Bali"
-        - img "Linge propre"
-      - generic [ref=e373]:
-        - generic [ref=e374]: Notre Histoire
-        - heading "De la douceur de Bali à l'exigence de Paris." [level=2] [ref=e375]:
-          - text: De la douceur de Bali
-          - text: à l'exigence de Paris.
-        - paragraph [ref=e376]: "Là-bas, le soin du linge au poids est la norme : simple, direct, sans artifices. Nous avons importé ce concept pour en finir avec le casse-tête des tarifs à la pièce."
-        - blockquote [ref=e377]:
-          - paragraph [ref=e378]: "\"Juste le poids du linge propre. Rien d'autre.\""
-        - link "Envie de devenir Washer ? C'est par ici" [ref=e379] [cursor=pointer]:
-          - /url: /become-washer
-          - text: Envie de devenir Washer ? C'est par ici
-          - img [ref=e380]
-    - generic [ref=e386]:
-      - heading "Prêt à récupérer votre temps libre ?" [level=2] [ref=e387]
-      - paragraph [ref=e388]: Rejoignez les milliers d'utilisateurs qui ont déjà arrêté la corvée du linge
-      - generic [ref=e389]:
-        - link "Commander maintenant" [ref=e390] [cursor=pointer]:
-          - /url: /new-order
-          - text: Commander maintenant
-          - img [ref=e391]
-        - link "Devenir Washer" [ref=e393] [cursor=pointer]:
-          - /url: /become-washer
-          - text: Devenir Washer
-          - img [ref=e394]
-    - contentinfo [ref=e397]:
-      - generic [ref=e399]:
-        - generic [ref=e400]:
-          - link "K Kilolab" [ref=e401] [cursor=pointer]:
-            - /url: /
-            - generic [ref=e403]: K
-            - generic [ref=e404]: Kilolab
-          - paragraph [ref=e405]: Le 1er service de laverie à domicile en France. Collecte, lavage et pliage dès 3€/kg.
-          - generic [ref=e406]:
-            - link "Instagram" [ref=e407] [cursor=pointer]:
-              - /url: https://instagram.com/kilolab.fr
-              - img [ref=e408]
-            - link "Facebook" [ref=e411] [cursor=pointer]:
-              - /url: https://facebook.com/kilolab.fr
-              - img [ref=e412]
-            - link "Twitter" [ref=e414] [cursor=pointer]:
-              - /url: https://twitter.com/kilolab_fr
-              - img [ref=e415]
-        - generic [ref=e417]:
-          - heading "Services" [level=3] [ref=e418]
-          - list [ref=e419]:
-            - listitem [ref=e420]:
-              - link "Commander" [ref=e421] [cursor=pointer]:
-                - /url: /new-order
-            - listitem [ref=e422]:
-              - link "Nos tarifs" [ref=e423] [cursor=pointer]:
-                - /url: /tarifs
-            - listitem [ref=e424]:
-              - link "Trouver un Washer" [ref=e425] [cursor=pointer]:
-                - /url: /trouver
-            - listitem [ref=e426]:
-              - link "FAQ" [ref=e427] [cursor=pointer]:
-                - /url: /faq
-        - generic [ref=e428]:
-          - heading "Partenaires" [level=3] [ref=e429]
-          - list [ref=e430]:
-            - listitem [ref=e431]:
-              - link "Devenir Washer" [ref=e432] [cursor=pointer]:
-                - /url: /become-washer
-            - listitem [ref=e433]:
-              - link "Espace Pressing" [ref=e434] [cursor=pointer]:
-                - /url: /partner
-            - listitem [ref=e435]:
-              - link "Dashboard Pro" [ref=e436] [cursor=pointer]:
-                - /url: /partner-dashboard
-        - generic [ref=e437]:
-          - heading "Légal" [level=3] [ref=e438]
-          - list [ref=e439]:
-            - listitem [ref=e440]:
-              - link "CGU" [ref=e441] [cursor=pointer]:
-                - /url: /cgu
-            - listitem [ref=e442]:
-              - link "CGV" [ref=e443] [cursor=pointer]:
-                - /url: /cgv
-            - listitem [ref=e444]:
-              - link "Confidentialité" [ref=e445] [cursor=pointer]:
-                - /url: /privacy
-            - listitem [ref=e446]:
-              - link "Cookies" [ref=e447] [cursor=pointer]:
-                - /url: /cookies
-            - listitem [ref=e448]:
-              - link "Mentions légales" [ref=e449] [cursor=pointer]:
-                - /url: /legal
-        - generic [ref=e450]:
-          - heading "Contact" [level=3] [ref=e451]
-          - list [ref=e452]:
-            - listitem [ref=e453]:
-              - link "Nous contacter" [ref=e454] [cursor=pointer]:
-                - /url: /contact
-                - img [ref=e455]
-                - text: Nous contacter
-            - listitem [ref=e457]:
-              - link "contact@kilolab.fr" [ref=e458] [cursor=pointer]:
-                - /url: /contact
-                - img [ref=e459]
-                - text: contact@kilolab.fr
-            - listitem [ref=e462]:
-              - img [ref=e463]
-              - generic [ref=e466]: Lille - Nantes - Bordeaux
-      - generic [ref=e469]:
-        - paragraph [ref=e470]: © 2026 Kilolab SAS. Tous droits réservés.
-        - generic [ref=e471]:
-          - link "Admin" [ref=e472] [cursor=pointer]:
-            - /url: /admin
-          - generic [ref=e473]: "-"
-          - generic [ref=e474]: Made with love in France
+          - listitem [ref=e417]:
+            - link "Nos tarifs" [ref=e418] [cursor=pointer]:
+              - /url: /tarifs
+          - listitem [ref=e419]:
+            - link "Trouver un Washer" [ref=e420] [cursor=pointer]:
+              - /url: /trouver
+          - listitem [ref=e421]:
+            - link "FAQ" [ref=e422] [cursor=pointer]:
+              - /url: /faq
+      - generic [ref=e423]:
+        - heading "Partenaires" [level=3] [ref=e424]
+        - list [ref=e425]:
+          - listitem [ref=e426]:
+            - link "Devenir Washer" [ref=e427] [cursor=pointer]:
+              - /url: /become-washer
+          - listitem [ref=e428]:
+            - link "Espace Pressing" [ref=e429] [cursor=pointer]:
+              - /url: /partner
+          - listitem [ref=e430]:
+            - link "Dashboard Pro" [ref=e431] [cursor=pointer]:
+              - /url: /partner-dashboard
+      - generic [ref=e432]:
+        - heading "Légal" [level=3] [ref=e433]
+        - list [ref=e434]:
+          - listitem [ref=e435]:
+            - link "CGU" [ref=e436] [cursor=pointer]:
+              - /url: /cgu
+          - listitem [ref=e437]:
+            - link "CGV" [ref=e438] [cursor=pointer]:
+              - /url: /cgv
+          - listitem [ref=e439]:
+            - link "Confidentialité" [ref=e440] [cursor=pointer]:
+              - /url: /privacy
+          - listitem [ref=e441]:
+            - link "Cookies" [ref=e442] [cursor=pointer]:
+              - /url: /cookies
+          - listitem [ref=e443]:
+            - link "Mentions légales" [ref=e444] [cursor=pointer]:
+              - /url: /legal
+      - generic [ref=e445]:
+        - heading "Contact" [level=3] [ref=e446]
+        - list [ref=e447]:
+          - listitem [ref=e448]:
+            - link "Nous contacter" [ref=e449] [cursor=pointer]:
+              - /url: /contact
+              - img [ref=e450]
+              - text: Nous contacter
+          - listitem [ref=e452]:
+            - link "contact@kilolab.fr" [ref=e453] [cursor=pointer]:
+              - /url: /contact
+              - img [ref=e454]
+              - text: contact@kilolab.fr
+          - listitem [ref=e457]:
+            - img [ref=e458]
+            - generic [ref=e461]: Lille - Nantes - Bordeaux
+    - generic [ref=e464]:
+      - paragraph [ref=e465]: © 2026 Kilolab SAS. Tous droits réservés.
+      - generic [ref=e466]:
+        - link "Admin" [ref=e467] [cursor=pointer]:
+          - /url: /admin
+        - generic [ref=e468]: "-"
+        - generic [ref=e469]: Made with love in France
 ```

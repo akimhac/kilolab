@@ -1,0 +1,52 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e3]:
+  - navigation [ref=e4]:
+    - generic [ref=e6]:
+      - link "K Kilolab" [ref=e7] [cursor=pointer]:
+        - /url: /
+        - generic [ref=e9]: K
+        - generic [ref=e10]: Kilolab
+      - generic [ref=e11]:
+        - link "Tarifs" [ref=e12] [cursor=pointer]:
+          - /url: /tarifs
+        - link "Trouver un Washer" [ref=e13] [cursor=pointer]:
+          - /url: /trouver
+        - link "FAQ" [ref=e14] [cursor=pointer]:
+          - /url: /faq
+        - link "Contact" [ref=e15] [cursor=pointer]:
+          - /url: /contact
+      - generic [ref=e16]:
+        - link "Connexion" [ref=e17] [cursor=pointer]:
+          - /url: /login
+        - link "Devenir Washer" [ref=e18] [cursor=pointer]:
+          - /url: /washers
+        - link "Commander" [ref=e19] [cursor=pointer]:
+          - /url: /new-order
+        - button "Change language" [ref=e21] [cursor=pointer]:
+          - generic [ref=e22]: 🇫🇷
+        - button "Activer le mode sombre" [ref=e23] [cursor=pointer]:
+          - img [ref=e24]
+  - generic [ref=e26]:
+    - heading "Nouvelle Commande" [level=1] [ref=e27]
+    - generic [ref=e28]:
+      - generic [ref=e29]: 1. Formule
+      - generic [ref=e30]: 2. Poids
+      - generic [ref=e31]: 3. Localisation
+      - generic [ref=e32]: 4. Date
+      - generic [ref=e33]: 5. Paiement
+    - generic [ref=e35]:
+      - heading "Où êtes-vous ?" [level=2] [ref=e36]:
+        - img [ref=e37]
+        - text: Où êtes-vous ?
+      - generic [ref=e40]:
+        - generic [ref=e41]:
+          - img [ref=e42]
+          - textbox "59000 ou Lille..." [ref=e45]
+        - button "Chercher" [disabled] [ref=e46]
+      - generic [ref=e50]:
+        - img [ref=e51]
+        - generic [ref=e54]: Entrez votre code postal pour démarrer
+      - button "← Retour" [ref=e56] [cursor=pointer]
+```
