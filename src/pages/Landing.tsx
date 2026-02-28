@@ -212,6 +212,28 @@ export default function Landing() {
 
         {/* COST COMPARISON */}
         <section className="py-24 bg-white">
+
+          {/* ═══ EMBEDDED VIDEO ═══ */}
+          <div className="max-w-4xl mx-auto px-4 sm:px-6 mb-24">
+            <AnimateOnScroll className="text-center mb-10">
+              <span className="inline-block px-4 py-1.5 bg-purple-100 text-purple-700 rounded-full text-sm font-semibold mb-4">En 60 secondes</span>
+              <h2 className="font-heading text-3xl md:text-4xl font-bold text-slate-900 mb-4">Découvrez Kilolab en vidéo</h2>
+              <p className="text-lg text-slate-600 max-w-2xl mx-auto">Comment ça marche, du canapé à la livraison.</p>
+            </AnimateOnScroll>
+            <AnimateOnScroll delay={150}>
+              <div className="relative rounded-3xl overflow-hidden shadow-2xl border border-slate-200 aspect-video bg-slate-900">
+                <iframe
+                  src="https://www.youtube.com/embed/dQw4w9WgXcQ?rel=0&modestbranding=1&showinfo=0"
+                  title="Kilolab - Comment ça marche"
+                  className="absolute inset-0 w-full h-full"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                  loading="lazy"
+                />
+              </div>
+              <p className="text-center text-sm text-slate-500 mt-4">Remplacez cette vidéo par votre propre contenu marketing dans le code source</p>
+            </AnimateOnScroll>
+          </div>
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <AnimateOnScroll>
               <div className="text-center mb-16">
