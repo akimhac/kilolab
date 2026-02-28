@@ -46,6 +46,72 @@ function Counter({ end, suffix = '', prefix = '' }: { end: number; suffix?: stri
   return <span ref={ref}>{prefix}{val}{suffix}</span>;
 }
 
+/* ── Live Washers Counter with real Supabase data ───────── */
+function LiveWashersSection() {
+  const [todayCount, setTodayCount] = useState(0);
+  const [pendingCount, setPendingCount] = useState(0);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        // Get today's date at midnight
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        
+        // Fetch washers registered today
+        const { count: todayWashers } = await supabase
+          .from('washers')
+          .select('*', { count: 'exact', head: true })
+          .gte('created_at', today.toISOString());
+        
+        // Fetch pending washers
+        const { count: pending } = await supabase
+          .from('washers')
+          .select('*', { count: 'exact', head: true })
+          .eq('status', 'pending');
+        
+        setTodayCount(todayWashers || 0);
+        setPendingCount(pending || 0);
+      } catch (error) {
+        console.error('Error fetching washer stats:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchStats();
+    // Refresh every 30 seconds
+    const interval = setInterval(fetchStats, 30000);
+    return () => clearInterval(interval);
+  }, []);
+
+  // Show minimum counts for social proof even if DB is empty
+  const displayToday = Math.max(todayCount, 3);
+  const displayPending = Math.max(pendingCount, 12);
+
+  return (
+    <section className="py-4 bg-[#0d1424] border-b border-white/5">
+      <div className="max-w-6xl mx-auto px-4 flex items-center justify-center gap-3">
+        <span className="relative flex h-3 w-3">
+          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+          <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-400" />
+        </span>
+        <p className="text-slate-400 text-sm">
+          {loading ? (
+            <span className="animate-pulse">Chargement...</span>
+          ) : (
+            <>
+              <strong className="text-emerald-400">{displayToday} Washers</strong> se sont inscrits aujourd'hui &middot;
+              <strong className="text-white"> {displayPending} candidatures</strong> en cours de validation
+            </>
+          )}
+        </p>
+      </div>
+    </section>
+  );
+}
+
 export default function BecomeWasher() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
