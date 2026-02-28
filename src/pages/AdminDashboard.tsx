@@ -571,36 +571,49 @@ export default function AdminDashboard() {
 
   if (loading)
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
         <div className="text-center">
-          <Loader2 className="animate-spin text-teal-600 mx-auto mb-4" size={48} />
-          <p className="text-slate-600 font-medium">Chargement du dashboard...</p>
+          <div className="relative">
+            <div className="w-20 h-20 border-4 border-teal-500/30 rounded-full animate-pulse" />
+            <Loader2 className="absolute inset-0 m-auto animate-spin text-teal-400" size={40} />
+          </div>
+          <p className="text-slate-400 font-medium mt-6">Chargement du dashboard...</p>
         </div>
       </div>
     );
 
   return (
-    <div className="min-h-screen bg-slate-50 font-sans text-slate-900">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 font-sans text-white">
       <Navbar />
 
-      <div className="pt-32 pb-20 px-4 max-w-[1400px] mx-auto">
+      <div className="pt-28 pb-20 px-4 max-w-[1500px] mx-auto">
         {/* HEADER */}
         <div className="mb-8">
           <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-6">
             <div>
-              <h1 className="text-4xl font-black mb-2 bg-gradient-to-r from-teal-600 to-cyan-600 bg-clip-text text-transparent">
-                Dashboard Admin 👑
-              </h1>
-              <p className="text-slate-600 flex items-center gap-2">
-                <Activity size={16} className="text-teal-500" />
-                Vue d&apos;ensemble en temps réel
-              </p>
+              <div className="flex items-center gap-3 mb-2">
+                <div className="w-12 h-12 bg-gradient-to-br from-teal-500 to-cyan-500 rounded-xl flex items-center justify-center shadow-lg shadow-teal-500/30">
+                  <Shield size={24} className="text-white" />
+                </div>
+                <div>
+                  <h1 className="text-3xl font-black bg-gradient-to-r from-white to-slate-300 bg-clip-text text-transparent">
+                    Command Center
+                  </h1>
+                  <p className="text-slate-400 text-sm flex items-center gap-2">
+                    <span className="relative flex h-2 w-2">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                      <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-400" />
+                    </span>
+                    Données en temps réel
+                  </p>
+                </div>
+              </div>
             </div>
 
             <div className="flex gap-3 flex-wrap">
               <button
                 onClick={fetchData}
-                className="bg-white border border-slate-200 px-4 py-2.5 rounded-xl text-sm font-bold hover:bg-slate-50 flex items-center gap-2 shadow-sm hover:shadow transition-all"
+                className="bg-white/10 backdrop-blur-sm border border-white/10 px-4 py-2.5 rounded-xl text-sm font-bold hover:bg-white/20 flex items-center gap-2 transition-all"
               >
                 <RefreshCw size={16} />
                 Actualiser
@@ -608,7 +621,7 @@ export default function AdminDashboard() {
 
               <a
                 href="/admin/analytics"
-                className="bg-white border border-slate-200 px-4 py-2.5 rounded-xl text-sm font-bold hover:bg-slate-50 flex items-center gap-2 shadow-sm hover:shadow transition-all"
+                className="bg-white/10 backdrop-blur-sm border border-white/10 px-4 py-2.5 rounded-xl text-sm font-bold hover:bg-white/20 flex items-center gap-2 transition-all"
               >
                 <BarChart3 size={16} />
                 Analytics
@@ -616,7 +629,7 @@ export default function AdminDashboard() {
 
               <button
                 onClick={() => window.open("https://supabase.com/dashboard", "_blank")}
-                className="bg-white border border-slate-200 px-4 py-2.5 rounded-xl text-sm font-bold hover:bg-slate-50 flex items-center gap-2 shadow-sm hover:shadow transition-all"
+                className="bg-white/10 backdrop-blur-sm border border-white/10 px-4 py-2.5 rounded-xl text-sm font-bold hover:bg-white/20 flex items-center gap-2 transition-all"
               >
                 <Database size={16} />
                 Supabase
@@ -624,7 +637,7 @@ export default function AdminDashboard() {
 
               <button
                 onClick={handleExportCSV}
-                className="bg-gradient-to-r from-teal-600 to-cyan-600 text-white px-4 py-2.5 rounded-xl text-sm font-bold hover:from-teal-700 hover:to-cyan-700 flex items-center gap-2 shadow-lg transition-all"
+                className="bg-gradient-to-r from-teal-500 to-cyan-500 text-white px-4 py-2.5 rounded-xl text-sm font-bold hover:shadow-lg hover:shadow-teal-500/30 flex items-center gap-2 transition-all"
               >
                 <Download size={16} />
                 Export CSV
@@ -640,8 +653,8 @@ export default function AdminDashboard() {
                 onClick={() => setTimeRange(range)}
                 className={`px-5 py-2.5 rounded-xl font-bold text-sm transition-all ${
                   timeRange === range
-                    ? "bg-gradient-to-r from-teal-600 to-cyan-600 text-white shadow-lg shadow-teal-200"
-                    : "bg-white text-slate-600 border border-slate-200 hover:border-teal-300"
+                    ? "bg-gradient-to-r from-teal-500 to-cyan-500 text-white shadow-lg shadow-teal-500/30"
+                    : "bg-white/5 text-slate-400 border border-white/10 hover:bg-white/10 hover:text-white"
                 }`}
               >
                 {range === "7d" ? "7 jours" : range === "30d" ? "30 jours" : range === "90d" ? "90 jours" : "Tout"}
@@ -649,107 +662,135 @@ export default function AdminDashboard() {
             ))}
           </div>
 
-          {/* TOP STATS */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <StatCard
-              title="Chiffre d'affaires"
-              value={stats.totalRevenue.toFixed(0)}
-              suffix=" €"
-              icon={<DollarSign size={24} />}
-              color="teal"
-            />
-            <StatCard title="Commandes" value={stats.totalOrders} icon={<ShoppingBag size={24} />} color="blue" />
-            <StatCard title="Clients" value={stats.totalClients} icon={<Users size={24} />} color="purple" />
-            <StatCard title="Messages" value={stats.newMessages} icon={<MessageSquare size={24} />} badge={stats.newMessages} color="orange" />
+          {/* TOP STATS - Glass morphism style */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6 hover:bg-white/10 transition-all group">
+              <div className="flex items-start justify-between mb-4">
+                <div className="p-3 bg-emerald-500/20 rounded-xl">
+                  <DollarSign size={24} className="text-emerald-400" />
+                </div>
+                <TrendingUp size={18} className="text-emerald-400" />
+              </div>
+              <p className="text-4xl font-black text-white mb-1">{stats.totalRevenue.toFixed(0)}€</p>
+              <p className="text-sm text-slate-400">Chiffre d'affaires</p>
+            </div>
+
+            <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6 hover:bg-white/10 transition-all group">
+              <div className="flex items-start justify-between mb-4">
+                <div className="p-3 bg-blue-500/20 rounded-xl">
+                  <ShoppingBag size={24} className="text-blue-400" />
+                </div>
+                <span className="text-xs font-bold text-blue-400 bg-blue-500/20 px-2 py-1 rounded-full">
+                  {stats.completedOrders} terminées
+                </span>
+              </div>
+              <p className="text-4xl font-black text-white mb-1">{stats.totalOrders}</p>
+              <p className="text-sm text-slate-400">Commandes totales</p>
+            </div>
+
+            <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6 hover:bg-white/10 transition-all group">
+              <div className="flex items-start justify-between mb-4">
+                <div className="p-3 bg-violet-500/20 rounded-xl">
+                  <Users size={24} className="text-violet-400" />
+                </div>
+              </div>
+              <p className="text-4xl font-black text-white mb-1">{stats.totalClients}</p>
+              <p className="text-sm text-slate-400">Clients inscrits</p>
+            </div>
+
+            <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6 hover:bg-white/10 transition-all group relative">
+              <div className="flex items-start justify-between mb-4">
+                <div className="p-3 bg-orange-500/20 rounded-xl">
+                  <MessageSquare size={24} className="text-orange-400" />
+                </div>
+                {stats.newMessages > 0 && (
+                  <span className="absolute top-4 right-4 bg-red-500 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center animate-pulse">
+                    {stats.newMessages}
+                  </span>
+                )}
+              </div>
+              <p className="text-4xl font-black text-white mb-1">{messages.length}</p>
+              <p className="text-sm text-slate-400">Messages reçus</p>
+            </div>
           </div>
 
-          {/* SECOND STATS */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mt-6">
-            <div className="bg-white rounded-2xl p-6 border border-slate-100">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-slate-500 font-medium mb-1">Pressings actifs</p>
-                  <p className="text-2xl font-black text-green-600">{stats.activePartners}</p>
-                </div>
-                <div className="p-3 bg-green-50 rounded-xl">
-                  <CheckCircle size={24} className="text-green-600" />
-                </div>
+          {/* SECOND STATS ROW */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
+            <div className="bg-gradient-to-br from-emerald-500/10 to-emerald-500/5 border border-emerald-500/20 rounded-xl p-4 flex items-center gap-4">
+              <div className="p-2 bg-emerald-500/20 rounded-lg">
+                <CheckCircle size={20} className="text-emerald-400" />
+              </div>
+              <div>
+                <p className="text-2xl font-black text-emerald-400">{stats.activePartners}</p>
+                <p className="text-xs text-slate-400">Pressings actifs</p>
               </div>
             </div>
 
-            <div className="bg-white rounded-2xl p-6 border border-slate-100">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-slate-500 font-medium mb-1">En attente</p>
-                  <p className="text-2xl font-black text-orange-600">{stats.pendingPartners}</p>
-                </div>
-                <div className="p-3 bg-orange-50 rounded-xl">
-                  <Clock size={24} className="text-orange-600" />
-                </div>
+            <div className="bg-gradient-to-br from-orange-500/10 to-orange-500/5 border border-orange-500/20 rounded-xl p-4 flex items-center gap-4">
+              <div className="p-2 bg-orange-500/20 rounded-lg">
+                <Clock size={20} className="text-orange-400" />
+              </div>
+              <div>
+                <p className="text-2xl font-black text-orange-400">{stats.pendingPartners + stats.pendingWashers}</p>
+                <p className="text-xs text-slate-400">En attente</p>
               </div>
             </div>
 
-            <div className="bg-white rounded-2xl p-6 border border-slate-100">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-slate-500 font-medium mb-1">Panier moyen</p>
-                  <p className="text-2xl font-black text-teal-600">{stats.avgOrderValue.toFixed(2)} €</p>
-                </div>
-                <div className="p-3 bg-teal-50 rounded-xl">
-                  <BarChart3 size={24} className="text-teal-600" />
-                </div>
+            <div className="bg-gradient-to-br from-teal-500/10 to-teal-500/5 border border-teal-500/20 rounded-xl p-4 flex items-center gap-4">
+              <div className="p-2 bg-teal-500/20 rounded-lg">
+                <BarChart3 size={20} className="text-teal-400" />
+              </div>
+              <div>
+                <p className="text-2xl font-black text-teal-400">{stats.avgOrderValue.toFixed(0)}€</p>
+                <p className="text-xs text-slate-400">Panier moyen</p>
               </div>
             </div>
 
-            <div className="bg-white rounded-2xl p-6 border border-slate-100">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-slate-500 font-medium mb-1">Erreurs (crit.)</p>
-                  <p className="text-2xl font-black text-red-600">{stats.criticalErrors}</p>
-                </div>
-                <div className="p-3 bg-red-50 rounded-xl">
-                  <AlertTriangle size={24} className="text-red-600" />
-                </div>
+            <div className="bg-gradient-to-br from-red-500/10 to-red-500/5 border border-red-500/20 rounded-xl p-4 flex items-center gap-4">
+              <div className="p-2 bg-red-500/20 rounded-lg">
+                <AlertTriangle size={20} className="text-red-400" />
+              </div>
+              <div>
+                <p className="text-2xl font-black text-red-400">{stats.criticalErrors}</p>
+                <p className="text-xs text-slate-400">Erreurs critiques</p>
               </div>
             </div>
           </div>
         </div>
 
-        {/* NAVIGATION TABS */}
-        <div className="bg-white rounded-2xl shadow-sm border border-slate-100 mb-8">
-          <div className="flex border-b overflow-x-auto">
+        {/* NAVIGATION TABS - Modern pills */}
+        <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl mb-8 overflow-hidden">
+          <div className="flex border-b border-white/10 overflow-x-auto p-2 gap-1">
             {(["overview", "partners", "washers", "clients", "orders", "messages", "heatmap", "b2b", "logs", "coupons"] as const).map(
               (tab) => (
                 <button
                   key={tab}
                   onClick={() => setActiveTab(tab)}
-                  className={`px-6 py-4 font-bold transition whitespace-nowrap relative ${
-                    activeTab === tab ? "text-teal-600" : "text-slate-500 hover:text-slate-700"
+                  className={`px-4 py-2.5 font-bold transition-all whitespace-nowrap rounded-xl relative text-sm ${
+                    activeTab === tab 
+                      ? "bg-gradient-to-r from-teal-500 to-cyan-500 text-white shadow-lg" 
+                      : "text-slate-400 hover:text-white hover:bg-white/10"
                   }`}
                 >
                   {tab === "overview"
-                    ? "📊 Vue d'ensemble"
+                    ? "Vue d'ensemble"
                     : tab === "partners"
-                    ? `🏪 Pressings (${partners.length})`
+                    ? `Pressings (${partners.length})`
                     : tab === "washers"
-                    ? `🧺 Washers (${washers.length})`
+                    ? `Washers (${washers.length})`
                     : tab === "clients"
-                    ? `👤 Clients (${clients.length})`
+                    ? `Clients (${clients.length})`
                     : tab === "orders"
-                    ? `📦 Commandes (${orders.length})`
+                    ? `Commandes (${orders.length})`
                     : tab === "messages"
-                    ? `💬 Messages (${stats.newMessages})`
+                    ? `Messages (${stats.newMessages})`
                     : tab === "heatmap"
-                    ? "🗺️ Heatmap"
+                    ? "Heatmap"
                     : tab === "b2b"
-                    ? "🏢 B2B / API"
+                    ? "B2B / API"
                     : tab === "logs"
-                    ? `🔴 Logs (${stats.criticalErrors})`
-                    : `🎟️ Coupons (${coupons.length})`}
-
-                  {activeTab === tab && (
-                    <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-teal-600 to-cyan-600" />
-                  )}
+                    ? `Logs (${stats.criticalErrors})`
+                    : `Coupons (${coupons.length})`}
 
                   {tab === "washers" && stats.pendingWashers > 0 && (
                     <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
@@ -772,34 +813,40 @@ export default function AdminDashboard() {
             {activeTab === "overview" && (
               <div className="space-y-8">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                  <div className="bg-white rounded-2xl">
-                    <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
-                      <TrendingUp className="text-teal-600" size={20} />
+                  <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6">
+                    <h3 className="text-lg font-bold mb-4 flex items-center gap-2 text-white">
+                      <TrendingUp className="text-teal-400" size={20} />
                       Évolution du CA
                     </h3>
                     <ResponsiveContainer width="100%" height={300}>
                       <LineChart data={monthlyData}>
-                        <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-                        <XAxis dataKey="month" stroke="#64748b" fontSize={12} />
-                        <YAxis stroke="#64748b" fontSize={12} />
-                        <Tooltip />
+                        <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
+                        <XAxis dataKey="month" stroke="#94a3b8" fontSize={12} />
+                        <YAxis stroke="#94a3b8" fontSize={12} />
+                        <Tooltip 
+                          contentStyle={{ backgroundColor: '#1e293b', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px' }}
+                          labelStyle={{ color: '#fff' }}
+                        />
                         <Legend />
-                        <Line type="monotone" dataKey="revenue" stroke="#14b8a6" strokeWidth={3} name="CA (€)" dot={{ r: 4 }} />
+                        <Line type="monotone" dataKey="revenue" stroke="#14b8a6" strokeWidth={3} name="CA (€)" dot={{ r: 4, fill: '#14b8a6' }} />
                       </LineChart>
                     </ResponsiveContainer>
                   </div>
 
-                  <div className="bg-white rounded-2xl">
-                    <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
-                      <Package className="text-blue-600" size={20} />
+                  <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6">
+                    <h3 className="text-lg font-bold mb-4 flex items-center gap-2 text-white">
+                      <Package className="text-blue-400" size={20} />
                       Commandes mensuelles
                     </h3>
                     <ResponsiveContainer width="100%" height={300}>
                       <BarChart data={monthlyData}>
-                        <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-                        <XAxis dataKey="month" stroke="#64748b" fontSize={12} />
-                        <YAxis stroke="#64748b" fontSize={12} />
-                        <Tooltip />
+                        <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
+                        <XAxis dataKey="month" stroke="#94a3b8" fontSize={12} />
+                        <YAxis stroke="#94a3b8" fontSize={12} />
+                        <Tooltip 
+                          contentStyle={{ backgroundColor: '#1e293b', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px' }}
+                          labelStyle={{ color: '#fff' }}
+                        />
                         <Legend />
                         <Bar dataKey="orders" fill="#3b82f6" name="Commandes" radius={[8, 8, 0, 0]} />
                       </BarChart>
@@ -808,9 +855,9 @@ export default function AdminDashboard() {
                 </div>
 
                 {statusData.length > 0 && (
-                  <div className="bg-white rounded-2xl p-6">
-                    <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
-                      <BarChart3 className="text-purple-600" size={20} />
+                  <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6">
+                    <h3 className="text-lg font-bold mb-4 flex items-center gap-2 text-white">
+                      <BarChart3 className="text-violet-400" size={20} />
                       Statuts des commandes
                     </h3>
                     <ResponsiveContainer width="100%" height={300}>
@@ -829,7 +876,9 @@ export default function AdminDashboard() {
                             <Cell key={`cell-${index}`} fill={entry.color} />
                           ))}
                         </Pie>
-                        <Tooltip />
+                        <Tooltip 
+                          contentStyle={{ backgroundColor: '#1e293b', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px' }}
+                        />
                       </PieChart>
                     </ResponsiveContainer>
                   </div>
