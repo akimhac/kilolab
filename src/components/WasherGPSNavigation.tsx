@@ -128,6 +128,25 @@ export default function WasherGPSNavigation() {
     setIsNavigating(true);
   };
 
+  const markAsComplete = () => {
+    if (!currentOrder) return;
+    const remaining = orders.filter(o => o.id !== currentOrder.id);
+    setOrders(remaining);
+    setCurrentOrder(remaining[0] || null);
+    setIsNavigating(false);
+  };
+
+  if (loading) {
+    return (
+      <div className="bg-[#0a0f1a] min-h-screen text-white flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="animate-spin text-teal-500 mx-auto mb-4" size={40} />
+          <p className="text-slate-400">Chargement des missions...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="bg-[#0a0f1a] min-h-screen text-white">
       {/* Header */}
