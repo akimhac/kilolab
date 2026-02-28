@@ -1308,50 +1308,50 @@ export default function AdminDashboard() {
             {activeTab === "logs" && (
               <div>
                 <div className="mb-6">
-                  <h3 className="text-2xl font-bold mb-2">🔴 Logs d&apos;erreurs</h3>
-                  <p className="text-slate-600">{errorLogs.length} logs au total</p>
+                  <h3 className="text-2xl font-bold mb-2 text-white">Logs d'erreurs</h3>
+                  <p className="text-slate-400">{errorLogs.length} logs au total</p>
                 </div>
 
                 {errorLogs.length === 0 ? (
-                  <div className="text-center py-16 bg-slate-50 rounded-2xl">
-                    <AlertTriangle size={64} className="mx-auto mb-4 text-slate-300" />
+                  <div className="text-center py-16 bg-white/5 rounded-2xl border border-white/10">
+                    <AlertTriangle size={64} className="mx-auto mb-4 text-slate-500" />
                     <p className="text-xl font-bold text-slate-400">Aucune erreur enregistrée</p>
-                    <p className="text-sm text-slate-500 mt-2">C&apos;est une bonne nouvelle ! 🎉</p>
+                    <p className="text-sm text-slate-500 mt-2">C'est une bonne nouvelle !</p>
                   </div>
                 ) : (
                   <div className="overflow-x-auto">
                     <table className="w-full">
-                      <thead className="bg-slate-50 border-b">
+                      <thead className="bg-white/5 border-b border-white/10">
                         <tr>
-                          <th className="text-left p-4 font-bold text-sm">Date</th>
-                          <th className="text-left p-4 font-bold text-sm">Source</th>
-                          <th className="text-left p-4 font-bold text-sm">Sévérité</th>
-                          <th className="text-left p-4 font-bold text-sm">Message</th>
-                          <th className="text-left p-4 font-bold text-sm">Order ID</th>
+                          <th className="text-left p-4 font-bold text-sm text-slate-400">Date</th>
+                          <th className="text-left p-4 font-bold text-sm text-slate-400">Source</th>
+                          <th className="text-left p-4 font-bold text-sm text-slate-400">Sévérité</th>
+                          <th className="text-left p-4 font-bold text-sm text-slate-400">Message</th>
+                          <th className="text-left p-4 font-bold text-sm text-slate-400">Order ID</th>
                         </tr>
                       </thead>
                       <tbody>
                         {errorLogs.map((log) => (
-                          <tr key={log.id} className="border-b hover:bg-slate-50">
-                            <td className="p-4 text-sm text-slate-600">{new Date(log.created_at).toLocaleString("fr-FR")}</td>
-                            <td className="p-4 font-mono text-xs">{log.source}</td>
+                          <tr key={log.id} className="border-b border-white/5 hover:bg-white/5 transition">
+                            <td className="p-4 text-sm text-slate-400">{new Date(log.created_at).toLocaleString("fr-FR")}</td>
+                            <td className="p-4 font-mono text-xs text-slate-300">{log.source}</td>
                             <td className="p-4">
                               <span
-                                className={`px-2 py-1 rounded-full text-xs font-bold ${
+                                className={`px-3 py-1 rounded-full text-xs font-bold ${
                                   log.severity === "critical"
-                                    ? "bg-red-100 text-red-700"
+                                    ? "bg-red-500/20 text-red-400"
                                     : log.severity === "error"
-                                    ? "bg-orange-100 text-orange-700"
+                                    ? "bg-orange-500/20 text-orange-400"
                                     : log.severity === "warning"
-                                    ? "bg-yellow-100 text-yellow-700"
-                                    : "bg-blue-100 text-blue-700"
+                                    ? "bg-yellow-500/20 text-yellow-400"
+                                    : "bg-blue-500/20 text-blue-400"
                                 }`}
                               >
                                 {log.severity}
                               </span>
                             </td>
-                            <td className="p-4 text-sm max-w-md truncate">{log.message}</td>
-                            <td className="p-4 font-mono text-xs">{log.order_id ? String(log.order_id).slice(0, 8) : "-"}</td>
+                            <td className="p-4 text-sm max-w-md truncate text-slate-300">{log.message}</td>
+                            <td className="p-4 font-mono text-xs text-teal-400">{log.order_id ? String(log.order_id).slice(0, 8) : "-"}</td>
                           </tr>
                         ))}
                       </tbody>
@@ -1365,29 +1365,29 @@ export default function AdminDashboard() {
             {activeTab === "coupons" && (
               <div>
                 <div className="mb-8">
-                  <h3 className="text-2xl font-bold mb-4 flex items-center gap-2">
-                    <Tag size={20} className="text-teal-600" />
+                  <h3 className="text-2xl font-bold mb-4 flex items-center gap-2 text-white">
+                    <Tag size={20} className="text-teal-400" />
                     Créer un coupon
                   </h3>
 
-                  <div className="bg-white p-6 rounded-2xl border grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="bg-white/5 backdrop-blur-sm border border-white/10 p-6 rounded-2xl grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-bold mb-2">Code *</label>
+                      <label className="block text-sm font-bold mb-2 text-slate-300">Code *</label>
                       <input
                         type="text"
                         placeholder="PROMO2026"
                         value={newCoupon.code}
                         onChange={(e) => setNewCoupon({ ...newCoupon, code: e.target.value })}
-                        className="w-full p-3 border rounded-xl uppercase"
+                        className="w-full p-3 bg-white/5 border border-white/10 rounded-xl uppercase text-white placeholder-slate-500 focus:border-teal-500 focus:outline-none"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-sm font-bold mb-2">Type</label>
+                      <label className="block text-sm font-bold mb-2 text-slate-300">Type</label>
                       <select
                         value={newCoupon.discount_type}
                         onChange={(e) => setNewCoupon({ ...newCoupon, discount_type: e.target.value as CouponType })}
-                        className="w-full p-3 border rounded-xl"
+                        className="w-full p-3 bg-white/5 border border-white/10 rounded-xl text-white focus:border-teal-500 focus:outline-none"
                       >
                         <option value="percentage">Pourcentage (%)</option>
                         <option value="fixed">Montant fixe (€)</option>
@@ -1395,7 +1395,7 @@ export default function AdminDashboard() {
                     </div>
 
                     <div>
-                      <label className="block text-sm font-bold mb-2">
+                      <label className="block text-sm font-bold mb-2 text-slate-300">
                         Réduction ({newCoupon.discount_type === "percentage" ? "%" : "€"})
                       </label>
                       <input
@@ -1404,37 +1404,37 @@ export default function AdminDashboard() {
                         max={newCoupon.discount_type === "percentage" ? 100 : 1000}
                         value={newCoupon.discount_value}
                         onChange={(e) => setNewCoupon({ ...newCoupon, discount_value: parseInt(e.target.value || "0", 10) })}
-                        className="w-full p-3 border rounded-xl"
+                        className="w-full p-3 bg-white/5 border border-white/10 rounded-xl text-white focus:border-teal-500 focus:outline-none"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-sm font-bold mb-2">Utilisations max</label>
+                      <label className="block text-sm font-bold mb-2 text-slate-300">Utilisations max</label>
                       <input
                         type="number"
                         min={1}
                         value={newCoupon.max_uses}
                         onChange={(e) => setNewCoupon({ ...newCoupon, max_uses: parseInt(e.target.value || "0", 10) })}
-                        className="w-full p-3 border rounded-xl"
+                        className="w-full p-3 bg-white/5 border border-white/10 rounded-xl text-white focus:border-teal-500 focus:outline-none"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-sm font-bold mb-2">Expire le (optionnel)</label>
+                      <label className="block text-sm font-bold mb-2 text-slate-300">Expire le (optionnel)</label>
                       <input
                         type="date"
                         value={newCoupon.expires_at}
                         onChange={(e) => setNewCoupon({ ...newCoupon, expires_at: e.target.value })}
-                        className="w-full p-3 border rounded-xl"
+                        className="w-full p-3 bg-white/5 border border-white/10 rounded-xl text-white focus:border-teal-500 focus:outline-none"
                       />
                     </div>
 
                     <div className="flex items-end">
                       <button
                         onClick={createCoupon}
-                        className="w-full py-3 bg-teal-600 text-white rounded-xl font-bold hover:bg-teal-700 flex items-center justify-center gap-2"
+                        className="w-full py-3 bg-gradient-to-r from-teal-500 to-cyan-500 text-white rounded-xl font-bold hover:shadow-lg hover:shadow-teal-500/30 flex items-center justify-center gap-2 transition"
                       >
-                        <Shield size={18} />
+                        <Plus size={18} />
                         Créer le coupon
                       </button>
                     </div>
@@ -1442,11 +1442,11 @@ export default function AdminDashboard() {
                 </div>
 
                 <div>
-                  <h3 className="text-2xl font-bold mb-4">📋 Coupons existants</h3>
+                  <h3 className="text-2xl font-bold mb-4 text-white">Coupons existants</h3>
 
                   {coupons.length === 0 ? (
-                    <div className="text-center py-12 bg-slate-50 rounded-2xl border border-slate-200">
-                      <p className="text-slate-600">Aucun coupon pour le moment.</p>
+                    <div className="text-center py-12 bg-white/5 rounded-2xl border border-white/10">
+                      <p className="text-slate-500">Aucun coupon pour le moment.</p>
                     </div>
                   ) : (
                     <div className="overflow-x-auto">
