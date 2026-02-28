@@ -262,10 +262,7 @@ export default function WasherGPSNavigation() {
           </button>
 
           {currentOrder && (
-            <button onClick={() => {
-              const next = mockOrders.find(o => o.id !== currentOrder.id);
-              if (next) { setCurrentOrder(next); setIsNavigating(false); }
-            }}
+            <button onClick={markAsComplete}
               className="w-full py-3 border border-teal-500/30 text-teal-400 rounded-2xl font-semibold text-sm flex items-center justify-center gap-2 hover:bg-teal-500/10 transition">
               <CheckCircle size={16} /> Marquer comme {currentOrder.status === 'pickup' ? 'collecté' : 'livré'}
             </button>
@@ -274,31 +271,43 @@ export default function WasherGPSNavigation() {
 
         {/* Queue */}
         <div className="mt-6">
-          <p className="text-slate-500 text-xs uppercase tracking-widest font-bold mb-3">File d'attente ({mockOrders.length})</p>
+          <div className="flex items-center justify-between mb-3">
+            <p className="text-slate-500 text-xs uppercase tracking-widest font-bold">File d'attente ({orders.length})</p>
+            <button onClick={fetchOrders} className="text-teal-400 hover:text-teal-300 transition p-1">
+              <RefreshCw size={14} />
+            </button>
+          </div>
           <div className="space-y-2">
-            {mockOrders.map((order) => (
-              <button key={order.id}
-                onClick={() => { setCurrentOrder(order); setIsNavigating(false); }}
-                className={`w-full flex items-center gap-3 p-3 rounded-xl border transition text-left ${
-                  currentOrder?.id === order.id
-                    ? 'bg-teal-500/10 border-teal-500/30'
-                    : 'bg-white/[0.03] border-white/[0.06] hover:bg-white/[0.06]'
-                }`}>
-                <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold ${
-                  order.status === 'pickup' ? 'bg-orange-500/20 text-orange-400' : 'bg-teal-500/20 text-teal-400'
-                }`}>
-                  {order.status === 'pickup' ? 'C' : 'L'}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-white text-sm font-semibold truncate">{order.clientName}</p>
-                  <p className="text-slate-500 text-xs truncate">{order.address}</p>
-                </div>
-                <div className="text-right flex-shrink-0">
-                  <p className="text-white text-sm font-bold">{order.estimatedTime} min</p>
-                  <p className="text-slate-500 text-xs">{order.distance}</p>
-                </div>
-              </button>
-            ))}
+            {orders.length === 0 ? (
+              <div className="text-center py-8 text-slate-500">
+                <Package size={32} className="mx-auto mb-2 opacity-50" />
+                <p className="text-sm">Aucune mission en attente</p>
+              </div>
+            ) : (
+              orders.map((order) => (
+                <button key={order.id}
+                  onClick={() => { setCurrentOrder(order); setIsNavigating(false); }}
+                  className={`w-full flex items-center gap-3 p-3 rounded-xl border transition text-left ${
+                    currentOrder?.id === order.id
+                      ? 'bg-teal-500/10 border-teal-500/30'
+                      : 'bg-white/[0.03] border-white/[0.06] hover:bg-white/[0.06]'
+                  }`}>
+                  <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold ${
+                    order.status === 'pickup' ? 'bg-orange-500/20 text-orange-400' : 'bg-teal-500/20 text-teal-400'
+                  }`}>
+                    {order.status === 'pickup' ? 'C' : 'L'}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-white text-sm font-semibold truncate">{order.clientName}</p>
+                    <p className="text-slate-500 text-xs truncate">{order.address}</p>
+                  </div>
+                  <div className="text-right flex-shrink-0">
+                    <p className="text-white text-sm font-bold">{order.estimatedTime} min</p>
+                    <p className="text-slate-500 text-xs">{order.distance}</p>
+                  </div>
+                </button>
+              ))
+            )}
           </div>
         </div>
       </div>
