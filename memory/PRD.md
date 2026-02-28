@@ -14,28 +14,32 @@ Le 1er service de laverie à domicile en France. Marketplace connectant les clie
 
 ## Implémenté
 
+### Sprint 7 - CRUD B2B + React Router v7 (28/02/2026)
+- [x] **CRUD B2B Complet** : create, update, delete, toggleStatus, regenerateApiKey
+- [x] **Supabase Table** : b2b_partners avec api_key, plan, status, api_calls, monthly_revenue
+- [x] **Modales B2B** : Create partner modal + Edit partner modal (dark theme)
+- [x] **React Router v7 Future Flags** : v7_startTransition + v7_relativeSplatPath
+- [x] **Warnings Résolus** : Aucun warning React Router dans la console
+- [x] Tests E2E : **24/24 pass** - CRUD B2B + No warnings
+
 ### Sprint 6 - Refonte Admin Dashboard Dark Theme (28/02/2026)
-- [x] **Admin Dashboard Dark Theme** : Background slate-900, glass-morphism cards (bg-white/5 backdrop-blur)
-- [x] **Stats Cards Modernisées** : Gradients teal/cyan, emerald/blue/violet/orange accents
-- [x] **Navigation Tabs Pills** : Design moderne avec pills rounded, gradients actifs
-- [x] **Tables Dark Theme** : Toutes les tables (Partners, Washers, Clients, Orders, Messages, Logs, Coupons)
-- [x] **Modales Dark Theme** : Partner Modal et Washer Modal avec bg-slate-800
-- [x] **B2B Tab Modernisé** : API Keys section violet gradient, partners list dark
-- [x] Tests E2E : **28/28 pass** - Admin login dark + toutes les features
+- [x] **Admin Dashboard Dark Theme** : Glass-morphism, gradients, stats cards modernes
+- [x] **Toutes les Tables** : Partners, Washers, Clients, Orders, Messages, Logs, Coupons
+- [x] Tests E2E : **28/28 pass**
 
 ### Sprint 5 - Connexion données réelles (28/02/2026)
-- [x] **Compteur Live Washers** : Connecté à Supabase (washers créés aujourd'hui + pending)
-- [x] **GPS Navigation** : Connecté aux vraies commandes Supabase avec fallback mock
-- [x] **Heatmap Admin** : Connectée aux commandes Supabase avec Leaflet
+- [x] **Compteur Live Washers** : Supabase (washers du jour + pending)
+- [x] **GPS Navigation** : Supabase orders avec fallback mock
+- [x] **Heatmap Admin** : Supabase orders avec Leaflet
 
-### Sprint 4 - Traductions complètes + Vidéo (28/02/2026)
+### Sprint 4 - Traductions + Vidéo (28/02/2026)
 - [x] **FAQ/Contact/Tarifs traduits** : i18next FR/EN complet
-- [x] **Vidéo HTML5** : Stock gratuite Coverr.co sur landing
+- [x] **Vidéo HTML5** : Stock gratuite Coverr.co
 
 ### Sprint 3 - Features avancées (28/02/2026)
-- [x] **Heatmap** : Onglet Admin Dashboard avec carte Leaflet
-- [x] **B2B / API** : Onglet Admin avec gestion partenaires, clés API
-- [x] **Navigation GPS** : Page /washer-gps avec Google Maps/Apple Maps natif
+- [x] **Heatmap** : Leaflet dans Admin Dashboard
+- [x] **B2B / API Tab** : Gestion partenaires avec CRUD complet
+- [x] **Navigation GPS** : Google Maps/Apple Maps natif
 
 ### Sprint 2 - Refonte BecomeWasher (28/02/2026)
 - [x] Hero immersif dark + Simulateur revenus + Témoignages
@@ -44,18 +48,16 @@ Le 1er service de laverie à domicile en France. Marketplace connectant les clie
 - [x] Traductions i18next + Fix Logo + Refonte Landing
 
 ## Tests
-- iteration_8.json: **100%** (28 tests) — Admin Dashboard dark theme + Features
+- iteration_9.json: **100%** (24 tests) — CRUD B2B + React Router v7
+- iteration_8.json: 100% (28 tests) — Admin Dashboard dark theme
 - iteration_7.json: 100% (21 tests) — Compteur Live + GPS
-- iteration_6.json: 100% (19 tests) — Traductions + Vidéo
 
-## Backlog
+## Backlog Complété ✅
+- ~~CRUD B2B partenaires avec vrais appels API~~ → DONE
+- ~~Warnings React Router v7~~ → DONE
 
-### P1
-- [ ] B2B : CRUD partenaires avec vrais appels API (actuellement mock data)
-
-### P2
+## Futur (P3)
 - [ ] App mobile React Native séparée
-- [ ] Résoudre warnings React Router v7
 
 ---
-*Dernière mise à jour: 28/02/2026*
+*Dernière mise à jour: 28/02/2026 - BACKLOG TERMINÉ*
