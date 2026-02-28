@@ -600,6 +600,14 @@ export default function AdminDashboard() {
                 Actualiser
               </button>
 
+              <a
+                href="/admin/analytics"
+                className="bg-white border border-slate-200 px-4 py-2.5 rounded-xl text-sm font-bold hover:bg-slate-50 flex items-center gap-2 shadow-sm hover:shadow transition-all"
+              >
+                <BarChart3 size={16} />
+                Analytics
+              </a>
+
               <button
                 onClick={() => window.open("https://supabase.com/dashboard", "_blank")}
                 className="bg-white border border-slate-200 px-4 py-2.5 rounded-xl text-sm font-bold hover:bg-slate-50 flex items-center gap-2 shadow-sm hover:shadow transition-all"
