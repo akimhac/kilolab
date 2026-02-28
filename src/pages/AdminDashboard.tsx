@@ -377,6 +377,175 @@ export default function AdminDashboard() {
     }
   };
 
+  // --- ORDER MANAGEMENT ---
+  const cancelOrder = async (order: any, message: string) => {
+    if (!message.trim()) {
+      toast.error("Veuillez écrire un message au client");
+      return;
+    }
+
+    setSendingEmail(true);
+    const t = toast.loading("Annulation en cours...");
+
+    try {
+      // 1. Update order status in Supabase
+      const { error: updateError } = await supabase
+        .from("orders")
+        .update({ 
+          status: "cancelled",
+          cancelled_at: new Date().toISOString(),
+          cancel_reason: message
+        })
+        .eq("id", order.id);
+
+      if (updateError) throw updateError;
+
+      // 2. Get client email
+      const clientEmail = order.profiles?.email || order.client_email;
+      
+      if (clientEmail) {
+        // 3. Send cancellation email to client
+        const emailHtml = `
+          <!DOCTYPE html>
+          <html>
+          <head><meta charset="utf-8"></head>
+          <body style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f8fafc;">
+            <div style="background: linear-gradient(135deg, #ef4444 0%, #f97316 100%); padding: 25px; border-radius: 16px 16px 0 0; text-align: center;">
+              <h1 style="color: white; margin: 0; font-size: 22px;">Commande annulée</h1>
+            </div>
+            <div style="background: white; padding: 25px; border-radius: 0 0 16px 16px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+              <p style="color: #334155; font-size: 16px; line-height: 1.6;">Bonjour,</p>
+              <p style="color: #334155; font-size: 16px; line-height: 1.6;">
+                Nous sommes désolés de vous informer que votre commande <strong>#${order.id.slice(0, 8).toUpperCase()}</strong> a été annulée.
+              </p>
+              
+              <div style="background: #fef2f2; border-left: 4px solid #ef4444; padding: 15px; margin: 20px 0; border-radius: 0 8px 8px 0;">
+                <p style="color: #991b1b; margin: 0; font-weight: bold;">Message de l'équipe Kilolab :</p>
+                <p style="color: #7f1d1d; margin: 10px 0 0 0; font-style: italic;">"${message}"</p>
+              </div>
+              
+              <p style="color: #334155; font-size: 16px; line-height: 1.6;">
+                Si vous avez effectué un paiement, il sera remboursé sous 5-7 jours ouvrés.
+              </p>
+              
+              <p style="color: #334155; font-size: 16px; line-height: 1.6;">
+                N'hésitez pas à passer une nouvelle commande quand vous le souhaitez.
+              </p>
+              
+              <a href="https://kilolab.fr/new-order" style="display: block; background: linear-gradient(135deg, #14b8a6 0%, #06b6d4 100%); color: white; text-align: center; padding: 15px 30px; border-radius: 12px; text-decoration: none; font-weight: bold; margin-top: 20px;">
+                Passer une nouvelle commande
+              </a>
+              
+              <p style="color: #64748b; font-size: 14px; text-align: center; margin-top: 20px;">
+                Des questions ? Contactez-nous à contact@kilolab.fr
+              </p>
+            </div>
+            <p style="text-align: center; color: #94a3b8; font-size: 12px; margin-top: 20px;">
+              © 2025 Kilolab - Le pressing au kilo
+            </p>
+          </body>
+          </html>
+        `;
+
+        // Call the email API
+        await fetch('/api/send-email', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            to: clientEmail,
+            subject: `❌ Commande #${order.id.slice(0, 8).toUpperCase()} annulée - Kilolab`,
+            html: emailHtml,
+            type: 'order_cancelled'
+          })
+        });
+      }
+
+      toast.success("Commande annulée et client notifié !", { id: t });
+      setShowOrderModal(false);
+      setCancelMessage("");
+      setSelectedOrder(null);
+      fetchData();
+
+    } catch (e: any) {
+      console.error(e);
+      toast.error("Erreur: " + e.message, { id: t });
+    } finally {
+      setSendingEmail(false);
+    }
+  };
+
+  const sendMessageToClient = async (order: any, message: string) => {
+    if (!message.trim()) {
+      toast.error("Veuillez écrire un message");
+      return;
+    }
+
+    setSendingEmail(true);
+    const t = toast.loading("Envoi du message...");
+
+    try {
+      const clientEmail = order.profiles?.email || order.client_email;
+      
+      if (!clientEmail) {
+        throw new Error("Email du client non trouvé");
+      }
+
+      const emailHtml = `
+        <!DOCTYPE html>
+        <html>
+        <head><meta charset="utf-8"></head>
+        <body style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f8fafc;">
+          <div style="background: linear-gradient(135deg, #14b8a6 0%, #06b6d4 100%); padding: 25px; border-radius: 16px 16px 0 0; text-align: center;">
+            <h1 style="color: white; margin: 0; font-size: 22px;">Message de Kilolab</h1>
+          </div>
+          <div style="background: white; padding: 25px; border-radius: 0 0 16px 16px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+            <p style="color: #334155; font-size: 16px; line-height: 1.6;">Bonjour,</p>
+            <p style="color: #334155; font-size: 16px; line-height: 1.6;">
+              Concernant votre commande <strong>#${order.id.slice(0, 8).toUpperCase()}</strong> :
+            </p>
+            
+            <div style="background: #f0fdfa; border-left: 4px solid #14b8a6; padding: 15px; margin: 20px 0; border-radius: 0 8px 8px 0;">
+              <p style="color: #0f766e; margin: 0; white-space: pre-wrap;">${message}</p>
+            </div>
+            
+            <p style="color: #334155; font-size: 16px; line-height: 1.6;">
+              N'hésitez pas à nous répondre si vous avez des questions.
+            </p>
+            
+            <a href="https://kilolab.fr/tracking/${order.id}" style="display: block; background: linear-gradient(135deg, #14b8a6 0%, #06b6d4 100%); color: white; text-align: center; padding: 15px 30px; border-radius: 12px; text-decoration: none; font-weight: bold; margin-top: 20px;">
+              Suivre ma commande
+            </a>
+            
+            <p style="color: #64748b; font-size: 14px; text-align: center; margin-top: 20px;">
+              © 2025 Kilolab - Le pressing au kilo
+            </p>
+          </div>
+        </body>
+        </html>
+      `;
+
+      await fetch('/api/send-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          to: clientEmail,
+          subject: `📬 Message concernant votre commande #${order.id.slice(0, 8).toUpperCase()} - Kilolab`,
+          html: emailHtml,
+          type: 'order_message'
+        })
+      });
+
+      toast.success("Message envoyé au client !", { id: t });
+      setCancelMessage("");
+
+    } catch (e: any) {
+      console.error(e);
+      toast.error("Erreur: " + e.message, { id: t });
+    } finally {
+      setSendingEmail(false);
+    }
+  };
+
   // --- ACTIONS PARTENAIRES ---
   const approvePartner = async (id: string, e?: MouseEvent) => {
     if (e) e.stopPropagation();
