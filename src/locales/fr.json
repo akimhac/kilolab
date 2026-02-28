@@ -20,8 +20,8 @@
     "success": "Succès"
   },
   "nav": {
-    "home": "Accueil",
     "pricing": "Tarifs",
+    "findWasher": "Trouver un Washer",
     "faq": "FAQ",
     "contact": "Contact",
     "login": "Connexion",
@@ -30,67 +30,122 @@
     "newOrder": "Nouvelle commande",
     "settings": "Paramètres",
     "logout": "Déconnexion",
-    "becomeWasher": "Devenir Washer"
+    "becomeWasher": "Devenir Washer",
+    "order": "Commander",
+    "myAccount": "Mon compte"
   },
-  "landing": {
-    "hero": {
-      "title": "Votre linge, lavé et livré",
-      "subtitle": "Service de blanchisserie premium à domicile. Collecte et livraison en 24h.",
-      "cta": "Commander maintenant",
-      "ctaSecondary": "Voir les tarifs"
-    },
-    "stats": {
-      "orders": "Commandes",
-      "clients": "Clients satisfaits",
-      "washers": "Washers actifs",
-      "cities": "Villes"
-    },
-    "howItWorks": {
-      "title": "Comment ça marche",
-      "step1": {
-        "title": "Commandez",
-        "description": "Choisissez votre formule et programmez votre collecte"
-      },
-      "step2": {
-        "title": "Collecte",
-        "description": "Un Washer récupère votre linge à domicile"
-      },
-      "step3": {
-        "title": "Lavage",
-        "description": "Votre linge est lavé avec soin en laverie"
-      },
-      "step4": {
-        "title": "Livraison",
-        "description": "Votre linge propre est livré chez vous"
-      }
-    },
-    "pricing": {
-      "title": "Nos tarifs",
-      "perKg": "/ kg",
-      "standard": {
-        "name": "Standard",
-        "time": "48h",
-        "description": "Livraison sous 48 heures"
-      },
-      "express": {
-        "name": "Express",
-        "time": "24h",
-        "description": "Livraison sous 24 heures",
-        "popular": "Populaire"
-      },
-      "express2h": {
-        "name": "Express 2h",
-        "time": "2h",
-        "description": "Livraison en 2 heures",
-        "new": "Nouveau"
-      }
-    },
-    "trust": {
-      "title": "Ils nous font confiance",
-      "secure": "Paiement sécurisé",
-      "verified": "Washers vérifiés",
-      "guarantee": "Satisfait ou remboursé"
-    }
+  "hero": {
+    "badge": "Disponible partout en France",
+    "title1": "Libérez votre temps.",
+    "title2": "On prend soin de votre linge.",
+    "subtitle": "Collecte, lavage et pliage inclus.",
+    "subtitle2": "Simple, rapide et partout en France.",
+    "price": "Dès 3€",
+    "priceUnit": "/kg",
+    "cta": "Confier mon linge",
+    "ctaSecondary": "Comment ça marche ?",
+    "trustSecure": "Paiement sécurisé",
+    "trustDelivery": "Livraison 48h",
+    "trustRating": "4.9/5 (500+ avis)"
+  },
+  "washerBanner": {
+    "title": "Vous avez une machine à laver ?",
+    "subtitle": "Rejoignez 500+ Washers et gagnez jusqu'à",
+    "amount": "600€/mois",
+    "cta": "Devenir Washer Partenaire"
+  },
+  "socialProof": {
+    "title": "La plateforme n°1 en France",
+    "subtitle": "Des milliers de clients nous font déjà confiance",
+    "clients": "Clients satisfaits",
+    "rating": "Note moyenne",
+    "washers": "Washers actifs",
+    "cities": "Villes couvertes",
+    "guaranteesTitle": "Nos engagements qualité",
+    "guarantee1Title": "Satisfaction garantie",
+    "guarantee1Desc": "Pas satisfait ? On relave gratuitement ou on vous rembourse.",
+    "guarantee2Title": "Washers vérifiés",
+    "guarantee2Desc": "Chaque Washer est vérifié et noté par la communauté.",
+    "guarantee3Title": "Délais respectés",
+    "guarantee3Desc": "48h Standard, 24h Express. Retard ? -50% sur votre commande.",
+    "trustSecure": "Paiement sécurisé",
+    "trustSecureDesc": "SSL & Stripe",
+    "trustVerified": "Washers vérifiés",
+    "trustVerifiedDesc": "Identité contrôlée",
+    "trustGuarantee": "Satisfait ou remboursé",
+    "trustGuaranteeDesc": "Garantie 48h",
+    "trustTracking": "Suivi temps réel",
+    "trustTrackingDesc": "Notifications live"
+  },
+  "costComparison": {
+    "badge": "Arrêtez de perdre de l'argent",
+    "title": "Combien vous coûte vraiment votre lessive ?",
+    "subtitle": "Eau, électricité, produits, usure machine...",
+    "subtitleBold": "Le coût réel est bien plus élevé que vous ne le pensez.",
+    "sliderLabel": "Votre volume de linge par semaine",
+    "sliderMin": "3kg (1 personne)",
+    "sliderMax": "15kg (famille)",
+    "diyTitle": "Faire soi-même",
+    "diySubtitle": "Le piège du \"gratuit\"",
+    "diyWater": "Eau (60L/machine)",
+    "diyElectricity": "Électricité",
+    "diyDetergent": "Lessive + Adoucissant",
+    "diyMachine": "Usure machine + Séchage",
+    "diyTimeLabel": "Temps perdu :",
+    "diyTimeDesc": "Tri + Lavage + Séchage + Pliage + Rangement",
+    "diyMaterialCosts": "Coûts matériels",
+    "diyTimeValue": "Valeur de votre temps",
+    "diyRealCost": "COÛT RÉEL",
+    "kilolabTitle": "Avec Kilolab",
+    "kilolabSubtitle": "Tout inclus, zéro effort",
+    "kilolabSave": "ÉCONOMISEZ",
+    "kilolabFeature1": "Collecte gratuite à domicile",
+    "kilolabFeature2": "Lavage professionnel (lessive premium)",
+    "kilolabFeature3": "Séchage + Pliage impeccable",
+    "kilolabFeature4": "Livraison en 48h max",
+    "kilolabTimeLabel": "Temps passé : 0 minute",
+    "kilolabTimeDesc": "On s'occupe de tout !",
+    "kilolabPrice": "PRIX KILOLAB",
+    "savingsTitle": "VOS ÉCONOMIES",
+    "savingsAmount": "économisés",
+    "savingsTime": "récupérées",
+    "ctaSave": "Économiser {{amount}}€ maintenant",
+    "ctaPromo": "Première commande ? Profitez de -20% avec le code BIENVENUE"
+  },
+  "howItWorks": {
+    "badge": "Simple et efficace",
+    "titleLine1": "Comment",
+    "titleLine2": "ça marche ?",
+    "subtitle": "4 étapes simples pour un linge impeccable — sans effort.",
+    "cta": "Commander maintenant",
+    "step": "ÉTAPE",
+    "active": "Actif",
+    "step1Title": "Commandez en 2 min",
+    "step1Subtitle": "Depuis votre canapé",
+    "step1Desc": "Choisissez votre formule, indiquez votre adresse et sélectionnez un créneau. Paiement sécurisé en ligne.",
+    "step2Title": "On vient chercher",
+    "step2Subtitle": "Enlèvement gratuit",
+    "step2Desc": "Un washer vérifié près de chez vous vient collecter votre linge à l'heure choisie. Pas besoin d'être présent.",
+    "step3Title": "Lavage premium",
+    "step3Subtitle": "Pro, séché, plié",
+    "step3Desc": "Votre linge est lavé, séché et minutieusement plié. Produits premium, soin professionnel garanti.",
+    "step4Title": "Livré chez vous",
+    "step4Subtitle": "Propre et plié",
+    "step4Desc": "Votre linge vous est retourné propre, séché et soigneusement plié. Suivez la livraison en temps réel."
+  },
+  "story": {
+    "badge": "Notre Histoire",
+    "title": "De la douceur de Bali",
+    "title2": "à l'exigence de Paris.",
+    "description": "Là-bas, le soin du linge au poids est la norme : simple, direct, sans artifices. Nous avons importé ce concept pour en finir avec le casse-tête des tarifs à la pièce.",
+    "quote": "Juste le poids du linge propre. Rien d'autre.",
+    "cta": "Envie de devenir Washer ? C'est par ici"
+  },
+  "finalCta": {
+    "title": "Prêt à récupérer votre temps libre ?",
+    "subtitle": "Rejoignez les milliers d'utilisateurs qui ont déjà arrêté la corvée du linge",
+    "orderCta": "Commander maintenant",
+    "washerCta": "Devenir Washer"
   },
   "auth": {
     "login": {
@@ -188,29 +243,80 @@
       "delivering": "En livraison",
       "delivered": "Livrée",
       "cancelled": "Annulée"
-    },
-    "loyalty": {
-      "title": "Programme fidélité",
-      "points": "Points",
-      "level": "Niveau",
-      "nextLevel": "Prochain niveau",
-      "rewards": "Récompenses disponibles"
-    },
-    "subscription": {
-      "title": "Mon abonnement",
-      "noSubscription": "Pas d'abonnement actif",
-      "subscribe": "S'abonner",
-      "weekly": "Hebdomadaire",
-      "biweekly": "Bi-mensuel",
-      "monthly": "Mensuel"
-    },
-    "referral": {
-      "title": "Parrainage",
-      "code": "Votre code",
-      "share": "Partager",
-      "referrals": "Filleuls",
-      "reward": "Gagnez 100 points par filleul"
     }
+  },
+  "settings": {
+    "title": "Paramètres",
+    "tabs": {
+      "profile": "Profil",
+      "notifications": "Notifications",
+      "security": "Sécurité",
+      "appearance": "Apparence"
+    },
+    "profile": {
+      "title": "Informations personnelles",
+      "firstName": "Prénom",
+      "lastName": "Nom",
+      "email": "Email",
+      "emailReadonly": "L'email ne peut pas être modifié",
+      "phone": "Téléphone",
+      "address": "Adresse par défaut",
+      "save": "Enregistrer",
+      "saving": "Enregistrement..."
+    },
+    "notifications": {
+      "title": "Notifications push",
+      "emailPrefs": "Préférences email",
+      "orderUpdates": "Mises à jour commandes",
+      "orderUpdatesDesc": "Statut de vos commandes",
+      "promos": "Promotions",
+      "promosDesc": "Offres et réductions",
+      "newsletter": "Newsletter",
+      "newsletterDesc": "Actualités Kilolab"
+    },
+    "security": {
+      "password": "Mot de passe",
+      "changePassword": "Modifier le mot de passe",
+      "logout": "Déconnexion",
+      "logoutBtn": "Se déconnecter",
+      "dangerZone": "Zone dangereuse",
+      "deleteAccount": "Supprimer mon compte",
+      "deleteWarning": "Cette action est irréversible"
+    },
+    "appearance": {
+      "title": "Thème",
+      "description": "Choisissez l'apparence de l'application. Le mode automatique s'adapte aux préférences de votre système.",
+      "darkModeTitle": "Mode sombre activé !",
+      "darkModeDesc": "Profitez d'une expérience visuelle plus confortable la nuit et économisez la batterie sur les écrans OLED."
+    }
+  },
+  "footer": {
+    "description": "Le 1er service de laverie à domicile en France. Collecte, lavage et pliage dès 3€/kg.",
+    "services": "Services",
+    "order": "Commander",
+    "pricing": "Nos tarifs",
+    "findWasher": "Trouver un Washer",
+    "faq": "FAQ",
+    "partners": "Partenaires",
+    "becomeWasher": "Devenir Washer",
+    "pressingSpace": "Espace Pressing",
+    "proDashboard": "Dashboard Pro",
+    "legal": "Légal",
+    "cgu": "CGU",
+    "cgv": "CGV",
+    "privacy": "Confidentialité",
+    "cookies": "Cookies",
+    "legalMentions": "Mentions légales",
+    "contactTitle": "Contact",
+    "contactUs": "Nous contacter",
+    "copyright": "© {{year}} Kilolab SAS. Tous droits réservés.",
+    "madeIn": "Made with love in France"
+  },
+  "chat": {
+    "title": "Messages",
+    "placeholder": "Écrivez un message...",
+    "send": "Envoyer",
+    "washer": "Washer"
   },
   "tracking": {
     "title": "Suivi en temps réel",
@@ -219,60 +325,6 @@
     "minutes": "min",
     "contactWasher": "Contacter",
     "liveLocation": "Position en direct"
-  },
-  "settings": {
-    "title": "Paramètres",
-    "tabs": {
-      "profile": "Profil",
-      "notifications": "Notifications",
-      "security": "Sécurité"
-    },
-    "profile": {
-      "title": "Informations personnelles",
-      "firstName": "Prénom",
-      "lastName": "Nom",
-      "email": "Email",
-      "phone": "Téléphone",
-      "address": "Adresse par défaut"
-    },
-    "notifications": {
-      "title": "Notifications push",
-      "enabled": "Activées",
-      "disabled": "Désactivées",
-      "enable": "Activer",
-      "orderUpdates": "Mises à jour commande",
-      "washerAssigned": "Attribution Washer",
-      "ready": "Linge prêt",
-      "messages": "Nouveaux messages"
-    },
-    "security": {
-      "password": "Mot de passe",
-      "changePassword": "Modifier le mot de passe",
-      "logout": "Déconnexion",
-      "deleteAccount": "Supprimer mon compte",
-      "deleteWarning": "Cette action est irréversible"
-    },
-    "language": {
-      "title": "Langue",
-      "fr": "Français",
-      "en": "English"
-    }
-  },
-  "chat": {
-    "title": "Messages",
-    "placeholder": "Écrivez un message...",
-    "send": "Envoyer",
-    "washer": "Washer"
-  },
-  "footer": {
-    "about": "À propos",
-    "legal": "Mentions légales",
-    "cgu": "CGU",
-    "cgv": "CGV",
-    "privacy": "Confidentialité",
-    "cookies": "Cookies",
-    "contact": "Contact",
-    "followUs": "Suivez-nous"
   },
   "errors": {
     "generic": "Une erreur est survenue",

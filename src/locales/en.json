@@ -20,8 +20,8 @@
     "success": "Success"
   },
   "nav": {
-    "home": "Home",
     "pricing": "Pricing",
+    "findWasher": "Find a Washer",
     "faq": "FAQ",
     "contact": "Contact",
     "login": "Login",
@@ -30,67 +30,122 @@
     "newOrder": "New order",
     "settings": "Settings",
     "logout": "Logout",
-    "becomeWasher": "Become a Washer"
+    "becomeWasher": "Become a Washer",
+    "order": "Order now",
+    "myAccount": "My account"
   },
-  "landing": {
-    "hero": {
-      "title": "Your laundry, washed and delivered",
-      "subtitle": "Premium home laundry service. Pickup and delivery within 24 hours.",
-      "cta": "Order now",
-      "ctaSecondary": "View pricing"
-    },
-    "stats": {
-      "orders": "Orders",
-      "clients": "Happy clients",
-      "washers": "Active Washers",
-      "cities": "Cities"
-    },
-    "howItWorks": {
-      "title": "How it works",
-      "step1": {
-        "title": "Order",
-        "description": "Choose your plan and schedule your pickup"
-      },
-      "step2": {
-        "title": "Pickup",
-        "description": "A Washer picks up your laundry at home"
-      },
-      "step3": {
-        "title": "Washing",
-        "description": "Your laundry is carefully washed"
-      },
-      "step4": {
-        "title": "Delivery",
-        "description": "Your clean laundry is delivered to you"
-      }
-    },
-    "pricing": {
-      "title": "Our pricing",
-      "perKg": "/ kg",
-      "standard": {
-        "name": "Standard",
-        "time": "48h",
-        "description": "Delivery within 48 hours"
-      },
-      "express": {
-        "name": "Express",
-        "time": "24h",
-        "description": "Delivery within 24 hours",
-        "popular": "Popular"
-      },
-      "express2h": {
-        "name": "Express 2h",
-        "time": "2h",
-        "description": "Delivery in 2 hours",
-        "new": "New"
-      }
-    },
-    "trust": {
-      "title": "They trust us",
-      "secure": "Secure payment",
-      "verified": "Verified Washers",
-      "guarantee": "Satisfaction guaranteed"
-    }
+  "hero": {
+    "badge": "Available everywhere in France",
+    "title1": "Free up your time.",
+    "title2": "We take care of your laundry.",
+    "subtitle": "Pickup, washing and folding included.",
+    "subtitle2": "Simple, fast and across France.",
+    "price": "From €3",
+    "priceUnit": "/kg",
+    "cta": "Trust us with your laundry",
+    "ctaSecondary": "How does it work?",
+    "trustSecure": "Secure payment",
+    "trustDelivery": "48h delivery",
+    "trustRating": "4.9/5 (500+ reviews)"
+  },
+  "washerBanner": {
+    "title": "Do you have a washing machine?",
+    "subtitle": "Join 500+ Washers and earn up to",
+    "amount": "€600/month",
+    "cta": "Become a Washer Partner"
+  },
+  "socialProof": {
+    "title": "The #1 platform in France",
+    "subtitle": "Thousands of customers already trust us",
+    "clients": "Happy customers",
+    "rating": "Average rating",
+    "washers": "Active Washers",
+    "cities": "Cities covered",
+    "guaranteesTitle": "Our quality commitments",
+    "guarantee1Title": "Satisfaction guaranteed",
+    "guarantee1Desc": "Not satisfied? We rewash for free or refund you.",
+    "guarantee2Title": "Verified Washers",
+    "guarantee2Desc": "Every Washer is verified and rated by the community.",
+    "guarantee3Title": "On-time delivery",
+    "guarantee3Desc": "48h Standard, 24h Express. Late? -50% on your order.",
+    "trustSecure": "Secure payment",
+    "trustSecureDesc": "SSL & Stripe",
+    "trustVerified": "Verified Washers",
+    "trustVerifiedDesc": "ID checked",
+    "trustGuarantee": "Money-back guarantee",
+    "trustGuaranteeDesc": "48h warranty",
+    "trustTracking": "Real-time tracking",
+    "trustTrackingDesc": "Live notifications"
+  },
+  "costComparison": {
+    "badge": "Stop wasting money",
+    "title": "How much does your laundry really cost?",
+    "subtitle": "Water, electricity, products, machine wear...",
+    "subtitleBold": "The real cost is much higher than you think.",
+    "sliderLabel": "Your weekly laundry volume",
+    "sliderMin": "3kg (1 person)",
+    "sliderMax": "15kg (family)",
+    "diyTitle": "Do it yourself",
+    "diySubtitle": "The \"free\" trap",
+    "diyWater": "Water (60L/machine)",
+    "diyElectricity": "Electricity",
+    "diyDetergent": "Detergent + Softener",
+    "diyMachine": "Machine wear + Drying",
+    "diyTimeLabel": "Time wasted:",
+    "diyTimeDesc": "Sorting + Washing + Drying + Folding + Putting away",
+    "diyMaterialCosts": "Material costs",
+    "diyTimeValue": "Value of your time",
+    "diyRealCost": "REAL COST",
+    "kilolabTitle": "With Kilolab",
+    "kilolabSubtitle": "All-inclusive, zero effort",
+    "kilolabSave": "SAVE",
+    "kilolabFeature1": "Free home pickup",
+    "kilolabFeature2": "Professional washing (premium detergent)",
+    "kilolabFeature3": "Drying + Perfect folding",
+    "kilolabFeature4": "Delivery within 48h",
+    "kilolabTimeLabel": "Time spent: 0 minutes",
+    "kilolabTimeDesc": "We handle everything!",
+    "kilolabPrice": "KILOLAB PRICE",
+    "savingsTitle": "YOUR SAVINGS",
+    "savingsAmount": "saved",
+    "savingsTime": "recovered",
+    "ctaSave": "Save €{{amount}} now",
+    "ctaPromo": "First order? Get -20% with code WELCOME"
+  },
+  "howItWorks": {
+    "badge": "Simple and efficient",
+    "titleLine1": "How does",
+    "titleLine2": "it work?",
+    "subtitle": "4 simple steps for impeccable laundry — effortlessly.",
+    "cta": "Order now",
+    "step": "STEP",
+    "active": "Active",
+    "step1Title": "Order in 2 min",
+    "step1Subtitle": "From your couch",
+    "step1Desc": "Choose your plan, enter your address and select a time slot. Secure online payment.",
+    "step2Title": "We pick up",
+    "step2Subtitle": "Free pickup",
+    "step2Desc": "A verified washer near you comes to collect your laundry at the chosen time. No need to be home.",
+    "step3Title": "Premium wash",
+    "step3Subtitle": "Pro, dried, folded",
+    "step3Desc": "Your laundry is washed, dried and carefully folded. Premium products, professional care guaranteed.",
+    "step4Title": "Delivered to you",
+    "step4Subtitle": "Clean and folded",
+    "step4Desc": "Your laundry is returned clean, dried and neatly folded. Track delivery in real time."
+  },
+  "story": {
+    "badge": "Our Story",
+    "title": "From the ease of Bali",
+    "title2": "to the standards of Paris.",
+    "description": "There, weight-based laundry care is the norm: simple, direct, no frills. We imported this concept to end the headache of per-item pricing.",
+    "quote": "Just the weight of clean laundry. Nothing else.",
+    "cta": "Want to become a Washer? Click here"
+  },
+  "finalCta": {
+    "title": "Ready to reclaim your free time?",
+    "subtitle": "Join thousands of users who already stopped the laundry chore",
+    "orderCta": "Order now",
+    "washerCta": "Become a Washer"
   },
   "auth": {
     "login": {
@@ -188,29 +243,80 @@
       "delivering": "Delivering",
       "delivered": "Delivered",
       "cancelled": "Cancelled"
-    },
-    "loyalty": {
-      "title": "Loyalty program",
-      "points": "Points",
-      "level": "Level",
-      "nextLevel": "Next level",
-      "rewards": "Available rewards"
-    },
-    "subscription": {
-      "title": "My subscription",
-      "noSubscription": "No active subscription",
-      "subscribe": "Subscribe",
-      "weekly": "Weekly",
-      "biweekly": "Bi-weekly",
-      "monthly": "Monthly"
-    },
-    "referral": {
-      "title": "Referral",
-      "code": "Your code",
-      "share": "Share",
-      "referrals": "Referrals",
-      "reward": "Earn 100 points per referral"
     }
+  },
+  "settings": {
+    "title": "Settings",
+    "tabs": {
+      "profile": "Profile",
+      "notifications": "Notifications",
+      "security": "Security",
+      "appearance": "Appearance"
+    },
+    "profile": {
+      "title": "Personal information",
+      "firstName": "First name",
+      "lastName": "Last name",
+      "email": "Email",
+      "emailReadonly": "Email cannot be changed",
+      "phone": "Phone",
+      "address": "Default address",
+      "save": "Save",
+      "saving": "Saving..."
+    },
+    "notifications": {
+      "title": "Push notifications",
+      "emailPrefs": "Email preferences",
+      "orderUpdates": "Order updates",
+      "orderUpdatesDesc": "Order status updates",
+      "promos": "Promotions",
+      "promosDesc": "Deals and discounts",
+      "newsletter": "Newsletter",
+      "newsletterDesc": "Kilolab news"
+    },
+    "security": {
+      "password": "Password",
+      "changePassword": "Change password",
+      "logout": "Logout",
+      "logoutBtn": "Log out",
+      "dangerZone": "Danger zone",
+      "deleteAccount": "Delete my account",
+      "deleteWarning": "This action is irreversible"
+    },
+    "appearance": {
+      "title": "Theme",
+      "description": "Choose the app appearance. Auto mode adapts to your system preferences.",
+      "darkModeTitle": "Dark mode enabled!",
+      "darkModeDesc": "Enjoy a more comfortable visual experience at night and save battery on OLED screens."
+    }
+  },
+  "footer": {
+    "description": "The #1 home laundry service in France. Pickup, washing and folding from €3/kg.",
+    "services": "Services",
+    "order": "Order",
+    "pricing": "Our pricing",
+    "findWasher": "Find a Washer",
+    "faq": "FAQ",
+    "partners": "Partners",
+    "becomeWasher": "Become a Washer",
+    "pressingSpace": "Pressing space",
+    "proDashboard": "Pro Dashboard",
+    "legal": "Legal",
+    "cgu": "Terms of Service",
+    "cgv": "Sales Terms",
+    "privacy": "Privacy",
+    "cookies": "Cookies",
+    "legalMentions": "Legal notices",
+    "contactTitle": "Contact",
+    "contactUs": "Contact us",
+    "copyright": "© {{year}} Kilolab SAS. All rights reserved.",
+    "madeIn": "Made with love in France"
+  },
+  "chat": {
+    "title": "Messages",
+    "placeholder": "Write a message...",
+    "send": "Send",
+    "washer": "Washer"
   },
   "tracking": {
     "title": "Live tracking",
@@ -219,60 +325,6 @@
     "minutes": "min",
     "contactWasher": "Contact",
     "liveLocation": "Live location"
-  },
-  "settings": {
-    "title": "Settings",
-    "tabs": {
-      "profile": "Profile",
-      "notifications": "Notifications",
-      "security": "Security"
-    },
-    "profile": {
-      "title": "Personal information",
-      "firstName": "First name",
-      "lastName": "Last name",
-      "email": "Email",
-      "phone": "Phone",
-      "address": "Default address"
-    },
-    "notifications": {
-      "title": "Push notifications",
-      "enabled": "Enabled",
-      "disabled": "Disabled",
-      "enable": "Enable",
-      "orderUpdates": "Order updates",
-      "washerAssigned": "Washer assigned",
-      "ready": "Laundry ready",
-      "messages": "New messages"
-    },
-    "security": {
-      "password": "Password",
-      "changePassword": "Change password",
-      "logout": "Logout",
-      "deleteAccount": "Delete my account",
-      "deleteWarning": "This action is irreversible"
-    },
-    "language": {
-      "title": "Language",
-      "fr": "Français",
-      "en": "English"
-    }
-  },
-  "chat": {
-    "title": "Messages",
-    "placeholder": "Write a message...",
-    "send": "Send",
-    "washer": "Washer"
-  },
-  "footer": {
-    "about": "About",
-    "legal": "Legal",
-    "cgu": "Terms of Service",
-    "cgv": "Sales Terms",
-    "privacy": "Privacy",
-    "cookies": "Cookies",
-    "contact": "Contact",
-    "followUs": "Follow us"
   },
   "errors": {
     "generic": "An error occurred",
