@@ -103,6 +103,12 @@ export default function AdminDashboard() {
     phone: "",
     plan: "starter" as "starter" | "business" | "enterprise",
   });
+
+  // Order Management State
+  const [selectedOrder, setSelectedOrder] = useState<any | null>(null);
+  const [showOrderModal, setShowOrderModal] = useState(false);
+  const [cancelMessage, setCancelMessage] = useState("");
+  const [sendingEmail, setSendingEmail] = useState(false);
   const [loading, setLoading] = useState(true);
 
   // Filtres & UI
