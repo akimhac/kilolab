@@ -360,6 +360,7 @@ function ReferralCard({ profile }: { profile: UserProfile }) {
 }
 
 export default function ClientDashboard() {
+  const { t } = useTranslation();
   const [activeOrders, setActiveOrders] = useState<Order[]>([]);
   const [pastOrders, setPastOrders] = useState<Order[]>([]);
   const [stats, setStats] = useState({ totalOrders: 0, totalSpent: 0, totalKg: 0, avgOrderValue: 0 });
