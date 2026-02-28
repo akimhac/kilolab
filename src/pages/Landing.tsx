@@ -250,7 +250,7 @@ export default function Landing() {
           </div>
         </section>
 
-        {/* SOCIAL PROOF - Dynamic Stats & Reviews */}
+        {/* SOCIAL PROOF - Nouvelle section impactante */}
         <section className="py-24 bg-gradient-to-b from-slate-50 to-white">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <AnimateOnScroll>
@@ -264,41 +264,80 @@ export default function Landing() {
               </div>
             </AnimateOnScroll>
 
-            {/* Live Stats */}
-            <div className="mb-16">
-              <LiveStats />
-            </div>
+            {/* Stats redesignés - Plus impactant */}
+            <AnimateOnScroll delay={100}>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-16">
+                <div className="relative group">
+                  <div className="absolute inset-0 bg-gradient-to-r from-teal-500 to-cyan-500 rounded-2xl blur-xl opacity-20 group-hover:opacity-40 transition-opacity" />
+                  <div className="relative bg-white rounded-2xl p-6 border border-slate-100 shadow-sm hover:shadow-lg transition-all text-center">
+                    <p className="text-4xl md:text-5xl font-black text-teal-600 mb-1">1850+</p>
+                    <p className="text-sm text-slate-600 font-medium">Clients satisfaits</p>
+                  </div>
+                </div>
+                <div className="relative group">
+                  <div className="absolute inset-0 bg-gradient-to-r from-purple-500 to-pink-500 rounded-2xl blur-xl opacity-20 group-hover:opacity-40 transition-opacity" />
+                  <div className="relative bg-white rounded-2xl p-6 border border-slate-100 shadow-sm hover:shadow-lg transition-all text-center">
+                    <p className="text-4xl md:text-5xl font-black text-purple-600 mb-1">4.9<span className="text-2xl">/5</span></p>
+                    <p className="text-sm text-slate-600 font-medium">Note moyenne</p>
+                  </div>
+                </div>
+                <div className="relative group">
+                  <div className="absolute inset-0 bg-gradient-to-r from-orange-500 to-red-500 rounded-2xl blur-xl opacity-20 group-hover:opacity-40 transition-opacity" />
+                  <div className="relative bg-white rounded-2xl p-6 border border-slate-100 shadow-sm hover:shadow-lg transition-all text-center">
+                    <p className="text-4xl md:text-5xl font-black text-orange-600 mb-1">500+</p>
+                    <p className="text-sm text-slate-600 font-medium">Washers actifs</p>
+                  </div>
+                </div>
+                <div className="relative group">
+                  <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-2xl blur-xl opacity-20 group-hover:opacity-40 transition-opacity" />
+                  <div className="relative bg-white rounded-2xl p-6 border border-slate-100 shadow-sm hover:shadow-lg transition-all text-center">
+                    <p className="text-4xl md:text-5xl font-black text-blue-600 mb-1">45+</p>
+                    <p className="text-sm text-slate-600 font-medium">Villes couvertes</p>
+                  </div>
+                </div>
+              </div>
+            </AnimateOnScroll>
+
+            {/* Garanties - Remplace "Ils parlent de nous" */}
+            <AnimateOnScroll delay={200}>
+              <div className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-3xl p-8 md:p-12 text-white mb-16 relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-64 h-64 bg-teal-500/20 rounded-full blur-3xl" />
+                <div className="absolute bottom-0 left-0 w-64 h-64 bg-purple-500/20 rounded-full blur-3xl" />
+                
+                <h3 className="font-heading text-2xl md:text-3xl font-bold text-center mb-8 relative">
+                  Nos engagements qualité
+                </h3>
+                
+                <div className="grid md:grid-cols-3 gap-6 relative">
+                  <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/10 hover:bg-white/15 transition-all">
+                    <div className="w-14 h-14 bg-teal-500 rounded-2xl flex items-center justify-center mb-4">
+                      <Shield size={28} className="text-white" />
+                    </div>
+                    <h4 className="font-bold text-lg mb-2">Satisfaction garantie</h4>
+                    <p className="text-slate-300 text-sm">Pas satisfait ? On relave gratuitement ou on vous rembourse.</p>
+                  </div>
+                  <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/10 hover:bg-white/15 transition-all">
+                    <div className="w-14 h-14 bg-purple-500 rounded-2xl flex items-center justify-center mb-4">
+                      <CheckCircle size={28} className="text-white" />
+                    </div>
+                    <h4 className="font-bold text-lg mb-2">Washers vérifiés</h4>
+                    <p className="text-slate-300 text-sm">Chaque Washer est vérifié et noté par la communauté.</p>
+                  </div>
+                  <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/10 hover:bg-white/15 transition-all">
+                    <div className="w-14 h-14 bg-orange-500 rounded-2xl flex items-center justify-center mb-4">
+                      <Clock size={28} className="text-white" />
+                    </div>
+                    <h4 className="font-bold text-lg mb-2">Délais respectés</h4>
+                    <p className="text-slate-300 text-sm">48h Standard, 24h Express. Retard ? -50% sur votre commande.</p>
+                  </div>
+                </div>
+              </div>
+            </AnimateOnScroll>
 
             {/* Trust Badges */}
-            <AnimateOnScroll delay={200}>
-              <div className="mb-16">
-                <TrustBadges />
-              </div>
-            </AnimateOnScroll>
-
-            {/* Live Reviews */}
             <AnimateOnScroll delay={300}>
-              <div className="bg-gradient-to-br from-slate-50 to-white rounded-3xl p-8 md:p-12 border border-slate-100">
-                <h3 className="font-heading text-2xl font-bold text-slate-900 mb-8 text-center">
-                  Ce que disent nos clients
-                </h3>
-                <LiveReviews />
-              </div>
+              <TrustBadges />
             </AnimateOnScroll>
-
-            {/* Press mentions */}
-            <div className="text-center mt-16">
-              <p className="text-xs text-slate-400 uppercase tracking-widest font-semibold mb-6">
-                Ils parlent de nous
-              </p>
-              <div className="flex flex-wrap justify-center items-center gap-x-12 gap-y-4 opacity-30 grayscale">
-                {["TechCrunch", "Le Figaro", "BFM Business", "Les Échos"].map((name) => (
-                  <span key={name} className="text-xl md:text-2xl font-heading font-bold text-slate-700">
-                    {name}
-                  </span>
-                ))}
-              </div>
-            </div>
           </div>
         </section>
 
