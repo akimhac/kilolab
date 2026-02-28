@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { supabase } from '../lib/supabase';
 import { useNavigate, Link } from 'react-router-dom';
 import Navbar from '../components/Navbar';
@@ -7,6 +8,7 @@ import { Mail, Lock, ArrowRight, Loader2 } from 'lucide-react';
 import { analytics } from "../lib/analytics";
 
 export default function Login() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [pageLoading, setPageLoading] = useState(true);
@@ -120,24 +122,19 @@ export default function Login() {
 
           <div className="text-center mb-8">
             <h1 className="text-3xl font-black mb-2">
-              {isSignUp ? 'Créer un compte' : 'Bon retour !'}
+              {isSignUp ? t('auth.signup.title') : t('auth.login.title')}
             </h1>
-            <p className="text-slate-500 text-sm">Gérez vos commandes de pressing simplement.</p>
+            <p className="text-slate-500 text-sm">{t('hero.subtitle')}</p>
           </div>
 
-          {/* TOGGLE */}
           <div className="flex bg-slate-100 p-1 rounded-xl mb-8">
-            <button
-              onClick={() => setIsSignUp(false)}
-              className={`flex-1 py-2 rounded-lg text-sm font-bold transition ${!isSignUp ? 'bg-white shadow-sm text-slate-900' : 'text-slate-500'}`}
-            >
-              Connexion
+            <button onClick={() => setIsSignUp(false)}
+              className={`flex-1 py-2 rounded-lg text-sm font-bold transition ${!isSignUp ? 'bg-white shadow-sm text-slate-900' : 'text-slate-500'}`}>
+              {t('auth.login.title')}
             </button>
-            <button
-              onClick={() => setIsSignUp(true)}
-              className={`flex-1 py-2 rounded-lg text-sm font-bold transition ${isSignUp ? 'bg-white shadow-sm text-slate-900' : 'text-slate-500'}`}
-            >
-              Inscription
+            <button onClick={() => setIsSignUp(true)}
+              className={`flex-1 py-2 rounded-lg text-sm font-bold transition ${isSignUp ? 'bg-white shadow-sm text-slate-900' : 'text-slate-500'}`}>
+              {t('auth.signup.title')}
             </button>
           </div>
 
@@ -147,7 +144,7 @@ export default function Login() {
               <input
                 type="email"
                 required
-                placeholder="Votre email"
+                placeholder={t('auth.login.email')}
                 value={email}
                 onChange={e => setEmail(e.target.value)}
                 className="w-full pl-12 pr-4 py-3 rounded-xl border border-slate-200 focus:border-teal-500 outline-none transition bg-slate-50 focus:bg-white"
@@ -159,7 +156,7 @@ export default function Login() {
               <input
                 type="password"
                 required
-                placeholder="Mot de passe"
+                placeholder={t('auth.login.password')}
                 value={password}
                 onChange={e => setPassword(e.target.value)}
                 className="w-full pl-12 pr-4 py-3 rounded-xl border border-slate-200 focus:border-teal-500 outline-none transition bg-slate-50 focus:bg-white"
@@ -169,7 +166,7 @@ export default function Login() {
             {!isSignUp && (
               <div className="text-right">
                 <Link to="/forgot-password" className="text-xs text-teal-600 font-bold hover:underline">
-                  Mot de passe oublié ?
+                  {t('auth.login.forgotPassword')}
                 </Link>
               </div>
             )}
@@ -183,7 +180,7 @@ export default function Login() {
                 <Loader2 className="animate-spin" />
               ) : (
                 <>
-                  {isSignUp ? "S'inscrire" : 'Se connecter'} <ArrowRight size={20} />
+                  {isSignUp ? t('auth.signup.submit') : t('auth.login.submit')} <ArrowRight size={20} />
                 </>
               )}
             </button>
