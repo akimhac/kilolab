@@ -1,0 +1,149 @@
+------WebKitFormBoundaryAHbnaEvdXUwJqS3u
+Content-Disposition: form-data; name="id"
+
+1573268523913279
+------WebKitFormBoundaryAHbnaEvdXUwJqS3u
+Content-Disposition: form-data; name="ev"
+
+SubscribedButtonClick
+------WebKitFormBoundaryAHbnaEvdXUwJqS3u
+Content-Disposition: form-data; name="dl"
+
+http://localhost:3000/new-order
+------WebKitFormBoundaryAHbnaEvdXUwJqS3u
+Content-Disposition: form-data; name="rl"
+
+
+------WebKitFormBoundaryAHbnaEvdXUwJqS3u
+Content-Disposition: form-data; name="if"
+
+false
+------WebKitFormBoundaryAHbnaEvdXUwJqS3u
+Content-Disposition: form-data; name="ts"
+
+1772291419083
+------WebKitFormBoundaryAHbnaEvdXUwJqS3u
+Content-Disposition: form-data; name="cd[buttonFeatures]"
+
+{"classList":"flex-1 py-4 bg-teal-600 text-white rounded-xl font-bold hover:bg-teal-500 transition shadow-lg flex items-center justify-center gap-2","destination":"","id":"","imageUrl":"","innerText":"Suivant","numChildButtons":0,"tag":"button","type":null,"name":"","value":""}
+------WebKitFormBoundaryAHbnaEvdXUwJqS3u
+Content-Disposition: form-data; name="cd[buttonText]"
+
+Suivant
+------WebKitFormBoundaryAHbnaEvdXUwJqS3u
+Content-Disposition: form-data; name="cd[formFeatures]"
+
+[]
+------WebKitFormBoundaryAHbnaEvdXUwJqS3u
+Content-Disposition: form-data; name="cd[pageFeatures]"
+
+{"title":"Kilolab France - Le 1er Service de Laverie à Domicile"}
+------WebKitFormBoundaryAHbnaEvdXUwJqS3u
+Content-Disposition: form-data; name="sw"
+
+1280
+------WebKitFormBoundaryAHbnaEvdXUwJqS3u
+Content-Disposition: form-data; name="sh"
+
+720
+------WebKitFormBoundaryAHbnaEvdXUwJqS3u
+Content-Disposition: form-data; name="v"
+
+2.9.272
+------WebKitFormBoundaryAHbnaEvdXUwJqS3u
+Content-Disposition: form-data; name="r"
+
+stable
+------WebKitFormBoundaryAHbnaEvdXUwJqS3u
+Content-Disposition: form-data; name="ec"
+
+2
+------WebKitFormBoundaryAHbnaEvdXUwJqS3u
+Content-Disposition: form-data; name="o"
+
+12318
+------WebKitFormBoundaryAHbnaEvdXUwJqS3u
+Content-Disposition: form-data; name="fbp"
+
+fb.0.1772291417380.510089469245236731
+------WebKitFormBoundaryAHbnaEvdXUwJqS3u
+Content-Disposition: form-data; name="ler"
+
+empty
+------WebKitFormBoundaryAHbnaEvdXUwJqS3u
+Content-Disposition: form-data; name="pmd[locale]"
+
+fr_FR
+------WebKitFormBoundaryAHbnaEvdXUwJqS3u
+Content-Disposition: form-data; name="pmd[description]"
+
+Kilolab connecte vos paniers de linge à des machines disponibles partout en France. Collecte, lavage, séchage et pliage dès 3€/kg.
+------WebKitFormBoundaryAHbnaEvdXUwJqS3u
+Content-Disposition: form-data; name="pmd[keywords]"
+
+laverie à domicile, pressing domicile, service linge france, kilolab, lavage linge livraison, collecte linge
+------WebKitFormBoundaryAHbnaEvdXUwJqS3u
+Content-Disposition: form-data; name="plt"
+
+820.1000000014901
+------WebKitFormBoundaryAHbnaEvdXUwJqS3u
+Content-Disposition: form-data; name="it"
+
+1772291417179
+------WebKitFormBoundaryAHbnaEvdXUwJqS3u
+Content-Disposition: form-data; name="coo"
+
+false
+------WebKitFormBoundaryAHbnaEvdXUwJqS3u
+Content-Disposition: form-data; name="es"
+
+automatic
+------WebKitFormBoundaryAHbnaEvdXUwJqS3u
+Content-Disposition: form-data; name="tm"
+
+3
+------WebKitFormBoundaryAHbnaEvdXUwJqS3u
+Content-Disposition: form-data; name="ap[currency]"
+
+EUR
+------WebKitFormBoundaryAHbnaEvdXUwJqS3u
+Content-Disposition: form-data; name="ap[contents]"
+
+[{"item_price":3}]
+------WebKitFormBoundaryAHbnaEvdXUwJqS3u
+Content-Disposition: form-data; name="expv2[0]"
+
+pl0
+------WebKitFormBoundaryAHbnaEvdXUwJqS3u
+Content-Disposition: form-data; name="expv2[1]"
+
+el3
+------WebKitFormBoundaryAHbnaEvdXUwJqS3u
+Content-Disposition: form-data; name="expv2[2]"
+
+bc1
+------WebKitFormBoundaryAHbnaEvdXUwJqS3u
+Content-Disposition: form-data; name="expv2[3]"
+
+ra2
+------WebKitFormBoundaryAHbnaEvdXUwJqS3u
+Content-Disposition: form-data; name="expv2[4]"
+
+rp2
+------WebKitFormBoundaryAHbnaEvdXUwJqS3u
+Content-Disposition: form-data; name="expv2[5]"
+
+im0
+------WebKitFormBoundaryAHbnaEvdXUwJqS3u
+Content-Disposition: form-data; name="expv2[6]"
+
+hf1
+------WebKitFormBoundaryAHbnaEvdXUwJqS3u
+Content-Disposition: form-data; name="expv2[7]"
+
+pt0
+------WebKitFormBoundaryAHbnaEvdXUwJqS3u
+Content-Disposition: form-data; name="rqm"
+
+SB
+------WebKitFormBoundaryAHbnaEvdXUwJqS3u--

@@ -2,7 +2,7 @@ import { useState, useRef, useEffect, ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
-import { Mail, MessageSquare, Send, CheckCircle, Loader2, Tag, Phone, MapPin, Clock } from 'lucide-react';
+import { Mail, MessageSquare, Send, CheckCircle, Loader2, Tag, Clock, MapPin } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import toast from 'react-hot-toast';
 import { analytics } from "../lib/analytics";
@@ -43,6 +43,7 @@ function AnimateOnScroll({ children, delay = 0, className = "" }: { children: Re
 }
 
 export default function Contact() {
+  const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
   const [formData, setFormData] = useState({ email: '', subject: '', message: '' });
@@ -52,14 +53,12 @@ export default function Contact() {
     setLoading(true);
 
     try {
-      // Insert dans contact_messages
       const { error } = await supabase
         .from("contact_messages")
         .insert({ 
           email: formData.email, 
           subject: formData.subject, 
           message: formData.message
-          // read: false est la valeur par défaut en DB
         });
 
       if (error) {
@@ -67,25 +66,23 @@ export default function Contact() {
         throw error;
       }
 
-      // Analytics (ne bloque pas en cas d'erreur)
       try {
         analytics.contactFormSubmitted(formData.subject); 
       } catch (err) {
         console.warn("Analytics error (ignored):", err);
       }
 
-      // Success
       setSent(true);
-      toast.success("✅ Message envoyé à l'équipe Kilolab !");
+      toast.success("✅ " + t('contact.success.title'));
       setFormData({ email: '', subject: '', message: '' });
 
     } catch (error: any) {
       console.error('Contact form error:', error);
       
       if (error.message?.includes("permission")) {
-        toast.error("❌ Erreur de permissions");
+        toast.error("❌ " + t('errors.unauthorized'));
       } else {
-        toast.error("❌ Erreur : " + (error.message || "Erreur inconnue"));
+        toast.error("❌ " + (error.message || t('errors.generic')));
       }
     } finally {
       setLoading(false);
@@ -95,8 +92,8 @@ export default function Contact() {
   return (
     <>
       <Helmet>
-        <title>Contact - Kilolab | Service Client</title>
-        <meta name="description" content="Contactez l'équipe Kilolab pour toute question sur votre commande, un partenariat ou une suggestion. Réponse sous 24h." />
+        <title>{t('contact.title')} - Kilolab</title>
+        <meta name="description" content={t('contact.subtitle')} />
         <link rel="canonical" href="https://kilolab.fr/contact" />
       </Helmet>
 
@@ -107,8 +104,8 @@ export default function Contact() {
         <header className="pt-32 pb-12 bg-gradient-to-b from-slate-900 to-slate-800 text-white">
           <div className="max-w-4xl mx-auto px-4 text-center">
             <AnimateOnScroll>
-              <h1 className="text-4xl md:text-5xl font-bold mb-4">Contactez-nous</h1>
-              <p className="text-xl text-slate-400">Notre équipe vous répond sous 24h</p>
+              <h1 className="text-4xl md:text-5xl font-bold mb-4">{t('contact.title')}</h1>
+              <p className="text-xl text-slate-400">{t('contact.subtitle')}</p>
             </AnimateOnScroll>
           </div>
         </header>
@@ -121,9 +118,9 @@ export default function Contact() {
                 <div className="w-12 h-12 bg-teal-100 rounded-xl flex items-center justify-center mx-auto mb-4">
                   <Mail className="text-teal-600" size={24} />
                 </div>
-                <h3 className="font-bold text-slate-900 mb-1">Email</h3>
+                <h3 className="font-bold text-slate-900 mb-1">{t('contact.emailTitle')}</h3>
                 <a href="mailto:contact@kilolab.fr" className="text-teal-600 hover:underline text-sm">
-                  contact@kilolab.fr
+                  {t('contact.emailAddress')}
                 </a>
               </div>
             </AnimateOnScroll>
@@ -132,8 +129,8 @@ export default function Contact() {
                 <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mx-auto mb-4">
                   <Clock className="text-blue-600" size={24} />
                 </div>
-                <h3 className="font-bold text-slate-900 mb-1">Horaires</h3>
-                <p className="text-slate-600 text-sm">Lun-Ven : 9h-18h</p>
+                <h3 className="font-bold text-slate-900 mb-1">{t('contact.hoursTitle')}</h3>
+                <p className="text-slate-600 text-sm">{t('contact.hoursValue')}</p>
               </div>
             </AnimateOnScroll>
             <AnimateOnScroll delay={200}>
@@ -141,8 +138,8 @@ export default function Contact() {
                 <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center mx-auto mb-4">
                   <MapPin className="text-purple-600" size={24} />
                 </div>
-                <h3 className="font-bold text-slate-900 mb-1">Zone</h3>
-                <p className="text-slate-600 text-sm">France métropolitaine</p>
+                <h3 className="font-bold text-slate-900 mb-1">{t('contact.zoneTitle')}</h3>
+                <p className="text-slate-600 text-sm">{t('contact.zoneValue')}</p>
               </div>
             </AnimateOnScroll>
           </div>
@@ -154,14 +151,14 @@ export default function Contact() {
           {!sent ? (
             <form onSubmit={handleSubmit} className="space-y-6">
               <div>
-                <label className="font-bold text-slate-700 block mb-2">Votre Email</label>
+                <label className="font-bold text-slate-700 block mb-2">{t('contact.form.emailLabel')}</label>
                 <div className="relative">
                   <Mail className="absolute left-3 top-3.5 text-slate-400" size={18}/>
                   <input 
                     required 
                     type="email" 
                     className="w-full pl-10 p-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500 font-medium transition"
-                    placeholder="client@kilolab.fr"
+                    placeholder={t('contact.form.emailPlaceholder')}
                     value={formData.email}
                     onChange={e => setFormData({...formData, email: e.target.value})}
                   />
@@ -169,14 +166,14 @@ export default function Contact() {
               </div>
 
               <div>
-                <label className="font-bold text-slate-700 block mb-2">Sujet</label>
+                <label className="font-bold text-slate-700 block mb-2">{t('contact.form.subjectLabel')}</label>
                 <div className="relative">
                   <Tag className="absolute left-3 top-3.5 text-slate-400" size={18}/>
                   <input 
                     required 
                     type="text" 
                     className="w-full pl-10 p-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500 font-medium transition"
-                    placeholder="Commande, Partenariat..."
+                    placeholder={t('contact.form.subjectPlaceholder')}
                     value={formData.subject}
                     onChange={e => setFormData({...formData, subject: e.target.value})}
                   />
@@ -184,14 +181,14 @@ export default function Contact() {
               </div>
 
               <div>
-                <label className="font-bold text-slate-700 block mb-2">Votre Message</label>
+                <label className="font-bold text-slate-700 block mb-2">{t('contact.form.messageLabel')}</label>
                 <div className="relative">
                   <MessageSquare className="absolute left-3 top-3.5 text-slate-400" size={18}/>
                   <textarea 
                     required 
                     rows={5}
                     className="w-full pl-10 p-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500 font-medium transition resize-none"
-                    placeholder="Une question sur une commande ? Un partenariat ?"
+                    placeholder={t('contact.form.messagePlaceholder')}
                     value={formData.message}
                     onChange={e => setFormData({...formData, message: e.target.value})}
                   />
@@ -202,7 +199,7 @@ export default function Contact() {
                 disabled={loading} 
                 className="w-full py-4 bg-slate-900 text-white font-bold rounded-xl flex items-center justify-center gap-2 hover:bg-black transition transform active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed shadow-lg"
               >
-                {loading ? <Loader2 className="animate-spin"/> : <>Envoyer <Send size={18}/></>}
+                {loading ? <Loader2 className="animate-spin"/> : <>{t('contact.form.submit')} <Send size={18}/></>}
               </button>
             </form>
           ) : (
@@ -210,13 +207,13 @@ export default function Contact() {
               <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
                 <CheckCircle size={40} className="text-green-600"/>
               </div>
-              <h2 className="text-3xl font-black mb-3 text-slate-900">Message envoyé !</h2>
-              <p className="text-slate-500 mb-8">Notre équipe a bien reçu votre demande et vous répondra sous 24h.</p>
+              <h2 className="text-3xl font-black mb-3 text-slate-900">{t('contact.success.title')}</h2>
+              <p className="text-slate-500 mb-8">{t('contact.success.description')}</p>
               <button 
                 onClick={() => setSent(false)}
                 className="text-teal-600 font-bold hover:text-teal-700 underline"
               >
-                Envoyer un autre message
+                {t('contact.success.sendAnother')}
               </button>
             </div>
           )}
