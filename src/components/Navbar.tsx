@@ -15,7 +15,7 @@ export default function Navbar() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const isDarkHero = ['/', '/become-washer', '/washers'].includes(location.pathname);
+  const isDarkHero = ['/', '/washers'].includes(location.pathname);
 
   useEffect(() => {
     checkUser();
