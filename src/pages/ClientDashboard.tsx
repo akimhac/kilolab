@@ -527,7 +527,7 @@ export default function ClientDashboard() {
                 activeTab === 'orders' ? 'bg-teal-500 text-white' : 'bg-white text-slate-600 border border-slate-200'
               }`}
             >
-              <Package size={16} /> Commandes
+              <Package size={16} /> {t('dashboard.tabs.orders')}
             </button>
             <button 
               onClick={() => setActiveTab('loyalty')}
@@ -535,7 +535,7 @@ export default function ClientDashboard() {
                 activeTab === 'loyalty' ? 'bg-amber-500 text-white' : 'bg-white text-slate-600 border border-slate-200'
               }`}
             >
-              <Crown size={16} /> Fidélité
+              <Crown size={16} /> {t('dashboard.tabs.loyalty')}
             </button>
             <button 
               onClick={() => setActiveTab('subscription')}
@@ -543,7 +543,7 @@ export default function ClientDashboard() {
                 activeTab === 'subscription' ? 'bg-purple-500 text-white' : 'bg-white text-slate-600 border border-slate-200'
               }`}
             >
-              <Repeat size={16} /> Abonnement
+              <Repeat size={16} /> {t('dashboard.tabs.subscription')}
             </button>
             <button 
               onClick={() => setActiveTab('referral')}
@@ -551,7 +551,7 @@ export default function ClientDashboard() {
                 activeTab === 'referral' ? 'bg-violet-500 text-white' : 'bg-white text-slate-600 border border-slate-200'
               }`}
             >
-              <Users size={16} /> Parrainage
+              <Users size={16} /> {t('dashboard.tabs.referral')}
             </button>
           </div>
         )}
