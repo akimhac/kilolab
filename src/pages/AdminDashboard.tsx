@@ -1152,23 +1152,23 @@ export default function AdminDashboard() {
             {activeTab === "clients" && (
               <div>
                 <table className="w-full">
-                  <thead className="bg-slate-50 border-b">
+                  <thead className="bg-white/5 border-b border-white/10">
                     <tr>
-                      <th className="text-left p-4 font-bold text-sm">Nom</th>
-                      <th className="text-left p-4 font-bold text-sm">Email</th>
-                      <th className="text-left p-4 font-bold text-sm">Ville</th>
-                      <th className="text-left p-4 font-bold text-sm">Inscrit le</th>
+                      <th className="text-left p-4 font-bold text-sm text-slate-400">Nom</th>
+                      <th className="text-left p-4 font-bold text-sm text-slate-400">Email</th>
+                      <th className="text-left p-4 font-bold text-sm text-slate-400">Ville</th>
+                      <th className="text-left p-4 font-bold text-sm text-slate-400">Inscrit le</th>
                     </tr>
                   </thead>
                   <tbody>
                     {clients.map((client) => (
-                      <tr key={client.id} className="border-b hover:bg-slate-50">
-                        <td className="p-4 font-bold">
+                      <tr key={client.id} className="border-b border-white/5 hover:bg-white/5 transition">
+                        <td className="p-4 font-bold text-white">
                           {client.full_name || client.email}
                         </td>
-                        <td className="p-4 text-sm">{client.email}</td>
-                        <td className="p-4 text-sm">{client.city || "-"}</td>
-                        <td className="p-4 text-sm text-slate-500">
+                        <td className="p-4 text-sm text-slate-300">{client.email}</td>
+                        <td className="p-4 text-sm text-slate-300">{client.city || "-"}</td>
+                        <td className="p-4 text-sm text-slate-400">
                           {new Date(client.created_at).toLocaleDateString("fr-FR")}
                         </td>
                       </tr>
@@ -1182,37 +1182,37 @@ export default function AdminDashboard() {
             {activeTab === "orders" && (
               <div>
                 <table className="w-full">
-                  <thead className="bg-slate-50 border-b">
+                  <thead className="bg-white/5 border-b border-white/10">
                     <tr>
-                      <th className="text-left p-4 font-bold text-sm">ID</th>
-                      <th className="text-left p-4 font-bold text-sm">Partenaire</th>
-                      <th className="text-left p-4 font-bold text-sm">Montant</th>
-                      <th className="text-left p-4 font-bold text-sm">Statut</th>
-                      <th className="text-left p-4 font-bold text-sm">Date</th>
+                      <th className="text-left p-4 font-bold text-sm text-slate-400">ID</th>
+                      <th className="text-left p-4 font-bold text-sm text-slate-400">Partenaire</th>
+                      <th className="text-left p-4 font-bold text-sm text-slate-400">Montant</th>
+                      <th className="text-left p-4 font-bold text-sm text-slate-400">Statut</th>
+                      <th className="text-left p-4 font-bold text-sm text-slate-400">Date</th>
                     </tr>
                   </thead>
                   <tbody>
                     {filteredOrdersByTime.map((order) => (
-                      <tr key={order.id} className="border-b hover:bg-slate-50">
-                        <td className="p-4 font-mono text-xs">{order.id.slice(0, 8)}</td>
-                        <td className="p-4 font-bold text-sm">
-                          {order.partner?.company_name || order.pickup_address?.slice(0,25) || <span className="text-slate-400">C2C</span>}
+                      <tr key={order.id} className="border-b border-white/5 hover:bg-white/5 transition">
+                        <td className="p-4 font-mono text-xs text-teal-400">{order.id.slice(0, 8)}</td>
+                        <td className="p-4 font-bold text-sm text-white">
+                          {order.partner?.company_name || order.pickup_address?.slice(0,25) || <span className="text-slate-500">C2C</span>}
                         </td>
-                        <td className="p-4 font-bold">{order.total_price} €</td>
+                        <td className="p-4 font-bold text-emerald-400">{order.total_price} €</td>
                         <td className="p-4">
                           <span
-                            className={`px-2 py-1 rounded-full text-xs font-bold ${
+                            className={`px-3 py-1 rounded-full text-xs font-bold ${
                               order.status === "completed"
-                                ? "bg-green-100 text-green-700"
+                                ? "bg-emerald-500/20 text-emerald-400"
                                 : order.status === "cancelled"
-                                ? "bg-red-100 text-red-700"
-                                : "bg-blue-100 text-blue-700"
+                                ? "bg-red-500/20 text-red-400"
+                                : "bg-blue-500/20 text-blue-400"
                             }`}
                           >
                             {order.status}
                           </span>
                         </td>
-                        <td className="p-4 text-sm text-slate-500">
+                        <td className="p-4 text-sm text-slate-400">
                           {new Date(order.created_at).toLocaleDateString("fr-FR")}
                         </td>
                       </tr>
@@ -1225,33 +1225,33 @@ export default function AdminDashboard() {
             {/* TAB MESSAGES */}
             {activeTab === "messages" && (
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 h-[600px]">
-                <div className="overflow-y-auto border-r pr-4">
+                <div className="overflow-y-auto border-r border-white/10 pr-4">
                   {messages.map((msg) => (
                     <div
                       key={msg.id}
                       onClick={() => setSelectedMessage(msg)}
                       className={`p-4 rounded-xl mb-3 cursor-pointer transition ${
                         selectedMessage?.id === msg.id
-                          ? "bg-teal-50 border border-teal-200"
-                          : "bg-white hover:bg-slate-50 border border-slate-100"
+                          ? "bg-teal-500/20 border border-teal-500/30"
+                          : "bg-white/5 hover:bg-white/10 border border-white/10"
                       } ${!msg.read ? "border-l-4 border-l-teal-500" : ""}`}
                     >
                       <div className="flex justify-between mb-1">
-                        <span className="font-bold">{msg.name}</span>
+                        <span className="font-bold text-white">{msg.name}</span>
                         <span className="text-xs text-slate-400">{new Date(msg.created_at).toLocaleDateString()}</span>
                       </div>
-                      <p className="text-sm text-slate-600 line-clamp-1">{msg.subject}</p>
+                      <p className="text-sm text-slate-400 line-clamp-1">{msg.subject}</p>
                     </div>
                   ))}
                 </div>
 
-                <div className="bg-slate-50 rounded-2xl p-6 h-full flex flex-col">
+                <div className="bg-white/5 rounded-2xl p-6 h-full flex flex-col border border-white/10">
                   {selectedMessage ? (
                     <>
-                      <div className="flex justify-between items-start mb-6 pb-4 border-b">
+                      <div className="flex justify-between items-start mb-6 pb-4 border-b border-white/10">
                         <div>
-                          <h3 className="font-bold text-xl mb-1">{selectedMessage.subject}</h3>
-                          <div className="flex items-center gap-2 text-sm text-slate-500 flex-wrap">
+                          <h3 className="font-bold text-xl mb-1 text-white">{selectedMessage.subject}</h3>
+                          <div className="flex items-center gap-2 text-sm text-slate-400 flex-wrap">
                             <span className="flex items-center gap-1">
                               <Mail size={14} /> {selectedMessage.email}
                             </span>
@@ -1262,25 +1262,25 @@ export default function AdminDashboard() {
                             )}
                           </div>
                         </div>
-                        <button onClick={() => deleteMessage(selectedMessage.id)} className="text-red-400 hover:text-red-600">
+                        <button onClick={() => deleteMessage(selectedMessage.id)} className="text-red-400 hover:text-red-500 transition">
                           <Trash2 size={18} />
                         </button>
                       </div>
 
-                      <div className="flex-1 overflow-y-auto mb-6 bg-white p-4 rounded-xl border border-slate-200">
-                        <p className="whitespace-pre-wrap text-slate-700">{selectedMessage.message}</p>
+                      <div className="flex-1 overflow-y-auto mb-6 bg-white/5 p-4 rounded-xl border border-white/10">
+                        <p className="whitespace-pre-wrap text-slate-300">{selectedMessage.message}</p>
                       </div>
 
                       {selectedMessage.support_responses?.length > 0 && (
-                        <div className="mb-4 pl-4 border-l-2 border-teal-200">
-                          <p className="text-xs font-bold text-teal-600 mb-1">Réponse envoyée :</p>
-                          <p className="text-sm text-slate-600 italic">"{selectedMessage.support_responses[0].response}"</p>
+                        <div className="mb-4 pl-4 border-l-2 border-teal-500/50">
+                          <p className="text-xs font-bold text-teal-400 mb-1">Réponse envoyée :</p>
+                          <p className="text-sm text-slate-400 italic">"{selectedMessage.support_responses[0].response}"</p>
                         </div>
                       )}
 
                       <div className="mt-auto">
                         <textarea
-                          className="w-full p-3 rounded-xl border border-slate-200 mb-3 focus:ring-2 focus:ring-teal-500"
+                          className="w-full p-3 rounded-xl bg-white/5 border border-white/10 mb-3 focus:ring-2 focus:ring-teal-500 text-white placeholder-slate-500"
                           placeholder="Écrire une réponse..."
                           rows={3}
                           value={replyText}
@@ -1288,14 +1288,14 @@ export default function AdminDashboard() {
                         />
                         <button
                           onClick={() => handleReplyInApp(selectedMessage)}
-                          className="w-full bg-teal-600 text-white py-3 rounded-xl font-bold hover:bg-teal-700 flex items-center justify-center gap-2"
+                          className="w-full bg-gradient-to-r from-teal-500 to-cyan-500 text-white py-3 rounded-xl font-bold hover:shadow-lg hover:shadow-teal-500/30 flex items-center justify-center gap-2 transition"
                         >
                           <Send size={18} /> Envoyer la réponse
                         </button>
                       </div>
                     </>
                   ) : (
-                    <div className="h-full flex items-center justify-center text-slate-400 flex-col gap-4">
+                    <div className="h-full flex items-center justify-center text-slate-500 flex-col gap-4">
                       <MessageSquare size={48} />
                       <p>Sélectionnez un message pour répondre</p>
                     </div>
