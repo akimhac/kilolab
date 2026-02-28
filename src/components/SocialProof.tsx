@@ -1,7 +1,7 @@
 // Social Proof Component - Live counters and reviews
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
-import { Star, TrendingUp, Users, Package, CheckCircle, MapPin } from 'lucide-react';
+import { Star, TrendingUp, Users, Package, CheckCircle, MapPin, Shield } from 'lucide-react';
 import { FadeInOnScroll } from './animations/ScrollAnimations';
 
 interface Review {
