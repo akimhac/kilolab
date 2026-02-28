@@ -998,17 +998,22 @@ export default function AdminDashboard() {
             {activeTab === "washers" && (
               <div>
                 <div className="mb-6">
-                  <h3 className="text-2xl font-bold mb-2">🧺 Validation des Washers</h3>
-                  <p className="text-slate-600">{washers.length} washers au total</p>
+                  <h3 className="text-2xl font-bold mb-2 text-white">Validation des Washers</h3>
+                  <p className="text-slate-400">{washers.length} washers au total</p>
                 </div>
 
-                <div className="flex gap-4 mb-6 flex-wrap">
+                <div className="flex gap-3 mb-6 flex-wrap">
                   {(["all", "pending", "approved", "rejected"] as const).map((f) => (
                     <button
                       key={f}
                       onClick={() => setWasherFilter(f)}
-                      className={`px-4 py-2 rounded-lg font-bold text-sm transition ${
-                        washerFilter === f ? "bg-slate-900 text-white" : "bg-white text-slate-500 hover:bg-slate-50 border"
+                      className={`px-4 py-2 rounded-xl font-bold text-sm transition ${
+                        washerFilter === f 
+                          ? f === "pending" ? "bg-orange-500 text-white" 
+                            : f === "approved" ? "bg-emerald-500 text-white"
+                            : f === "rejected" ? "bg-red-500 text-white"
+                            : "bg-white/20 text-white"
+                          : "bg-white/5 text-slate-400 border border-white/10 hover:bg-white/10"
                       }`}
                     >
                       {f === "all"
@@ -1023,33 +1028,33 @@ export default function AdminDashboard() {
                 </div>
 
                 {filteredWashers.length === 0 ? (
-                  <div className="text-center py-16 bg-slate-50 rounded-2xl border-2 border-dashed border-slate-200">
-                    <Users size={64} className="mx-auto mb-4 text-slate-300" />
+                  <div className="text-center py-16 bg-white/5 rounded-2xl border border-white/10">
+                    <Users size={64} className="mx-auto mb-4 text-slate-500" />
                     <p className="text-xl font-bold text-slate-400">Aucun washer trouvé</p>
                   </div>
                 ) : (
                   <div className="overflow-x-auto">
                     <table className="w-full">
-                      <thead className="bg-slate-50 border-b border-slate-200">
+                      <thead className="bg-white/5 border-b border-white/10">
                         <tr>
-                          <th className="text-left p-4 font-bold text-sm">Nom</th>
-                          <th className="text-left p-4 font-bold text-sm">Email</th>
-                          <th className="text-left p-4 font-bold text-sm">Téléphone</th>
-                          <th className="text-left p-4 font-bold text-sm">Ville</th>
-                          <th className="text-left p-4 font-bold text-sm">Statut</th>
-                          <th className="text-left p-4 font-bold text-sm">Date</th>
-                          <th className="text-left p-4 font-bold text-sm">Actions</th>
+                          <th className="text-left p-4 font-bold text-sm text-slate-400">Nom</th>
+                          <th className="text-left p-4 font-bold text-sm text-slate-400">Email</th>
+                          <th className="text-left p-4 font-bold text-sm text-slate-400">Téléphone</th>
+                          <th className="text-left p-4 font-bold text-sm text-slate-400">Ville</th>
+                          <th className="text-left p-4 font-bold text-sm text-slate-400">Statut</th>
+                          <th className="text-left p-4 font-bold text-sm text-slate-400">Date</th>
+                          <th className="text-left p-4 font-bold text-sm text-slate-400">Actions</th>
                         </tr>
                       </thead>
                       <tbody>
                         {filteredWashers.map((washer) => (
-                          <tr key={washer.id} className="border-b border-slate-100 hover:bg-slate-50">
+                          <tr key={washer.id} className="border-b border-white/5 hover:bg-white/5 transition">
                             <td className="p-4">
-                              <div className="font-bold">{washer.full_name || "Sans nom"}</div>
+                              <div className="font-bold text-white">{washer.full_name || "Sans nom"}</div>
                             </td>
-                            <td className="p-4 text-sm">{washer.email}</td>
-                            <td className="p-4 text-sm">{washer.phone}</td>
-                            <td className="p-4 text-sm">
+                            <td className="p-4 text-sm text-slate-300">{washer.email}</td>
+                            <td className="p-4 text-sm text-slate-300">{washer.phone}</td>
+                            <td className="p-4 text-sm text-slate-300">
                               {washer.city} ({washer.postal_code})
                             </td>
 
@@ -1058,26 +1063,26 @@ export default function AdminDashboard() {
                                 <span
                                   className={`px-3 py-1 rounded-full text-xs font-bold ${
                                     washer.status === "approved"
-                                      ? "bg-green-100 text-green-700"
+                                      ? "bg-emerald-500/20 text-emerald-400"
                                       : washer.status === "pending"
-                                      ? "bg-orange-100 text-orange-700"
-                                      : "bg-red-100 text-red-700"
+                                      ? "bg-orange-500/20 text-orange-400"
+                                      : "bg-red-500/20 text-red-400"
                                   }`}
                                 >
-                                  {washer.status === "approved" && "✅ Approuvé"}
-                                  {washer.status === "pending" && "⏳ En attente"}
-                                  {washer.status === "rejected" && "❌ Rejeté"}
+                                  {washer.status === "approved" && "Approuvé"}
+                                  {washer.status === "pending" && "En attente"}
+                                  {washer.status === "rejected" && "Rejeté"}
                                 </span>
 
                                 {washer.is_blocked && (
                                   <span className="px-3 py-1 rounded-full text-xs font-bold bg-red-600 text-white">
-                                    🚫 BLOQUÉ
+                                    BLOQUÉ
                                   </span>
                                 )}
                               </div>
                             </td>
 
-                            <td className="p-4 text-sm text-slate-600">
+                            <td className="p-4 text-sm text-slate-400">
                               {new Date(washer.created_at).toLocaleDateString("fr-FR")}
                             </td>
 
@@ -1087,17 +1092,17 @@ export default function AdminDashboard() {
                                   <>
                                     <button
                                       onClick={() => approveWasher(washer.id)}
-                                      className="px-4 py-2 bg-green-600 text-white rounded-lg text-sm font-bold hover:bg-green-500 transition"
+                                      className="px-3 py-2 bg-emerald-500/20 text-emerald-400 rounded-lg text-sm font-bold hover:bg-emerald-500/30 transition"
                                       title="Approuver"
                                     >
-                                      ✅
+                                      <CheckCircle size={16} />
                                     </button>
                                     <button
                                       onClick={() => rejectWasher(washer.id)}
-                                      className="px-4 py-2 bg-red-600 text-white rounded-lg text-sm font-bold hover:bg-red-500 transition"
+                                      className="px-3 py-2 bg-red-500/20 text-red-400 rounded-lg text-sm font-bold hover:bg-red-500/30 transition"
                                       title="Rejeter"
                                     >
-                                      ❌
+                                      <XCircle size={16} />
                                     </button>
                                   </>
                                 )}
@@ -1105,20 +1110,20 @@ export default function AdminDashboard() {
                                 {washer.status === "approved" && !washer.is_blocked && (
                                   <button
                                     onClick={() => blockWasher(washer.id)}
-                                    className="px-4 py-2 bg-orange-600 text-white rounded-lg text-sm font-bold hover:bg-orange-500 transition"
+                                    className="px-3 py-2 bg-orange-500/20 text-orange-400 rounded-lg text-sm font-bold hover:bg-orange-500/30 transition"
                                     title="Bloquer"
                                   >
-                                    🚫 Bloquer
+                                    <AlertTriangle size={16} />
                                   </button>
                                 )}
 
                                 {washer.is_blocked && (
                                   <button
                                     onClick={() => unblockWasher(washer.id)}
-                                    className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-bold hover:bg-blue-500 transition"
+                                    className="px-3 py-2 bg-blue-500/20 text-blue-400 rounded-lg text-sm font-bold hover:bg-blue-500/30 transition"
                                     title="Débloquer"
                                   >
-                                    ✅ Débloquer
+                                    <CheckCircle size={16} />
                                   </button>
                                 )}
 
@@ -1127,10 +1132,10 @@ export default function AdminDashboard() {
                                     setSelectedWasher(washer);
                                     setShowWasherModal(true);
                                   }}
-                                  className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-bold hover:bg-blue-500 transition"
+                                  className="px-3 py-2 bg-blue-500/20 text-blue-400 rounded-lg text-sm font-bold hover:bg-blue-500/30 transition"
                                   title="Voir détails"
                                 >
-                                  👁️
+                                  <FileText size={16} />
                                 </button>
                               </div>
                             </td>
