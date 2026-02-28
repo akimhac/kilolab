@@ -714,7 +714,7 @@ export default function AdminDashboard() {
         {/* NAVIGATION TABS */}
         <div className="bg-white rounded-2xl shadow-sm border border-slate-100 mb-8">
           <div className="flex border-b overflow-x-auto">
-            {(["overview", "partners", "washers", "clients", "orders", "messages", "logs", "coupons"] as const).map(
+            {(["overview", "partners", "washers", "clients", "orders", "messages", "heatmap", "b2b", "logs", "coupons"] as const).map(
               (tab) => (
                 <button
                   key={tab}
