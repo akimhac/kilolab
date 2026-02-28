@@ -1451,35 +1451,35 @@ export default function AdminDashboard() {
                   ) : (
                     <div className="overflow-x-auto">
                       <table className="w-full">
-                        <thead className="bg-slate-50 border-b">
+                        <thead className="bg-white/5 border-b border-white/10">
                           <tr>
-                            <th className="text-left p-4 font-bold text-sm">Code</th>
-                            <th className="text-left p-4 font-bold text-sm">Réduction</th>
-                            <th className="text-left p-4 font-bold text-sm">Utilisations</th>
-                            <th className="text-left p-4 font-bold text-sm">Expire le</th>
-                            <th className="text-left p-4 font-bold text-sm">Actions</th>
+                            <th className="text-left p-4 font-bold text-sm text-slate-400">Code</th>
+                            <th className="text-left p-4 font-bold text-sm text-slate-400">Réduction</th>
+                            <th className="text-left p-4 font-bold text-sm text-slate-400">Utilisations</th>
+                            <th className="text-left p-4 font-bold text-sm text-slate-400">Expire le</th>
+                            <th className="text-left p-4 font-bold text-sm text-slate-400">Actions</th>
                           </tr>
                         </thead>
                         <tbody>
                           {coupons.map((coupon) => (
-                            <tr key={coupon.id} className="border-b hover:bg-slate-50">
-                              <td className="p-4 font-mono font-bold">{coupon.code}</td>
-                              <td className="p-4">
+                            <tr key={coupon.id} className="border-b border-white/5 hover:bg-white/5 transition">
+                              <td className="p-4 font-mono font-bold text-teal-400">{coupon.code}</td>
+                              <td className="p-4 text-white">
                                 {coupon.discount_value}
                                 {coupon.discount_type === "percentage" ? "%" : "€"}
                               </td>
                               <td className="p-4">
-                                <span className={`font-bold ${coupon.uses_count >= coupon.max_uses ? "text-red-600" : "text-green-600"}`}>
+                                <span className={`font-bold ${coupon.uses_count >= coupon.max_uses ? "text-red-400" : "text-emerald-400"}`}>
                                   {coupon.uses_count} / {coupon.max_uses}
                                 </span>
                               </td>
-                              <td className="p-4 text-sm">
+                              <td className="p-4 text-sm text-slate-400">
                                 {coupon.expires_at ? new Date(coupon.expires_at).toLocaleDateString("fr-FR") : "Jamais"}
                               </td>
                               <td className="p-4">
                                 <button
                                   onClick={() => deleteCoupon(coupon.id)}
-                                  className="p-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100"
+                                  className="p-2 bg-red-500/20 text-red-400 rounded-lg hover:bg-red-500/30 transition"
                                   title="Supprimer"
                                 >
                                   <Trash2 size={18} />
@@ -1494,96 +1494,29 @@ export default function AdminDashboard() {
                 </div>
               </div>
             )}
-          </div>
-        </div>
-      </div>
-
-      {/* MODALE PARTNER */}
-      {showPartnerModal && selectedPartner && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-3xl p-8 max-w-2xl w-full relative shadow-2xl">
-            <button
-              onClick={() => setShowPartnerModal(false)}
-              className="absolute top-6 right-6 p-2 bg-slate-100 rounded-full hover:bg-slate-200 transition"
-            >
-              <X size={20} />
-            </button>
-
-            <div className="mb-8">
-              <h2 className="text-3xl font-black mb-2">{selectedPartner.name}</h2>
-              <div className="flex gap-2">
-                <span className="bg-slate-100 px-3 py-1 rounded-full text-sm font-bold text-slate-600">
-                  {selectedPartner.city}
-                </span>
-                <span
-                  className={`px-3 py-1 rounded-full text-sm font-bold ${
-                    selectedPartner.is_active ? "bg-green-100 text-green-700" : "bg-orange-100 text-orange-700"
-                  }`}
-                >
-                  {selectedPartner.is_active ? "Actif" : "En attente"}
-                </span>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-6 mb-8">
-              <div className="bg-slate-50 p-4 rounded-xl">
-                <p className="text-sm text-slate-500 mb-1">Email Pro</p>
-                <p className="font-bold">{selectedPartner.email}</p>
-              </div>
-              <div className="bg-slate-50 p-4 rounded-xl">
-                <p className="text-sm text-slate-500 mb-1">Téléphone</p>
-                <p className="font-bold">{selectedPartner.phone}</p>
-              </div>
-              <div className="bg-slate-50 p-4 rounded-xl col-span-2">
-                <p className="text-sm text-slate-500 mb-1">Adresse</p>
-                <p className="font-bold">
-                  {selectedPartner.address}, {selectedPartner.postal_code} {selectedPartner.city}
-                </p>
-              </div>
-            </div>
-
-            {!selectedPartner.is_active && (
-              <div className="flex gap-3 pt-6 border-t">
-                <button
-                  onClick={() => rejectPartner(selectedPartner)}
-                  className="flex-1 py-3 bg-red-50 text-red-600 font-bold rounded-xl hover:bg-red-100 transition"
-                >
-                  Refuser
-                </button>
-                <button
-                  onClick={() => approvePartner(selectedPartner.id)}
-                  className="flex-1 py-3 bg-green-600 text-white font-bold rounded-xl hover:bg-green-700 transition shadow-lg shadow-green-200"
-                >
-                  Valider le compte
-                </button>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
 
             {/* ═══ HEATMAP TAB ═══ */}
             {activeTab === "heatmap" && (
               <div className="space-y-6">
                 <div className="flex items-center justify-between">
-                  <h3 className="text-2xl font-bold flex items-center gap-2">
-                    <MapPin size={20} className="text-teal-600" /> Carte des commandes
+                  <h3 className="text-2xl font-bold flex items-center gap-2 text-white">
+                    <MapPin size={20} className="text-teal-400" /> Carte des commandes
                   </h3>
                 </div>
                 {/* Real Heatmap Component with Leaflet */}
                 <OrderHeatmap dateRange={timeRange === '7d' ? '7d' : timeRange === '90d' ? '90d' : '30d'} />
                 <div className="grid md:grid-cols-3 gap-4">
-                  <div className="bg-white rounded-2xl border p-6 text-center">
-                    <p className="text-3xl font-black text-teal-600">{orders.length}</p>
-                    <p className="text-sm text-slate-600 mt-1">Commandes totales</p>
+                  <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6 text-center">
+                    <p className="text-3xl font-black text-teal-400">{orders.length}</p>
+                    <p className="text-sm text-slate-400 mt-1">Commandes totales</p>
                   </div>
-                  <div className="bg-white rounded-2xl border p-6 text-center">
-                    <p className="text-3xl font-black text-violet-600">{new Set(orders.map(o => o.city || 'N/A')).size}</p>
-                    <p className="text-sm text-slate-600 mt-1">Villes actives</p>
+                  <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6 text-center">
+                    <p className="text-3xl font-black text-violet-400">{new Set(orders.map(o => o.city || 'N/A')).size}</p>
+                    <p className="text-sm text-slate-400 mt-1">Villes actives</p>
                   </div>
-                  <div className="bg-white rounded-2xl border p-6 text-center">
-                    <p className="text-3xl font-black text-orange-600">{washers.filter(w => w.status === 'approved').length}</p>
-                    <p className="text-sm text-slate-600 mt-1">Washers disponibles</p>
+                  <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6 text-center">
+                    <p className="text-3xl font-black text-orange-400">{washers.filter(w => w.status === 'approved').length}</p>
+                    <p className="text-sm text-slate-400 mt-1">Washers disponibles</p>
                   </div>
                 </div>
               </div>
