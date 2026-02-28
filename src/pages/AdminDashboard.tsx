@@ -735,6 +735,10 @@ export default function AdminDashboard() {
                     ? `📦 Commandes (${orders.length})`
                     : tab === "messages"
                     ? `💬 Messages (${stats.newMessages})`
+                    : tab === "heatmap"
+                    ? "🗺️ Heatmap"
+                    : tab === "b2b"
+                    ? "🏢 B2B / API"
                     : tab === "logs"
                     ? `🔴 Logs (${stats.criticalErrors})`
                     : `🎟️ Coupons (${coupons.length})`}
