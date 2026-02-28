@@ -127,8 +127,8 @@ export default function BecomeWasher() {
   return (
     <>
       <Helmet>
-        <title>Devenir Washer - Gagnez jusqu'a 600eur/mois | Kilolab France</title>
-        <meta name="description" content="Rejoignez le reseau Kilolab France et generez un revenu complementaire en lavant du linge depuis chez vous." />
+        <title>Devenir Washer - Gagnez jusqu'à 600€/mois | Kilolab France</title>
+        <meta name="description" content="Rejoignez le réseau Kilolab France et générez un revenu complémentaire en lavant du linge depuis chez vous." />
         <link rel="canonical" href="https://kilolab.fr/become-washer" />
       </Helmet>
 
@@ -333,7 +333,7 @@ export default function BecomeWasher() {
                       <div className="bg-gradient-to-r from-teal-500/20 to-cyan-500/20 border border-teal-500/30 rounded-2xl p-5">
                         <div className="flex items-center gap-3 text-teal-300">
                           <Zap size={20} className="flex-shrink-0" />
-                          <p className="text-sm">Calcul base sur <strong>2.80eur/kg</strong> de commission moyenne. Les top Washers gagnent jusqu'a <strong>1200eur/mois</strong>.</p>
+                          <p className="text-sm">Calcul basé sur <strong>2.80€/kg</strong> de commission moyenne. Les top Washers gagnent jusqu'à <strong>1200€/mois</strong>.</p>
                         </div>
                       </div>
                     </div>
@@ -351,9 +351,9 @@ export default function BecomeWasher() {
 
                 <div className="grid md:grid-cols-3 gap-6">
                   {[
-                    { name: 'Marie L.', city: 'Lille', quote: "Je gagne 450eur/mois en complement de mon mi-temps. C'est flexible et ca me permet de rester a la maison avec mes enfants.", stars: 5, revenue: '450eur/mois' },
-                    { name: 'Karim B.', city: 'Nantes', quote: "Etudiant, je fais 3-4 machines par jour entre les cours. L'app est simple et les paiements tombent chaque semaine.", stars: 5, revenue: '320eur/mois' },
-                    { name: 'Sophie R.', city: 'Bordeaux', quote: "Retraitee, je cherchais une activite. Kilolab m'a permis de rencontrer des voisins et de gagner un complement de retraite.", stars: 5, revenue: '280eur/mois' },
+                    { name: 'Marie L.', city: 'Lille', quote: "Je gagne 450€/mois en complément de mon mi-temps. C'est flexible et ça me permet de rester à la maison avec mes enfants.", stars: 5, revenue: '450€/mois' },
+                    { name: 'Karim B.', city: 'Nantes', quote: "Étudiant, je fais 3-4 machines par jour entre les cours. L'app est simple et les paiements tombent chaque semaine.", stars: 5, revenue: '320€/mois' },
+                    { name: 'Sophie R.', city: 'Bordeaux', quote: "Retraitée, je cherchais une activité. Kilolab m'a permis de rencontrer des voisins et de gagner un complément de retraite.", stars: 5, revenue: '280€/mois' },
                   ].map((t, idx) => (
                     <AnimateOnScroll key={idx} delay={idx * 100}>
                       <div className="bg-white/[0.04] border border-white/[0.08] rounded-3xl p-8 hover:bg-white/[0.07] transition-all">
