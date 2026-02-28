@@ -160,8 +160,8 @@ export default function BecomeWasher() {
                 </h1>
 
                 <p className="text-lg sm:text-xl text-slate-300 max-w-2xl mx-auto leading-relaxed mb-10 font-light animate-slide-up" style={{ animationDelay: '100ms' }}>
-                  Transformez votre machine a laver en source de revenus.<br className="hidden sm:block" />
-                  Jusqu'a <strong className="text-white font-semibold">600eur/mois</strong>, depuis chez vous, a votre rythme.
+                  Transformez votre machine à laver en source de revenus.<br className="hidden sm:block" />
+                  Jusqu'à <strong className="text-white font-semibold">600&euro;/mois</strong>, depuis chez vous, à votre rythme.
                 </p>
 
                 <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12 animate-slide-up" style={{ animationDelay: '200ms' }}>
@@ -180,7 +180,7 @@ export default function BecomeWasher() {
                 {/* Live stats */}
                 <div className="grid grid-cols-3 gap-4 max-w-xl mx-auto animate-fade-in" style={{ animationDelay: '400ms' }}>
                   {[
-                    { value: '0eur', label: "Frais d'inscription" },
+                    { value: '0\u20AC', label: "Frais d'inscription" },
                     { value: '24h', label: 'Activation' },
                     { value: '7j/7', label: 'Virements' },
                   ].map((s, i) => (
@@ -218,15 +218,15 @@ export default function BecomeWasher() {
                 <AnimateOnScroll className="text-center mb-16">
                   <span className="inline-block px-4 py-1.5 bg-teal-500/10 border border-teal-500/20 text-teal-400 rounded-full text-xs font-bold tracking-widest uppercase mb-6">Pourquoi nous rejoindre</span>
                   <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-white leading-tight">
-                    Tout ce qu'il faut<br /><span className="bg-gradient-to-r from-teal-400 to-cyan-400 bg-clip-text text-transparent">pour reussir</span>
+                    Tout ce qu'il faut<br /><span className="bg-gradient-to-r from-teal-400 to-cyan-400 bg-clip-text text-transparent">pour réussir</span>
                   </h2>
                 </AnimateOnScroll>
 
                 <div className="grid md:grid-cols-3 gap-6">
                   {[
-                    { icon: <DollarSign size={28} />, title: "Revenus complementaires", desc: "Generez jusqu'a 600eur/mois. Fixez vos tarifs et augmentez votre volume a votre rythme.", gradient: 'from-teal-500 to-emerald-500', glow: 'shadow-teal-500/20' },
-                    { icon: <Home size={28} />, title: "Travaillez de chez vous", desc: "Zero deplacement, zero bureau. Votre salon devient votre espace de travail. Acceptez uniquement les missions qui vous conviennent.", gradient: 'from-violet-500 to-purple-500', glow: 'shadow-violet-500/20' },
-                    { icon: <ShieldCheck size={28} />, title: "Plateforme securisee", desc: "Paiements garantis, assurance incluse, support 7j/7. Concentrez-vous sur le lavage, on gere le reste.", gradient: 'from-orange-500 to-red-500', glow: 'shadow-orange-500/20' },
+                    { icon: <DollarSign size={28} />, title: "Revenus complémentaires", desc: "Générez jusqu'à 600\u20AC/mois. Fixez vos tarifs et augmentez votre volume à votre rythme.", gradient: 'from-teal-500 to-emerald-500', glow: 'shadow-teal-500/20' },
+                    { icon: <Home size={28} />, title: "Travaillez de chez vous", desc: "Zéro déplacement, zéro bureau. Votre salon devient votre espace de travail. Acceptez uniquement les missions qui vous conviennent.", gradient: 'from-violet-500 to-purple-500', glow: 'shadow-violet-500/20' },
+                    { icon: <ShieldCheck size={28} />, title: "Plateforme sécurisée", desc: "Paiements garantis, assurance incluse, support 7j/7. Concentrez-vous sur le lavage, on gère le reste.", gradient: 'from-orange-500 to-red-500', glow: 'shadow-orange-500/20' },
                   ].map((item, idx) => (
                     <AnimateOnScroll key={idx} delay={idx * 120}>
                       <div className={`group relative bg-white/[0.03] backdrop-blur-sm border border-white/[0.08] rounded-3xl p-8 hover:bg-white/[0.06] transition-all duration-500 hover:-translate-y-2 hover:${item.glow} hover:shadow-2xl`}>
