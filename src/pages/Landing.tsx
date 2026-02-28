@@ -341,30 +341,34 @@ export default function Landing() {
           </div>
         </section>
 
-        {/* COST COMPARISON - Premium Card Style */}
+        {/* COST COMPARISON - Focus sur l'ARGENT */}
         <section className="py-24 bg-white">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <AnimateOnScroll>
               <div className="text-center mb-16">
-                <span className="inline-block px-4 py-1.5 bg-orange-100 text-orange-700 rounded-full text-sm font-semibold mb-4">
-                  Calculateur
+                <span className="inline-block px-4 py-1.5 bg-red-100 text-red-700 rounded-full text-sm font-semibold mb-4">
+                  Arrêtez de perdre de l'argent
                 </span>
                 <h2 className="font-heading text-3xl md:text-5xl font-bold text-slate-900 mb-6">
-                  Le coût caché de votre lessive
+                  Combien vous coûte vraiment votre lessive ?
                 </h2>
                 <p className="text-lg text-slate-600 max-w-2xl mx-auto">
-                  Entre l'eau, l'électricité, les produits et votre temps... faire sa lessive coûte plus cher qu'on ne le pense.
+                  Eau, électricité, produits, usure machine... <br className="hidden sm:block" />
+                  <strong>Le coût réel est bien plus élevé que vous ne le pensez.</strong>
                 </p>
               </div>
             </AnimateOnScroll>
 
             <div className="max-w-5xl mx-auto">
-              {/* Weight Slider */}
+              {/* Weight Slider - Plus visible */}
               <AnimateOnScroll delay={100}>
-                <div className="bg-slate-50 rounded-2xl p-6 md:p-8 mb-8 border border-slate-100">
+                <div className="bg-gradient-to-r from-slate-900 to-slate-800 rounded-2xl p-6 md:p-8 mb-8 text-white">
                   <div className="flex items-center justify-between mb-4">
-                    <span className="text-sm font-medium text-slate-600">Simulez avec votre volume</span>
-                    <span className="text-2xl font-heading font-bold text-teal-600">{weight} kg</span>
+                    <span className="font-medium">Votre volume de linge par semaine</span>
+                    <div className="flex items-baseline gap-1">
+                      <span className="text-4xl font-black text-teal-400">{weight}</span>
+                      <span className="text-slate-400">kg</span>
+                    </div>
                   </div>
                   <input
                     type="range"
@@ -374,167 +378,181 @@ export default function Landing() {
                     value={weight}
                     onChange={(e) => setWeight(parseInt(e.target.value, 10))}
                     data-testid="weight-slider"
-                    className="w-full h-2 bg-slate-200 rounded-full appearance-none cursor-pointer accent-teal-600 [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-teal-600 [&::-webkit-slider-thumb]:shadow-lg [&::-webkit-slider-thumb]:transition-transform [&::-webkit-slider-thumb]:hover:scale-110"
+                    className="w-full h-3 bg-slate-700 rounded-full appearance-none cursor-pointer accent-teal-500 [&::-webkit-slider-thumb]:w-6 [&::-webkit-slider-thumb]:h-6 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-teal-500 [&::-webkit-slider-thumb]:shadow-lg [&::-webkit-slider-thumb]:cursor-grab"
                   />
-                  <div className="flex justify-between text-xs text-slate-400 mt-2">
-                    <span>Petit sac</span>
-                    <span>Gros volume</span>
+                  <div className="flex justify-between text-xs text-slate-500 mt-2">
+                    <span>3kg (1 personne)</span>
+                    <span>15kg (famille)</span>
                   </div>
                 </div>
               </AnimateOnScroll>
 
-              {/* Comparison Cards */}
+              {/* Comparaison Visuelle - Focus ARGENT */}
               <div className="grid md:grid-cols-2 gap-6 md:gap-8">
-                {/* DIY Card */}
-                <div className="relative bg-gradient-to-br from-orange-50 to-red-50 rounded-3xl p-6 md:p-8 border border-orange-200/50 overflow-hidden">
-                  <div className="absolute top-0 right-0 w-40 h-40 bg-orange-200/30 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
-                  
-                  <div className="relative">
-                    <div className="flex items-center gap-3 mb-8">
-                      <div className="p-3 bg-orange-100 rounded-xl">
-                        <AlertCircle className="text-orange-600" size={24} />
+                {/* Faire soi-même */}
+                <AnimateOnScroll delay={150}>
+                  <div className="bg-gradient-to-br from-red-50 to-orange-50 rounded-3xl p-6 md:p-8 border-2 border-red-200 relative overflow-hidden h-full">
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-red-200/50 rounded-full blur-3xl" />
+                    
+                    <div className="relative">
+                      <div className="flex items-center gap-3 mb-6">
+                        <div className="w-12 h-12 bg-red-100 rounded-2xl flex items-center justify-center">
+                          <AlertCircle className="text-red-600" size={24} />
+                        </div>
+                        <div>
+                          <h3 className="font-heading text-xl font-bold text-slate-900">Faire soi-même</h3>
+                          <p className="text-sm text-red-600 font-medium">Le piège du "gratuit"</p>
+                        </div>
                       </div>
-                      <div>
-                        <h3 className="font-heading text-xl font-bold text-slate-900">À la maison</h3>
-                        <p className="text-sm text-slate-600">Pour {weight}kg de linge</p>
-                      </div>
-                    </div>
 
-                    <div className="space-y-2 mb-6">
-                      {[
-                        { icon: Droplet, color: "blue", label: "Eau (60L)", value: diyWater },
-                        { icon: Zap, color: "yellow", label: "Électricité", value: diyElectricity },
-                        { icon: Sparkles, color: "purple", label: "Lessive", value: diyDetergent },
-                        { icon: Sparkles, color: "pink", label: "Adoucissant", value: diySoftener },
-                        { icon: TrendingUp, color: "slate", label: "Usure machine", value: diyMachineWear },
-                        { icon: Zap, color: "orange", label: "Sèche-linge", value: diyDryer },
-                      ].map(({ icon: Icon, color, label, value }) => (
-                        <div key={label} className={`flex justify-between items-center p-3 bg-${color}-50/50 rounded-xl text-sm`}>
-                          <div className="flex items-center gap-2">
-                            <Icon size={16} className={`text-${color}-600`} />
-                            <span className="text-slate-700">{label}</span>
+                      {/* Coûts détaillés */}
+                      <div className="space-y-2 mb-6">
+                        <div className="flex justify-between items-center p-3 bg-white/80 rounded-xl text-sm">
+                          <span className="text-slate-600">💧 Eau (60L/machine)</span>
+                          <span className="font-bold text-slate-900">{diyWater.toFixed(2)}€</span>
+                        </div>
+                        <div className="flex justify-between items-center p-3 bg-white/80 rounded-xl text-sm">
+                          <span className="text-slate-600">⚡ Électricité</span>
+                          <span className="font-bold text-slate-900">{diyElectricity.toFixed(2)}€</span>
+                        </div>
+                        <div className="flex justify-between items-center p-3 bg-white/80 rounded-xl text-sm">
+                          <span className="text-slate-600">🧴 Lessive + Adoucissant</span>
+                          <span className="font-bold text-slate-900">{(diyDetergent + diySoftener).toFixed(2)}€</span>
+                        </div>
+                        <div className="flex justify-between items-center p-3 bg-white/80 rounded-xl text-sm">
+                          <span className="text-slate-600">🔧 Usure machine + Séchage</span>
+                          <span className="font-bold text-slate-900">{(diyMachineWear + diyDryer).toFixed(2)}€</span>
+                        </div>
+                      </div>
+
+                      {/* Temps = Argent */}
+                      <div className="bg-orange-100 border border-orange-200 p-4 rounded-xl mb-4">
+                        <div className="flex justify-between items-center">
+                          <div>
+                            <p className="text-sm text-orange-800 font-medium">⏰ Temps perdu : {diyTimeHours}h</p>
+                            <p className="text-xs text-orange-600">Tri + Lavage + Séchage + Pliage + Rangement</p>
                           </div>
-                          <span className="font-semibold text-slate-900">{value.toFixed(2)}€</span>
-                        </div>
-                      ))}
-                    </div>
-
-                    <div className="bg-white/80 backdrop-blur-sm p-4 rounded-xl border border-orange-200 mb-4">
-                      <div className="flex justify-between items-center mb-2">
-                        <div className="flex items-center gap-2">
-                          <Clock className="text-orange-600" size={18} />
-                          <span className="font-semibold text-sm text-slate-900">Votre temps</span>
-                        </div>
-                        <span className="text-2xl font-heading font-bold text-orange-600">{diyTimeHours}h</span>
-                      </div>
-                      <p className="text-xs text-slate-600">Tri + Lavage + Séchage + Pliage = <span className="font-semibold">{diyTimeCost.toFixed(2)}€</span></p>
-                    </div>
-
-                    <div className="bg-gradient-to-r from-red-500 to-orange-500 p-5 rounded-2xl text-white">
-                      <div className="flex justify-between items-center mb-1 text-sm opacity-90">
-                        <span>Coût matériel</span>
-                        <span>{diyMaterialTotal.toFixed(2)}€</span>
-                      </div>
-                      <div className="flex justify-between items-center pb-3 border-b border-white/20 text-sm opacity-90">
-                        <span>Coût temps</span>
-                        <span>{diyTimeCost.toFixed(2)}€</span>
-                      </div>
-                      <div className="flex justify-between items-center pt-3">
-                        <span className="font-semibold">TOTAL RÉEL</span>
-                        <span className="text-3xl font-heading font-bold">{diyTotalCost.toFixed(2)}€</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Kilolab Card */}
-                <div className="relative bg-gradient-to-br from-teal-50 to-cyan-50 rounded-3xl p-6 md:p-8 border-2 border-teal-200 overflow-hidden">
-                  <div className="absolute top-0 right-0 w-40 h-40 bg-teal-200/30 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
-                  
-                  {/* Recommended badge */}
-                  <div className="absolute top-4 right-4 bg-gradient-to-r from-yellow-400 to-orange-400 text-slate-900 px-3 py-1 rounded-full text-xs font-bold shadow-lg">
-                    RECOMMANDÉ
-                  </div>
-
-                  <div className="relative">
-                    <div className="flex items-center gap-3 mb-8">
-                      <div className="p-3 bg-teal-100 rounded-xl">
-                        <Sparkles className="text-teal-600" size={24} />
-                      </div>
-                      <div>
-                        <h3 className="font-heading text-xl font-bold text-slate-900">Avec Kilolab</h3>
-                        <p className="text-sm text-slate-600">Tout inclus pour {weight}kg</p>
-                      </div>
-                    </div>
-
-                    <div className="space-y-3 mb-6">
-                      {[
-                        "Enlèvement gratuit à domicile",
-                        "Lavage professionnel (lessive premium)",
-                        "Séchage + Pliage impeccable",
-                        "Livraison en 48h max",
-                      ].map((feature, i) => (
-                        <div key={i} className="flex items-center gap-3 p-4 bg-white rounded-xl border border-teal-100 shadow-sm">
-                          <div className="w-8 h-8 bg-gradient-to-br from-teal-500 to-cyan-500 rounded-full flex items-center justify-center flex-shrink-0">
-                            <CheckCircle size={16} className="text-white" />
+                          <div className="text-right">
+                            <p className="text-2xl font-black text-orange-700">{diyTimeCost}€</p>
+                            <p className="text-xs text-orange-600">({hourlyRate}€/h)</p>
                           </div>
-                          <span className="text-sm font-medium text-slate-900">{feature}</span>
                         </div>
-                      ))}
-                    </div>
-
-                    <div className="bg-white p-5 rounded-xl border border-teal-200 mb-6">
-                      <div className="flex justify-between items-center mb-3">
-                        <span className="text-slate-600 font-medium">Prix tout compris</span>
-                        <span className="font-heading font-bold text-slate-900">{kilolabPrice.toFixed(2)}€</span>
                       </div>
-                      <div className="flex justify-between items-center pt-3 border-t border-teal-100">
-                        <div className="flex items-center gap-2">
-                          <Clock size={18} className="text-teal-600" />
-                          <span className="font-semibold text-sm text-slate-900">Votre temps</span>
-                        </div>
-                        <span className="text-xl font-heading font-bold text-teal-600">0h</span>
-                      </div>
-                    </div>
 
-                    <div className="bg-gradient-to-r from-teal-500 to-cyan-500 p-5 rounded-2xl text-white mb-6">
-                      <p className="text-xs font-semibold text-center uppercase tracking-wider mb-3 opacity-90">Vous économisez</p>
-                      <div className="grid grid-cols-2 gap-3">
-                        <div className="text-center bg-white/20 rounded-xl p-3">
-                          <p className="text-2xl font-heading font-bold">{timeSaved.toFixed(1)}h</p>
-                          <p className="text-xs font-medium">de temps libre</p>
+                      {/* Total */}
+                      <div className="bg-gradient-to-r from-red-500 to-orange-500 p-5 rounded-2xl text-white">
+                        <div className="flex justify-between items-center mb-2 text-sm opacity-90">
+                          <span>Coûts matériels</span>
+                          <span>{diyMaterialTotal.toFixed(2)}€</span>
                         </div>
-                        <div className="text-center bg-white/20 rounded-xl p-3">
-                          <p className="text-2xl font-heading font-bold">{paidToDoNothing}€</p>
-                          <p className="text-xs font-medium">de gagné</p>
+                        <div className="flex justify-between items-center pb-3 border-b border-white/30 text-sm opacity-90">
+                          <span>Valeur de votre temps</span>
+                          <span>{diyTimeCost.toFixed(2)}€</span>
+                        </div>
+                        <div className="flex justify-between items-center pt-3">
+                          <span className="font-bold">COÛT RÉEL</span>
+                          <span className="text-4xl font-black">{diyTotalCost.toFixed(0)}€</span>
                         </div>
                       </div>
                     </div>
-
-                    <Link
-                      to="/new-order"
-                      data-testid="choose-kilolab-btn"
-                      className="block w-full py-4 bg-slate-900 text-white text-center font-semibold rounded-xl hover:bg-slate-800 transition-all duration-300 shadow-lg hover:shadow-xl text-lg"
-                    >
-                      Je choisis Kilolab
-                    </Link>
                   </div>
-                </div>
+                </AnimateOnScroll>
+
+                {/* Avec Kilolab */}
+                <AnimateOnScroll delay={200}>
+                  <div className="bg-gradient-to-br from-teal-50 to-cyan-50 rounded-3xl p-6 md:p-8 border-2 border-teal-400 relative overflow-hidden h-full">
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-teal-200/50 rounded-full blur-3xl" />
+                    
+                    {/* Badge */}
+                    <div className="absolute top-4 right-4 bg-gradient-to-r from-yellow-400 to-orange-400 text-slate-900 px-4 py-1.5 rounded-full text-xs font-black shadow-lg">
+                      💰 ÉCONOMISEZ
+                    </div>
+
+                    <div className="relative">
+                      <div className="flex items-center gap-3 mb-6">
+                        <div className="w-12 h-12 bg-teal-100 rounded-2xl flex items-center justify-center">
+                          <Sparkles className="text-teal-600" size={24} />
+                        </div>
+                        <div>
+                          <h3 className="font-heading text-xl font-bold text-slate-900">Avec Kilolab</h3>
+                          <p className="text-sm text-teal-600 font-medium">Tout inclus, zéro effort</p>
+                        </div>
+                      </div>
+
+                      {/* Ce qui est inclus */}
+                      <div className="space-y-2 mb-6">
+                        {[
+                          "Collecte gratuite à domicile",
+                          "Lavage professionnel (lessive premium)",
+                          "Séchage + Pliage impeccable",
+                          "Livraison en 48h max",
+                        ].map((feature, i) => (
+                          <div key={i} className="flex items-center gap-3 p-3 bg-white rounded-xl border border-teal-100">
+                            <div className="w-7 h-7 bg-teal-500 rounded-full flex items-center justify-center flex-shrink-0">
+                              <CheckCircle size={14} className="text-white" />
+                            </div>
+                            <span className="text-sm font-medium text-slate-900">{feature}</span>
+                          </div>
+                        ))}
+                      </div>
+
+                      {/* Temps récupéré */}
+                      <div className="bg-teal-100 border border-teal-200 p-4 rounded-xl mb-4">
+                        <div className="flex justify-between items-center">
+                          <div>
+                            <p className="text-sm text-teal-800 font-medium">⏰ Temps passé : 0 minute</p>
+                            <p className="text-xs text-teal-600">On s'occupe de tout !</p>
+                          </div>
+                          <div className="text-right">
+                            <p className="text-2xl font-black text-teal-700">0€</p>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Prix Kilolab */}
+                      <div className="bg-gradient-to-r from-teal-500 to-cyan-500 p-5 rounded-2xl text-white mb-4">
+                        <div className="flex justify-between items-center">
+                          <div>
+                            <span className="font-medium text-sm opacity-90">{weight}kg × 3€/kg</span>
+                            <p className="font-bold mt-1">PRIX KILOLAB</p>
+                          </div>
+                          <span className="text-4xl font-black">{kilolabPrice}€</span>
+                        </div>
+                      </div>
+
+                      {/* Économies */}
+                      <div className="bg-white p-5 rounded-2xl border-2 border-teal-300 shadow-lg">
+                        <p className="text-teal-600 font-bold text-sm text-center mb-3">🎉 VOS ÉCONOMIES</p>
+                        <div className="grid grid-cols-2 gap-4">
+                          <div className="text-center bg-teal-50 rounded-xl p-3">
+                            <p className="text-3xl font-black text-teal-600">{(diyTotalCost - kilolabPrice).toFixed(0)}€</p>
+                            <p className="text-xs text-slate-600 font-medium">économisés</p>
+                          </div>
+                          <div className="text-center bg-teal-50 rounded-xl p-3">
+                            <p className="text-3xl font-black text-teal-600">{timeSaved}h</p>
+                            <p className="text-xs text-slate-600 font-medium">récupérées</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </AnimateOnScroll>
               </div>
 
-              {/* Bottom highlight */}
-              <div className="mt-12 text-center">
-                <div className="inline-flex items-center gap-4 bg-gradient-to-r from-teal-600 to-cyan-600 text-white px-8 py-5 rounded-2xl">
-                  <Sparkles size={24} />
-                  <div className="text-left">
-                    <p className="font-heading font-bold text-lg">Le vrai coût, c'est votre temps</p>
-                    <p className="text-teal-100 text-sm">
-                      Pour seulement <strong className="text-white">{(kilolabPrice - diyMaterialTotal).toFixed(2)}€ de plus</strong>, vous récupérez{" "}
-                      <strong className="text-white">{timeSaved}h de vie</strong>
-                    </p>
-                  </div>
+              {/* CTA */}
+              <AnimateOnScroll delay={300}>
+                <div className="mt-12 text-center">
+                  <Link
+                    to="/new-order"
+                    data-testid="choose-kilolab-btn"
+                    className="inline-flex items-center gap-3 px-10 py-5 bg-gradient-to-r from-teal-600 to-cyan-600 text-white rounded-2xl font-bold text-lg hover:shadow-2xl transition-all hover:scale-105 active:scale-95"
+                  >
+                    <span>Économiser {(diyTotalCost - kilolabPrice).toFixed(0)}€ maintenant</span>
+                    <ArrowRight size={20} />
+                  </Link>
+                  <p className="text-sm text-slate-500 mt-4">Première commande ? Profitez de -20% avec le code BIENVENUE</p>
                 </div>
-              </div>
+              </AnimateOnScroll>
             </div>
           </div>
         </section>
