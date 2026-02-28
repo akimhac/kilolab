@@ -30,7 +30,7 @@ export default function Landing() {
   const [weight, setWeight] = useState(5);
   const [reduceMotion, setReduceMotion] = useState(false);
 
-  const HERO_VIDEO_MP4 = "https://videos.pexels.com/video-files/3205636/3205636-hd_1920_1080_25fps.mp4";
+  const HERO_VIDEO_MP4 = "https://cdn.coverr.co/videos/coverr-clothes-being-washed-in-a-laundry-machine-1674/1080p.mp4";
   const HERO_POSTER = "https://images.unsplash.com/photo-1582735689369-4fe89db7114c?q=80&w=2400&auto=format&fit=crop";
 
   useEffect(() => {
