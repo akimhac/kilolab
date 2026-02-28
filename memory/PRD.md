@@ -14,51 +14,44 @@ Le 1er service de laverie à domicile en France. Marketplace connectant les clie
 
 ## Implémenté
 
+### Sprint 6 - Refonte Admin Dashboard Dark Theme (28/02/2026)
+- [x] **Admin Dashboard Dark Theme** : Background slate-900, glass-morphism cards (bg-white/5 backdrop-blur)
+- [x] **Stats Cards Modernisées** : Gradients teal/cyan, emerald/blue/violet/orange accents
+- [x] **Navigation Tabs Pills** : Design moderne avec pills rounded, gradients actifs
+- [x] **Tables Dark Theme** : Toutes les tables (Partners, Washers, Clients, Orders, Messages, Logs, Coupons)
+- [x] **Modales Dark Theme** : Partner Modal et Washer Modal avec bg-slate-800
+- [x] **B2B Tab Modernisé** : API Keys section violet gradient, partners list dark
+- [x] Tests E2E : **28/28 pass** - Admin login dark + toutes les features
+
 ### Sprint 5 - Connexion données réelles (28/02/2026)
 - [x] **Compteur Live Washers** : Connecté à Supabase (washers créés aujourd'hui + pending)
 - [x] **GPS Navigation** : Connecté aux vraies commandes Supabase avec fallback mock
-- [x] **Heatmap Admin** : Déjà connectée aux commandes Supabase
-- [x] Tests E2E : **21/21 pass** - Compteur + GPS + Traductions
+- [x] **Heatmap Admin** : Connectée aux commandes Supabase avec Leaflet
 
 ### Sprint 4 - Traductions complètes + Vidéo (28/02/2026)
-- [x] **FAQ traduite** : useTranslation hook avec 12 questions/réponses FR/EN
-- [x] **Contact traduit** : Formulaire, cartes info (Email, Horaires, Zone) FR/EN
-- [x] **Tarifs traduit** : Pricing cards, comparatif, FAQ tarifs FR/EN
-- [x] **Vidéo HTML5** : Remplacé iframe YouTube par vidéo Coverr.co gratuite
-- [x] Tests E2E : **19/19 pass** - Traductions FR/EN + navigation + vidéo
+- [x] **FAQ/Contact/Tarifs traduits** : i18next FR/EN complet
+- [x] **Vidéo HTML5** : Stock gratuite Coverr.co sur landing
 
 ### Sprint 3 - Features avancées (28/02/2026)
-- [x] **Compteur live** : "[X] Washers se sont inscrits aujourd'hui" sur BecomeWasher
-- [x] **Vidéo embarquée** : Section sur la landing avec vidéo stock gratuite
-- [x] **Heatmap** : Onglet dans Admin Dashboard avec carte Leaflet
-- [x] **B2B / API** : Onglet Admin avec gestion partenaires, clés API, docs, stats
-- [x] **Navigation GPS** : Page /washer-gps avec Google Maps/Apple Maps natif (gratuit)
+- [x] **Heatmap** : Onglet Admin Dashboard avec carte Leaflet
+- [x] **B2B / API** : Onglet Admin avec gestion partenaires, clés API
+- [x] **Navigation GPS** : Page /washer-gps avec Google Maps/Apple Maps natif
 
 ### Sprint 2 - Refonte BecomeWasher (28/02/2026)
-- [x] Hero immersif dark "Votre machine tourne. Votre compte aussi."
-- [x] Simulateur de revenus interactif (10-100kg)
-- [x] Témoignages Washers + CTA final gradient
-- [x] Formulaire 3 étapes dark premium
+- [x] Hero immersif dark + Simulateur revenus + Témoignages
 
 ### Sprint 1 - Bug Fix & Traductions (28/02/2026)
-- [x] Traductions i18next sur 8 composants majeurs (~280 clés FR/EN)
-- [x] Fix Logo "Kilolab" visible sur toutes les pages
-- [x] Refonte Landing : Social Proof, Comparateur Coûts, CTA
-
-### Features existantes
-- [x] Chat, Parrainage, Admin Heatmap, Push Notifications, Dark Mode
-- [x] Analytics avancés, Playwright setup
+- [x] Traductions i18next + Fix Logo + Refonte Landing
 
 ## Tests
-- iteration_7.json: **100%** (21 tests) — Compteur Live + GPS + Sprint final
+- iteration_8.json: **100%** (28 tests) — Admin Dashboard dark theme + Features
+- iteration_7.json: 100% (21 tests) — Compteur Live + GPS
 - iteration_6.json: 100% (19 tests) — Traductions + Vidéo
-- iteration_5.json: 100% (17 tests) — BecomeWasher redesign
 
 ## Backlog
 
 ### P1
-- [ ] B2B : CRUD partenaires avec vrais appels API
-- [ ] Refonte visuelle Admin Dashboard (design moderne)
+- [ ] B2B : CRUD partenaires avec vrais appels API (actuellement mock data)
 
 ### P2
 - [ ] App mobile React Native séparée
