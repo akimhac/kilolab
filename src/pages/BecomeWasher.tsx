@@ -210,18 +210,7 @@ export default function BecomeWasher() {
             </section>
 
             {/* ═══════════ LIVE COUNTER ═══════════ */}
-            <section className="py-4 bg-[#0d1424] border-b border-white/5">
-              <div className="max-w-6xl mx-auto px-4 flex items-center justify-center gap-3">
-                <span className="relative flex h-3 w-3">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-                  <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-400" />
-                </span>
-                <p className="text-slate-400 text-sm">
-                  <strong className="text-emerald-400">{Math.floor(Math.random() * 8) + 5} Washers</strong> se sont inscrits aujourd'hui &middot;
-                  <strong className="text-white"> {Math.floor(Math.random() * 15) + 20} candidatures</strong> en cours de validation
-                </p>
-              </div>
-            </section>
+            <LiveWashersSection />
 
             {/* ═══════════ WHY BECOME A WASHER ═══════════ */}
             <section className="py-24 bg-[#0a0f1a] relative overflow-hidden">
