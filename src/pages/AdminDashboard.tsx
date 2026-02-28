@@ -1697,85 +1697,156 @@ export default function AdminDashboard() {
                   <h3 className="text-2xl font-bold flex items-center gap-2 text-white">
                     <Database size={20} className="text-violet-400" /> Partenaires B2B & API
                   </h3>
-                  <button className="px-4 py-2 bg-violet-500 text-white rounded-xl font-bold text-sm hover:bg-violet-600 transition flex items-center gap-2">
+                  <button 
+                    onClick={() => setShowB2BModal(true)}
+                    className="px-4 py-2 bg-violet-500 text-white rounded-xl font-bold text-sm hover:bg-violet-600 transition flex items-center gap-2"
+                  >
                     <Plus size={16} /> Nouveau partenaire
                   </button>
                 </div>
 
-                {/* API Keys Management */}
+                {/* API Info Box */}
                 <div className="bg-gradient-to-r from-violet-600 to-purple-600 rounded-2xl p-8 text-white relative overflow-hidden">
                   <div className="absolute top-0 right-0 w-40 h-40 bg-white/10 rounded-full blur-[60px]" />
                   <h4 className="text-xl font-bold mb-2 relative">API Kilolab B2B</h4>
-                  <p className="text-violet-200 mb-6 text-sm relative">Intégrez Kilolab dans vos applications avec notre API REST.</p>
-                  <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 mb-4 relative">
-                    <div className="flex justify-between items-center">
-                      <div>
-                        <p className="text-xs text-violet-200 uppercase tracking-wider">Clé API Production</p>
-                        <code className="text-sm font-mono text-white mt-1 block">kb_live_••••••••••••••••3f9a</code>
-                      </div>
-                      <button className="px-3 py-1.5 bg-white/20 hover:bg-white/30 rounded-lg text-xs font-bold transition">Copier</button>
+                  <p className="text-violet-200 mb-6 text-sm relative">Intégrez Kilolab dans vos applications avec notre API REST. Chaque partenaire reçoit sa propre clé API.</p>
+                  <div className="grid md:grid-cols-4 gap-4 relative">
+                    <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 text-center">
+                      <p className="text-3xl font-black">{b2bPartners.length}</p>
+                      <p className="text-xs text-violet-200">Partenaires</p>
                     </div>
-                  </div>
-                  <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 relative">
-                    <div className="flex justify-between items-center">
-                      <div>
-                        <p className="text-xs text-violet-200 uppercase tracking-wider">Clé API Test</p>
-                        <code className="text-sm font-mono text-white mt-1 block">kb_test_••••••••••••••••7b2e</code>
-                      </div>
-                      <button className="px-3 py-1.5 bg-white/20 hover:bg-white/30 rounded-lg text-xs font-bold transition">Copier</button>
+                    <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 text-center">
+                      <p className="text-3xl font-black">{b2bPartners.reduce((sum, p) => sum + (p.api_calls || 0), 0).toLocaleString()}</p>
+                      <p className="text-xs text-violet-200">Appels API / mois</p>
+                    </div>
+                    <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 text-center">
+                      <p className="text-3xl font-black">{b2bPartners.reduce((sum, p) => sum + (p.monthly_revenue || 0), 0).toFixed(0)}€</p>
+                      <p className="text-xs text-violet-200">Revenus B2B</p>
+                    </div>
+                    <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 text-center">
+                      <p className="text-3xl font-black">99.9%</p>
+                      <p className="text-xs text-violet-200">Uptime API</p>
                     </div>
                   </div>
                 </div>
 
-                {/* B2B Partners List */}
+                {/* B2B Partners List - CRUD */}
                 <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl overflow-hidden">
                   <div className="p-6 border-b border-white/10">
-                    <h4 className="font-bold text-lg text-white">Partenaires actifs</h4>
-                    <p className="text-sm text-slate-400">Entreprises utilisant l'API Kilolab</p>
+                    <h4 className="font-bold text-lg text-white">Partenaires B2B</h4>
+                    <p className="text-sm text-slate-400">{b2bPartners.length} entreprises enregistrées</p>
                   </div>
-                  <div className="divide-y divide-white/5">
-                    {[
-                      { name: "CleanCorp SAS", plan: "Enterprise", calls: "12,847", status: "active", revenue: "4,230€" },
-                      { name: "HôtelGroup", plan: "Business", calls: "8,392", status: "active", revenue: "2,810€" },
-                      { name: "AirBnB Cleaning", plan: "Starter", calls: "2,156", status: "active", revenue: "890€" },
-                      { name: "CoWork Spaces", plan: "Business", calls: "945", status: "trial", revenue: "0€" },
-                    ].map((p, i) => (
-                      <div key={i} className="p-4 flex items-center justify-between hover:bg-white/5 transition">
-                        <div className="flex items-center gap-4">
-                          <div className="w-10 h-10 bg-violet-500/20 rounded-xl flex items-center justify-center text-violet-400 font-bold text-sm">{p.name[0]}</div>
-                          <div>
-                            <p className="font-bold text-white">{p.name}</p>
-                            <p className="text-xs text-slate-400">{p.calls} appels API / mois</p>
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-4">
-                          <span className={`px-2.5 py-1 rounded-full text-xs font-bold ${p.plan === 'Enterprise' ? 'bg-violet-500/20 text-violet-400' : p.plan === 'Business' ? 'bg-teal-500/20 text-teal-400' : 'bg-white/10 text-slate-400'}`}>{p.plan}</span>
-                          <span className={`px-2.5 py-1 rounded-full text-xs font-bold ${p.status === 'active' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-orange-500/20 text-orange-400'}`}>{p.status === 'active' ? 'Actif' : 'Essai'}</span>
-                          <span className="font-bold text-white min-w-[70px] text-right">{p.revenue}</span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* API Stats */}
-                <div className="grid md:grid-cols-4 gap-4">
-                  <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6 text-center">
-                    <p className="text-3xl font-black text-violet-400">24,340</p>
-                    <p className="text-sm text-slate-400 mt-1">Appels API / mois</p>
-                  </div>
-                  <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6 text-center">
-                    <p className="text-3xl font-black text-teal-400">4</p>
-                    <p className="text-sm text-slate-400 mt-1">Partenaires</p>
-                  </div>
-                  <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6 text-center">
-                    <p className="text-3xl font-black text-emerald-400">7,930€</p>
-                    <p className="text-sm text-slate-400 mt-1">Revenus B2B / mois</p>
-                  </div>
-                  <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6 text-center">
-                    <p className="text-3xl font-black text-orange-400">99.7%</p>
-                    <p className="text-sm text-slate-400 mt-1">Uptime API</p>
-                  </div>
+                  
+                  {b2bPartners.length === 0 ? (
+                    <div className="p-12 text-center">
+                      <Database size={48} className="mx-auto mb-4 text-slate-500" />
+                      <p className="text-slate-400 mb-4">Aucun partenaire B2B</p>
+                      <button 
+                        onClick={() => setShowB2BModal(true)}
+                        className="px-4 py-2 bg-violet-500 text-white rounded-xl font-bold text-sm hover:bg-violet-600 transition"
+                      >
+                        Ajouter le premier partenaire
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="overflow-x-auto">
+                      <table className="w-full">
+                        <thead className="bg-white/5 border-b border-white/10">
+                          <tr>
+                            <th className="text-left p-4 font-bold text-sm text-slate-400">Entreprise</th>
+                            <th className="text-left p-4 font-bold text-sm text-slate-400">Plan</th>
+                            <th className="text-left p-4 font-bold text-sm text-slate-400">Statut</th>
+                            <th className="text-left p-4 font-bold text-sm text-slate-400">Clé API</th>
+                            <th className="text-left p-4 font-bold text-sm text-slate-400">Appels</th>
+                            <th className="text-left p-4 font-bold text-sm text-slate-400">Revenus</th>
+                            <th className="text-left p-4 font-bold text-sm text-slate-400">Actions</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {b2bPartners.map((partner) => (
+                            <tr key={partner.id} className="border-b border-white/5 hover:bg-white/5 transition">
+                              <td className="p-4">
+                                <div className="flex items-center gap-3">
+                                  <div className="w-10 h-10 bg-violet-500/20 rounded-xl flex items-center justify-center text-violet-400 font-bold">
+                                    {partner.name[0]}
+                                  </div>
+                                  <div>
+                                    <p className="font-bold text-white">{partner.name}</p>
+                                    <p className="text-xs text-slate-400">{partner.email}</p>
+                                  </div>
+                                </div>
+                              </td>
+                              <td className="p-4">
+                                <span className={`px-3 py-1 rounded-full text-xs font-bold ${
+                                  partner.plan === 'enterprise' ? 'bg-violet-500/20 text-violet-400' :
+                                  partner.plan === 'business' ? 'bg-teal-500/20 text-teal-400' :
+                                  'bg-white/10 text-slate-400'
+                                }`}>
+                                  {partner.plan}
+                                </span>
+                              </td>
+                              <td className="p-4">
+                                <button 
+                                  onClick={() => toggleB2BStatus(partner)}
+                                  className={`px-3 py-1 rounded-full text-xs font-bold cursor-pointer transition ${
+                                    partner.status === 'active' ? 'bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30' :
+                                    partner.status === 'trial' ? 'bg-orange-500/20 text-orange-400 hover:bg-orange-500/30' :
+                                    'bg-red-500/20 text-red-400 hover:bg-red-500/30'
+                                  }`}
+                                >
+                                  {partner.status}
+                                </button>
+                              </td>
+                              <td className="p-4">
+                                <div className="flex items-center gap-2">
+                                  <code className="text-xs font-mono text-slate-300 bg-white/5 px-2 py-1 rounded">
+                                    {partner.api_key?.slice(0, 12)}...
+                                  </code>
+                                  <button
+                                    onClick={() => {
+                                      navigator.clipboard.writeText(partner.api_key);
+                                      toast.success("Clé copiée !");
+                                    }}
+                                    className="p-1 hover:bg-white/10 rounded transition text-slate-400 hover:text-white"
+                                    title="Copier"
+                                  >
+                                    <FileText size={14} />
+                                  </button>
+                                  <button
+                                    onClick={() => regenerateApiKey(partner)}
+                                    className="p-1 hover:bg-white/10 rounded transition text-slate-400 hover:text-orange-400"
+                                    title="Régénérer"
+                                  >
+                                    <RefreshCw size={14} />
+                                  </button>
+                                </div>
+                              </td>
+                              <td className="p-4 text-sm text-slate-300">{(partner.api_calls || 0).toLocaleString()}</td>
+                              <td className="p-4 font-bold text-emerald-400">{(partner.monthly_revenue || 0).toFixed(0)}€</td>
+                              <td className="p-4">
+                                <div className="flex gap-2">
+                                  <button
+                                    onClick={() => setEditingB2B(partner)}
+                                    className="p-2 bg-blue-500/20 text-blue-400 rounded-lg hover:bg-blue-500/30 transition"
+                                    title="Modifier"
+                                  >
+                                    <FileText size={16} />
+                                  </button>
+                                  <button
+                                    onClick={() => deleteB2BPartner(partner.id)}
+                                    className="p-2 bg-red-500/20 text-red-400 rounded-lg hover:bg-red-500/30 transition"
+                                    title="Supprimer"
+                                  >
+                                    <Trash2 size={16} />
+                                  </button>
+                                </div>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
                 </div>
 
                 {/* API Documentation */}
