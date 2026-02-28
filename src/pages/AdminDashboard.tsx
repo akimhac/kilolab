@@ -1700,40 +1700,40 @@ export default function AdminDashboard() {
         </div>
       )}
       {showWasherModal && selectedWasher && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-3xl p-8 max-w-4xl w-full max-h-[90vh] overflow-y-auto relative shadow-2xl">
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-slate-800 border border-white/10 rounded-3xl p-8 max-w-4xl w-full max-h-[90vh] overflow-y-auto relative shadow-2xl">
             <button
               onClick={() => setShowWasherModal(false)}
-              className="absolute top-6 right-6 p-2 bg-slate-100 rounded-full hover:bg-slate-200 transition"
+              className="absolute top-6 right-6 p-2 bg-white/10 rounded-full hover:bg-white/20 transition text-white"
             >
               <X size={20} />
             </button>
 
             <div className="flex items-center gap-4 mb-8">
-              <div className="w-16 h-16 bg-gradient-to-br from-blue-400 to-indigo-500 rounded-2xl flex items-center justify-center text-white text-2xl font-bold shadow-lg">
+              <div className="w-16 h-16 bg-gradient-to-br from-teal-400 to-cyan-500 rounded-2xl flex items-center justify-center text-white text-2xl font-bold shadow-lg">
                 {(selectedWasher.full_name || "?").charAt(0).toUpperCase()}
               </div>
               <div className="flex flex-col gap-2">
-                <h2 className="text-3xl font-black text-slate-900">{selectedWasher.full_name || "Sans nom"}</h2>
+                <h2 className="text-3xl font-black text-white">{selectedWasher.full_name || "Sans nom"}</h2>
 
                 <div className="flex gap-2 flex-wrap">
                   <span
                     className={`text-xs px-3 py-1 rounded-full font-bold ${
                       selectedWasher.status === "approved"
-                        ? "bg-green-100 text-green-700"
+                        ? "bg-emerald-500/20 text-emerald-400"
                         : selectedWasher.status === "pending"
-                        ? "bg-orange-100 text-orange-700"
-                        : "bg-red-100 text-red-700"
+                        ? "bg-orange-500/20 text-orange-400"
+                        : "bg-red-500/20 text-red-400"
                     }`}
                   >
-                    {selectedWasher.status === "approved" && "✅ Approuvé"}
-                    {selectedWasher.status === "pending" && "⏳ En attente"}
-                    {selectedWasher.status === "rejected" && "❌ Rejeté"}
+                    {selectedWasher.status === "approved" && "Approuvé"}
+                    {selectedWasher.status === "pending" && "En attente"}
+                    {selectedWasher.status === "rejected" && "Rejeté"}
                   </span>
 
                   {selectedWasher.is_blocked && (
                     <span className="text-xs px-3 py-1 rounded-full font-bold bg-red-600 text-white">
-                      🚫 BLOQUÉ
+                      BLOQUÉ
                     </span>
                   )}
                 </div>
@@ -1742,51 +1742,51 @@ export default function AdminDashboard() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               <div className="space-y-6">
-                <div className="bg-slate-50 p-6 rounded-2xl border">
-                  <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
-                    <Users size={18} className="text-blue-600" /> Informations personnelles
+                <div className="bg-white/5 p-6 rounded-2xl border border-white/10">
+                  <h3 className="text-lg font-bold mb-4 flex items-center gap-2 text-white">
+                    <Users size={18} className="text-teal-400" /> Informations personnelles
                   </h3>
                   <div className="space-y-3">
                     <div className="flex justify-between">
-                      <span className="text-slate-500">Email</span>
-                      <span className="font-medium">{selectedWasher.email}</span>
+                      <span className="text-slate-400">Email</span>
+                      <span className="font-medium text-white">{selectedWasher.email}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-slate-500">Téléphone</span>
-                      <span className="font-medium">{selectedWasher.phone}</span>
+                      <span className="text-slate-400">Téléphone</span>
+                      <span className="font-medium text-white">{selectedWasher.phone}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-slate-500">Ville</span>
-                      <span className="font-medium">{selectedWasher.city}</span>
+                      <span className="text-slate-400">Ville</span>
+                      <span className="font-medium text-white">{selectedWasher.city}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-slate-500">Code postal</span>
-                      <span className="font-medium">{selectedWasher.postal_code}</span>
+                      <span className="text-slate-400">Code postal</span>
+                      <span className="font-medium text-white">{selectedWasher.postal_code}</span>
                     </div>
                     <div className="flex justify-between gap-4">
-                      <span className="text-slate-500">Adresse</span>
-                      <span className="font-medium text-right">{selectedWasher.address || "Non renseignée"}</span>
+                      <span className="text-slate-400">Adresse</span>
+                      <span className="font-medium text-right text-white">{selectedWasher.address || "Non renseignée"}</span>
                     </div>
                   </div>
                 </div>
 
                 {selectedWasher?.is_blocked && (
-                  <div className="bg-red-50 border-2 border-red-200 p-6 rounded-2xl">
-                    <h3 className="text-lg font-bold mb-4 flex items-center gap-2 text-red-700">
+                  <div className="bg-red-500/10 border border-red-500/30 p-6 rounded-2xl">
+                    <h3 className="text-lg font-bold mb-4 flex items-center gap-2 text-red-400">
                       <AlertCircle size={18} /> Washer bloqué
                     </h3>
 
                     <div className="space-y-3">
                       <div className="flex justify-between gap-4">
-                        <span className="text-slate-500">Raison</span>
-                        <span className="font-bold text-red-700 text-right">
+                        <span className="text-slate-400">Raison</span>
+                        <span className="font-bold text-red-400 text-right">
                           {selectedWasher.blocked_reason || "Non spécifiée"}
                         </span>
                       </div>
 
                       <div className="flex justify-between">
-                        <span className="text-slate-500">Bloqué le</span>
-                        <span className="font-medium">
+                        <span className="text-slate-400">Bloqué le</span>
+                        <span className="font-medium text-white">
                           {selectedWasher.blocked_at ? new Date(selectedWasher.blocked_at).toLocaleDateString("fr-FR") : "-"}
                         </span>
                       </div>
@@ -1796,14 +1796,14 @@ export default function AdminDashboard() {
               </div>
 
               <div className="space-y-6">
-                <div className="bg-slate-50 p-6 rounded-2xl border">
-                  <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
-                    <Calendar size={18} className="text-blue-600" /> Inscription
+                <div className="bg-white/5 p-6 rounded-2xl border border-white/10">
+                  <h3 className="text-lg font-bold mb-4 flex items-center gap-2 text-white">
+                    <Calendar size={18} className="text-teal-400" /> Inscription
                   </h3>
                   <div className="space-y-3">
                     <div className="flex justify-between">
-                      <span className="text-slate-500">Date d'inscription</span>
-                      <span className="font-medium">
+                      <span className="text-slate-400">Date d'inscription</span>
+                      <span className="font-medium text-white">
                         {new Date(selectedWasher.created_at).toLocaleDateString("fr-FR", {
                           day: "numeric",
                           month: "long",
@@ -1816,10 +1816,10 @@ export default function AdminDashboard() {
               </div>
             </div>
 
-            <div className="mt-8 pt-6 border-t flex justify-end gap-3 flex-wrap">
+            <div className="mt-8 pt-6 border-t border-white/10 flex justify-end gap-3 flex-wrap">
               <button
                 onClick={() => setShowWasherModal(false)}
-                className="px-6 py-3 bg-white border rounded-xl font-bold text-slate-600 hover:bg-slate-50"
+                className="px-6 py-3 bg-white/10 border border-white/10 rounded-xl font-bold text-white hover:bg-white/20 transition"
               >
                 Fermer
               </button>
@@ -1828,15 +1828,15 @@ export default function AdminDashboard() {
                 <>
                   <button
                     onClick={() => rejectWasher(selectedWasher.id)}
-                    className="px-6 py-3 bg-red-50 text-red-600 border border-red-100 rounded-xl font-bold hover:bg-red-100"
+                    className="px-6 py-3 bg-red-500/20 text-red-400 border border-red-500/30 rounded-xl font-bold hover:bg-red-500/30 transition"
                   >
-                    ❌ Rejeter
+                    Rejeter
                   </button>
                   <button
                     onClick={() => approveWasher(selectedWasher.id)}
-                    className="px-6 py-3 bg-teal-600 text-white rounded-xl font-bold hover:bg-teal-700 shadow-lg"
+                    className="px-6 py-3 bg-teal-500 text-white rounded-xl font-bold hover:bg-teal-600 shadow-lg shadow-teal-500/30 transition"
                   >
-                    ✅ Approuver
+                    Approuver
                   </button>
                 </>
               )}
@@ -1844,9 +1844,9 @@ export default function AdminDashboard() {
               {selectedWasher.status === "approved" && !selectedWasher.is_blocked && (
                 <button
                   onClick={() => blockWasher(selectedWasher.id)}
-                  className="px-6 py-3 bg-orange-600 text-white rounded-xl font-bold hover:bg-orange-700 shadow-lg"
+                  className="px-6 py-3 bg-orange-500 text-white rounded-xl font-bold hover:bg-orange-600 shadow-lg shadow-orange-500/30 transition"
                 >
-                  🚫 Bloquer ce Washer
+                  Bloquer ce Washer
                 </button>
               )}
 
