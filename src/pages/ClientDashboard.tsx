@@ -1,4 +1,5 @@
 import { useEffect, useState, useCallback, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { supabase } from '../lib/supabase';
 import Navbar from '../components/Navbar';
 import { FadeInOnScroll, StaggerChildren, CountUp } from '../components/animations/ScrollAnimations';
