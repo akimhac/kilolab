@@ -65,7 +65,7 @@
   "context_for_next_testing_agent": "i18n translations fully tested on FAQ, Contact, Tarifs pages. Video section on Landing page verified with HTML5 video from Coverr.co. Language switching between FR and EN working via flag button in navbar. All navigation links from navbar functional. Admin Dashboard Heatmap testing was mentioned but not tested in this iteration as it requires authentication.",
 
   "testing_environment": {
-    "server": "Vite preview on https://gps-navigation-4.preview.emergentagent.com",
+    "server": "Vite preview on https://laundry-alerts.preview.emergentagent.com",
     "framework": "React 18 + TypeScript + Vite",
     "styling": "TailwindCSS",
     "i18n": "react-i18next (FR default, EN available)",

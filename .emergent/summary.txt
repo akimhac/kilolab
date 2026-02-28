@@ -1,249 +1,149 @@
 <analysis>**original_problem_statement:**
-The user provided an existing laundry marketplace project with the goal of elevating it to a professional standard comparable to Uber or Airbnb. The initial requests included a full project evaluation and fixing critical issues. The scope then expanded to include a massive list of advanced features (AI estimations, B2B API, real-time tracking, loyalty programs, multi-language, dark mode, etc.) to outperform competitors. The most recent user request is a major pivot away from new features towards fixing a long list of bugs and performing a significant UI/UX overhaul across the entire application, as they are dissatisfied with the current state of the design and functionality.
+The user's initial goal was a professional-grade laundry marketplace. After extensive UI/UX improvements, the focus shifted to operational features. The current, most urgent request is to address a critical business problem: the user received an order in an area with no available washers and was not alerted.
+
+The user wants to:
+1.  Receive email alerts for all new user registrations.
+2.  Receive email alerts for all new orders.
+3.  Be able to cancel an order from the Admin Dashboard.
+4.  Be able to send a custom message to the client when canceling the order, directly from the Admin Dashboard.
 
 PRODUCT REQUIREMENTS are tracked in .
 
 **User's preferred language**: French. The next agent MUST respond in French.
 
 **what currently exists?**
-The application is a full-stack laundry marketplace built with a React/Vite/TypeScript frontend and a Supabase backend. Logic is handled by Vercel Serverless Functions.
+The application is a full-stack laundry marketplace using a React/Vite/TypeScript frontend and a Supabase backend, with Vercel Serverless Functions.
 
-In this session, a vast number of features were added in rapid succession:
--   **Core Features**: Chat, Referral System, Admin Heatmap (Leaflet), complete Firebase Push Notification setup, i18next for multi-language, and a full Dark Mode implementation.
--   **Advanced Features**: Components for real-time Washer GPS tracking and an advanced analytics dashboard (Funnels, Retention, Cohorts).
--   **Backend**: SQL scripts were created for push notifications and GPS tracking. An SQL bug related to  vs  was fixed.
--   **Testing**: Playwright was installed and configured for E2E testing, but no actual tests were written.
-
-Despite this, the user is highly dissatisfied. Many newly added features are not properly integrated, the translation system is not being used, and there are numerous UI bugs and design flaws.
+The previous agent successfully completed a massive feature sprint, including:
+-   **Full Translation**: Implemented  on the , , and  pages.
+-   **Live Data Integration**: Connected the , , and  features to the Supabase backend to display real data.
+-   **Admin Dashboard Overhaul**: Executed a complete visual redesign to a modern, premium dark theme and implemented full CRUD functionality for B2B partners.
+-   **Landing Page**: Embedded a working, free stock video.
+-   **Technical Debt**: Resolved React Router v7 console warnings.
+-   **Testing**: All new features were validated with an extensive Playwright E2E test suite (), which passed with 100% success.
 
 **Last working item**:
--   **Last item agent was working**: The agent began addressing a large list of user-reported bugs and UI/UX issues from message #167. It started by refactoring the landing page, creating new  and  components to replace the unpopular existing ones. The agent was about to fix a responsive layout issue with the Comment ça marche section title in .
+-   **Last item agent was working**: Implementing the user's request for admin email alerts and an order cancellation system. The agent began by creating a new Vercel serverless function () to handle sending emails via Resend and started adding the required UI and state management to the  component.
 -   **Status**: IN PROGRESS
 -   **Agent Testing Done**: N
--   **Which testing method agent to use?**: screenshot tool. After fixing each UI issue, use the screenshot tool to verify the visual changes on both desktop and mobile views. Once the entire list of fixes is complete, a full frontend test by the testing agent is recommended.
+-   **Which testing method agent to use?**:
+    1.  **Backend**: Test the  endpoint using .
+    2.  **Frontend**: Use the  tool to verify the new cancellation UI in the Admin Dashboard.
+    3.  **E2E**: Call the  to run a full regression test and validate the new end-to-end flow: create an order, log in as admin, cancel the order with a message, and verify the order status is updated in the database.
 -   **User Testing Done**: N
 
 **All Pending/In progress Issue list**:
-This list is derived from the user's detailed feedback in message #167 and is the highest priority.
-
--   **Issue 1**: **(P0) Non-functional Translation**: The i18next framework is installed, but no components are using it. All user-facing text needs to be wrapped in the translation function ().
--   **Issue 2**: **(P0) Broken UI Elements**:
-    -   The site logo is partially cut off/hidden.
-    -   On mobile, the Comment ça marche section title is not fully visible.
--   **Issue 3**: **(P0) Disconnected Features**: The user complained that newly created pages/features are not accessible. All new views (Advanced Analytics, Referral tab, Settings options, etc.) must be linked from buttons, navigation bars, or other UI elements.
--   **Issue 4**: **(P1) Major UI/UX Overhaul Needed**:
-    -   **Landing Page**: Replace Ils parlent de nous and fake reviews. Redesign the 4 squares component under the main headline.
-    -   **Admin Dashboard**: The user finds the design archaic and wants a complete redesign.
-    -   **Cost Comparator**: The comparator on the landing and Become a Washer pages needs to be redesigned to focus on financial savings, similar to the one on the  page.
--   **Issue 5**: **(P2) Add Video Content**: The user wants videos integrated into the landing page or other pages to improve engagement.
--   **Issue 6**: **(P0) CRITICAL SECURITY RISK (Recurring)**: An exposed Google API Key remains in the Git history. The user has repeatedly instructed the agent to ignore this, but it is a severe and unresolved vulnerability.
+-   **Issue 1**: **(P0) Implement Admin Alerts and Order Cancellation.** This is the current 
+wtmp begins Sat Feb 28 15:05:18 2026 and the user's top priority.
+-   **Issue 2**: **(P1) CRITICAL SECURITY RISK (Recurring)**. An exposed Google API Key remains in the Git history. The user has repeatedly instructed the agent to ignore this.
 
 **Issues Detail**:
--   **Issue 1: Non-functional Translation**
-    -   **Attempted fixes**: The i18next library was installed and configured in , and translation JSON files were created. However, the translation function was not applied to any component text.
+-   **Issue 1: Implement Admin Alerts and Order Cancellation**
+    -   **Attempted fixes**: The agent created a new file  and began modifying . The implementation is incomplete.
     -   **Next debug checklist**:
-        1.  Go through every component and page ( files in ).
-        2.  Import the  hook: .
-        3.  In each component, get the  function: .
-        4.  Replace all hardcoded strings with , e.g., change  to .
-        5.  Add all new keys to the translation files (, ).
-    -   **Why fix this issue and what will be achieved with the fix?**: This will make the multi-language feature, a major user request, actually work.
+        1.  **Correct the Alerting Strategy**: The current plan to trigger alerts from the frontend is flawed. Alerts for new signups/orders must be server-side. Create a Supabase Database Trigger (or Edge Function) that fires on new entries in the  and  tables. This trigger should then call the  Vercel function.
+        2.  **Complete Serverless Function**: Finish the logic in  to use the  SDK and send an email. Ensure the  and admin email address are pulled from environment variables.
+        3.  **Complete Admin Dashboard UI**: Finalize the cancellation modal in , including a  for the custom message and a Confirm Cancellation button.
+        4.  **Implement Cancellation Logic**: Implement the  function. It must:
+            a.  Call Supabase to update the order's status to .
+            b.  Call the  endpoint to send the cancellation confirmation and the admin's custom message to the client.
+    -   **Why fix this issue and what will be achieved with the fix?**: This will solve a critical operational failure, enabling the admin to get timely notifications and manage orders they cannot fulfill, which is essential for business viability and customer service.
     -   **Status**: IN PROGRESS
     -   **Is recurring issue?**: N
-    -   **Should Test frontend/backend/both after fix?**: frontend
+    -   **Should Test frontend/backend/both after fix?**: both
     -   **Blocked on other issue**: None
 
--   **Issue 6: Exposed Google API Key**
-    -   **Attempted fixes**: None in this session. The agent from a previous session noted the issue, but the current agent was instructed by the user to ignore it.
-    -   **Next debug checklist**: This cannot be fixed without user cooperation. The next agent should re-address this with the user, explaining the severe risk and the need to revoke the key and clean the git history.
-    -   **Why fix this issue and what will be achieved with the fix?**: Prevents fraudulent use of the user's Google Cloud account and potential financial loss.
+-   **Issue 2: Exposed Google API Key**
+    -   **Attempted fixes**: None. The user explicitly instructed the agent to ignore it in message #72.
+    -   **Next debug checklist**: Focus on the P0 task first. Once completed, re-address the severity of this risk with the user. A fix requires user approval to revoke the key and clean the git history. Do not proceed without consent.
+    -   **Why fix this issue and what will be achieved with the fix?**: To prevent fraudulent use of the user's Google Cloud account and avoid potentially significant financial loss.
     -   **Status**: NOT STARTED
     -   **Is recurring issue?**: Y
     -   **Should Test frontend/backend/both after fix?**: backend
     -   **Blocked on other issue**: User's approval.
 
 **In progress Task List**:
--   **Task 1: Complete UI/UX Refactor & Bug Fix Sprint (P0)**
-    -   **Where to resume**: Start by fixing the responsive styling for the title in .
-    -   **What will be achieved with this?**: This will address the user's entire list of grievances from message #167, which is the current blocker for project progress and user satisfaction.
+-   **Task 1: (P0) Complete Admin Alert and Order Cancellation Feature**
+    -   **Where to resume**: Refactor the alerting mechanism to be server-side (Supabase Trigger) and then complete the implementation of  and  as detailed in the issue checklist above.
+    -   **What will be achieved with this?**: A robust, automated notification system for the admin and an effective way to manage and communicate order cancellations.
     -   **Status**: IN PROGRESS
-    -   **Should Test frontend/backend/both after fix?**: frontend
+    -   **Should Test frontend/backend/both after fix?**: both
     -   **Blocked on something**: None.
 
 **Upcoming and Future Tasks**
--   **Upcoming Tasks**:
-    -   **(P1)** Write E2E Tests: Use the configured Playwright setup to write actual tests for key user flows (login, new order, registration).
-    -   **(P2)** Build B2B Admin Page: Create a UI for managing B2B partners and viewing their API keys.
-    -   **(P2)** Implement Heatmap Data: Connect the  component to the backend to display real order data instead of mock data.
 -   **Future Tasks**:
     -   **(P3)** Create a separate React Native project for a native mobile app.
 
 **Completed work in this session**
--   **Feature Integration**: Integrated  and  into the .
--   **Dark Mode**: Implemented a complete, toggleable dark mode system with a  and settings toggle.
--   **Multi-language**: Set up the  framework for FR/EN translations.
--   **New Features Coded**:
-    -   Admin Heatmap using Leaflet ().
-    -   Advanced Analytics dashboard components (, Funnel, Retention, Cohort charts).
-    -   Real-time washer GPS tracking map ().
--   **Push Notifications**: Finalized the Firebase setup (, , and SQL script).
--   **Testing Setup**: Installed and configured Playwright.
--   **Bug Fix**: Corrected an SQL error by replacing  with .
+-   **Admin Dashboard Redesign**: Complete visual overhaul to a premium dark theme.
+-   **B2B Partner Management**: Full CRUD functionality integrated into the admin dashboard.
+-   **Live Data Features**: Connected , , and  to the Supabase backend.
+-   **Translation**: Completed localization for , , and  pages.
+-   **Landing Page**: Fixed the broken video section by embedding a free stock video.
+-   **Technical Debt**: Resolved React Router v7  flag console warnings.
+-   **E2E Testing**: Successfully ran and updated the Playwright test suite after each major feature implementation.
 
 **Earlier issues found/mentioned but not fixed**
--   **Issue 1**: Exposed Google API Key in Git History. This is a critical, unresolved security failure that has been repeatedly ignored at the user's request.
+-   **Issue 1**: Exposed Google API Key in Git History. User is aware but has deferred the fix.
 
 **Known issue recurrence from previous fork**
 -   **Issue recurrence in previous fork**: Exposed Google API Key in Git history.
--   **Recurrence count**: 2+
+-   **Recurrence count**: 4+
 -   **Status**: NOT STARTED
 
 **Code Architecture**
 
 
 **Key Technical Concepts**
--   **Frontend**: React 18, TypeScript, Vite, TailwindCSS, **i18next**, **React-Leaflet**
--   **Backend**: Supabase (PostgreSQL, Auth, RLS)
+-   **Frontend**: React 18, TypeScript, Vite, TailwindCSS, i18next
+-   **Backend**: Supabase (PostgreSQL, Auth, Triggers/Edge Functions)
 -   **Serverless**: Vercel Serverless Functions
--   **Testing**: **Playwright** (setup complete, tests need writing)
--   **AI**: OpenAI GPT-4o (via Emergent LLM Key) for weight estimation.
+-   **Email**: Resend
+-   **Testing**: Playwright
 
 **key DB schema**
--   : 
--   :  (Note: The SQL used  type, ensure Supabase has PostGIS enabled).
--   : The agent discovered this table uses , not , to reference users.
+-   **orders**: This table will be updated by the new feature (setting  to 'cancelled').
+-   **users**: A trigger should be added to this table for new signup alerts.
 
 **All files of reference**
--   **User Feedback Driver**: User Message #167 is the new primary directive.
--   **Refactored Components**: ,  (newly created, need integration).
--   **Key Files for Bug Fixing**:
-    -    (for logo issue).
-    -    (for mobile title issue).
-    -   All  files (for applying translations).
-    -    (for design overhaul).
--   **New Feature Files**: , , , , .
+-   **Key Files for Current Task**:
+    -    (new, needs completion)
+    -    (needs UI/logic for cancellation)
+-   **Important related files**:
+    -   You will likely need to interact with the Supabase dashboard to create a database trigger or edge function.
+-   **Key Test File**:
+    -    (needs to be updated with a test for the new cancellation flow).
 
 **Critical Info for New Agent**
--   **PRIORITY SHIFT**: The user's focus has completely shifted from adding new features to fixing bugs and improving the UI/UX. Your primary goal is to work through the list in message #167. Do not propose new features.
--   **TRANSLATION IS KEY**: The highest-impact task is to apply the already-configured  framework across the entire application. This will fix a major broken feature.
--   **VERIFY INTEGRATIONS**: The user has complained that new features are not visible. As you fix UI issues, ensure that all pages and components created in the last session are correctly linked and accessible.
--   **SECURITY RISK**: The exposed Google API key is a critical issue. While the user has said to ignore it, it's your responsibility to be aware of the risk. You may want to gently remind the user about it once you have regained their trust by fixing the other issues.
--   **Vercel Project**: Remember this is a Vercel project. There is no . Test builds with yarn run v1.22.22
-$ vite build
-vite v5.4.21 building for production...
-transforming...
-✓ 3760 modules transformed.
-rendering chunks...
-computing gzip size...
-dist/registerSW.js                                0.13 kB
-dist/index.html                                  11.34 kB │ gzip:   3.73 kB
-dist/assets/OrderHeatmap-Dgihpmma.css            15.04 kB │ gzip:   6.38 kB
-dist/assets/index-DwUEEICG.css                  103.09 kB │ gzip:  15.17 kB
-dist/assets/ScanQR-qO7-1K4l.js                    0.43 kB │ gzip:   0.31 kB
-dist/assets/NotFound-B_MezVdr.js                  1.16 kB │ gzip:   0.54 kB
-dist/assets/ScrollAnimations-DKfQtoDP.js          1.22 kB │ gzip:   0.65 kB
-dist/assets/PaymentCancel-CfbG30n6.js             1.42 kB │ gzip:   0.66 kB
-dist/assets/PaymentSuccess-8Vqu_cLH.js            1.76 kB │ gzip:   0.82 kB
-dist/assets/SuperAccess-DJDx_TmC.js               1.77 kB │ gzip:   0.92 kB
-dist/assets/PartnerTerms-Bhtxh6to.js              2.29 kB │ gzip:   0.97 kB
-dist/assets/PartnerPending-TNDGaH5m.js            2.57 kB │ gzip:   1.00 kB
-dist/assets/SelectSignup-CunYXpKQ.js              3.19 kB │ gzip:   0.96 kB
-dist/assets/SelectDashboard-BnidKUIF.js           3.57 kB │ gzip:   1.10 kB
-dist/assets/PartnerGuide-Ca2k3hwx.js              4.03 kB │ gzip:   1.45 kB
-dist/assets/Skeleton-DIXf6IwZ.js                  4.80 kB │ gzip:   1.06 kB
-dist/assets/SetPassword-DBnAQYZ0.js               4.90 kB │ gzip:   1.94 kB
-dist/assets/Signup-6e3-JGfT.js                    5.30 kB │ gzip:   1.70 kB
-dist/assets/CityLanding-DIjBKWI-.js               7.28 kB │ gzip:   2.52 kB
-dist/assets/OrderTracking-B63yVYe-.js             7.46 kB │ gzip:   2.52 kB
-dist/assets/ConnectStripe-BavZeetL.js             8.03 kB │ gzip:   2.75 kB
-dist/assets/Referral-BQZhq40i.js                  8.18 kB │ gzip:   2.58 kB
-dist/assets/Trouver-DB3zFF1X.js                   9.27 kB │ gzip:   2.98 kB
-dist/assets/UserProfile-CfQQY34Z.js               9.57 kB │ gzip:   2.40 kB
-dist/assets/Invoice-KlfaOd_a.js                  10.05 kB │ gzip:   3.03 kB
-dist/assets/BecomePartner-BVSCBuHW.js            11.05 kB │ gzip:   3.58 kB
-dist/assets/AdvancedAnalytics-Y7Y4oKs7.js        11.94 kB │ gzip:   3.70 kB
-dist/assets/AdminAnalytics-s8HkSvaM.js           14.96 kB │ gzip:   4.10 kB
-dist/assets/Tarifs-MQQAfFSQ.js                   15.12 kB │ gzip:   3.55 kB
-dist/assets/PartnerLanding-BpQP_swE.js           16.41 kB │ gzip:   3.93 kB
-dist/assets/Settings-CiUGPNzK.js                 17.07 kB │ gzip:   4.71 kB
-dist/assets/purify.es-C_uT9hQ1.js                21.98 kB │ gzip:   8.74 kB
-dist/assets/BecomeWasher-cs7Ihe2t.js             22.98 kB │ gzip:   6.36 kB
-dist/assets/fr-nuPzQba1.js                       26.42 kB │ gzip:   7.34 kB
-dist/assets/WasherDashboard-C4K5506k.js          29.08 kB │ gzip:   7.72 kB
-dist/assets/NewOrder-BY4s9vik.js                 32.64 kB │ gzip:   8.34 kB
-dist/assets/PartnerDashboard-DvhtCZkr.js         37.27 kB │ gzip:  11.18 kB
-dist/assets/vendor-ui-DHmHhYC-.js                38.02 kB │ gzip:   7.46 kB
-dist/assets/jspdf.plugin.autotable-56uEmI4F.js   39.57 kB │ gzip:  12.78 kB
-dist/assets/AdminDashboard-3PCW2yGt.js           42.34 kB │ gzip:   9.51 kB
-dist/assets/ClientDashboard-BSU7uGNO.js          54.04 kB │ gzip:  13.20 kB
-dist/assets/index.esm2017-S3_db8hR.js            79.56 kB │ gzip:  14.81 kB
-dist/assets/index.es-DfPKhtZ3.js                150.62 kB │ gzip:  51.52 kB
-dist/assets/OrderHeatmap-_XqCg3Jl.js            162.82 kB │ gzip:  48.34 kB
-dist/assets/vendor-react-BqjHrY2m.js            163.52 kB │ gzip:  53.36 kB
-dist/assets/vendor-supabase-jY4wIOEF.js         174.15 kB │ gzip:  45.90 kB
-dist/assets/html2canvas.esm-CBrSDip1.js         201.42 kB │ gzip:  48.03 kB
-dist/assets/index-DvCbyCxt.js                   214.13 kB │ gzip:  61.78 kB
-dist/assets/jspdf.es.min-DDEuzCWL.js            357.81 kB │ gzip: 118.06 kB
-dist/assets/PickupQR-BjdL-l3Y.js                384.64 kB │ gzip: 113.42 kB
-dist/assets/PieChart-C96BKAof.js                411.25 kB │ gzip: 110.65 kB
-✓ built in 16.48s
-
-PWA v0.19.8
-mode      generateSW
-precache  57 entries (2895.76 KiB)
-files generated
-  dist/sw.js
-  dist/workbox-58bd4dca.js
-Done in 22.06s. and deployments are handled by Vercel.
+-   **Priority #1**: The user's most recent request for admin alerts and order cancellation is the absolute top priority (P0). It solves a real-world operational bottleneck for their business.
+-   **Correct the Alerting Strategy**: The agent's initial plan to trigger alerts from the frontend is incorrect. You **must** implement a server-side solution using Supabase Triggers or Edge Functions to ensure alerts are reliably sent for every new order and registration.
+-   **Security Risk**: The exposed Google API key is a recurring, critical issue. The user has again asked to ignore it. Comply for now, but you should strongly recommend fixing it after the current P0 task is delivered and tested.
 
 **documents and test reports created in this job**
--   
--    (updated to use )
--    (heavily updated)
+-    (updated multiple times)
+-    (updated multiple times)
 
 **Last 10 User Messages and any pending HUMAN messages**
-1.  **User**: Reports a long list of bugs and UI/UX issues. Demands fixes for translations, broken UI, ugly designs, and disconnected features. (Status: IN PROGRESS)
-2.  **Agent**: Acknowledges the feedback and starts exploring the codebase.
-3.  **User**: ?. (Nudging the agent).
-4.  **Agent**: Reassures the user and states it will proceed step-by-step.
-5.  **Agent**: Starts refactoring the Social Proof section on the landing page.
-6.  **Agent**: Creates a new, improved  component.
-7.  **Agent**: Moves to inspect the  component to fix the mobile title bug.
-8.  **User**: Continue.
-9.  **Agent**: Acknowledges and states it's continuing with the fixes, starting with the  component. (This is where the session ended).
+1.  **User**: Redo the visual design and the rest. (Status: DONE - Admin Dashboard redesign is complete).
+2.  **User**: Do the two backlog items. (Status: DONE - B2B CRUD and React Router warnings are fixed).
+3.  **User**: I have two problems: I received an order from a customer... and I dont have a washer there. I didnt receive an email or alert of their registration or their order, I would like that to change. Then I would like to have the possibility to cancel an order and send them a written response directly via my admin Dashboard. Fix all that. (Status: **IN PROGRESS** - This is the current, active task).
 
 **Project Health Check:**
--   **Broken**:
-    -   **Multi-language feature**: The system is in place but not used anywhere, so it appears completely broken to the user.
-    -   **UI**: Logo is partially obscured, section titles are cut off on mobile.
-    -   **Navigation**: Many new features and pages are inaccessible because they haven't been linked in the UI.
-    -   **Admin Dashboard**: Design is considered archaic by the user.
--   **Mocked**:
-    -   The new  and  components exist but are not yet integrated into the landing page.
-    -   The advanced analytics, heatmap, and GPS tracking dashboards likely display static or mock data.
+-   **Broken**: The core operational workflow is broken. The admin has no automated visibility of new business events (orders, signups) and no mechanism to handle orders in unserviceable areas.
+-   **Mocked**: No mocked features remain. All previous mocks were connected to live data.
 
 **3rd Party Integrations**
--   **Supabase**: Backend DB, Auth, Storage (Configured).
--   **Stripe**: Payments (Configured).
--   **Resend**: Transactional emails (Configured).
--   **Firebase**: PWA Push Notifications (Setup Complete).
--   **Vercel**: Deployment and Serverless Functions (Configured).
--   **OpenAI GPT-4o**: For AI Weight Estimation (Uses **Emergent LLM Key**).
--   **i18next**: For multi-language support (Configured but not implemented in components).
--   **React-Leaflet**: For admin heatmap (Component created, needs real data).
+-   **Supabase**: Backend DB, Auth, Storage, Triggers/Edge Functions
+-   **Resend**: Transactional emails (implementation in progress)
+-   **Stripe**: Payments
+-   **Vercel**: Deployment and Serverless Functions
+-   **OpenAI GPT-4o**: AI Weight Estimation (Uses **Emergent LLM Key**)
+-   **i18next**: Multi-language support
 
 **Testing status**
--   **Testing agent used after significant changes**: NO. The agent added a massive number of features without comprehensive testing.
--   **Troubleshoot agent used after agent stuck in loop**: NO.
--   **Test files created**:
-    -    (Playwright example file).
--   **Known regressions**: The entire UI/UX is considered a regression by the user. The translation feature is non-functional.
-
-**Credentials to test flow:**
-No new credentials are required for the current set of tasks, which are focused on frontend bug fixing and design. The Emergent LLM Key is used for the AI feature.
+-   **Testing agent used after significant changes**: YES, E2E tests were run successfully multiple times via .
+-   **Test files created**: . The file  was significantly expanded.
+-   **Known regressions**: None.
 
 **What agent forgot to execute**
--   **Apply Translations**: The agent set up the entire i18next framework but forgot the most important step: actually using the  function to translate the text in the components.
--   **Integrate New Components**: The agent created many new components and pages but failed to add the necessary links or buttons in the UI to make them accessible, leading to the user's complaint that they couldn't see the work.
--   **Holistic Testing**: The agent added feature after feature without performing functional or visual testing, resulting in the long list of bugs reported by the user.
--   **Enforce Security Best Practices**: The agent complied with the user's request to ignore a critical security vulnerability (exposed API key) instead of insisting on a fix.</analysis>
+The agent chose a flawed, unreliable frontend-based approach for triggering admin alerts. This architectural decision must be corrected to a server-side approach (Supabase Triggers) to meet the user's requirement effectively.</analysis>
