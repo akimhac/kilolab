@@ -895,7 +895,7 @@ export default function AdminDashboard() {
                     <input
                       type="text"
                       placeholder="Rechercher un pressing..."
-                      className="w-full pl-10 pr-4 py-2 border rounded-xl"
+                      className="w-full pl-10 pr-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-slate-400 focus:outline-none focus:border-teal-500"
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
                     />
@@ -903,19 +903,19 @@ export default function AdminDashboard() {
                   <div className="flex gap-2">
                     <button
                       onClick={() => setStatusFilter("all")}
-                      className={`px-4 py-2 rounded-xl text-sm font-bold ${statusFilter === "all" ? "bg-slate-900 text-white" : "bg-white border"}`}
+                      className={`px-4 py-2 rounded-xl text-sm font-bold transition ${statusFilter === "all" ? "bg-white/20 text-white" : "bg-white/5 text-slate-400 border border-white/10 hover:bg-white/10"}`}
                     >
                       Tous
                     </button>
                     <button
                       onClick={() => setStatusFilter("active")}
-                      className={`px-4 py-2 rounded-xl text-sm font-bold ${statusFilter === "active" ? "bg-green-600 text-white" : "bg-white border"}`}
+                      className={`px-4 py-2 rounded-xl text-sm font-bold transition ${statusFilter === "active" ? "bg-emerald-500 text-white" : "bg-white/5 text-slate-400 border border-white/10 hover:bg-white/10"}`}
                     >
                       Actifs
                     </button>
                     <button
                       onClick={() => setStatusFilter("pending")}
-                      className={`px-4 py-2 rounded-xl text-sm font-bold ${statusFilter === "pending" ? "bg-orange-500 text-white" : "bg-white border"}`}
+                      className={`px-4 py-2 rounded-xl text-sm font-bold transition ${statusFilter === "pending" ? "bg-orange-500 text-white" : "bg-white/5 text-slate-400 border border-white/10 hover:bg-white/10"}`}
                     >
                       En attente
                     </button>
@@ -924,51 +924,51 @@ export default function AdminDashboard() {
 
                 <div className="overflow-x-auto">
                   <table className="w-full">
-                    <thead className="bg-slate-50 border-b">
+                    <thead className="bg-white/5 border-b border-white/10">
                       <tr>
-                        <th className="text-left p-4 font-bold text-sm text-slate-500">Nom</th>
-                        <th className="text-left p-4 font-bold text-sm text-slate-500">Ville</th>
-                        <th className="text-left p-4 font-bold text-sm text-slate-500">Statut</th>
-                        <th className="text-left p-4 font-bold text-sm text-slate-500">CA Total</th>
-                        <th className="text-left p-4 font-bold text-sm text-slate-500">Actions</th>
+                        <th className="text-left p-4 font-bold text-sm text-slate-400">Nom</th>
+                        <th className="text-left p-4 font-bold text-sm text-slate-400">Ville</th>
+                        <th className="text-left p-4 font-bold text-sm text-slate-400">Statut</th>
+                        <th className="text-left p-4 font-bold text-sm text-slate-400">CA Total</th>
+                        <th className="text-left p-4 font-bold text-sm text-slate-400">Actions</th>
                       </tr>
                     </thead>
                     <tbody>
                       {filteredPartners.map((partner) => (
                         <tr
                           key={partner.id}
-                          className="border-b hover:bg-slate-50 cursor-pointer"
+                          className="border-b border-white/5 hover:bg-white/5 cursor-pointer transition"
                           onClick={() => {
                             setSelectedPartner(partner);
                             setShowPartnerModal(true);
                           }}
                         >
-                          <td className="p-4 font-bold">{partner.name}</td>
-                          <td className="p-4">{partner.city}</td>
+                          <td className="p-4 font-bold text-white">{partner.name}</td>
+                          <td className="p-4 text-slate-300">{partner.city}</td>
                           <td className="p-4">
                             <span
-                              className={`px-2 py-1 rounded-full text-xs font-bold ${
-                                partner.is_active ? "bg-green-100 text-green-700" : "bg-orange-100 text-orange-700"
+                              className={`px-3 py-1 rounded-full text-xs font-bold ${
+                                partner.is_active ? "bg-emerald-500/20 text-emerald-400" : "bg-orange-500/20 text-orange-400"
                               }`}
                             >
                               {partner.is_active ? "Actif" : "En attente"}
                             </span>
                           </td>
-                          <td className="p-4 font-bold text-teal-600">{partner.totalRevenue} €</td>
+                          <td className="p-4 font-bold text-teal-400">{partner.totalRevenue} €</td>
                           <td className="p-4">
                             <div className="flex gap-2">
                               {!partner.is_active && (
                                 <>
                                   <button
                                     onClick={(e) => approvePartner(partner.id, e as any)}
-                                    className="p-2 bg-green-50 text-green-600 rounded-lg hover:bg-green-100"
+                                    className="p-2 bg-emerald-500/20 text-emerald-400 rounded-lg hover:bg-emerald-500/30 transition"
                                     title="Valider"
                                   >
                                     <CheckCircle size={18} />
                                   </button>
                                   <button
                                     onClick={(e) => rejectPartner(partner, e as any)}
-                                    className="p-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100"
+                                    className="p-2 bg-red-500/20 text-red-400 rounded-lg hover:bg-red-500/30 transition"
                                     title="Refuser"
                                   >
                                     <XCircle size={18} />
@@ -978,7 +978,7 @@ export default function AdminDashboard() {
                               {partner.is_active && (
                                 <button
                                   onClick={(e) => deactivatePartner(partner.id, e as any)}
-                                  className="p-2 bg-slate-50 text-slate-600 rounded-lg hover:bg-slate-100"
+                                  className="p-2 bg-white/10 text-slate-400 rounded-lg hover:bg-white/20 transition"
                                   title="Désactiver"
                                 >
                                   <Trash2 size={18} />
