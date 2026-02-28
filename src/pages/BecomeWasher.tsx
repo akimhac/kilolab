@@ -247,7 +247,7 @@ export default function BecomeWasher() {
               <div className="max-w-5xl mx-auto px-4 sm:px-6">
                 <AnimateOnScroll className="text-center mb-16">
                   <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-white">
-                    4 etapes pour <span className="bg-gradient-to-r from-teal-400 to-cyan-400 bg-clip-text text-transparent">commencer</span>
+                    4 étapes pour <span className="bg-gradient-to-r from-teal-400 to-cyan-400 bg-clip-text text-transparent">commencer</span>
                   </h2>
                 </AnimateOnScroll>
 
@@ -257,9 +257,9 @@ export default function BecomeWasher() {
 
                   {[
                     { n: '01', title: 'Inscrivez-vous', desc: 'Formulaire en 3 minutes. Aucun frais.', icon: <Sparkles size={24} />, color: 'teal' },
-                    { n: '02', title: 'Validation express', desc: 'Notre equipe verifie votre profil sous 24h.', icon: <Clock size={24} />, color: 'violet' },
-                    { n: '03', title: 'Recevez des missions', desc: 'Acceptez les commandes pres de chez vous.', icon: <MapPin size={24} />, color: 'cyan' },
-                    { n: '04', title: 'Soyez paye', desc: 'Virement automatique chaque semaine.', icon: <DollarSign size={24} />, color: 'emerald' },
+                    { n: '02', title: 'Validation express', desc: 'Notre équipe vérifie votre profil sous 24h.', icon: <Clock size={24} />, color: 'violet' },
+                    { n: '03', title: 'Recevez des missions', desc: 'Acceptez les commandes près de chez vous.', icon: <MapPin size={24} />, color: 'cyan' },
+                    { n: '04', title: 'Soyez payé', desc: 'Virement automatique chaque semaine.', icon: <DollarSign size={24} />, color: 'emerald' },
                   ].map((s, idx) => (
                     <AnimateOnScroll key={idx} delay={idx * 100}>
                       <div className={`flex items-center gap-6 md:gap-10 mb-8 last:mb-0 ${idx % 2 === 1 ? 'md:flex-row-reverse' : ''}`}>
@@ -295,7 +295,7 @@ export default function BecomeWasher() {
                 <AnimateOnScroll className="text-center mb-12">
                   <span className="inline-block px-4 py-1.5 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 rounded-full text-xs font-bold tracking-widest uppercase mb-6">Simulateur</span>
                   <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-white mb-4">Combien pouvez-vous <span className="bg-gradient-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent">gagner ?</span></h2>
-                  <p className="text-slate-400 max-w-xl mx-auto">Deplacez le curseur pour estimer vos revenus mensuels en fonction du volume de linge traite.</p>
+                  <p className="text-slate-400 max-w-xl mx-auto">Déplacez le curseur pour estimer vos revenus mensuels en fonction du volume de linge traité.</p>
                 </AnimateOnScroll>
 
                 <AnimateOnScroll delay={150}>
