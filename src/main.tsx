@@ -45,7 +45,12 @@ if (!rootEl) {
   ReactDOM.createRoot(rootEl).render(
     <React.Fragment>
       <ThemeProvider>
-        <BrowserRouter>
+        <BrowserRouter
+          future={{
+            v7_startTransition: true,
+            v7_relativeSplatPath: true,
+          }}
+        >
           <Toaster 
             position="top-center"
             toastOptions={{
