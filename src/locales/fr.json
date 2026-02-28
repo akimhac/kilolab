@@ -334,5 +334,148 @@
     "invalidCredentials": "Email ou mot de passe incorrect",
     "emailRequired": "Email requis",
     "passwordRequired": "Mot de passe requis"
+  },
+  "faq": {
+    "title": "Questions fréquentes",
+    "subtitle": "Tout ce que vous devez savoir sur Kilolab",
+    "badge": "Centre d'aide",
+    "ctaTitle": "Vous n'avez pas trouvé votre réponse ?",
+    "ctaSubtitle": "Notre équipe est disponible pour vous aider",
+    "ctaButton": "Nous contacter",
+    "categories": {
+      "service": "Service",
+      "delivery": "Livraison",
+      "payment": "Paiement",
+      "issues": "Problèmes"
+    },
+    "questions": {
+      "howItWorks": "Comment fonctionne Kilolab ?",
+      "howItWorksAnswer": "C'est simple ! Passez commande, un Washer vient collecter votre linge, le lave, sèche et plie, puis vous le livre sous 48h. Vous payez au poids (dès 3€/kg).",
+      "sorting": "Dois-je trier mon linge ?",
+      "sortingAnswer": "Non ! C'est l'avantage de Kilolab. Nos Washers s'occupent du tri par couleur et matière. Mettez tout dans un sac, on s'occupe du reste.",
+      "clothes": "Quels vêtements puis-je faire laver ?",
+      "clothesAnswer": "Tous vos vêtements du quotidien : t-shirts, pantalons, sous-vêtements, draps, serviettes... Pour les pièces délicates (soie, cachemire), nous recommandons un pressing traditionnel.",
+      "deliveryTime": "Quel est le délai de livraison ?",
+      "deliveryTimeAnswer": "Formule Standard : 48-72h. Formule Express : 24h. Vous recevez des notifications à chaque étape.",
+      "pickup": "Comment se passe la collecte ?",
+      "pickupAnswer": "Choisissez un créneau de collecte lors de votre commande. Le Washer vient directement chez vous récupérer votre sac de linge.",
+      "chooseWasher": "Puis-je choisir mon Washer ?",
+      "chooseWasherAnswer": "Oui ! Lors de votre commande, vous pouvez sélectionner un Washer proche de chez vous ou laisser notre algorithme vous en attribuer un.",
+      "billing": "Comment fonctionne la facturation ?",
+      "billingAnswer": "Vous payez au poids. Le prix final est calculé après pesée par le Washer. Paiement 100% sécurisé par Stripe.",
+      "promo": "Puis-je utiliser un code promo ?",
+      "promoAnswer": "Oui ! Entrez votre code lors de l'étape paiement. Les codes sont cumulables avec le parrainage.",
+      "referral": "Comment fonctionne le parrainage ?",
+      "referralAnswer": "Partagez votre code unique avec vos amis. Vous recevez 10€ de crédit pour chaque filleul, et votre filleul reçoit aussi 10€ sur sa première commande.",
+      "orderIssue": "Que faire si j'ai un problème avec ma commande ?",
+      "orderIssueAnswer": "Contactez-nous dans les 48h via contact@kilolab.fr ou depuis votre dashboard. Nous traitons toutes les réclamations sous 24h ouvrées.",
+      "insurance": "Mon linge est-il assuré ?",
+      "insuranceAnswer": "Oui, tous les vêtements confiés sont couverts par notre assurance jusqu'à 500€ par commande en cas de dommage."
+    }
+  },
+  "contact": {
+    "title": "Contactez-nous",
+    "subtitle": "Notre équipe vous répond sous 24h",
+    "emailTitle": "Email",
+    "emailAddress": "contact@kilolab.fr",
+    "hoursTitle": "Horaires",
+    "hoursValue": "Lun-Ven : 9h-18h",
+    "zoneTitle": "Zone",
+    "zoneValue": "France métropolitaine",
+    "form": {
+      "emailLabel": "Votre Email",
+      "emailPlaceholder": "client@kilolab.fr",
+      "subjectLabel": "Sujet",
+      "subjectPlaceholder": "Commande, Partenariat...",
+      "messageLabel": "Votre Message",
+      "messagePlaceholder": "Une question sur une commande ? Un partenariat ?",
+      "submit": "Envoyer"
+    },
+    "success": {
+      "title": "Message envoyé !",
+      "description": "Notre équipe a bien reçu votre demande et vous répondra sous 24h.",
+      "sendAnother": "Envoyer un autre message"
+    }
+  },
+  "pricing": {
+    "heroTitle": "Tarifs simples.",
+    "heroTitle2": "Sans surprise.",
+    "heroSubtitle": "Deux formules claires. Aucun frais caché.",
+    "standard": {
+      "badge": "Standard",
+      "price": "3€/kg",
+      "description": "Idéal pour le quotidien.",
+      "washing": "Lavage",
+      "drying": "Séchage",
+      "folding": "Pliage soigné",
+      "time": "Prêt sous 48 à 72h",
+      "cta": "Choisir Standard"
+    },
+    "express": {
+      "badge": "Premium",
+      "popular": "Populaire",
+      "price": "5€/kg",
+      "description": "Idéal si vous êtes pressé.",
+      "washing": "Lavage prioritaire",
+      "drying": "Séchage express",
+      "folding": "Pliage \"boutique\"",
+      "stain": "Traitement détachant",
+      "time": "Sous 24h garanti",
+      "cta": "Choisir Express"
+    },
+    "trust": {
+      "secure": "Paiement sécurisé",
+      "verified": "Washers vérifiés",
+      "support": "Support client disponible"
+    },
+    "comparison": {
+      "badge": "Arrêtez de perdre du temps et de l'argent",
+      "title": "Le VRAI coût de votre lessive",
+      "subtitle": "Ce que vous payez vraiment quand vous faites votre linge vous-même.",
+      "diy": {
+        "title": "Faire soi-même / Laverie",
+        "subtitle": "Le coût caché qu'on ignore",
+        "waterElec": "Eau + Électricité",
+        "detergent": "Lessive + Adoucissant",
+        "machine": "Usure machine + Séchage",
+        "timeLabel": "Votre temps (2h30)",
+        "materialCost": "Coût matériel",
+        "timeCost": "Coût de votre temps",
+        "totalCost": "COÛT RÉEL TOTAL",
+        "note": "*Basé sur le SMIC horaire (12€/h)"
+      },
+      "kilolab": {
+        "title": "Avec Kilolab",
+        "badge": "VOUS GAGNEZ",
+        "subtitle": "Tout inclus, zéro effort",
+        "pickup": "Collecte gratuite à domicile",
+        "washing": "Lavage pro + Séchage + Pliage",
+        "delivery": "Livraison en 48h",
+        "time": "Votre temps : 0 minute"
+      },
+      "savings": {
+        "title": "Vous économisez",
+        "money": "d'argent",
+        "time": "de vie"
+      },
+      "ctaTitle": "Vous payez pour PERDRE 2h30 de votre vie ?",
+      "ctaDesc": "Avec Kilolab, pour moins cher qu'un aller-retour à la laverie, vous récupérez 2h30 de temps libre.",
+      "ctaButton": "Récupérer mon temps"
+    },
+    "faq": {
+      "title": "Questions fréquentes",
+      "weight": {
+        "q": "Comment est calculé le poids ?",
+        "a": "Le Washer pèse votre sac devant vous avec un peson digital lors de la collecte. Vous validez le poids ensemble."
+      },
+      "minimum": {
+        "q": "Y a-t-il un minimum de commande ?",
+        "a": "Oui, le minimum est de 3kg (soit 9€ en Standard). C'est environ l'équivalent d'une petite machine."
+      },
+      "difference": {
+        "q": "Quelle différence entre Standard et Express ?",
+        "a": "Standard (3€/kg) : Sous 48 à 72h, idéal pour le quotidien. Express (5€/kg) : Sous 24h garanti, traitement détachant inclus, pliage \"boutique\"."
+      }
+    }
   }
 }
