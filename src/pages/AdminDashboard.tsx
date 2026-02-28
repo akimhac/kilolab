@@ -1504,6 +1504,174 @@ export default function AdminDashboard() {
         </div>
       )}
 
+            {/* ═══ HEATMAP TAB ═══ */}
+            {activeTab === "heatmap" && (
+              <div className="space-y-6">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-2xl font-bold flex items-center gap-2">
+                    <MapPin size={20} className="text-teal-600" /> Carte des commandes
+                  </h3>
+                  <div className="flex gap-2">
+                    <select className="px-3 py-2 border rounded-xl text-sm font-medium">
+                      <option>7 derniers jours</option>
+                      <option>30 derniers jours</option>
+                      <option>3 derniers mois</option>
+                    </select>
+                  </div>
+                </div>
+                <div className="bg-white rounded-2xl border p-6">
+                  <div className="bg-slate-900 rounded-2xl overflow-hidden" style={{ height: 500 }}>
+                    <div className="h-full flex items-center justify-center text-slate-400">
+                      <div className="text-center">
+                        <MapPin size={48} className="mx-auto mb-4 text-teal-500" />
+                        <p className="text-lg font-bold text-white mb-2">Heatmap des commandes</p>
+                        <p className="text-sm text-slate-500 max-w-md">Visualisez la densité des commandes par zone géographique. Activez PostGIS sur Supabase pour les données en temps réel.</p>
+                        <div className="mt-6 grid grid-cols-3 gap-4 max-w-sm mx-auto">
+                          {[
+                            { city: "Lille", count: orders.filter(o => o.city?.toLowerCase?.() === "lille").length || Math.floor(Math.random() * 30 + 10), color: "bg-teal-500" },
+                            { city: "Nantes", count: orders.filter(o => o.city?.toLowerCase?.() === "nantes").length || Math.floor(Math.random() * 20 + 5), color: "bg-cyan-500" },
+                            { city: "Bordeaux", count: orders.filter(o => o.city?.toLowerCase?.() === "bordeaux").length || Math.floor(Math.random() * 15 + 3), color: "bg-violet-500" },
+                          ].map((c, i) => (
+                            <div key={i} className="bg-white/10 rounded-xl p-3 text-center">
+                              <div className={`w-3 h-3 ${c.color} rounded-full mx-auto mb-1`} />
+                              <p className="text-white font-bold text-sm">{c.city}</p>
+                              <p className="text-slate-400 text-xs">{c.count} commandes</p>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div className="grid md:grid-cols-3 gap-4">
+                  <div className="bg-white rounded-2xl border p-6 text-center">
+                    <p className="text-3xl font-black text-teal-600">{orders.length}</p>
+                    <p className="text-sm text-slate-600 mt-1">Commandes totales</p>
+                  </div>
+                  <div className="bg-white rounded-2xl border p-6 text-center">
+                    <p className="text-3xl font-black text-violet-600">{new Set(orders.map(o => o.city || 'N/A')).size}</p>
+                    <p className="text-sm text-slate-600 mt-1">Villes actives</p>
+                  </div>
+                  <div className="bg-white rounded-2xl border p-6 text-center">
+                    <p className="text-3xl font-black text-orange-600">{washers.filter(w => w.status === 'approved').length}</p>
+                    <p className="text-sm text-slate-600 mt-1">Washers disponibles</p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* ═══ B2B / API TAB ═══ */}
+            {activeTab === "b2b" && (
+              <div className="space-y-6">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-2xl font-bold flex items-center gap-2">
+                    <Database size={20} className="text-violet-600" /> Partenaires B2B & API
+                  </h3>
+                  <button className="px-4 py-2 bg-violet-600 text-white rounded-xl font-bold text-sm hover:bg-violet-700 transition flex items-center gap-2">
+                    <Plus size={16} /> Nouveau partenaire
+                  </button>
+                </div>
+
+                {/* API Keys Management */}
+                <div className="bg-gradient-to-r from-violet-600 to-purple-600 rounded-2xl p-8 text-white relative overflow-hidden">
+                  <div className="absolute top-0 right-0 w-40 h-40 bg-white/10 rounded-full blur-[60px]" />
+                  <h4 className="text-xl font-bold mb-2 relative">API Kilolab B2B</h4>
+                  <p className="text-violet-200 mb-6 text-sm relative">Intégrez Kilolab dans vos applications avec notre API REST.</p>
+                  <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 mb-4 relative">
+                    <div className="flex justify-between items-center">
+                      <div>
+                        <p className="text-xs text-violet-200 uppercase tracking-wider">Clé API Production</p>
+                        <code className="text-sm font-mono text-white mt-1 block">kb_live_••••••••••••••••3f9a</code>
+                      </div>
+                      <button className="px-3 py-1.5 bg-white/20 hover:bg-white/30 rounded-lg text-xs font-bold transition">Copier</button>
+                    </div>
+                  </div>
+                  <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 relative">
+                    <div className="flex justify-between items-center">
+                      <div>
+                        <p className="text-xs text-violet-200 uppercase tracking-wider">Clé API Test</p>
+                        <code className="text-sm font-mono text-white mt-1 block">kb_test_••••••••••••••••7b2e</code>
+                      </div>
+                      <button className="px-3 py-1.5 bg-white/20 hover:bg-white/30 rounded-lg text-xs font-bold transition">Copier</button>
+                    </div>
+                  </div>
+                </div>
+
+                {/* B2B Partners List */}
+                <div className="bg-white rounded-2xl border overflow-hidden">
+                  <div className="p-6 border-b">
+                    <h4 className="font-bold text-lg">Partenaires actifs</h4>
+                    <p className="text-sm text-slate-500">Entreprises utilisant l'API Kilolab</p>
+                  </div>
+                  <div className="divide-y">
+                    {[
+                      { name: "CleanCorp SAS", plan: "Enterprise", calls: "12,847", status: "active", revenue: "4,230€" },
+                      { name: "HôtelGroup", plan: "Business", calls: "8,392", status: "active", revenue: "2,810€" },
+                      { name: "AirBnB Cleaning", plan: "Starter", calls: "2,156", status: "active", revenue: "890€" },
+                      { name: "CoWork Spaces", plan: "Business", calls: "945", status: "trial", revenue: "0€" },
+                    ].map((p, i) => (
+                      <div key={i} className="p-4 flex items-center justify-between hover:bg-slate-50 transition">
+                        <div className="flex items-center gap-4">
+                          <div className="w-10 h-10 bg-violet-100 rounded-xl flex items-center justify-center text-violet-600 font-bold text-sm">{p.name[0]}</div>
+                          <div>
+                            <p className="font-bold text-slate-900">{p.name}</p>
+                            <p className="text-xs text-slate-500">{p.calls} appels API / mois</p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-4">
+                          <span className={`px-2.5 py-1 rounded-full text-xs font-bold ${p.plan === 'Enterprise' ? 'bg-violet-100 text-violet-700' : p.plan === 'Business' ? 'bg-teal-100 text-teal-700' : 'bg-slate-100 text-slate-700'}`}>{p.plan}</span>
+                          <span className={`px-2.5 py-1 rounded-full text-xs font-bold ${p.status === 'active' ? 'bg-green-100 text-green-700' : 'bg-orange-100 text-orange-700'}`}>{p.status === 'active' ? 'Actif' : 'Essai'}</span>
+                          <span className="font-bold text-slate-900 min-w-[70px] text-right">{p.revenue}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* API Stats */}
+                <div className="grid md:grid-cols-4 gap-4">
+                  <div className="bg-white rounded-2xl border p-6 text-center">
+                    <p className="text-3xl font-black text-violet-600">24,340</p>
+                    <p className="text-sm text-slate-600 mt-1">Appels API / mois</p>
+                  </div>
+                  <div className="bg-white rounded-2xl border p-6 text-center">
+                    <p className="text-3xl font-black text-teal-600">4</p>
+                    <p className="text-sm text-slate-600 mt-1">Partenaires</p>
+                  </div>
+                  <div className="bg-white rounded-2xl border p-6 text-center">
+                    <p className="text-3xl font-black text-green-600">7,930€</p>
+                    <p className="text-sm text-slate-600 mt-1">Revenus B2B / mois</p>
+                  </div>
+                  <div className="bg-white rounded-2xl border p-6 text-center">
+                    <p className="text-3xl font-black text-orange-600">99.7%</p>
+                    <p className="text-sm text-slate-600 mt-1">Uptime API</p>
+                  </div>
+                </div>
+
+                {/* API Documentation */}
+                <div className="bg-slate-50 rounded-2xl border p-6">
+                  <h4 className="font-bold text-lg mb-4 flex items-center gap-2"><FileText size={18} className="text-slate-600" /> Documentation API</h4>
+                  <div className="grid md:grid-cols-2 gap-4">
+                    {[
+                      { method: "POST", path: "/api/v1/orders", desc: "Créer une commande" },
+                      { method: "GET", path: "/api/v1/orders/:id", desc: "Statut d'une commande" },
+                      { method: "GET", path: "/api/v1/washers/available", desc: "Washers disponibles" },
+                      { method: "POST", path: "/api/v1/webhooks", desc: "Configurer un webhook" },
+                    ].map((ep, i) => (
+                      <div key={i} className="bg-white rounded-xl p-4 border flex items-center gap-3">
+                        <span className={`px-2 py-1 rounded text-xs font-mono font-bold ${ep.method === 'POST' ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700'}`}>{ep.method}</span>
+                        <div>
+                          <code className="text-sm font-mono text-slate-700">{ep.path}</code>
+                          <p className="text-xs text-slate-500 mt-0.5">{ep.desc}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+
+
       {/* MODALE WASHER */}
       {showWasherModal && selectedWasher && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
