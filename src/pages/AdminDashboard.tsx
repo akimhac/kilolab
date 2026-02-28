@@ -29,6 +29,9 @@ import {
   Phone,
   Shield,
   Tag,
+  MapPin,
+  Plus,
+  FileText,
 } from "lucide-react";
 import {
   LineChart,
