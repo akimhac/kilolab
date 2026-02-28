@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect, ReactNode } from 'react';
+import { useTranslation } from 'react-i18next';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import { Mail, MessageSquare, Send, CheckCircle, Loader2, Tag, Phone, MapPin, Clock } from 'lucide-react';
