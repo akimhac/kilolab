@@ -312,18 +312,20 @@ export function WasherVerifiedBadge({
 
 // Trust Badges
 export function TrustBadges() {
+  // Using static French as default since these are simple trust badges
+  // They will be translated when the parent component passes translated props
   const badges = [
-    { icon: '🔒', title: 'Paiement sécurisé', desc: 'SSL & Stripe' },
-    { icon: '✅', title: 'Washers vérifiés', desc: 'Identité contrôlée' },
-    { icon: '💯', title: 'Satisfait ou remboursé', desc: 'Garantie 48h' },
-    { icon: '📱', title: 'Suivi temps réel', desc: 'Notifications live' },
+    { icon: <Shield size={20} className="text-teal-600" />, title: 'Paiement sécurisé', desc: 'SSL & Stripe' },
+    { icon: <CheckCircle size={20} className="text-teal-600" />, title: 'Washers vérifiés', desc: 'Identité contrôlée' },
+    { icon: <Star size={20} className="text-amber-500 fill-amber-500" />, title: 'Satisfait ou remboursé', desc: 'Garantie 48h' },
+    { icon: <TrendingUp size={20} className="text-teal-600" />, title: 'Suivi temps réel', desc: 'Notifications live' },
   ];
 
   return (
     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
       {badges.map((badge, idx) => (
         <div key={idx} className="flex items-center gap-3 p-4 bg-slate-50 rounded-xl">
-          <span className="text-2xl">{badge.icon}</span>
+          {badge.icon}
           <div>
             <p className="font-bold text-slate-900 text-sm">{badge.title}</p>
             <p className="text-xs text-slate-500">{badge.desc}</p>
