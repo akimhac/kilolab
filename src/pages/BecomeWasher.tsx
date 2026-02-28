@@ -381,7 +381,7 @@ export default function BecomeWasher() {
               <div className="max-w-3xl mx-auto px-4 text-center relative">
                 <AnimateOnScroll>
                   <h2 className="text-3xl sm:text-4xl md:text-6xl font-black text-white mb-6 leading-tight">
-                    Pret a transformer votre<br /><span className="bg-gradient-to-r from-teal-400 to-cyan-400 bg-clip-text text-transparent">machine en revenus ?</span>
+                    Prêt à transformer votre<br /><span className="bg-gradient-to-r from-teal-400 to-cyan-400 bg-clip-text text-transparent">machine en revenus ?</span>
                   </h2>
                   <p className="text-xl text-slate-400 mb-10">Inscription gratuite. Aucun engagement. Premiers revenus sous 48h.</p>
                   <button data-testid="cta-final" onClick={() => setStep(1)}
