@@ -109,6 +109,7 @@ export default function App() {
 
           <Route path="/select-dashboard" element={<SelectDashboard />} />
           <Route path="/select-signup" element={<SelectSignup />} />
+          <Route path="/washer-gps" element={<WasherGPSNavigation />} />
 
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
