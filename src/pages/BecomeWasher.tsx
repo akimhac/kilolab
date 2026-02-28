@@ -317,15 +317,15 @@ export default function BecomeWasher() {
 
                       <div className="grid grid-cols-3 gap-4 mb-8">
                         <div className="bg-white/[0.06] rounded-2xl p-5 text-center border border-white/[0.08]">
-                          <p className="text-3xl sm:text-4xl font-black text-teal-400">{revenue}eur</p>
+                          <p className="text-3xl sm:text-4xl font-black text-teal-400">{revenue}&euro;</p>
                           <p className="text-xs text-slate-500 mt-1 uppercase tracking-wider">/ mois</p>
                         </div>
                         <div className="bg-white/[0.06] rounded-2xl p-5 text-center border border-white/[0.08]">
-                          <p className="text-3xl sm:text-4xl font-black text-white">{(parseFloat(revenue) / 4).toFixed(0)}eur</p>
+                          <p className="text-3xl sm:text-4xl font-black text-white">{(parseFloat(revenue) / 4).toFixed(0)}&euro;</p>
                           <p className="text-xs text-slate-500 mt-1 uppercase tracking-wider">/ semaine</p>
                         </div>
                         <div className="bg-white/[0.06] rounded-2xl p-5 text-center border border-white/[0.08]">
-                          <p className="text-3xl sm:text-4xl font-black text-emerald-400">{(parseFloat(revenue) * 12).toFixed(0)}eur</p>
+                          <p className="text-3xl sm:text-4xl font-black text-emerald-400">{(parseFloat(revenue) * 12).toFixed(0)}&euro;</p>
                           <p className="text-xs text-slate-500 mt-1 uppercase tracking-wider">/ an</p>
                         </div>
                       </div>
@@ -509,7 +509,7 @@ export default function BecomeWasher() {
                       </div>
                       <div className="bg-white/15 backdrop-blur-sm p-6 rounded-2xl border border-white/20 text-center">
                         <p className="text-teal-100 text-xs uppercase tracking-widest mb-1">Revenus mensuels</p>
-                        <p className="text-5xl font-black text-white mb-1">{revenue}eur</p>
+                        <p className="text-5xl font-black text-white mb-1">{revenue}&euro;</p>
                         <p className="text-teal-200 text-sm">Paye chaque semaine</p>
                       </div>
                     </div>
