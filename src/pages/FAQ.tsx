@@ -40,73 +40,6 @@ function AnimateOnScroll({ children, delay = 0, className = "" }: { children: Re
   );
 }
 
-const faqs = [
-  {
-    category: "Service",
-    questions: [
-      {
-        question: "Comment fonctionne Kilolab ?",
-        answer: "C'est simple ! Passez commande, un Washer vient collecter votre linge, le lave, sèche et plie, puis vous le livre sous 48h. Vous payez au poids (dès 3€/kg)."
-      },
-      {
-        question: "Dois-je trier mon linge ?",
-        answer: "Non ! C'est l'avantage de Kilolab. Nos Washers s'occupent du tri par couleur et matière. Mettez tout dans un sac, on s'occupe du reste."
-      },
-      {
-        question: "Quels vêtements puis-je faire laver ?",
-        answer: "Tous vos vêtements du quotidien : t-shirts, pantalons, sous-vêtements, draps, serviettes... Pour les pièces délicates (soie, cachemire), nous recommandons un pressing traditionnel."
-      },
-    ]
-  },
-  {
-    category: "Livraison",
-    questions: [
-      {
-        question: "Quel est le délai de livraison ?",
-        answer: "Formule Standard : 48-72h. Formule Express : 24h. Vous recevez des notifications à chaque étape."
-      },
-      {
-        question: "Comment se passe la collecte ?",
-        answer: "Choisissez un créneau de collecte lors de votre commande. Le Washer vient directement chez vous récupérer votre sac de linge."
-      },
-      {
-        question: "Puis-je choisir mon Washer ?",
-        answer: "Oui ! Lors de votre commande, vous pouvez sélectionner un Washer proche de chez vous ou laisser notre algorithme vous en attribuer un."
-      },
-    ]
-  },
-  {
-    category: "Paiement",
-    questions: [
-      {
-        question: "Comment fonctionne la facturation ?",
-        answer: "Vous payez au poids. Le prix final est calculé après pesée par le Washer. Paiement 100% sécurisé par Stripe."
-      },
-      {
-        question: "Puis-je utiliser un code promo ?",
-        answer: "Oui ! Entrez votre code lors de l'étape paiement. Les codes sont cumulables avec le parrainage."
-      },
-      {
-        question: "Comment fonctionne le parrainage ?",
-        answer: "Partagez votre code unique avec vos amis. Vous recevez 10€ de crédit pour chaque filleul, et votre filleul reçoit aussi 10€ sur sa première commande."
-      },
-    ]
-  },
-  {
-    category: "Problèmes",
-    questions: [
-      {
-        question: "Que faire si j'ai un problème avec ma commande ?",
-        answer: "Contactez-nous dans les 48h via contact@kilolab.fr ou depuis votre dashboard. Nous traitons toutes les réclamations sous 24h ouvrées."
-      },
-      {
-        question: "Mon linge est-il assuré ?",
-        answer: "Oui, tous les vêtements confiés sont couverts par notre assurance jusqu'à 500€ par commande en cas de dommage."
-      },
-    ]
-  },
-];
-
 function FAQItem({ question, answer, isOpen, onClick, delay }: { 
   question: string; 
   answer: string; 
@@ -139,17 +72,53 @@ function FAQItem({ question, answer, isOpen, onClick, delay }: {
 }
 
 export default function FAQ() {
+  const { t } = useTranslation();
   const [openItems, setOpenItems] = useState<Record<string, boolean>>({ "0-0": true });
 
   const toggleItem = (key: string) => {
     setOpenItems(prev => ({ ...prev, [key]: !prev[key] }));
   };
 
+  // FAQ data using translations
+  const faqs = [
+    {
+      category: t('faq.categories.service'),
+      questions: [
+        { question: t('faq.questions.howItWorks'), answer: t('faq.questions.howItWorksAnswer') },
+        { question: t('faq.questions.sorting'), answer: t('faq.questions.sortingAnswer') },
+        { question: t('faq.questions.clothes'), answer: t('faq.questions.clothesAnswer') },
+      ]
+    },
+    {
+      category: t('faq.categories.delivery'),
+      questions: [
+        { question: t('faq.questions.deliveryTime'), answer: t('faq.questions.deliveryTimeAnswer') },
+        { question: t('faq.questions.pickup'), answer: t('faq.questions.pickupAnswer') },
+        { question: t('faq.questions.chooseWasher'), answer: t('faq.questions.chooseWasherAnswer') },
+      ]
+    },
+    {
+      category: t('faq.categories.payment'),
+      questions: [
+        { question: t('faq.questions.billing'), answer: t('faq.questions.billingAnswer') },
+        { question: t('faq.questions.promo'), answer: t('faq.questions.promoAnswer') },
+        { question: t('faq.questions.referral'), answer: t('faq.questions.referralAnswer') },
+      ]
+    },
+    {
+      category: t('faq.categories.issues'),
+      questions: [
+        { question: t('faq.questions.orderIssue'), answer: t('faq.questions.orderIssueAnswer') },
+        { question: t('faq.questions.insurance'), answer: t('faq.questions.insuranceAnswer') },
+      ]
+    },
+  ];
+
   return (
     <>
       <Helmet>
-        <title>FAQ - Questions Fréquentes | Kilolab</title>
-        <meta name="description" content="Trouvez les réponses à vos questions sur Kilolab : fonctionnement, tarifs, livraison, paiement et plus encore." />
+        <title>{t('faq.title')} | Kilolab</title>
+        <meta name="description" content={t('faq.subtitle')} />
         <link rel="canonical" href="https://kilolab.fr/faq" />
       </Helmet>
 
@@ -162,13 +131,13 @@ export default function FAQ() {
             <AnimateOnScroll>
               <div className="inline-flex items-center gap-2 bg-teal-500/20 border border-teal-400/30 text-teal-300 px-4 py-2 rounded-full text-sm font-medium mb-6">
                 <HelpCircle size={16} />
-                Centre d'aide
+                {t('faq.badge')}
               </div>
               <h1 className="text-4xl md:text-5xl font-bold mb-4">
-                Questions fréquentes
+                {t('faq.title')}
               </h1>
               <p className="text-xl text-slate-400">
-                Tout ce que vous devez savoir sur Kilolab
+                {t('faq.subtitle')}
               </p>
             </AnimateOnScroll>
           </div>
@@ -207,16 +176,16 @@ export default function FAQ() {
             <AnimateOnScroll>
               <MessageCircle className="w-12 h-12 text-teal-500 mx-auto mb-4" />
               <h2 className="text-2xl font-bold text-slate-900 mb-4">
-                Vous n'avez pas trouvé votre réponse ?
+                {t('faq.ctaTitle')}
               </h2>
               <p className="text-slate-600 mb-8">
-                Notre équipe est disponible pour vous aider
+                {t('faq.ctaSubtitle')}
               </p>
               <Link
                 to="/contact"
                 className="inline-flex items-center gap-2 px-8 py-4 bg-slate-900 text-white rounded-full font-semibold hover:bg-slate-800 transition-all hover:scale-[1.02] active:scale-[0.98]"
               >
-                Nous contacter
+                {t('faq.ctaButton')}
                 <ArrowRight size={18} />
               </Link>
             </AnimateOnScroll>
