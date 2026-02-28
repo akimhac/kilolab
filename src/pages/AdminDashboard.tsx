@@ -220,11 +220,154 @@ export default function AdminDashboard() {
       });
 
       setPartners(partnersWithStats);
+      
+      // 8. B2B Partners
+      const { data: b2b } = await supabase
+        .from("b2b_partners")
+        .select("*")
+        .order("created_at", { ascending: false });
+      
+      setB2bPartners(b2b || []);
     } catch (e) {
       console.error(e);
       toast.error("Erreur de chargement");
     } finally {
       setLoading(false);
+    }
+  };
+
+  // --- CRUD B2B PARTNERS ---
+  const generateApiKey = () => {
+    const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
+    let key = 'kb_live_';
+    for (let i = 0; i < 24; i++) {
+      key += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return key;
+  };
+
+  const createB2BPartner = async () => {
+    if (!newB2BPartner.name || !newB2BPartner.email) {
+      toast.error("Nom et email requis");
+      return;
+    }
+
+    const t = toast.loading("Création du partenaire...");
+    
+    try {
+      const { data, error } = await supabase
+        .from("b2b_partners")
+        .insert({
+          name: newB2BPartner.name,
+          email: newB2BPartner.email,
+          phone: newB2BPartner.phone,
+          plan: newB2BPartner.plan,
+          status: "trial",
+          api_key: generateApiKey(),
+          api_calls: 0,
+          monthly_revenue: 0,
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      toast.success("Partenaire B2B créé !", { id: t });
+      setB2bPartners([data, ...b2bPartners]);
+      setNewB2BPartner({ name: "", email: "", phone: "", plan: "starter" });
+      setShowB2BModal(false);
+    } catch (e: any) {
+      console.error(e);
+      toast.error("Erreur: " + e.message, { id: t });
+    }
+  };
+
+  const updateB2BPartner = async (partner: B2BPartner) => {
+    const t = toast.loading("Mise à jour...");
+    
+    try {
+      const { error } = await supabase
+        .from("b2b_partners")
+        .update({
+          name: partner.name,
+          email: partner.email,
+          phone: partner.phone,
+          plan: partner.plan,
+          status: partner.status,
+        })
+        .eq("id", partner.id);
+
+      if (error) throw error;
+
+      toast.success("Partenaire mis à jour !", { id: t });
+      setB2bPartners(b2bPartners.map(p => p.id === partner.id ? partner : p));
+      setEditingB2B(null);
+    } catch (e: any) {
+      console.error(e);
+      toast.error("Erreur: " + e.message, { id: t });
+    }
+  };
+
+  const deleteB2BPartner = async (id: string) => {
+    if (!confirm("Supprimer ce partenaire B2B ?")) return;
+    
+    const t = toast.loading("Suppression...");
+    
+    try {
+      const { error } = await supabase
+        .from("b2b_partners")
+        .delete()
+        .eq("id", id);
+
+      if (error) throw error;
+
+      toast.success("Partenaire supprimé", { id: t });
+      setB2bPartners(b2bPartners.filter(p => p.id !== id));
+    } catch (e: any) {
+      console.error(e);
+      toast.error("Erreur: " + e.message, { id: t });
+    }
+  };
+
+  const toggleB2BStatus = async (partner: B2BPartner) => {
+    const newStatus = partner.status === "active" ? "inactive" : "active";
+    const t = toast.loading("Mise à jour...");
+    
+    try {
+      const { error } = await supabase
+        .from("b2b_partners")
+        .update({ status: newStatus })
+        .eq("id", partner.id);
+
+      if (error) throw error;
+
+      toast.success(`Statut: ${newStatus}`, { id: t });
+      setB2bPartners(b2bPartners.map(p => p.id === partner.id ? { ...p, status: newStatus } : p));
+    } catch (e: any) {
+      console.error(e);
+      toast.error("Erreur: " + e.message, { id: t });
+    }
+  };
+
+  const regenerateApiKey = async (partner: B2BPartner) => {
+    if (!confirm("Régénérer la clé API ? L'ancienne sera invalidée.")) return;
+    
+    const t = toast.loading("Régénération...");
+    const newKey = generateApiKey();
+    
+    try {
+      const { error } = await supabase
+        .from("b2b_partners")
+        .update({ api_key: newKey })
+        .eq("id", partner.id);
+
+      if (error) throw error;
+
+      toast.success("Nouvelle clé API générée", { id: t });
+      setB2bPartners(b2bPartners.map(p => p.id === partner.id ? { ...p, api_key: newKey } : p));
+    } catch (e: any) {
+      console.error(e);
+      toast.error("Erreur: " + e.message, { id: t });
     }
   };
 
