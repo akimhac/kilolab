@@ -56,7 +56,9 @@ type Tab =
   | "orders"
   | "messages"
   | "logs"
-  | "coupons";
+  | "coupons"
+  | "heatmap"
+  | "b2b";
 
 type PartnerStatusFilter = "all" | "active" | "pending";
 type WasherFilter = "all" | "pending" | "approved" | "rejected";
