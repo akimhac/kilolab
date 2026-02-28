@@ -2101,6 +2101,186 @@ export default function AdminDashboard() {
           </div>
         </div>
       )}
+
+      {/* MODALE CREATE B2B PARTNER */}
+      {showB2BModal && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-slate-800 border border-white/10 rounded-3xl p-8 max-w-lg w-full relative shadow-2xl">
+            <button
+              onClick={() => setShowB2BModal(false)}
+              className="absolute top-6 right-6 p-2 bg-white/10 rounded-full hover:bg-white/20 transition text-white"
+            >
+              <X size={20} />
+            </button>
+
+            <div className="mb-6">
+              <h2 className="text-2xl font-black text-white">Nouveau Partenaire B2B</h2>
+              <p className="text-slate-400 text-sm mt-1">Créer un compte API pour une entreprise</p>
+            </div>
+
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-bold mb-2 text-slate-300">Nom de l'entreprise *</label>
+                <input
+                  type="text"
+                  placeholder="CleanCorp SAS"
+                  value={newB2BPartner.name}
+                  onChange={(e) => setNewB2BPartner({ ...newB2BPartner, name: e.target.value })}
+                  className="w-full p-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-slate-500 focus:border-violet-500 focus:outline-none"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-bold mb-2 text-slate-300">Email *</label>
+                <input
+                  type="email"
+                  placeholder="contact@cleancorp.fr"
+                  value={newB2BPartner.email}
+                  onChange={(e) => setNewB2BPartner({ ...newB2BPartner, email: e.target.value })}
+                  className="w-full p-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-slate-500 focus:border-violet-500 focus:outline-none"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-bold mb-2 text-slate-300">Téléphone</label>
+                <input
+                  type="tel"
+                  placeholder="01 23 45 67 89"
+                  value={newB2BPartner.phone}
+                  onChange={(e) => setNewB2BPartner({ ...newB2BPartner, phone: e.target.value })}
+                  className="w-full p-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-slate-500 focus:border-violet-500 focus:outline-none"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-bold mb-2 text-slate-300">Plan</label>
+                <select
+                  value={newB2BPartner.plan}
+                  onChange={(e) => setNewB2BPartner({ ...newB2BPartner, plan: e.target.value as any })}
+                  className="w-full p-3 bg-white/5 border border-white/10 rounded-xl text-white focus:border-violet-500 focus:outline-none"
+                >
+                  <option value="starter">Starter</option>
+                  <option value="business">Business</option>
+                  <option value="enterprise">Enterprise</option>
+                </select>
+              </div>
+            </div>
+
+            <div className="mt-6 flex gap-3">
+              <button
+                onClick={() => setShowB2BModal(false)}
+                className="flex-1 py-3 bg-white/10 text-white rounded-xl font-bold hover:bg-white/20 transition"
+              >
+                Annuler
+              </button>
+              <button
+                onClick={createB2BPartner}
+                className="flex-1 py-3 bg-violet-500 text-white rounded-xl font-bold hover:bg-violet-600 shadow-lg shadow-violet-500/30 transition"
+              >
+                Créer le partenaire
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODALE EDIT B2B PARTNER */}
+      {editingB2B && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-slate-800 border border-white/10 rounded-3xl p-8 max-w-lg w-full relative shadow-2xl">
+            <button
+              onClick={() => setEditingB2B(null)}
+              className="absolute top-6 right-6 p-2 bg-white/10 rounded-full hover:bg-white/20 transition text-white"
+            >
+              <X size={20} />
+            </button>
+
+            <div className="mb-6">
+              <h2 className="text-2xl font-black text-white">Modifier {editingB2B.name}</h2>
+              <p className="text-slate-400 text-sm mt-1">Mettre à jour les informations du partenaire</p>
+            </div>
+
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-bold mb-2 text-slate-300">Nom de l'entreprise</label>
+                <input
+                  type="text"
+                  value={editingB2B.name}
+                  onChange={(e) => setEditingB2B({ ...editingB2B, name: e.target.value })}
+                  className="w-full p-3 bg-white/5 border border-white/10 rounded-xl text-white focus:border-violet-500 focus:outline-none"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-bold mb-2 text-slate-300">Email</label>
+                <input
+                  type="email"
+                  value={editingB2B.email}
+                  onChange={(e) => setEditingB2B({ ...editingB2B, email: e.target.value })}
+                  className="w-full p-3 bg-white/5 border border-white/10 rounded-xl text-white focus:border-violet-500 focus:outline-none"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-bold mb-2 text-slate-300">Téléphone</label>
+                <input
+                  type="tel"
+                  value={editingB2B.phone}
+                  onChange={(e) => setEditingB2B({ ...editingB2B, phone: e.target.value })}
+                  className="w-full p-3 bg-white/5 border border-white/10 rounded-xl text-white focus:border-violet-500 focus:outline-none"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-bold mb-2 text-slate-300">Plan</label>
+                  <select
+                    value={editingB2B.plan}
+                    onChange={(e) => setEditingB2B({ ...editingB2B, plan: e.target.value as any })}
+                    className="w-full p-3 bg-white/5 border border-white/10 rounded-xl text-white focus:border-violet-500 focus:outline-none"
+                  >
+                    <option value="starter">Starter</option>
+                    <option value="business">Business</option>
+                    <option value="enterprise">Enterprise</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-bold mb-2 text-slate-300">Statut</label>
+                  <select
+                    value={editingB2B.status}
+                    onChange={(e) => setEditingB2B({ ...editingB2B, status: e.target.value as any })}
+                    className="w-full p-3 bg-white/5 border border-white/10 rounded-xl text-white focus:border-violet-500 focus:outline-none"
+                  >
+                    <option value="trial">Essai</option>
+                    <option value="active">Actif</option>
+                    <option value="inactive">Inactif</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="bg-white/5 p-4 rounded-xl border border-white/10">
+                <p className="text-sm text-slate-400 mb-2">Clé API</p>
+                <code className="text-xs font-mono text-violet-400 break-all">{editingB2B.api_key}</code>
+              </div>
+            </div>
+
+            <div className="mt-6 flex gap-3">
+              <button
+                onClick={() => setEditingB2B(null)}
+                className="flex-1 py-3 bg-white/10 text-white rounded-xl font-bold hover:bg-white/20 transition"
+              >
+                Annuler
+              </button>
+              <button
+                onClick={() => updateB2BPartner(editingB2B)}
+                className="flex-1 py-3 bg-violet-500 text-white rounded-xl font-bold hover:bg-violet-600 shadow-lg shadow-violet-500/30 transition"
+              >
+                Enregistrer
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
