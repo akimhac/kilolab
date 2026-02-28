@@ -1526,10 +1526,10 @@ export default function AdminDashboard() {
             {activeTab === "b2b" && (
               <div className="space-y-6">
                 <div className="flex items-center justify-between">
-                  <h3 className="text-2xl font-bold flex items-center gap-2">
-                    <Database size={20} className="text-violet-600" /> Partenaires B2B & API
+                  <h3 className="text-2xl font-bold flex items-center gap-2 text-white">
+                    <Database size={20} className="text-violet-400" /> Partenaires B2B & API
                   </h3>
-                  <button className="px-4 py-2 bg-violet-600 text-white rounded-xl font-bold text-sm hover:bg-violet-700 transition flex items-center gap-2">
+                  <button className="px-4 py-2 bg-violet-500 text-white rounded-xl font-bold text-sm hover:bg-violet-600 transition flex items-center gap-2">
                     <Plus size={16} /> Nouveau partenaire
                   </button>
                 </div>
@@ -1560,30 +1560,30 @@ export default function AdminDashboard() {
                 </div>
 
                 {/* B2B Partners List */}
-                <div className="bg-white rounded-2xl border overflow-hidden">
-                  <div className="p-6 border-b">
-                    <h4 className="font-bold text-lg">Partenaires actifs</h4>
-                    <p className="text-sm text-slate-500">Entreprises utilisant l'API Kilolab</p>
+                <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl overflow-hidden">
+                  <div className="p-6 border-b border-white/10">
+                    <h4 className="font-bold text-lg text-white">Partenaires actifs</h4>
+                    <p className="text-sm text-slate-400">Entreprises utilisant l'API Kilolab</p>
                   </div>
-                  <div className="divide-y">
+                  <div className="divide-y divide-white/5">
                     {[
                       { name: "CleanCorp SAS", plan: "Enterprise", calls: "12,847", status: "active", revenue: "4,230€" },
                       { name: "HôtelGroup", plan: "Business", calls: "8,392", status: "active", revenue: "2,810€" },
                       { name: "AirBnB Cleaning", plan: "Starter", calls: "2,156", status: "active", revenue: "890€" },
                       { name: "CoWork Spaces", plan: "Business", calls: "945", status: "trial", revenue: "0€" },
                     ].map((p, i) => (
-                      <div key={i} className="p-4 flex items-center justify-between hover:bg-slate-50 transition">
+                      <div key={i} className="p-4 flex items-center justify-between hover:bg-white/5 transition">
                         <div className="flex items-center gap-4">
-                          <div className="w-10 h-10 bg-violet-100 rounded-xl flex items-center justify-center text-violet-600 font-bold text-sm">{p.name[0]}</div>
+                          <div className="w-10 h-10 bg-violet-500/20 rounded-xl flex items-center justify-center text-violet-400 font-bold text-sm">{p.name[0]}</div>
                           <div>
-                            <p className="font-bold text-slate-900">{p.name}</p>
-                            <p className="text-xs text-slate-500">{p.calls} appels API / mois</p>
+                            <p className="font-bold text-white">{p.name}</p>
+                            <p className="text-xs text-slate-400">{p.calls} appels API / mois</p>
                           </div>
                         </div>
                         <div className="flex items-center gap-4">
-                          <span className={`px-2.5 py-1 rounded-full text-xs font-bold ${p.plan === 'Enterprise' ? 'bg-violet-100 text-violet-700' : p.plan === 'Business' ? 'bg-teal-100 text-teal-700' : 'bg-slate-100 text-slate-700'}`}>{p.plan}</span>
-                          <span className={`px-2.5 py-1 rounded-full text-xs font-bold ${p.status === 'active' ? 'bg-green-100 text-green-700' : 'bg-orange-100 text-orange-700'}`}>{p.status === 'active' ? 'Actif' : 'Essai'}</span>
-                          <span className="font-bold text-slate-900 min-w-[70px] text-right">{p.revenue}</span>
+                          <span className={`px-2.5 py-1 rounded-full text-xs font-bold ${p.plan === 'Enterprise' ? 'bg-violet-500/20 text-violet-400' : p.plan === 'Business' ? 'bg-teal-500/20 text-teal-400' : 'bg-white/10 text-slate-400'}`}>{p.plan}</span>
+                          <span className={`px-2.5 py-1 rounded-full text-xs font-bold ${p.status === 'active' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-orange-500/20 text-orange-400'}`}>{p.status === 'active' ? 'Actif' : 'Essai'}</span>
+                          <span className="font-bold text-white min-w-[70px] text-right">{p.revenue}</span>
                         </div>
                       </div>
                     ))}
@@ -1592,27 +1592,27 @@ export default function AdminDashboard() {
 
                 {/* API Stats */}
                 <div className="grid md:grid-cols-4 gap-4">
-                  <div className="bg-white rounded-2xl border p-6 text-center">
-                    <p className="text-3xl font-black text-violet-600">24,340</p>
-                    <p className="text-sm text-slate-600 mt-1">Appels API / mois</p>
+                  <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6 text-center">
+                    <p className="text-3xl font-black text-violet-400">24,340</p>
+                    <p className="text-sm text-slate-400 mt-1">Appels API / mois</p>
                   </div>
-                  <div className="bg-white rounded-2xl border p-6 text-center">
-                    <p className="text-3xl font-black text-teal-600">4</p>
-                    <p className="text-sm text-slate-600 mt-1">Partenaires</p>
+                  <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6 text-center">
+                    <p className="text-3xl font-black text-teal-400">4</p>
+                    <p className="text-sm text-slate-400 mt-1">Partenaires</p>
                   </div>
-                  <div className="bg-white rounded-2xl border p-6 text-center">
-                    <p className="text-3xl font-black text-green-600">7,930€</p>
-                    <p className="text-sm text-slate-600 mt-1">Revenus B2B / mois</p>
+                  <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6 text-center">
+                    <p className="text-3xl font-black text-emerald-400">7,930€</p>
+                    <p className="text-sm text-slate-400 mt-1">Revenus B2B / mois</p>
                   </div>
-                  <div className="bg-white rounded-2xl border p-6 text-center">
-                    <p className="text-3xl font-black text-orange-600">99.7%</p>
-                    <p className="text-sm text-slate-600 mt-1">Uptime API</p>
+                  <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6 text-center">
+                    <p className="text-3xl font-black text-orange-400">99.7%</p>
+                    <p className="text-sm text-slate-400 mt-1">Uptime API</p>
                   </div>
                 </div>
 
                 {/* API Documentation */}
-                <div className="bg-slate-50 rounded-2xl border p-6">
-                  <h4 className="font-bold text-lg mb-4 flex items-center gap-2"><FileText size={18} className="text-slate-600" /> Documentation API</h4>
+                <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6">
+                  <h4 className="font-bold text-lg mb-4 flex items-center gap-2 text-white"><FileText size={18} className="text-slate-400" /> Documentation API</h4>
                   <div className="grid md:grid-cols-2 gap-4">
                     {[
                       { method: "POST", path: "/api/v1/orders", desc: "Créer une commande" },
@@ -1620,10 +1620,10 @@ export default function AdminDashboard() {
                       { method: "GET", path: "/api/v1/washers/available", desc: "Washers disponibles" },
                       { method: "POST", path: "/api/v1/webhooks", desc: "Configurer un webhook" },
                     ].map((ep, i) => (
-                      <div key={i} className="bg-white rounded-xl p-4 border flex items-center gap-3">
-                        <span className={`px-2 py-1 rounded text-xs font-mono font-bold ${ep.method === 'POST' ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700'}`}>{ep.method}</span>
+                      <div key={i} className="bg-white/5 rounded-xl p-4 border border-white/10 flex items-center gap-3">
+                        <span className={`px-2 py-1 rounded text-xs font-mono font-bold ${ep.method === 'POST' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-blue-500/20 text-blue-400'}`}>{ep.method}</span>
                         <div>
-                          <code className="text-sm font-mono text-slate-700">{ep.path}</code>
+                          <code className="text-sm font-mono text-slate-300">{ep.path}</code>
                           <p className="text-xs text-slate-500 mt-0.5">{ep.desc}</p>
                         </div>
                       </div>
@@ -1632,9 +1632,73 @@ export default function AdminDashboard() {
                 </div>
               </div>
             )}
+          </div>
+        </div>
+      </div>
 
+      {/* MODALE PARTNER */}
+      {showPartnerModal && selectedPartner && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-slate-800 border border-white/10 rounded-3xl p-8 max-w-2xl w-full relative shadow-2xl">
+            <button
+              onClick={() => setShowPartnerModal(false)}
+              className="absolute top-6 right-6 p-2 bg-white/10 rounded-full hover:bg-white/20 transition text-white"
+            >
+              <X size={20} />
+            </button>
 
-      {/* MODALE WASHER */}
+            <div className="mb-8">
+              <h2 className="text-3xl font-black mb-2 text-white">{selectedPartner.name}</h2>
+              <div className="flex gap-2">
+                <span className="bg-white/10 px-3 py-1 rounded-full text-sm font-bold text-slate-300">
+                  {selectedPartner.city}
+                </span>
+                <span
+                  className={`px-3 py-1 rounded-full text-sm font-bold ${
+                    selectedPartner.is_active ? "bg-emerald-500/20 text-emerald-400" : "bg-orange-500/20 text-orange-400"
+                  }`}
+                >
+                  {selectedPartner.is_active ? "Actif" : "En attente"}
+                </span>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-6 mb-8">
+              <div className="bg-white/5 p-4 rounded-xl border border-white/10">
+                <p className="text-sm text-slate-400 mb-1">Email Pro</p>
+                <p className="font-bold text-white">{selectedPartner.email}</p>
+              </div>
+              <div className="bg-white/5 p-4 rounded-xl border border-white/10">
+                <p className="text-sm text-slate-400 mb-1">Téléphone</p>
+                <p className="font-bold text-white">{selectedPartner.phone}</p>
+              </div>
+              <div className="bg-white/5 p-4 rounded-xl col-span-2 border border-white/10">
+                <p className="text-sm text-slate-400 mb-1">Adresse</p>
+                <p className="font-bold text-white">
+                  {selectedPartner.address}, {selectedPartner.postal_code} {selectedPartner.city}
+                </p>
+              </div>
+            </div>
+
+            {!selectedPartner.is_active && (
+              <div className="flex gap-3 pt-6 border-t border-white/10">
+                <button
+                  onClick={() => rejectPartner(selectedPartner)}
+                  className="flex-1 py-3 bg-red-500/20 text-red-400 font-bold rounded-xl hover:bg-red-500/30 transition"
+                >
+                  Refuser
+                </button>
+                <button
+                  onClick={() => approvePartner(selectedPartner.id)}
+                  className="flex-1 py-3 bg-emerald-500 text-white font-bold rounded-xl hover:bg-emerald-600 transition shadow-lg shadow-emerald-500/30"
+                >
+                  Valider le compte
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
       {showWasherModal && selectedWasher && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-3xl p-8 max-w-4xl w-full max-h-[90vh] overflow-y-auto relative shadow-2xl">
