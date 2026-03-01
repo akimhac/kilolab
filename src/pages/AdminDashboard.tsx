@@ -2316,6 +2316,127 @@ export default function AdminDashboard() {
         </div>
       )}
 
+      {/* MODALE ORDER - ANNULATION / MESSAGE CLIENT */}
+      {showOrderModal && selectedOrder && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-slate-800 border border-white/10 rounded-3xl p-8 max-w-2xl w-full relative shadow-2xl">
+            <button
+              onClick={() => {
+                setShowOrderModal(false);
+                setSelectedOrder(null);
+                setCancelMessage("");
+              }}
+              className="absolute top-6 right-6 p-2 bg-white/10 rounded-full hover:bg-white/20 transition text-white"
+            >
+              <X size={20} />
+            </button>
+
+            <div className="mb-6">
+              <h2 className="text-2xl font-black text-white flex items-center gap-3">
+                <ShoppingBag className="text-teal-400" />
+                Commande #{selectedOrder.id.slice(0, 8).toUpperCase()}
+              </h2>
+              <p className="text-slate-400 text-sm mt-1">
+                {new Date(selectedOrder.created_at).toLocaleDateString("fr-FR", { 
+                  day: "numeric", 
+                  month: "long", 
+                  year: "numeric",
+                  hour: "2-digit",
+                  minute: "2-digit"
+                })}
+              </p>
+            </div>
+
+            {/* Order Details */}
+            <div className="grid grid-cols-2 gap-4 mb-6">
+              <div className="bg-white/5 p-4 rounded-xl border border-white/10">
+                <p className="text-sm text-slate-400 mb-1">Client</p>
+                <p className="font-bold text-white">{selectedOrder.profiles?.email || selectedOrder.client_email || "Non spécifié"}</p>
+              </div>
+              <div className="bg-white/5 p-4 rounded-xl border border-white/10">
+                <p className="text-sm text-slate-400 mb-1">Montant</p>
+                <p className="font-bold text-emerald-400 text-xl">{selectedOrder.total_price} €</p>
+              </div>
+              <div className="bg-white/5 p-4 rounded-xl border border-white/10 col-span-2">
+                <p className="text-sm text-slate-400 mb-1">Adresse de collecte</p>
+                <p className="font-bold text-white">{selectedOrder.pickup_address || "Non spécifiée"}</p>
+                {selectedOrder.pickup_city && (
+                  <p className="text-slate-300 text-sm">{selectedOrder.pickup_city}</p>
+                )}
+              </div>
+              <div className="bg-white/5 p-4 rounded-xl border border-white/10">
+                <p className="text-sm text-slate-400 mb-1">Statut actuel</p>
+                <span className={`px-3 py-1 rounded-full text-xs font-bold ${
+                  selectedOrder.status === "completed"
+                    ? "bg-emerald-500/20 text-emerald-400"
+                    : selectedOrder.status === "cancelled"
+                    ? "bg-red-500/20 text-red-400"
+                    : selectedOrder.status === "pending"
+                    ? "bg-orange-500/20 text-orange-400"
+                    : "bg-blue-500/20 text-blue-400"
+                }`}>
+                  {selectedOrder.status === "completed" ? "Terminé" 
+                    : selectedOrder.status === "cancelled" ? "Annulé"
+                    : selectedOrder.status === "pending" ? "En attente"
+                    : selectedOrder.status}
+                </span>
+              </div>
+              <div className="bg-white/5 p-4 rounded-xl border border-white/10">
+                <p className="text-sm text-slate-400 mb-1">Poids</p>
+                <p className="font-bold text-white">{selectedOrder.weight || "?"} kg</p>
+              </div>
+            </div>
+
+            {/* Message Input */}
+            <div className="mb-6">
+              <label className="block text-sm font-bold mb-2 text-slate-300">
+                Message au client
+              </label>
+              <textarea
+                value={cancelMessage}
+                onChange={(e) => setCancelMessage(e.target.value)}
+                placeholder="Écrivez votre message au client... (ex: Désolé, nous n'avons pas de laveur disponible dans votre zone actuellement)"
+                className="w-full p-4 bg-white/5 border border-white/10 rounded-xl text-white placeholder-slate-500 focus:border-teal-500 focus:outline-none resize-none h-32"
+              />
+            </div>
+
+            {/* Actions */}
+            <div className="flex gap-3 pt-4 border-t border-white/10">
+              <button
+                onClick={() => {
+                  setShowOrderModal(false);
+                  setSelectedOrder(null);
+                  setCancelMessage("");
+                }}
+                className="flex-1 py-3 bg-white/10 text-white rounded-xl font-bold hover:bg-white/20 transition"
+              >
+                Fermer
+              </button>
+              
+              <button
+                onClick={() => sendMessageToClient(selectedOrder, cancelMessage)}
+                disabled={sendingEmail || !cancelMessage.trim()}
+                className="flex-1 py-3 bg-blue-500 text-white rounded-xl font-bold hover:bg-blue-600 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-lg shadow-blue-500/30"
+              >
+                {sendingEmail ? <Loader2 className="animate-spin" size={18} /> : <Send size={18} />}
+                Envoyer message
+              </button>
+
+              {selectedOrder.status !== "cancelled" && selectedOrder.status !== "completed" && (
+                <button
+                  onClick={() => cancelOrder(selectedOrder, cancelMessage)}
+                  disabled={sendingEmail || !cancelMessage.trim()}
+                  className="flex-1 py-3 bg-red-500 text-white rounded-xl font-bold hover:bg-red-600 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-lg shadow-red-500/30"
+                >
+                  {sendingEmail ? <Loader2 className="animate-spin" size={18} /> : <XCircle size={18} />}
+                  Annuler commande
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* MODALE CREATE B2B PARTNER */}
       {showB2BModal && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
