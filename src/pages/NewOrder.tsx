@@ -332,6 +332,28 @@ export default function NewOrder() {
 
       if (order) {
         localStorage.removeItem("kilolab_pending_order");
+        
+        // Send admin alert for new order
+        try {
+          await fetch('/api/send-email', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              type: 'admin_new_order',
+              data: {
+                id: order.id,
+                weight: order.weight,
+                total_price: order.total_price,
+                pickup_address: order.pickup_address,
+                pickup_city: searchQuery,
+                client_email: user?.email
+              }
+            })
+          });
+        } catch (alertError) {
+          console.error('Admin order alert failed:', alertError);
+        }
+        
         await handlePayment(order.id, user.email || "");
       }
     } catch (error: any) {
