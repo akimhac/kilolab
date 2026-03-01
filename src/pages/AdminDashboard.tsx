@@ -1528,18 +1528,23 @@ export default function AdminDashboard() {
                   <thead className="bg-white/5 border-b border-white/10">
                     <tr>
                       <th className="text-left p-4 font-bold text-sm text-slate-400">ID</th>
-                      <th className="text-left p-4 font-bold text-sm text-slate-400">Partenaire</th>
+                      <th className="text-left p-4 font-bold text-sm text-slate-400">Client</th>
+                      <th className="text-left p-4 font-bold text-sm text-slate-400">Adresse</th>
                       <th className="text-left p-4 font-bold text-sm text-slate-400">Montant</th>
                       <th className="text-left p-4 font-bold text-sm text-slate-400">Statut</th>
                       <th className="text-left p-4 font-bold text-sm text-slate-400">Date</th>
+                      <th className="text-left p-4 font-bold text-sm text-slate-400">Actions</th>
                     </tr>
                   </thead>
                   <tbody>
                     {filteredOrdersByTime.map((order) => (
                       <tr key={order.id} className="border-b border-white/5 hover:bg-white/5 transition">
                         <td className="p-4 font-mono text-xs text-teal-400">{order.id.slice(0, 8)}</td>
-                        <td className="p-4 font-bold text-sm text-white">
-                          {order.partner?.company_name || order.pickup_address?.slice(0,25) || <span className="text-slate-500">C2C</span>}
+                        <td className="p-4 text-sm text-white">
+                          {order.profiles?.email || order.client_email || <span className="text-slate-500">-</span>}
+                        </td>
+                        <td className="p-4 text-sm text-slate-300 max-w-[200px] truncate">
+                          {order.pickup_address || order.partner?.company_name || <span className="text-slate-500">-</span>}
                         </td>
                         <td className="p-4 font-bold text-emerald-400">{order.total_price} €</td>
                         <td className="p-4">
@@ -1549,14 +1554,48 @@ export default function AdminDashboard() {
                                 ? "bg-emerald-500/20 text-emerald-400"
                                 : order.status === "cancelled"
                                 ? "bg-red-500/20 text-red-400"
+                                : order.status === "pending"
+                                ? "bg-orange-500/20 text-orange-400"
                                 : "bg-blue-500/20 text-blue-400"
                             }`}
                           >
-                            {order.status}
+                            {order.status === "completed" ? "Terminé" 
+                              : order.status === "cancelled" ? "Annulé"
+                              : order.status === "pending" ? "En attente"
+                              : order.status === "in_progress" ? "En cours"
+                              : order.status === "ready" ? "Prêt"
+                              : order.status}
                           </span>
                         </td>
                         <td className="p-4 text-sm text-slate-400">
                           {new Date(order.created_at).toLocaleDateString("fr-FR")}
+                        </td>
+                        <td className="p-4">
+                          <div className="flex gap-2">
+                            {order.status !== "cancelled" && order.status !== "completed" && (
+                              <button
+                                onClick={() => {
+                                  setSelectedOrder(order);
+                                  setShowOrderModal(true);
+                                }}
+                                className="p-2 bg-red-500/20 text-red-400 rounded-lg hover:bg-red-500/30 transition"
+                                title="Annuler la commande"
+                              >
+                                <XCircle size={16} />
+                              </button>
+                            )}
+                            <button
+                              onClick={() => {
+                                setSelectedOrder(order);
+                                setCancelMessage("");
+                                setShowOrderModal(true);
+                              }}
+                              className="p-2 bg-blue-500/20 text-blue-400 rounded-lg hover:bg-blue-500/30 transition"
+                              title="Contacter le client"
+                            >
+                              <Send size={16} />
+                            </button>
+                          </div>
                         </td>
                       </tr>
                     ))}
