@@ -70,6 +70,30 @@ export function useOrders(userId: string | undefined) {
       .single();
 
     if (error) throw error;
+    
+    // Send admin alert for new order
+    if (data) {
+      try {
+        await fetch('/api/send-email', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            type: 'admin_new_order',
+            data: {
+              id: data.id,
+              weight: data.weight,
+              total_price: data.total_price,
+              service_type: data.service_type,
+              pickup_address: data.pickup_address,
+              pickup_city: data.pickup_city
+            }
+          })
+        });
+      } catch (alertError) {
+        console.error('Admin order alert failed:', alertError);
+      }
+    }
+    
     await fetchOrders();
     return data;
   };
