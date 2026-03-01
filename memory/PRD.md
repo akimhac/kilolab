@@ -5,7 +5,7 @@ Le 1er service de laverie à domicile en France. Marketplace connectant les clie
 
 ## Architecture
 - **Frontend**: React 18 + TypeScript + Vite + TailwindCSS
-- **Backend**: Supabase (PostgreSQL, Auth, RLS, Storage)
+- **Backend**: Supabase (PostgreSQL, Auth, RLS, Storage) + FastAPI (preview)
 - **Serverless**: Vercel Serverless Functions (`/api/`)
 - **AI**: OpenAI GPT-4o via Emergent LLM Key
 - **Paiements**: Stripe | **Emails**: Resend | **Push**: Firebase
@@ -13,6 +13,13 @@ Le 1er service de laverie à domicile en France. Marketplace connectant les clie
 - **Testing**: Playwright E2E
 
 ## Implémenté
+
+### Sprint 8 - Alertes Admin & Annulation Commandes (01/03/2026)
+- [x] **Alertes Email Admin** : Notifications automatiques pour nouvelles inscriptions et commandes
+- [x] **Annulation de Commande** : Modal dans Admin Dashboard avec message personnalisé au client
+- [x] **API /api/send-email** : Endpoint Resend pour alertes admin et emails clients
+- [x] **Fix Signup CGU** : Checkbox CGU/CGV/RGPD correctement placée
+- [x] Tests API : Envoi emails ✅ (admin_new_order + admin_new_user)
 
 ### Sprint 7 - CRUD B2B + React Router v7 (28/02/2026)
 - [x] **CRUD B2B Complet** : create, update, delete, toggleStatus, regenerateApiKey
@@ -48,11 +55,19 @@ Le 1er service de laverie à domicile en France. Marketplace connectant les clie
 - [x] Traductions i18next + Fix Logo + Refonte Landing
 
 ## Tests
+- API send-email: ✅ Testé avec curl (admin_new_order + admin_new_user)
 - iteration_9.json: **100%** (24 tests) — CRUD B2B + React Router v7
 - iteration_8.json: 100% (28 tests) — Admin Dashboard dark theme
 - iteration_7.json: 100% (21 tests) — Compteur Live + GPS
 
+## Configuration Email
+- **Resend API Key**: Configurée dans backend/.env et Vercel
+- **Admin Email**: akim.hachili@gmail.com (stockée server-side uniquement)
+- **From Address**: noreply@kilolab.fr
+
 ## Backlog Complété ✅
+- ~~Alertes email nouvelles inscriptions/commandes~~ → DONE
+- ~~Annulation commande avec message client~~ → DONE
 - ~~CRUD B2B partenaires avec vrais appels API~~ → DONE
 - ~~Warnings React Router v7~~ → DONE
 
@@ -60,4 +75,4 @@ Le 1er service de laverie à domicile en France. Marketplace connectant les clie
 - [ ] App mobile React Native séparée
 
 ---
-*Dernière mise à jour: 28/02/2026 - BACKLOG TERMINÉ*
+*Dernière mise à jour: 01/03/2026 - Sprint 8 terminé*
