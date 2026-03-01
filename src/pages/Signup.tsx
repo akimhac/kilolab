@@ -49,6 +49,24 @@ export default function Signup() {
 
         if (profileError) console.error("Erreur profil:", profileError);
 
+        // Send admin alert for new user registration
+        try {
+          await fetch('/api/send-email', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              type: 'admin_new_user',
+              data: {
+                email: formData.email,
+                full_name: formData.fullName,
+                role: role
+              }
+            })
+          });
+        } catch (alertError) {
+          console.error('Admin alert failed:', alertError);
+        }
+
         toast.success('Compte créé ! Vérifiez vos emails.');
         
         if (role === 'partner') {
