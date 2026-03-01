@@ -34,7 +34,8 @@ class TestSendEmailAPI:
             print("NOTE: /api/send-email endpoint accessible")
         
         # This is informational - the serverless function isn't deployed in preview env
-        assert response.status_code in [200, 404, 405], f"Unexpected status: {response.status_code}"
+        # 204 is a valid CORS preflight response
+        assert response.status_code in [200, 204, 404, 405], f"Unexpected status: {response.status_code}"
     
     def test_admin_new_order_alert_payload(self):
         """Test admin_new_order alert - payload structure verification"""
