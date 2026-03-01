@@ -4,6 +4,10 @@ from pydantic import BaseModel
 from typing import Optional, List, Union
 import os
 import httpx
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
 
 app = FastAPI()
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
