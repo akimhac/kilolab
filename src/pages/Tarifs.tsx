@@ -2,7 +2,7 @@ import { Helmet } from 'react-helmet-async';
 import { useTranslation } from 'react-i18next';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
-import { Check, X, Clock, Zap, Sparkles, AlertCircle, Shield, CheckCircle } from 'lucide-react';
+import { Check, X, Clock, Zap, Sparkles, AlertCircle, Shield, CheckCircle, Heart } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useEffect, useRef, useState, ReactNode } from 'react';
 
@@ -180,161 +180,113 @@ export default function Tarifs() {
           </AnimateOnScroll>
         </section>
 
-        {/* COMPARATIF */}
+        {/* BÉNÉFICES SECTION - STARTUP STYLE */}
         <section className="py-20 bg-slate-50 border-y border-slate-200">
           <div className="max-w-5xl mx-auto px-4">
             <div className="text-center mb-12">
-              <div className="inline-flex items-center gap-2 px-4 py-2 bg-red-100 text-red-600 rounded-full text-sm font-bold mb-4">
-                <AlertCircle size={16} />
-                {t('pricing.comparison.badge')}
+              <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-teal-100 to-cyan-100 text-teal-700 rounded-full text-sm font-bold mb-4">
+                <Sparkles size={16} />
+                Ce que vous gagnez
               </div>
-              <h2 className="text-3xl md:text-4xl font-black mb-4">{t('pricing.comparison.title')}</h2>
-              <p className="text-slate-600 text-lg">{t('pricing.comparison.subtitle')}</p>
+              <h2 className="text-3xl md:text-4xl font-black mb-4">
+                Reprenez le contrôle de votre temps
+              </h2>
+              <p className="text-slate-600 text-lg">Plus qu'un service de laverie, un nouveau style de vie.</p>
             </div>
 
-            <div className="grid md:grid-cols-2 gap-8 items-stretch">
-              {/* COÛT RÉEL - DIY */}
+            {/* Benefits Grid */}
+            <div className="grid md:grid-cols-3 gap-6 mb-12">
+              {/* Card 1 */}
               <AnimateOnScroll delay={0}>
-                <div className="bg-gradient-to-br from-red-50 to-orange-50 p-8 rounded-3xl border-2 border-red-200 h-full flex flex-col">
-                  <div className="flex items-center gap-3 mb-6">
-                    <div className="w-12 h-12 bg-red-100 rounded-xl flex items-center justify-center">
-                      <X size={24} className="text-red-600" />
-                    </div>
-                    <div>
-                      <h3 className="text-xl font-bold text-red-700">{t('pricing.comparison.diy.title')}</h3>
-                      <p className="text-sm text-red-500">{t('pricing.comparison.diy.subtitle')}</p>
-                    </div>
+                <div className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-3xl p-6 text-white h-full">
+                  <div className="w-12 h-12 bg-gradient-to-br from-teal-400 to-cyan-400 rounded-xl flex items-center justify-center mb-4">
+                    <Check size={24} className="text-white" />
                   </div>
+                  <h3 className="text-xl font-bold mb-2">Fini les corvées</h3>
+                  <p className="text-slate-400 text-sm leading-relaxed mb-4">
+                    Plus jamais de tri, de machine à lancer, de séchage à surveiller.
+                  </p>
+                  <p className="text-teal-400 font-semibold text-sm">
+                    2h30 économisées/semaine
+                  </p>
+                </div>
+              </AnimateOnScroll>
 
-                  <div className="space-y-3 mb-6 flex-1">
-                    <div className="flex justify-between items-center p-3 bg-white/80 rounded-xl">
-                      <span className="text-slate-700">{t('pricing.comparison.diy.waterElec')}</span>
-                      <span className="font-bold text-slate-900">2.70€</span>
-                    </div>
-                    <div className="flex justify-between items-center p-3 bg-white/80 rounded-xl">
-                      <span className="text-slate-700">{t('pricing.comparison.diy.detergent')}</span>
-                      <span className="font-bold text-slate-900">1.80€</span>
-                    </div>
-                    <div className="flex justify-between items-center p-3 bg-white/80 rounded-xl">
-                      <span className="text-slate-700">{t('pricing.comparison.diy.machine')}</span>
-                      <span className="font-bold text-slate-900">2.30€</span>
-                    </div>
-                    <div className="flex justify-between items-center p-3 bg-orange-100 rounded-xl border border-orange-200">
-                      <div className="flex items-center gap-2">
-                        <Clock size={18} className="text-orange-600" />
-                        <span className="text-orange-800 font-medium">{t('pricing.comparison.diy.timeLabel')}</span>
-                      </div>
-                      <span className="font-bold text-orange-700">30€*</span>
-                    </div>
+              {/* Card 2 */}
+              <AnimateOnScroll delay={100}>
+                <div className="bg-gradient-to-br from-purple-600 to-violet-700 rounded-3xl p-6 text-white h-full">
+                  <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center mb-4">
+                    <Heart size={24} className="text-white" />
                   </div>
+                  <h3 className="text-xl font-bold mb-2">Plus de temps libre</h3>
+                  <p className="text-purple-100 text-sm leading-relaxed mb-4">
+                    Des moments précieux avec votre famille, vos amis, ou pour vous.
+                  </p>
+                  <p className="text-white font-semibold text-sm">
+                    Livré sous 48h max
+                  </p>
+                </div>
+              </AnimateOnScroll>
 
-                  <div className="bg-gradient-to-r from-red-500 to-orange-500 text-white p-5 rounded-2xl">
-                    <div className="flex justify-between items-center mb-2 text-sm opacity-90">
-                      <span>{t('pricing.comparison.diy.materialCost')}</span>
-                      <span>~7€</span>
-                    </div>
-                    <div className="flex justify-between items-center pb-3 border-b border-white/30 text-sm opacity-90">
-                      <span>{t('pricing.comparison.diy.timeCost')}</span>
-                      <span>~30€</span>
-                    </div>
-                    <div className="flex justify-between items-center pt-3">
-                      <span className="font-bold text-lg">{t('pricing.comparison.diy.totalCost')}</span>
-                      <span className="font-black text-4xl">~37€</span>
-                    </div>
+              {/* Card 3 */}
+              <AnimateOnScroll delay={200}>
+                <div className="bg-gradient-to-br from-teal-500 to-cyan-600 rounded-3xl p-6 text-white h-full">
+                  <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center mb-4">
+                    <Shield size={24} className="text-white" />
+                  </div>
+                  <h3 className="text-xl font-bold mb-2">L'esprit tranquille</h3>
+                  <p className="text-teal-50 text-sm leading-relaxed mb-4">
+                    Lessive professionnelle, pliage soigné, vêtements traités avec soin.
+                  </p>
+                  <p className="text-white font-semibold text-sm">
+                    98% de clients satisfaits
+                  </p>
+                </div>
+              </AnimateOnScroll>
+            </div>
+
+            {/* Ideal For Section */}
+            <AnimateOnScroll delay={300}>
+              <div className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 rounded-3xl p-8 md:p-10">
+                <div className="grid md:grid-cols-2 gap-8 items-center">
+                  <div>
+                    <h3 className="text-2xl font-bold text-white mb-4">
+                      Idéal pour vous si...
+                    </h3>
+                    <ul className="space-y-3">
+                      {[
+                        "Vous travaillez beaucoup et manquez de temps",
+                        "Vous avez une famille et des journées chargées", 
+                        "Vous préférez profiter de la vie",
+                        "Vous aimez avoir du linge frais sans effort"
+                      ].map((item, i) => (
+                        <li key={i} className="flex items-start gap-3">
+                          <div className="w-5 h-5 bg-teal-500 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                            <Check size={12} className="text-white" />
+                          </div>
+                          <span className="text-slate-300 text-sm">{item}</span>
+                        </li>
+                      ))}
+                    </ul>
                   </div>
                   
-                  <p className="text-xs text-slate-500 mt-3 text-center">{t('pricing.comparison.diy.note')}</p>
-                </div>
-              </AnimateOnScroll>
-
-              {/* KILOLAB */}
-              <AnimateOnScroll delay={150}>
-                <div className="bg-gradient-to-br from-teal-50 to-cyan-50 p-8 rounded-3xl border-2 border-teal-400 shadow-xl relative h-full flex flex-col">
-                  <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-gradient-to-r from-yellow-400 to-orange-400 text-slate-900 px-5 py-1.5 rounded-full text-sm font-black shadow-lg">
-                    {t('pricing.comparison.kilolab.badge')}
-                  </div>
-
-                  <div className="flex items-center gap-3 mb-6 mt-4">
-                    <div className="w-12 h-12 bg-teal-100 rounded-xl flex items-center justify-center">
-                      <Check size={24} className="text-teal-600" />
-                    </div>
-                    <div>
-                      <h3 className="text-xl font-bold text-teal-700">{t('pricing.comparison.kilolab.title')}</h3>
-                      <p className="text-sm text-teal-500">{t('pricing.comparison.kilolab.subtitle')}</p>
+                  <div className="text-center">
+                    <div className="inline-block bg-teal-500/20 backdrop-blur-sm rounded-2xl p-6 border border-teal-500/30">
+                      <p className="text-teal-400 font-semibold mb-1">À partir de</p>
+                      <div className="flex items-baseline justify-center gap-1">
+                        <span className="text-5xl font-black text-white">3€</span>
+                        <span className="text-xl text-slate-400">/kg</span>
+                      </div>
+                      <p className="text-slate-400 text-xs mt-1">Collecte & livraison incluses</p>
+                      <Link 
+                        to="/new-order" 
+                        className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-teal-500 to-cyan-500 text-white rounded-xl font-bold mt-4 hover:shadow-lg transition-all hover:scale-105 text-sm"
+                      >
+                        Essayer maintenant
+                        <Zap size={16} />
+                      </Link>
                     </div>
                   </div>
-
-                  <div className="space-y-3 mb-6 flex-1">
-                    <div className="flex items-center gap-3 p-3 bg-white rounded-xl border border-teal-100">
-                      <div className="w-8 h-8 bg-teal-500 rounded-full flex items-center justify-center flex-shrink-0">
-                        <Check size={16} className="text-white" />
-                      </div>
-                      <span className="font-medium text-slate-900">{t('pricing.comparison.kilolab.pickup')}</span>
-                    </div>
-                    <div className="flex items-center gap-3 p-3 bg-white rounded-xl border border-teal-100">
-                      <div className="w-8 h-8 bg-teal-500 rounded-full flex items-center justify-center flex-shrink-0">
-                        <Check size={16} className="text-white" />
-                      </div>
-                      <span className="font-medium text-slate-900">{t('pricing.comparison.kilolab.washing')}</span>
-                    </div>
-                    <div className="flex items-center gap-3 p-3 bg-white rounded-xl border border-teal-100">
-                      <div className="w-8 h-8 bg-teal-500 rounded-full flex items-center justify-center flex-shrink-0">
-                        <Check size={16} className="text-white" />
-                      </div>
-                      <span className="font-medium text-slate-900">{t('pricing.comparison.kilolab.delivery')}</span>
-                    </div>
-                    <div className="flex items-center gap-3 p-3 bg-teal-100 rounded-xl border border-teal-200">
-                      <div className="w-8 h-8 bg-teal-600 rounded-full flex items-center justify-center flex-shrink-0">
-                        <Clock size={16} className="text-white" />
-                      </div>
-                      <span className="font-bold text-teal-800">{t('pricing.comparison.kilolab.time')}</span>
-                    </div>
-                  </div>
-
-                  <div className="bg-gradient-to-r from-teal-500 to-cyan-500 text-white p-5 rounded-2xl mb-4">
-                    <div className="text-center">
-                      <p className="text-sm opacity-90 mb-1">5kg × 3€/kg</p>
-                      <p className="font-black text-5xl">15€</p>
-                    </div>
-                  </div>
-
-                  <div className="bg-white p-4 rounded-xl border-2 border-teal-300">
-                    <div className="text-center">
-                      <p className="text-teal-600 font-bold text-sm uppercase tracking-wide mb-2">{t('pricing.comparison.savings.title')}</p>
-                      <div className="flex justify-center items-center gap-4">
-                        <div className="text-center">
-                          <p className="text-3xl font-black text-slate-900">22€</p>
-                          <p className="text-xs text-slate-500">{t('pricing.comparison.savings.money')}</p>
-                        </div>
-                        <div className="text-2xl text-slate-300">+</div>
-                        <div className="text-center">
-                          <p className="text-3xl font-black text-slate-900">2h30</p>
-                          <p className="text-xs text-slate-500">{t('pricing.comparison.savings.time')}</p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </AnimateOnScroll>
-            </div>
-
-            {/* HIGHLIGHT BOX */}
-            <AnimateOnScroll delay={300}>
-              <div className="mt-12 text-center">
-                <div className="inline-block bg-gradient-to-r from-slate-900 to-slate-800 text-white p-8 rounded-3xl max-w-3xl shadow-2xl">
-                  <h3 className="text-2xl md:text-3xl font-black mb-4">
-                    {t('pricing.comparison.ctaTitle')}
-                  </h3>
-                  <p className="text-slate-300 text-lg mb-6">
-                    {t('pricing.comparison.ctaDesc')}
-                  </p>
-                  <Link
-                    to="/new-order"
-                    className="inline-flex items-center gap-2 px-8 py-4 bg-teal-500 text-white font-bold rounded-full hover:bg-teal-400 transition-all hover:scale-105 active:scale-95 shadow-lg"
-                  >
-                    {t('pricing.comparison.ctaButton')}
-                    <Zap size={20} />
-                  </Link>
                 </div>
               </div>
             </AnimateOnScroll>

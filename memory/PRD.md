@@ -21,6 +21,14 @@ Le 1er service de laverie à domicile en France. Marketplace connectant les clie
 - [x] **Fix Signup CGU** : Checkbox CGU/CGV/RGPD correctement placée
 - [x] Tests API : Envoi emails ✅ (admin_new_order + admin_new_user)
 
+### Sprint 8.1 - Refonte UX Landing & Tarifs (01/03/2026)
+- [x] **Nouvelle vidéo** : Vidéo Pexels HD de qualité professionnelle
+- [x] **Suppression texte** : "Vidéo de démonstration..." supprimé
+- [x] **Nouvelle section Bénéfices** : Design startup moderne remplaçant le comparateur
+  - Cartes "Fini les corvées", "Plus de temps libre", "L'esprit tranquille"
+  - Section "Idéal pour vous si..." avec CTA
+- [x] **Page Tarifs** : Même refonte bénéfices, plus de comparateur prix
+
 ### Sprint 7 - CRUD B2B + React Router v7 (28/02/2026)
 - [x] **CRUD B2B Complet** : create, update, delete, toggleStatus, regenerateApiKey
 - [x] **Supabase Table** : b2b_partners avec api_key, plan, status, api_calls, monthly_revenue

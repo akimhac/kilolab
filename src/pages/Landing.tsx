@@ -5,7 +5,7 @@ import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import { TrustBadges } from "../components/SocialProof";
 import {
-  ArrowRight, CheckCircle, Clock, Sparkles, AlertCircle, TrendingUp, Shield, Star, Play,
+  ArrowRight, CheckCircle, Clock, Sparkles, AlertCircle, TrendingUp, Shield, Star, Play, Heart, Check,
 } from "lucide-react";
 import { useEffect, useMemo, useState, useRef, ReactNode } from "react";
 import HowItWorks from "../components/HowItWorks";
@@ -27,7 +27,6 @@ function AnimateOnScroll({ children, delay = 0, className = "" }: { children: Re
 
 export default function Landing() {
   const { t } = useTranslation();
-  const [weight, setWeight] = useState(5);
   const [reduceMotion, setReduceMotion] = useState(false);
 
   const HERO_VIDEO_MP4 = "https://cdn.coverr.co/videos/coverr-clothes-being-washed-in-a-laundry-machine-1674/1080p.mp4";
@@ -40,15 +39,6 @@ export default function Landing() {
     mq?.addEventListener?.("change", update);
     return () => mq?.removeEventListener?.("change", update);
   }, []);
-
-  const diyWater = 1.8, diyElectricity = 0.9, diyDetergent = 1.2, diySoftener = 0.6, diyMachineWear = 0.8, diyDryer = 1.5;
-  const diyMaterialTotal = diyWater + diyElectricity + diyDetergent + diySoftener + diyMachineWear + diyDryer;
-  const diyTimeHours = 2.5, hourlyRate = 12;
-  const diyTimeCost = diyTimeHours * hourlyRate;
-  const diyTotalCost = diyMaterialTotal + diyTimeCost;
-  const kilolabPrice = weight * 3;
-  const timeSaved = diyTimeHours;
-  const savings = (diyTotalCost - kilolabPrice).toFixed(0);
 
   return (
     <>
@@ -210,7 +200,7 @@ export default function Landing() {
           </div>
         </section>
 
-        {/* COST COMPARISON */}
+        {/* BENEFITS SECTION */}
         <section className="py-24 bg-white">
 
           {/* ═══ EMBEDDED VIDEO ═══ */}
@@ -228,9 +218,9 @@ export default function Landing() {
                   muted 
                   playsInline 
                   className="absolute inset-0 w-full h-full object-cover"
-                  poster="https://images.unsplash.com/photo-1582735689369-4fe89db7114c?q=80&w=2400&auto=format&fit=crop"
+                  poster="https://images.unsplash.com/photo-1517677208171-0bc6725a3e60?q=80&w=2400&auto=format&fit=crop"
                 >
-                  <source src="https://cdn.coverr.co/videos/coverr-clothes-being-washed-in-a-laundry-machine-1674/1080p.mp4" type="video/mp4" />
+                  <source src="https://videos.pexels.com/video-files/5591209/5591209-hd_1920_1080_30fps.mp4" type="video/mp4" />
                 </video>
                 {/* Overlay with play indicator */}
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 via-transparent to-transparent pointer-events-none" />
@@ -249,171 +239,143 @@ export default function Landing() {
                   </div>
                 </div>
               </div>
-              <p className="text-center text-sm text-slate-500 mt-4">Vidéo de démonstration • Uploadez votre propre contenu marketing</p>
-            </AnimateOnScroll>
+          </AnimateOnScroll>
           </div>
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+          {/* ═══ BENEFITS SECTION - MODERN STARTUP STYLE ═══ */}
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-16">
             <AnimateOnScroll>
               <div className="text-center mb-16">
-                <span className="inline-block px-4 py-1.5 bg-red-100 text-red-700 rounded-full text-sm font-semibold mb-4">{t('costComparison.badge')}</span>
-                <h2 className="font-heading text-3xl md:text-5xl font-bold text-slate-900 mb-6">{t('costComparison.title')}</h2>
-                <p className="text-lg text-slate-600 max-w-2xl mx-auto">
-                  {t('costComparison.subtitle')}<br className="hidden sm:block" />
-                  <strong>{t('costComparison.subtitleBold')}</strong>
-                </p>
+                <span className="inline-block px-4 py-1.5 bg-gradient-to-r from-teal-100 to-cyan-100 text-teal-700 rounded-full text-sm font-semibold mb-4">
+                  Ce que vous gagnez
+                </span>
+                <h2 className="font-heading text-3xl md:text-5xl font-bold text-slate-900 mb-6">
+                  Reprenez le contrôle<br className="hidden sm:block" />
+                  <span className="bg-gradient-to-r from-teal-600 to-cyan-600 bg-clip-text text-transparent">de votre temps</span>
+                </h2>
               </div>
             </AnimateOnScroll>
 
-            <div className="max-w-5xl mx-auto">
+            {/* Benefits Cards Grid */}
+            <div className="grid md:grid-cols-3 gap-6 md:gap-8 mb-16">
+              {/* Card 1 - Fini les corvées */}
               <AnimateOnScroll delay={100}>
-                <div className="bg-gradient-to-r from-slate-900 to-slate-800 rounded-2xl p-6 md:p-8 mb-8 text-white">
-                  <div className="flex items-center justify-between mb-4">
-                    <span className="font-medium">{t('costComparison.sliderLabel')}</span>
-                    <div className="flex items-baseline gap-1">
-                      <span className="text-4xl font-black text-teal-400">{weight}</span>
-                      <span className="text-slate-400">kg</span>
+                <div className="group relative bg-gradient-to-br from-slate-900 to-slate-800 rounded-3xl p-8 overflow-hidden hover:scale-[1.02] transition-all duration-300">
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-teal-500/20 rounded-full blur-3xl group-hover:bg-teal-500/30 transition-colors" />
+                  <div className="relative">
+                    <div className="w-16 h-16 bg-gradient-to-br from-teal-400 to-cyan-400 rounded-2xl flex items-center justify-center mb-6 shadow-lg shadow-teal-500/30">
+                      <CheckCircle className="text-white" size={32} />
                     </div>
-                  </div>
-                  <input type="range" min="3" max="15" step="1" value={weight} onChange={(e) => setWeight(parseInt(e.target.value, 10))}
-                    data-testid="weight-slider"
-                    className="w-full h-3 bg-slate-700 rounded-full appearance-none cursor-pointer accent-teal-500 [&::-webkit-slider-thumb]:w-6 [&::-webkit-slider-thumb]:h-6 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-teal-500 [&::-webkit-slider-thumb]:shadow-lg [&::-webkit-slider-thumb]:cursor-grab" />
-                  <div className="flex justify-between text-xs text-slate-500 mt-2">
-                    <span>{t('costComparison.sliderMin')}</span>
-                    <span>{t('costComparison.sliderMax')}</span>
+                    <h3 className="text-2xl font-bold text-white mb-3">Fini les corvées</h3>
+                    <p className="text-slate-400 leading-relaxed">
+                      Plus jamais de tri, de machine à lancer, de séchage à surveiller. 
+                      On s'occupe de tout, vous profitez du résultat.
+                    </p>
+                    <div className="mt-6 pt-6 border-t border-white/10">
+                      <p className="text-teal-400 font-semibold text-sm flex items-center gap-2">
+                        <Sparkles size={16} />
+                        2h30 économisées par semaine
+                      </p>
+                    </div>
                   </div>
                 </div>
               </AnimateOnScroll>
 
-              <div className="grid md:grid-cols-2 gap-6 md:gap-8">
-                {/* DIY */}
-                <AnimateOnScroll delay={150}>
-                  <div className="bg-gradient-to-br from-red-50 to-orange-50 rounded-3xl p-6 md:p-8 border-2 border-red-200 relative overflow-hidden h-full">
-                    <div className="absolute top-0 right-0 w-32 h-32 bg-red-200/50 rounded-full blur-3xl" />
-                    <div className="relative">
-                      <div className="flex items-center gap-3 mb-6">
-                        <div className="w-12 h-12 bg-red-100 rounded-2xl flex items-center justify-center">
-                          <AlertCircle className="text-red-600" size={24} />
-                        </div>
-                        <div>
-                          <h3 className="font-heading text-xl font-bold text-slate-900">{t('costComparison.diyTitle')}</h3>
-                          <p className="text-sm text-red-600 font-medium">{t('costComparison.diySubtitle')}</p>
-                        </div>
-                      </div>
-                      <div className="space-y-2 mb-6">
-                        {[
-                          { label: t('costComparison.diyWater'), val: diyWater },
-                          { label: t('costComparison.diyElectricity'), val: diyElectricity },
-                          { label: t('costComparison.diyDetergent'), val: diyDetergent + diySoftener },
-                          { label: t('costComparison.diyMachine'), val: diyMachineWear + diyDryer },
-                        ].map((item, i) => (
-                          <div key={i} className="flex justify-between items-center p-3 bg-white/80 rounded-xl text-sm">
-                            <span className="text-slate-600">{item.label}</span>
-                            <span className="font-bold text-slate-900">{item.val.toFixed(2)}&euro;</span>
-                          </div>
-                        ))}
-                      </div>
-                      <div className="bg-orange-100 border border-orange-200 p-4 rounded-xl mb-4">
-                        <div className="flex justify-between items-center">
-                          <div>
-                            <p className="text-sm text-orange-800 font-medium">{t('costComparison.diyTimeLabel')} {diyTimeHours}h</p>
-                            <p className="text-xs text-orange-600">{t('costComparison.diyTimeDesc')}</p>
-                          </div>
-                          <div className="text-right">
-                            <p className="text-2xl font-black text-orange-700">{diyTimeCost}&euro;</p>
-                            <p className="text-xs text-orange-600">({hourlyRate}&euro;/h)</p>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="bg-gradient-to-r from-red-500 to-orange-500 p-5 rounded-2xl text-white">
-                        <div className="flex justify-between items-center mb-2 text-sm opacity-90">
-                          <span>{t('costComparison.diyMaterialCosts')}</span><span>{diyMaterialTotal.toFixed(2)}&euro;</span>
-                        </div>
-                        <div className="flex justify-between items-center pb-3 border-b border-white/30 text-sm opacity-90">
-                          <span>{t('costComparison.diyTimeValue')}</span><span>{diyTimeCost.toFixed(2)}&euro;</span>
-                        </div>
-                        <div className="flex justify-between items-center pt-3">
-                          <span className="font-bold">{t('costComparison.diyRealCost')}</span>
-                          <span className="text-4xl font-black">{diyTotalCost.toFixed(0)}&euro;</span>
-                        </div>
-                      </div>
+              {/* Card 2 - Temps en famille */}
+              <AnimateOnScroll delay={200}>
+                <div className="group relative bg-gradient-to-br from-purple-600 to-violet-700 rounded-3xl p-8 overflow-hidden hover:scale-[1.02] transition-all duration-300">
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-3xl group-hover:bg-white/20 transition-colors" />
+                  <div className="relative">
+                    <div className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center mb-6">
+                      <Heart className="text-white" size={32} />
+                    </div>
+                    <h3 className="text-2xl font-bold text-white mb-3">Plus de temps libre</h3>
+                    <p className="text-purple-100 leading-relaxed">
+                      Des moments précieux avec votre famille, vos amis, ou simplement pour vous.
+                      Le temps que vous méritez.
+                    </p>
+                    <div className="mt-6 pt-6 border-t border-white/20">
+                      <p className="text-white font-semibold text-sm flex items-center gap-2">
+                        <Clock size={16} />
+                        Livré sous 48h max
+                      </p>
                     </div>
                   </div>
-                </AnimateOnScroll>
+                </div>
+              </AnimateOnScroll>
 
-                {/* Kilolab */}
-                <AnimateOnScroll delay={200}>
-                  <div className="bg-gradient-to-br from-teal-50 to-cyan-50 rounded-3xl p-6 md:p-8 border-2 border-teal-400 relative overflow-hidden h-full">
-                    <div className="absolute top-0 right-0 w-32 h-32 bg-teal-200/50 rounded-full blur-3xl" />
-                    <div className="absolute top-4 right-4 bg-gradient-to-r from-yellow-400 to-orange-400 text-slate-900 px-4 py-1.5 rounded-full text-xs font-black shadow-lg">
-                      {t('costComparison.kilolabSave')}
-                    </div>
-                    <div className="relative">
-                      <div className="flex items-center gap-3 mb-6">
-                        <div className="w-12 h-12 bg-teal-100 rounded-2xl flex items-center justify-center">
-                          <Sparkles className="text-teal-600" size={24} />
-                        </div>
-                        <div>
-                          <h3 className="font-heading text-xl font-bold text-slate-900">{t('costComparison.kilolabTitle')}</h3>
-                          <p className="text-sm text-teal-600 font-medium">{t('costComparison.kilolabSubtitle')}</p>
-                        </div>
-                      </div>
-                      <div className="space-y-2 mb-6">
-                        {[t('costComparison.kilolabFeature1'), t('costComparison.kilolabFeature2'), t('costComparison.kilolabFeature3'), t('costComparison.kilolabFeature4')].map((feature, i) => (
-                          <div key={i} className="flex items-center gap-3 p-3 bg-white rounded-xl border border-teal-100">
-                            <div className="w-7 h-7 bg-teal-500 rounded-full flex items-center justify-center flex-shrink-0">
-                              <CheckCircle size={14} className="text-white" />
-                            </div>
-                            <span className="text-sm font-medium text-slate-900">{feature}</span>
-                          </div>
-                        ))}
-                      </div>
-                      <div className="bg-teal-100 border border-teal-200 p-4 rounded-xl mb-4">
-                        <div className="flex justify-between items-center">
-                          <div>
-                            <p className="text-sm text-teal-800 font-medium">{t('costComparison.kilolabTimeLabel')}</p>
-                            <p className="text-xs text-teal-600">{t('costComparison.kilolabTimeDesc')}</p>
-                          </div>
-                          <div className="text-right"><p className="text-2xl font-black text-teal-700">0&euro;</p></div>
-                        </div>
-                      </div>
-                      <div className="bg-gradient-to-r from-teal-500 to-cyan-500 p-5 rounded-2xl text-white mb-4">
-                        <div className="flex justify-between items-center">
-                          <div>
-                            <span className="font-medium text-sm opacity-90">{weight}kg x 3&euro;/kg</span>
-                            <p className="font-bold mt-1">{t('costComparison.kilolabPrice')}</p>
-                          </div>
-                          <span className="text-4xl font-black">{kilolabPrice}&euro;</span>
-                        </div>
-                      </div>
-                      <div className="bg-white p-5 rounded-2xl border-2 border-teal-300 shadow-lg">
-                        <p className="text-teal-600 font-bold text-sm text-center mb-3">{t('costComparison.savingsTitle')}</p>
-                        <div className="grid grid-cols-2 gap-4">
-                          <div className="text-center bg-teal-50 rounded-xl p-3">
-                            <p className="text-3xl font-black text-teal-600">{savings}&euro;</p>
-                            <p className="text-xs text-slate-600 font-medium">{t('costComparison.savingsAmount')}</p>
-                          </div>
-                          <div className="text-center bg-teal-50 rounded-xl p-3">
-                            <p className="text-3xl font-black text-teal-600">{timeSaved}h</p>
-                            <p className="text-xs text-slate-600 font-medium">{t('costComparison.savingsTime')}</p>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </AnimateOnScroll>
-              </div>
-
+              {/* Card 3 - Sérénité */}
               <AnimateOnScroll delay={300}>
-                <div className="mt-12 text-center">
-                  <Link to="/new-order" data-testid="choose-kilolab-btn"
-                    className="inline-flex items-center gap-3 px-10 py-5 bg-gradient-to-r from-teal-600 to-cyan-600 text-white rounded-2xl font-bold text-lg hover:shadow-2xl transition-all hover:scale-105 active:scale-95">
-                    <span>{t('costComparison.ctaSave', { amount: savings })}</span>
-                    <ArrowRight size={20} />
-                  </Link>
-                  <p className="text-sm text-slate-500 mt-4">{t('costComparison.ctaPromo')}</p>
+                <div className="group relative bg-gradient-to-br from-teal-500 to-cyan-600 rounded-3xl p-8 overflow-hidden hover:scale-[1.02] transition-all duration-300">
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-3xl group-hover:bg-white/20 transition-colors" />
+                  <div className="relative">
+                    <div className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center mb-6">
+                      <Shield className="text-white" size={32} />
+                    </div>
+                    <h3 className="text-2xl font-bold text-white mb-3">L'esprit tranquille</h3>
+                    <p className="text-teal-50 leading-relaxed">
+                      Lessive professionnelle, pliage soigné, vêtements traités avec soin.
+                      Qualité garantie à chaque fois.
+                    </p>
+                    <div className="mt-6 pt-6 border-t border-white/20">
+                      <p className="text-white font-semibold text-sm flex items-center gap-2">
+                        <Star size={16} />
+                        98% de clients satisfaits
+                      </p>
+                    </div>
+                  </div>
                 </div>
               </AnimateOnScroll>
             </div>
+
+            {/* Big Value Proposition */}
+            <AnimateOnScroll delay={400}>
+              <div className="relative bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 rounded-[2rem] p-8 md:p-12 overflow-hidden">
+                <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4wMyI+PGNpcmNsZSBjeD0iMzAiIGN5PSIzMCIgcj0iMiIvPjwvZz48L2c+PC9zdmc+')] opacity-50" />
+                
+                <div className="relative grid md:grid-cols-2 gap-8 items-center">
+                  <div>
+                    <h3 className="text-2xl md:text-3xl font-bold text-white mb-4">
+                      Idéal pour vous si...
+                    </h3>
+                    <ul className="space-y-4">
+                      {[
+                        "Vous travaillez beaucoup et manquez de temps",
+                        "Vous avez une famille et des journées chargées", 
+                        "Vous préférez profiter de la vie plutôt que des corvées",
+                        "Vous aimez avoir du linge frais sans effort"
+                      ].map((item, i) => (
+                        <li key={i} className="flex items-start gap-3">
+                          <div className="w-6 h-6 bg-teal-500 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                            <Check size={14} className="text-white" />
+                          </div>
+                          <span className="text-slate-300">{item}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                  
+                  <div className="text-center md:text-right">
+                    <div className="inline-block bg-gradient-to-br from-teal-500/20 to-cyan-500/20 backdrop-blur-sm rounded-3xl p-8 border border-teal-500/30">
+                      <p className="text-teal-400 font-semibold mb-2">À partir de</p>
+                      <div className="flex items-baseline justify-center md:justify-end gap-1">
+                        <span className="text-6xl font-black text-white">3€</span>
+                        <span className="text-2xl text-slate-400">/kg</span>
+                      </div>
+                      <p className="text-slate-400 text-sm mt-2">Collecte & livraison incluses</p>
+                      <Link 
+                        to="/new-order" 
+                        data-testid="choose-kilolab-btn"
+                        className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-teal-500 to-cyan-500 text-white rounded-xl font-bold mt-6 hover:shadow-xl hover:shadow-teal-500/30 transition-all hover:scale-105"
+                      >
+                        Essayer maintenant
+                        <ArrowRight size={18} />
+                      </Link>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </AnimateOnScroll>
           </div>
         </section>
 
