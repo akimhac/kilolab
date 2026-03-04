@@ -150,10 +150,10 @@ export default function AdminDashboard() {
   const fetchData = async () => {
     setLoading(true);
     try {
-      // 1. Commandes
+      // 1. Commandes - inclure profiles pour avoir l'email du client
       const { data: o } = await supabase
         .from("orders")
-        .select(`*, partner:partners(company_name)`)
+        .select(`*, partner:partners(company_name), profiles(email, full_name)`)
         .order("created_at", { ascending: false });
 
       // 2. Partenaires
@@ -388,20 +388,29 @@ export default function AdminDashboard() {
     const t = toast.loading("Annulation en cours...");
 
     try {
-      // 1. Update order status in Supabase
+      // 1. Update order status in Supabase (only status and cancelled_at)
       const { error: updateError } = await supabase
         .from("orders")
         .update({ 
           status: "cancelled",
-          cancelled_at: new Date().toISOString(),
-          cancel_reason: message
+          cancelled_at: new Date().toISOString()
         })
         .eq("id", order.id);
 
       if (updateError) throw updateError;
 
-      // 2. Get client email
-      const clientEmail = order.profiles?.email || order.client_email;
+      // 2. Get client email from profiles or fallback
+      let clientEmail = order.profiles?.email;
+      
+      // If no email in profiles, try to get it from user_id
+      if (!clientEmail && order.user_id) {
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("email")
+          .eq("id", order.user_id)
+          .single();
+        clientEmail = profile?.email;
+      }
       
       if (clientEmail) {
         // 3. Send cancellation email to client
@@ -484,10 +493,21 @@ export default function AdminDashboard() {
     const t = toast.loading("Envoi du message...");
 
     try {
-      const clientEmail = order.profiles?.email || order.client_email;
+      // Get client email from profiles or fallback
+      let clientEmail = order.profiles?.email;
+      
+      // If no email in profiles, try to get it from user_id
+      if (!clientEmail && order.user_id) {
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("email")
+          .eq("id", order.user_id)
+          .single();
+        clientEmail = profile?.email;
+      }
       
       if (!clientEmail) {
-        throw new Error("Email du client non trouvé");
+        throw new Error("Email du client non trouvé. L'utilisateur n'a peut-être pas de compte.");
       }
 
       const emailHtml = `
@@ -2351,7 +2371,10 @@ export default function AdminDashboard() {
             <div className="grid grid-cols-2 gap-4 mb-6">
               <div className="bg-white/5 p-4 rounded-xl border border-white/10">
                 <p className="text-sm text-slate-400 mb-1">Client</p>
-                <p className="font-bold text-white">{selectedOrder.profiles?.email || selectedOrder.client_email || "Non spécifié"}</p>
+                <p className="font-bold text-white">{selectedOrder.profiles?.email || "Email non disponible"}</p>
+                {!selectedOrder.profiles?.email && (
+                  <p className="text-xs text-orange-400 mt-1">⚠️ Commande sans compte utilisateur</p>
+                )}
               </div>
               <div className="bg-white/5 p-4 rounded-xl border border-white/10">
                 <p className="text-sm text-slate-400 mb-1">Montant</p>
