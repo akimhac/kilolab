@@ -409,12 +409,11 @@ export default function AdminDashboard() {
     const t = toast.loading("Annulation en cours...");
 
     try {
-      // 1. Update order status in Supabase (only status and cancelled_at)
+      // 1. Update order status in Supabase (only status)
       const { error: updateError } = await supabase
         .from("orders")
         .update({ 
-          status: "cancelled",
-          cancelled_at: new Date().toISOString()
+          status: "cancelled"
         })
         .eq("id", order.id);
 

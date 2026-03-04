@@ -27,6 +27,8 @@ export default function NewOrder() {
 
   const [loading, setLoading] = useState(false);
   const [step, setStep] = useState(0);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+  const [userEmail, setUserEmail] = useState<string | null>(null);
 
   const [formula, setFormula] = useState<"eco" | "express" | "express_2h">("eco");
   const [weight, setWeight] = useState(5);
@@ -51,6 +53,24 @@ export default function NewOrder() {
   const [couponDiscount, setCouponDiscount] = useState(0);
   const [couponApplied, setCouponApplied] = useState(false);
   const [couponLoading, setCouponLoading] = useState(false);
+
+  // Check authentication status on mount
+  useEffect(() => {
+    const checkAuth = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      setIsAuthenticated(!!user);
+      setUserEmail(user?.email || null);
+    };
+    checkAuth();
+    
+    // Listen to auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_, session) => {
+      setIsAuthenticated(!!session?.user);
+      setUserEmail(session?.user?.email || null);
+    });
+    
+    return () => subscription.unsubscribe();
+  }, []);
 
   useEffect(() => {
     fetchWashers();
@@ -367,7 +387,43 @@ export default function NewOrder() {
     <div className="min-h-screen bg-slate-50 font-sans text-slate-900 pb-20">
       <Navbar />
 
-      <div className="pt-32 max-w-3xl mx-auto px-4 w-full">
+      {/* Auth Banner - shown when user is not logged in */}
+      {isAuthenticated === false && (
+        <div className="fixed top-[72px] left-0 right-0 z-40 bg-gradient-to-r from-teal-600 to-cyan-600 text-white py-3 px-4 shadow-lg">
+          <div className="max-w-3xl mx-auto flex items-center justify-between flex-wrap gap-3">
+            <div className="flex items-center gap-2">
+              <Info size={18} />
+              <span className="text-sm font-medium">Connectez-vous pour finaliser votre commande</span>
+            </div>
+            <div className="flex gap-2">
+              <button
+                onClick={() => navigate("/login?redirect=/new-order")}
+                className="px-4 py-1.5 bg-white text-teal-700 rounded-full text-sm font-bold hover:bg-teal-50 transition"
+              >
+                Connexion
+              </button>
+              <button
+                onClick={() => navigate("/signup?redirect=/new-order")}
+                className="px-4 py-1.5 bg-teal-700 text-white rounded-full text-sm font-bold hover:bg-teal-800 transition border border-white/30"
+              >
+                Créer un compte
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      
+      {/* Logged in confirmation */}
+      {isAuthenticated === true && userEmail && (
+        <div className="fixed top-[72px] left-0 right-0 z-40 bg-emerald-500 text-white py-2 px-4 shadow-lg">
+          <div className="max-w-3xl mx-auto flex items-center justify-center gap-2 text-sm">
+            <CheckCircle size={16} />
+            <span>Connecté en tant que <strong>{userEmail}</strong></span>
+          </div>
+        </div>
+      )}
+
+      <div className={`${isAuthenticated !== null ? 'pt-40' : 'pt-32'} max-w-3xl mx-auto px-4 w-full`}>
         <h1 className="text-3xl font-bold mb-8 text-center">Nouvelle Commande</h1>
 
         <div className="flex justify-center mb-8 text-xs md:text-sm overflow-x-auto">
