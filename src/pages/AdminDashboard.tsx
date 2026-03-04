@@ -150,11 +150,32 @@ export default function AdminDashboard() {
   const fetchData = async () => {
     setLoading(true);
     try {
-      // 1. Commandes - inclure profiles pour avoir l'email du client
+      // 1. Commandes
       const { data: o } = await supabase
         .from("orders")
-        .select(`*, partner:partners(company_name), profiles(email, full_name)`)
+        .select(`*, partner:partners(company_name)`)
         .order("created_at", { ascending: false });
+      
+      // Récupérer les emails des clients pour chaque commande
+      if (o && o.length > 0) {
+        const clientIds = [...new Set(o.map(order => order.client_id).filter(Boolean))];
+        if (clientIds.length > 0) {
+          const { data: profiles } = await supabase
+            .from("user_profiles")
+            .select("id, email, full_name")
+            .in("id", clientIds);
+          
+          // Associer les profils aux commandes
+          if (profiles) {
+            const profileMap = new Map(profiles.map(p => [p.id, p]));
+            o.forEach(order => {
+              if (order.client_id) {
+                order.profiles = profileMap.get(order.client_id) || null;
+              }
+            });
+          }
+        }
+      }
 
       // 2. Partenaires
       const { data: p } = await supabase
@@ -402,12 +423,12 @@ export default function AdminDashboard() {
       // 2. Get client email from profiles or fallback
       let clientEmail = order.profiles?.email;
       
-      // If no email in profiles, try to get it from user_id
-      if (!clientEmail && order.user_id) {
+      // If no email in profiles, try to get it from client_id
+      if (!clientEmail && order.client_id) {
         const { data: profile } = await supabase
-          .from("profiles")
+          .from("user_profiles")
           .select("email")
-          .eq("id", order.user_id)
+          .eq("id", order.client_id)
           .single();
         clientEmail = profile?.email;
       }
@@ -496,12 +517,12 @@ export default function AdminDashboard() {
       // Get client email from profiles or fallback
       let clientEmail = order.profiles?.email;
       
-      // If no email in profiles, try to get it from user_id
-      if (!clientEmail && order.user_id) {
+      // If no email in profiles, try to get it from client_id
+      if (!clientEmail && order.client_id) {
         const { data: profile } = await supabase
-          .from("profiles")
+          .from("user_profiles")
           .select("email")
-          .eq("id", order.user_id)
+          .eq("id", order.client_id)
           .single();
         clientEmail = profile?.email;
       }
