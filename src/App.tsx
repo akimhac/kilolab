@@ -48,6 +48,7 @@ const PartnerPending = lazy(() => import('./pages/PartnerPending'));
 const PartnerTerms = lazy(() => import('./pages/PartnerTerms'));
 const PaymentSuccess = lazy(() => import('./pages/PaymentSuccess'));
 const PaymentCancel = lazy(() => import('./pages/PaymentCancel'));
+const WasherWaitlist = lazy(() => import('./pages/WasherWaitlist'));
 const Referral = lazy(() => import('./pages/Referral'));
 const ScanQR = lazy(() => import('./pages/ScanQR'));
 const Settings = lazy(() => import('./pages/Settings'));
@@ -110,6 +111,7 @@ export default function App() {
           <Route path="/select-dashboard" element={<SelectDashboard />} />
           <Route path="/select-signup" element={<SelectSignup />} />
           <Route path="/washer-gps" element={<WasherGPSNavigation />} />
+          <Route path="/washer-waitlist" element={<WasherWaitlist />} />
 
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />

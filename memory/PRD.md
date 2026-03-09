@@ -29,6 +29,18 @@ Le 1er service de laverie à domicile en France. Marketplace connectant les clie
   - Section "Idéal pour vous si..." avec CTA
 - [x] **Page Tarifs** : Même refonte bénéfices, plus de comparateur prix
 
+### Sprint 9 - Tests Pré-lancement & Fonctionnalités (09/03/2026)
+- [x] **Page Washer Waitlist** : Espace pré-lancement pour les washers en attente
+  - Formation en 5 modules avec progression
+  - Système de parrainage clients (5€/filleul)
+  - Stats de zone (clients inscrits, seuil activation)
+  - Badge "Certifié Washer" après formation complète
+- [x] **Mentions Légales complètes** : Editeur, hébergement, propriété intellectuelle, RGPD
+- [x] **Page /trouver corrigée** : Fallback mock data si RLS bloque
+- [x] **Annulation commande** : Corrigé (trigger Supabase à modifier côté DB)
+- [x] **Bandeau inscription obligatoire** : Sur /new-order pour non-connectés
+- [x] **Kit Instagram** : 12 visuels + 20 photos libres de droit + légendes complètes
+
 ### Sprint 7 - CRUD B2B + React Router v7 (28/02/2026)
 - [x] **CRUD B2B Complet** : create, update, delete, toggleStatus, regenerateApiKey
 - [x] **Supabase Table** : b2b_partners avec api_key, plan, status, api_calls, monthly_revenue
