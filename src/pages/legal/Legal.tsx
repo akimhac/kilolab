@@ -40,15 +40,15 @@ export default function Legal() {
               </div>
               <div className="md:col-span-2">
                 <p className="text-slate-500 text-sm">Siège social</p>
-                <p className="font-medium">8 Square de Liège, 59000 Lille, France</p>
+                <p className="font-medium">En cours de définition</p>
               </div>
               <div>
                 <p className="text-slate-500 text-sm">Directeur de la publication</p>
-                <p className="font-medium">Akim Hachili</p>
+                <p className="font-medium">En cours de nomination</p>
               </div>
               <div>
                 <p className="text-slate-500 text-sm">Responsable de la rédaction</p>
-                <p className="font-medium">Akim Hachili</p>
+                <p className="font-medium">En cours de nomination</p>
               </div>
             </div>
           </section>
