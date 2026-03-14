@@ -3,7 +3,7 @@ import { Navigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { Loader2 } from 'lucide-react';
 
-const ADMIN_EMAILS = ['admin@kilolab.fr', 'contact@kilolab.fr', 'akim.hachili@gmail.com'];
+import { isAdminEmail } from '../config/admin';
 
 export default function ProtectedAdminRoute({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
@@ -26,7 +26,7 @@ export default function ProtectedAdminRoute({ children }: { children: React.Reac
       setIsAuth(true);
       const email = session.user.email?.toLowerCase().trim() || '';
       // Vérification simple via la liste, plus besoin de fichier externe
-      setIsAdmin(ADMIN_EMAILS.includes(email));
+      setIsAdmin(isAdminEmail(email));
       
     } catch (error) {
       console.error('Auth error:', error);

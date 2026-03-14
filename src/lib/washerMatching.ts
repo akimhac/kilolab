@@ -97,7 +97,6 @@ export async function assignOrderToWasher(orderId: string, washerId: string) {
 
     if (order && order.status === 'assigned') {
       // Pas acceptée → réassigner à un autre washer
-      console.log('Commande non acceptée, réassignation...');
       await reassignOrder(orderId);
     }
   }, 5 * 60 * 1000); // 5 minutes
@@ -107,7 +106,6 @@ export async function assignOrderToWasher(orderId: string, washerId: string) {
 
 async function sendPushNotification(washerId: string, notification: any) {
   // TODO: Intégrer FCM (Firebase Cloud Messaging)
-  console.log('📲 Notification envoyée à', washerId, notification);
 }
 
 async function reassignOrder(orderId: string) {

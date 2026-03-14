@@ -7,7 +7,6 @@ export const sendEmail = async (
   html: string
 ): Promise<boolean> => {
   // TODO: Implémenter avec Resend quand configuré
-  console.log('Email would be sent to:', to, subject);
   return true;
 };
 

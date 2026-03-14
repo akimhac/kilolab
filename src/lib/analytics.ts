@@ -5,7 +5,6 @@ export const trackEvent = (eventName: string, params?: Record<string, any>) => {
       event: eventName,
       ...params,
     });
-    console.log("📊 Event tracked:", eventName, params);
   }
 };
 

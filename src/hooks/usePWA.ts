@@ -21,7 +21,6 @@ export function usePWA() {
       navigator.serviceWorker
         .register('/sw.js')
         .then((registration) => {
-          console.log('✅ Service Worker enregistré:', registration.scope);
           
           // Vérifier les mises à jour
           registration.addEventListener('updatefound', () => {
@@ -29,7 +28,6 @@ export function usePWA() {
             if (newWorker) {
               newWorker.addEventListener('statechange', () => {
                 if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                  console.log('🔄 Mise à jour disponible');
                   // Notifier l'utilisateur qu'une MAJ est dispo
                 }
               });
@@ -44,13 +42,11 @@ export function usePWA() {
     // Détecter si l'app est installable
     const handleBeforeInstallPrompt = (e: Event) => {
       e.preventDefault();
-      console.log('📱 App installable détectée');
       setDeferredPrompt(e as BeforeInstallPromptEvent);
       setIsInstallable(true);
     };
 
     const handleAppInstalled = () => {
-      console.log('✅ App installée');
       setIsInstalled(true);
       setIsInstallable(false);
       setDeferredPrompt(null);
@@ -67,7 +63,6 @@ export function usePWA() {
 
   const installPWA = async () => {
     if (!deferredPrompt) {
-      console.log('❌ Pas de prompt disponible');
       return false;
     }
 
@@ -75,7 +70,6 @@ export function usePWA() {
       await deferredPrompt.prompt();
       const { outcome } = await deferredPrompt.userChoice;
       
-      console.log(`📊 Choix utilisateur: ${outcome}`);
       
       if (outcome === 'accepted') {
         setIsInstallable(false);

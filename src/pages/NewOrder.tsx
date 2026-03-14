@@ -125,7 +125,6 @@ export default function NewOrder() {
         toast.success("📍 Localisation détectée", { duration: 2000 });
       },
       (error) => {
-        console.log("Géoloc refusée:", error);
       }
     );
   };

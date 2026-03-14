@@ -97,7 +97,6 @@ export async function registerForPushNotifications(): Promise<string | null> {
 
     // Register service worker
     const registration = await navigator.serviceWorker.register('/firebase-messaging-sw.js');
-    console.log('Service Worker registered:', registration);
 
     // Get FCM token
     const token = await getToken(messaging, {
@@ -106,7 +105,6 @@ export async function registerForPushNotifications(): Promise<string | null> {
     });
 
     if (token) {
-      console.log('FCM Token:', token);
       
       // Save token to database
       await saveTokenToDatabase(token);
@@ -155,7 +153,6 @@ export function onForegroundMessage(callback: (payload: MessagePayload) => void)
   }
 
   return onMessage(messaging, (payload) => {
-    console.log('Foreground message received:', payload);
     
     // Show toast notification
     const title = payload.notification?.title || 'Kilolab';

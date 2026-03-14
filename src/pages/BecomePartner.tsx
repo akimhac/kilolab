@@ -159,7 +159,6 @@ export default function BecomePartner() {
         return;
       }
       
-      console.log('📍 Adresse géocodée:', coordinates.displayName);
       toast.success("Adresse validée !", { id: 'geo' });
 
       // ✅ 3. UPLOAD KBIS

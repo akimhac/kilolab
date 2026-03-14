@@ -24,7 +24,6 @@ export function useNotifications() {
     try {
       const result = await Notification.requestPermission();
       setPermission(result);
-      console.log('🔔 Permission notifications:', result);
       return result === 'granted';
     } catch (error) {
       console.error('❌ Erreur permission:', error);
@@ -53,7 +52,6 @@ export function useNotifications() {
       });
 
       setSubscription(newSubscription);
-      console.log('✅ Subscription créée');
       
       // Envoyer au backend
       await sendSubscriptionToServer(newSubscription);
@@ -72,7 +70,6 @@ export function useNotifications() {
       const success = await subscription.unsubscribe();
       if (success) {
         setSubscription(null);
-        console.log('✅ Désinscrit des notifications');
       }
       return success;
     } catch (error) {
@@ -143,7 +140,6 @@ async function sendSubscriptionToServer(subscription: PushSubscription): Promise
       throw new Error('Erreur serveur');
     }
 
-    console.log('✅ Subscription envoyée au serveur');
   } catch (error) {
     console.error('❌ Erreur envoi subscription:', error);
   }

@@ -22,7 +22,6 @@ if (typeof window !== 'undefined') {
     'gtm.start': new Date().getTime(),
     event: 'gtm.js'
   });
-  console.log('📊 Analytics initialized');
 }
 
 // ========================================

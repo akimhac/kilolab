@@ -26,7 +26,6 @@ export function NotificationSettings({ compact = false, onStatusChange }: Notifi
     
     // Listen for foreground messages
     const unsubscribe = onForegroundMessage((payload) => {
-      console.log('Notification received:', payload);
     });
 
     return () => {

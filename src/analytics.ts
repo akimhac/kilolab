@@ -5,8 +5,8 @@ declare global {
   }
 }
 
-// ID Google Analytics - À remplacer par ton ID
-const GA_MEASUREMENT_ID = 'G-XXXXXXXXXX';
+// ID Google Analytics - Configurer dans .env avec VITE_GA_MEASUREMENT_ID
+const GA_MEASUREMENT_ID = import.meta.env.VITE_GA_MEASUREMENT_ID || 'G-XXXXXXXXXX';
 
 // ============================================
 // INITIALISATION
@@ -32,7 +32,6 @@ export function initializeGA(): void {
     anonymize_ip: true // RGPD
   });
 
-  console.log('✅ Google Analytics initialisé');
 }
 
 // ============================================

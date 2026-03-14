@@ -13,7 +13,6 @@ export const trackFacebookEvent = (
 ) => {
   if (typeof window !== 'undefined' && window.fbq) {
     window.fbq('track', eventName, params);
-    console.log('📊 Facebook Event:', eventName, params);
   }
 };
 

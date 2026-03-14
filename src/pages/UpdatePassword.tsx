@@ -27,7 +27,6 @@ export default function UpdatePassword() {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
       if (event === 'PASSWORD_RECOVERY') {
         // L'utilisateur est bien là pour changer son mdp
-        console.log('Mode récupération de mot de passe activé');
       }
     });
 

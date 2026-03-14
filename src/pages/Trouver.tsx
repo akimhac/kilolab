@@ -54,7 +54,6 @@ export default function Trouver() {
         console.error('Supabase error:', error);
         // Fallback to mock data if RLS blocks access
         if (error.code === '401' || error.message?.includes('API key')) {
-          console.log('Using mock washers data');
           setWashers(getMockWashers());
           return;
         }
@@ -166,8 +165,6 @@ export default function Trouver() {
         return cityMatch || postalMatch || deptMatch;
       });
 
-      console.log('🔍 Recherche:', searchTerm);
-      console.log('📍 Résultats trouvés:', filtered.length);
       console.log(
         '📋 Détails:',
         filtered.map((w: any) => `${w.full_name} - ${w.city} (${w.postal_code})`)

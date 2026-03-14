@@ -22,10 +22,8 @@ export const requestNotificationPermission = async (): Promise<string | null> =>
       const token = await getToken(messaging, {
         vapidKey: import.meta.env.VITE_FIREBASE_VAPID_KEY,
       });
-      console.log('FCM Token:', token);
       return token;
     } else {
-      console.log('Permission de notification refusée');
       return null;
     }
   } catch (error) {
@@ -38,7 +36,6 @@ export const requestNotificationPermission = async (): Promise<string | null> =>
 export const onMessageListener = () =>
   new Promise((resolve) => {
     onMessage(messaging, (payload) => {
-      console.log('Message reçu:', payload);
       resolve(payload);
     });
   });

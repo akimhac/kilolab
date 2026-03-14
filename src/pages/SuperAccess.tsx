@@ -3,8 +3,7 @@ import { supabase } from '../lib/supabase';
 import { useNavigate } from 'react-router-dom';
 import { Lock, Mail, Loader2, ShieldCheck } from 'lucide-react';
 import toast from 'react-hot-toast';
-
-const ADMIN_EMAILS = ['admin@kilolab.fr', 'contact@kilolab.fr', 'akim.hachili@gmail.com'];
+import { isAdminEmail } from '../config/admin';
 
 export default function SuperAccess() {
   const navigate = useNavigate();
@@ -14,7 +13,7 @@ export default function SuperAccess() {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!ADMIN_EMAILS.includes(email.toLowerCase().trim())) {
+    if (!isAdminEmail(email)) {
       toast.error('⛔ Accès réservé aux administrateurs');
       return;
     }
@@ -27,7 +26,7 @@ export default function SuperAccess() {
       if (error) throw error;
       if (!data.session) throw new Error('Pas de session');
       
-      if (!ADMIN_EMAILS.includes(data.session.user.email || '')) {
+      if (!isAdminEmail(data.session.user.email)) {
         await supabase.auth.signOut();
         throw new Error('⛔ Accès refusé');
       }
