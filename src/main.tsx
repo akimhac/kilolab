@@ -2,6 +2,7 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
+import * as Sentry from "@sentry/react";
 
 import App from "./App";
 import "./index.css";
@@ -11,6 +12,26 @@ import "./i18n";
 
 // Theme Provider
 import { ThemeProvider } from "./contexts/ThemeContext";
+
+// ========================================
+// INITIALISATION SENTRY (Error Tracking)
+// ========================================
+const SENTRY_DSN = import.meta.env.VITE_SENTRY_DSN;
+if (SENTRY_DSN && SENTRY_DSN !== 'your-sentry-dsn') {
+  Sentry.init({
+    dsn: SENTRY_DSN,
+    integrations: [
+      Sentry.browserTracingIntegration(),
+      Sentry.replayIntegration(),
+    ],
+    // Performance Monitoring
+    tracesSampleRate: 0.1, // 10% des transactions
+    // Session Replay (gratuit jusqu'à 50 sessions/mois)
+    replaysSessionSampleRate: 0.1,
+    replaysOnErrorSampleRate: 1.0, // 100% des sessions avec erreur
+    environment: import.meta.env.MODE,
+  });
+}
 
 // ========================================
 // INITIALISATION ANALYTICS

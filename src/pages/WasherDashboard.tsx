@@ -1,6 +1,11 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { supabase } from "../lib/supabase";
 import { requestNotificationPermission } from "../lib/firebase";
+import { 
+  subscribeToZoneOrders, 
+  showBrowserNotification,
+  requestNotificationPermission as requestBrowserNotif 
+} from "../services/washerNotifications";
 import Navbar from "../components/Navbar";
 import { FadeInOnScroll, CountUp } from "../components/animations/ScrollAnimations";
 import { WasherDashboardSkeleton } from "../components/animations/Skeleton";
@@ -306,6 +311,34 @@ export default function WasherDashboard() {
     };
     check();
   }, [washerId, washerStatus]);
+
+  // Subscribe to realtime order notifications (FREE via Supabase)
+  useEffect(() => {
+    if (!washerId || washerStatus !== "approved" || !washerData?.postal_code) return;
+    
+    // Request browser notification permission
+    requestBrowserNotif();
+    
+    // Subscribe to new orders in zone
+    const unsubscribe = subscribeToZoneOrders(
+      washerId,
+      [washerData.postal_code],
+      (newOrder) => {
+        // Show browser notification
+        showBrowserNotification(
+          '🛒 Nouvelle commande !',
+          `${newOrder.weight || '?'}kg - ${newOrder.total_price || '?'}€ à gagner`,
+          '/icon-192x192.png'
+        );
+        // Show toast
+        toast.success('Nouvelle commande disponible !', { duration: 5000 });
+        // Refresh data
+        fetchWasherData();
+      }
+    );
+    
+    return unsubscribe;
+  }, [washerId, washerStatus, washerData?.postal_code]);
 
   const fetchWasherData = async () => {
     if (fetchLockRef.current) return;

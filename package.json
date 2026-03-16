@@ -14,6 +14,7 @@
     "test:e2e:report": "playwright show-report test-reports/playwright"
   },
   "dependencies": {
+    "@sentry/react": "^10.43.0",
     "@stripe/stripe-js": "^8.6.1",
     "@supabase/supabase-js": "^2.90.1",
     "@types/leaflet": "^1.9.21",
