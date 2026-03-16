@@ -46,18 +46,14 @@ export default function Trouver() {
     try {
       const { data, error } = await supabase
         .from('washers')
-        .select('*')
+        .select('id, full_name, city, postal_code, is_available, created_at')
         .eq('status', 'approved')
         .order('created_at', { ascending: false });
 
+      // Handle any Supabase error (RLS, auth, network, etc.)
       if (error) {
-        console.error('Supabase error:', error);
-        // Fallback to mock data if RLS blocks access
-        if (error.code === '401' || error.message?.includes('API key')) {
-          setWashers(getMockWashers());
-          return;
-        }
-        throw error;
+        setWashers(getMockWashers());
+        return;
       }
 
       if (data && data.length > 0) {
@@ -66,9 +62,8 @@ export default function Trouver() {
         // No approved washers yet, show mock data
         setWashers(getMockWashers());
       }
-    } catch (error: any) {
-      console.error('Erreur chargement washers:', error);
-      // Use mock data as fallback
+    } catch {
+      // Use mock data as fallback for any error
       setWashers(getMockWashers());
     } finally {
       setLoading(false);
@@ -146,18 +141,34 @@ export default function Trouver() {
     toast.loading('Recherche en cours...', { id: 'search' });
 
     try {
-      const { data, error } = await supabase.from('washers').select('*').eq('status', 'approved');
-      if (error) throw error;
+      const { data, error } = await supabase
+        .from('washers')
+        .select('id, full_name, city, postal_code, is_available, created_at')
+        .eq('status', 'approved');
+      
+      // If RLS blocks, filter mock data instead
+      if (error) {
+        const searchLower = searchTerm.toLowerCase();
+        const mockFiltered = getMockWashers().filter((w) => {
+          const cityMatch = w.city.toLowerCase().includes(searchLower);
+          const postalMatch = w.postal_code.includes(searchTerm);
+          return cityMatch || postalMatch;
+        });
+        setWashers(mockFiltered);
+        toast.dismiss('search');
+        if (mockFiltered.length > 0) toast.success(`✅ ${mockFiltered.length} Washer(s) trouvé(s) !`);
+        else toast.error('❌ Aucun Washer trouvé dans cette zone');
+        return;
+      }
 
-      // ✅ FIX RECHERCHE : ville OU CP OU département (2 premiers chiffres du CP)
+      // Filter real data
       const searchLower = searchTerm.toLowerCase();
-
       const filtered = (data || []).filter((w: any) => {
         const washerCity = (w.city || '').toLowerCase();
         const washerCP = (w.postal_code || '').toString();
 
-        const postalMatch = washerCP.includes(searchTerm); // cp exact/partial
-        const cityMatch = washerCity.includes(searchLower); // ville
+        const postalMatch = washerCP.includes(searchTerm);
+        const cityMatch = washerCity.includes(searchLower);
         const userDept = searchTerm.length >= 2 ? searchTerm.substring(0, 2) : '';
         const washerDept = washerCP.substring(0, 2);
         const deptMatch = userDept && washerDept === userDept;
@@ -165,19 +176,13 @@ export default function Trouver() {
         return cityMatch || postalMatch || deptMatch;
       });
 
-      console.log(
-        '📋 Détails:',
-        filtered.map((w: any) => `${w.full_name} - ${w.city} (${w.postal_code})`)
-      );
-
       const enriched = enrichWashers(filtered);
       setWashers(enriched);
 
       toast.dismiss('search');
       if (enriched.length > 0) toast.success(`✅ ${enriched.length} Washer(s) trouvé(s) !`);
       else toast.error('❌ Aucun Washer trouvé dans cette zone');
-    } catch (error: any) {
-      console.error('Erreur recherche:', error);
+    } catch {
       toast.dismiss('search');
       toast.error('Erreur de recherche');
     } finally {
