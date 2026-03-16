@@ -10,6 +10,9 @@ import PrivateRoute from './components/PrivateRoute';
 // ✅ AJOUT : Popup Instagram
 import InstagramPromoPopup from './components/InstagramPromoPopup';
 
+// ✅ PWA Install Banner
+import PWAInstallBanner from './components/PWAInstallBanner';
+
 // Imports directs
 import Landing from './pages/Landing';
 import Login from './pages/Login';
@@ -91,6 +94,9 @@ export default function App() {
 
       {/* ✅ AJOUT : POPUP INSTAGRAM */}
       <InstagramPromoPopup />
+
+      {/* ✅ PWA INSTALL BANNER */}
+      <PWAInstallBanner />
 
       <Suspense fallback={<PageLoader />}>
         <Routes>

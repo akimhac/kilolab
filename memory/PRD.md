@@ -14,6 +14,12 @@ Le 1er service de laverie à domicile en France. Marketplace connectant les clie
 
 ## Implémenté
 
+### Sprint 10 - PWA & Installation Mobile (16/03/2026)
+- [x] **PWA Install Banner** : Bandeau d'installation pour iOS et Android
+- [x] **Nouvelles icônes PWA** : icon-192, icon-512, maskable icons, apple-touch-icon
+- [x] **manifest.json amélioré** : Shortcuts, display_override, lang
+- [x] **Page /trouver corrigée** : Meilleure gestion des erreurs RLS Supabase
+
 ### Sprint 8 - Alertes Admin & Annulation Commandes (01/03/2026)
 - [x] **Alertes Email Admin** : Notifications automatiques pour nouvelles inscriptions et commandes
 - [x] **Annulation de Commande** : Modal dans Admin Dashboard avec message personnalisé au client
@@ -90,6 +96,11 @@ Le 1er service de laverie à domicile en France. Marketplace connectant les clie
 - ~~Annulation commande avec message client~~ → DONE
 - ~~CRUD B2B partenaires avec vrais appels API~~ → DONE
 - ~~Warnings React Router v7~~ → DONE
+- ~~PWA Install Banner iOS/Android~~ → DONE (16/03/2026)
+
+## En Attente (Action Utilisateur)
+- [ ] **STRIPE_SECRET_KEY** : Ajouter dans Vercel > Environment Variables
+- [ ] **RLS Supabase** : Autoriser SELECT public sur table `washers`
 
 ## Futur (P3)
 - [ ] App mobile React Native séparée

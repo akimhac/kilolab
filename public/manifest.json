@@ -1,100 +1,68 @@
 {
-  "name": "Kilolab - Le Uber du Linge",
+  "name": "Kilolab - Laverie à Domicile",
   "short_name": "Kilolab",
-  "description": "Gagne jusqu'à 600€/mois en lavant le linge de tes voisins. Liberté totale, comme Uber.",
+  "description": "Le 1er service de laverie à domicile en France. Collecte, lavage et livraison en 48h.",
   "start_url": "/",
+  "id": "/",
   "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
   "background_color": "#ffffff",
   "theme_color": "#14b8a6",
-  "orientation": "portrait",
+  "orientation": "portrait-primary",
   "scope": "/",
+  "lang": "fr",
+  "dir": "ltr",
+  "prefer_related_applications": false,
   "icons": [
     {
-      "src": "/logo-72.png",
-      "sizes": "72x72",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "/logo-96.png",
-      "sizes": "96x96",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "/logo-128.png",
-      "sizes": "128x128",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "/logo-144.png",
-      "sizes": "144x144",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "/logo-152.png",
-      "sizes": "152x152",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "/logo-192.png",
+      "src": "/icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
     },
     {
-      "src": "/logo-384.png",
-      "sizes": "384x384",
+      "src": "/icon-512.png",
+      "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/logo-512.png",
+      "src": "/icon-maskable-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/icon-maskable-512.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "maskable"
     }
   ],
   "shortcuts": [
     {
-      "name": "Devenir Washer",
-      "short_name": "Washer",
-      "description": "Inscris-toi pour gagner de l'argent",
-      "url": "/become-washer",
-      "icons": [
-        {
-          "src": "/icon-washer-96.png",
-          "sizes": "96x96"
-        }
-      ]
-    },
-    {
       "name": "Commander",
       "short_name": "Commander",
-      "description": "Trouve un Washer près de toi",
-      "url": "/trouver",
-      "icons": [
-        {
-          "src": "/icon-order-96.png",
-          "sizes": "96x96"
-        }
-      ]
+      "description": "Passer une commande de lavage",
+      "url": "/new-order",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Mon compte",
+      "short_name": "Compte",
+      "description": "Accéder à mon espace client",
+      "url": "/dashboard",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Devenir Washer",
+      "short_name": "Washer",
+      "description": "Gagner de l'argent en lavant du linge",
+      "url": "/become-washer",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
     }
   ],
   "categories": ["lifestyle", "business", "productivity"],
-  "screenshots": [
-    {
-      "src": "/screenshot-1.png",
-      "sizes": "540x720",
-      "type": "image/png"
-    },
-    {
-      "src": "/screenshot-2.png",
-      "sizes": "540x720",
-      "type": "image/png"
-    }
-  ]
+  "related_applications": [],
+  "handle_links": "preferred"
 }
