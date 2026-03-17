@@ -20,8 +20,8 @@ messaging.onBackgroundMessage((payload) => {
   const notificationTitle = payload.notification?.title || 'Kilolab';
   const notificationOptions = {
     body: payload.notification?.body || 'Nouvelle notification',
-    icon: '/logo-192.png',
-    badge: '/logo-72.png',
+    icon: '/icon-192.png',
+    badge: '/icon-192.png',
     tag: payload.data?.tag || 'kilolab-notification',
     data: payload.data,
     vibrate: [200, 100, 200],

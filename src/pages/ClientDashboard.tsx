@@ -9,6 +9,7 @@ import { LoyaltyCard } from '../components/Loyalty';
 import { SubscriptionCard } from '../components/Subscription';
 import { ReferralSystem } from '../components/ReferralSystem';
 import { Chat, ChatBubble } from '../components/Chat';
+import NotificationToggle from '../components/NotificationToggle';
 import {
   Package, Clock, CheckCircle, MapPin, Loader2, ArrowRight,
   Star, RefreshCw, Plus, Sparkles, Phone, TrendingUp,
@@ -559,6 +560,13 @@ export default function ClientDashboard() {
         {/* Tab Content - Orders */}
         {activeTab === 'orders' && (
           <>
+        {/* Notification Toggle */}
+        <FadeInOnScroll direction="up" delay={100}>
+          <div className="mb-6">
+            <NotificationToggle />
+          </div>
+        </FadeInOnScroll>
+
         {activeOrders.length > 0 && (
           <FadeInOnScroll direction="up" delay={200}>
             <div className="mb-8 space-y-4">
