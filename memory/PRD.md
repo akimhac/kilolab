@@ -20,6 +20,12 @@ Le 1er service de laverie à domicile en France. Marketplace connectant les clie
 - [x] **manifest.json amélioré** : Shortcuts, display_override, lang
 - [x] **Page /trouver corrigée** : Meilleure gestion des erreurs RLS Supabase
 - [x] **Notifications Push Toggle** : Bouton d'activation dans le dashboard client
+- [x] **Dashboard Live** (`/admin/live`) : Monitoring temps réel des commandes et revenus
+  - Stats en temps réel (commandes, CA, clients, washers)
+  - Pipeline visuel des commandes
+  - Dernières commandes et inscriptions
+  - Auto-refresh toutes les 30 secondes
+  - Alertes pour commandes en attente
 
 ### Sprint 8 - Alertes Admin & Annulation Commandes (01/03/2026)
 - [x] **Alertes Email Admin** : Notifications automatiques pour nouvelles inscriptions et commandes

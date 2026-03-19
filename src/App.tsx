@@ -62,6 +62,7 @@ const PickupQR = lazy(() => import('./pages/PickupQR'));
 const Invoice = lazy(() => import('./pages/Invoice'));
 const NotFound = lazy(() => import('./pages/NotFound'));
 const WasherGPSNavigation = lazy(() => import('./components/WasherGPSNavigation'));
+const LiveStatus = lazy(() => import('./pages/LiveStatus'));
 
 const PageLoader = () => (
   <div className="min-h-screen flex items-center justify-center bg-slate-50">
@@ -282,6 +283,14 @@ export default function App() {
             element={
               <ProtectedAdminRoute>
                 <AdminAnalytics />
+              </ProtectedAdminRoute>
+            }
+          />
+          <Route
+            path="/admin/live"
+            element={
+              <ProtectedAdminRoute>
+                <LiveStatus />
               </ProtectedAdminRoute>
             }
           />
