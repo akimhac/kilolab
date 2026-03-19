@@ -6,6 +6,7 @@
 const envAdmins = import.meta.env.VITE_ADMIN_EMAILS?.split(',').map((e: string) => e.trim().toLowerCase()) || [];
 
 export const ADMIN_EMAILS: string[] = [
+  'akim.hachili@gmail.com',
   'admin@kilolab.fr',
   'contact@kilolab.fr',
   ...envAdmins
