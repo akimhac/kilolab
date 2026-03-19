@@ -83,6 +83,7 @@ Le 1er service de laverie à domicile en France. Marketplace connectant les clie
 
 ## Tests
 - API send-email: ✅ Testé avec curl (admin_new_order + admin_new_user)
+- iteration_12.json: **100%** — Test pré-lancement complet (16/03/2026)
 - iteration_9.json: **100%** (24 tests) — CRUD B2B + React Router v7
 - iteration_8.json: 100% (28 tests) — Admin Dashboard dark theme
 - iteration_7.json: 100% (21 tests) — Compteur Live + GPS
