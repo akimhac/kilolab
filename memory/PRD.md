@@ -27,6 +27,14 @@ Le 1er service de laverie à domicile en France. Marketplace connectant les clie
   - Auto-refresh toutes les 30 secondes
   - Alertes pour commandes en attente
 
+### Sprint 11 - Bug Fixes & Auto-Assignment (27/03/2026)
+- [x] **Fix Dashboard Client** : Utilisation de `maybeSingle()` pour éviter les erreurs sur tables vides
+- [x] **Validation adresse améliorée** : Regex pour villes et codes postaux valides
+- [x] **UI "Pas de Washer" modernisée** : Message positif "Bonne nouvelle ! Kilolab prend en charge votre zone"
+- [x] **Webhook Stripe amélioré** : Emails de confirmation client + admin après paiement
+- [x] **Auto-assignation Washers** : Algorithme intelligent basé sur localisation et disponibilité
+- [x] **Service washerAssignment** : Scoring des washers par proximité géographique
+
 ### Sprint 8 - Alertes Admin & Annulation Commandes (01/03/2026)
 - [x] **Alertes Email Admin** : Notifications automatiques pour nouvelles inscriptions et commandes
 - [x] **Annulation de Commande** : Modal dans Admin Dashboard avec message personnalisé au client
