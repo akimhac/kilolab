@@ -39,14 +39,14 @@ export default function NewOrder() {
   const [isWeekend, setIsWeekend] = useState(false);
 
   // Washers
-  const [allWashers, setAllWashers] = useState<any[]>([]);
+  const [allWashers, setAllWashers] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [isSearching, setIsSearching] = useState(false);
   const [searchDone, setSearchDone] = useState(false);
-  const [filteredWashers, setFilteredWashers] = useState<any[]>([]);
+  const [filteredWashers, setFilteredWashers] = useState([]);
   const [selectedWasherId, setSelectedWasherId] = useState("");
   const [finalAddress, setFinalAddress] = useState("");
-  const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
+  const [userLocation, setUserLocation] = useState(null);
 
   // Coupons
   const [couponCode, setCouponCode] = useState("");
@@ -160,10 +160,31 @@ export default function NewOrder() {
     }
   };
 
-  // Recherche locale dans les washers
+  // Recherche locale dans les washers avec validation d'adresse
   const handleSearchLocally = () => {
-    if (!searchQuery.trim()) {
+    const query = searchQuery.trim();
+    
+    if (!query) {
       toast.error("Veuillez entrer un code postal ou une ville");
+      return;
+    }
+
+    // Validation basique : au moins 2 caractères et pas que des caractères spéciaux
+    const isValidInput = /^[a-zA-ZÀ-ÿ0-9\s-]{2,}$/.test(query);
+    if (!isValidInput) {
+      toast.error("Veuillez entrer une ville ou un code postal valide");
+      return;
+    }
+
+    // Vérifier si c'est un code postal français (5 chiffres)
+    const isPostalCode = /^\d{5}$/.test(query);
+    const isPartialPostal = /^\d{2,4}$/.test(query);
+    
+    // Si ce n'est pas un code postal, vérifier que ça ressemble à une ville (au moins 2 lettres)
+    const looksLikeCity = /[a-zA-ZÀ-ÿ]{2,}/.test(query);
+    
+    if (!isPostalCode && !isPartialPostal && !looksLikeCity) {
+      toast.error("Format invalide. Essayez : 75001 ou Paris");
       return;
     }
 
@@ -171,15 +192,14 @@ export default function NewOrder() {
     setSearchDone(false);
 
     setTimeout(() => {
-      const searchLower = searchQuery.toLowerCase().trim();
+      const searchLower = query.toLowerCase();
 
       // Matching amélioré (ville, CP, département)
       const results = allWashers.filter((w) => {
         const cityMatch = String(w.city || "").toLowerCase().includes(searchLower);
-        const postalMatch = String(w.postal_code || "").includes(searchQuery.trim());
+        const postalMatch = String(w.postal_code || "").includes(query);
 
-        const userDept =
-          searchQuery.trim().length >= 2 ? searchQuery.trim().substring(0, 2) : "";
+        const userDept = query.length >= 2 ? query.substring(0, 2) : "";
         const washerDept = String(w.postal_code || "").substring(0, 2);
         const deptMatch = userDept && washerDept === userDept;
 
@@ -195,8 +215,7 @@ export default function NewOrder() {
         toast.success(`✅ ${results.length} Washer(s) trouvé(s) !`);
       } else {
         setSelectedWasherId("waiting_list");
-        toast("ℹ️ Aucun Washer dans cette zone, la plateforme prendra en charge", {
-          icon: "🌐",
+        toast.success("✅ Zone prise en charge par Kilolab !", {
           duration: 4000,
         });
       }
@@ -665,9 +684,7 @@ export default function NewOrder() {
                 </button>
               </div>
 
-              <div className="flex-1 relative rounded-2xl overflow-hidden bg-slate-100 border-2 border-slate-200 min-h-[300px]">
-                <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1569336415962-a4bd9f69c07b?q=80&w=1000&auto=format&fit=crop')] bg-cover bg-center opacity-30 blur-sm" />
-
+              <div className="flex-1 relative rounded-2xl overflow-hidden bg-gradient-to-br from-teal-50 to-cyan-50 border-2 border-teal-100 min-h-[300px]">
                 <div className="absolute inset-0 flex flex-col items-center justify-center p-4 text-center z-10">
                   {isSearching && (
                     <div className="bg-white/90 backdrop-blur-lg p-8 rounded-2xl shadow-xl border border-slate-200 animate-pulse">
@@ -677,10 +694,12 @@ export default function NewOrder() {
                   )}
 
                   {!isSearching && searchDone && (
-                    <div className="bg-white/95 backdrop-blur-lg p-8 rounded-2xl shadow-2xl border-2 border-teal-200 animate-in zoom-in duration-300 max-w-md">
+                    <div className="bg-white p-8 rounded-2xl shadow-2xl border-2 border-teal-200 animate-in zoom-in duration-300 max-w-md">
                       {filteredWashers.length > 0 ? (
                         <>
-                          <Sparkles size={48} className="text-teal-500 mx-auto mb-4" />
+                          <div className="w-20 h-20 bg-gradient-to-br from-teal-400 to-cyan-500 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
+                            <Sparkles size={36} className="text-white" />
+                          </div>
                           <h3 className="text-2xl font-black text-slate-900 mb-2">Zone couverte ! 🎉</h3>
                           <p className="text-slate-600 font-medium mb-6">
                             {filteredWashers.length} Washer(s) disponible(s) près de chez vous
@@ -688,13 +707,21 @@ export default function NewOrder() {
                         </>
                       ) : (
                         <>
-                          <div className="w-16 h-16 bg-teal-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                            <Sparkles size={32} className="text-teal-600" />
+                          <div className="w-20 h-20 bg-gradient-to-br from-teal-400 to-cyan-500 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
+                            <CheckCircle size={36} className="text-white" />
                           </div>
-                          <h3 className="text-2xl font-black text-slate-900 mb-2">Réseau Kilolab 🌐</h3>
-                          <p className="text-slate-600 font-medium mb-6">
-                            Aucun Washer dans cette zone, mais notre plateforme prend en charge votre commande !
+                          <h3 className="text-2xl font-black text-slate-900 mb-2">Bonne nouvelle ! ✨</h3>
+                          <p className="text-slate-600 font-medium mb-4">
+                            Kilolab prend en charge votre zone
                           </p>
+                          <div className="bg-teal-50 rounded-xl p-4 mb-6 text-left">
+                            <div className="flex items-start gap-3">
+                              <CheckCircle size={18} className="text-teal-600 mt-0.5 shrink-0" />
+                              <p className="text-sm text-teal-800">
+                                <strong>Notre équipe partenaire</strong> s'occupera de votre linge avec le même soin et la même qualité.
+                              </p>
+                            </div>
+                          </div>
                         </>
                       )}
                       <button

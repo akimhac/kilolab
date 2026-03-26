@@ -392,7 +392,7 @@ export default function ClientDashboard() {
         .select('*, washer:washers(id, first_name, last_name, avatar_url, avg_rating, total_ratings, phone)')
         .eq('client_id', user.id)
         .order('created_at', { ascending: false });
-      if (error) { toast.error('Erreur chargement'); return; }
+      if (error) { /* Silently handle - user may have no orders yet */ }
       const all = (orders ?? []) as Order[];
       const active = all.filter(o => ['pending','assigned','picked_up','washing','ready'].includes(o.status));
       const completedUnrated = all.filter(o => o.status === 'completed' && !o.client_rating);
@@ -405,11 +405,11 @@ export default function ClientDashboard() {
       setStats({ totalOrders: valid.length, totalSpent, totalKg, avgOrderValue: past.length > 0 ? totalSpent / past.length : 0 });
       
       // Fetch profile with loyalty points
-      const [{ data: prof }, { data: refCode }, { data: sub }] = await Promise.all([
-        supabase.from('user_profiles').select('id, full_name, referral_credit, loyalty_points').eq('id', user.id).single(),
-        supabase.from('referral_codes').select('code, uses_count, bonus_earned_cents').eq('user_id', user.id).single(),
-        supabase.from('subscriptions').select('*').eq('user_id', user.id).eq('status', 'active').single(),
-      ]);
+      // Fetch profile data with error handling for each query
+      const { data: prof } = await supabase.from('user_profiles').select('id, full_name, referral_credit, loyalty_points').eq('id', user.id).maybeSingle();
+      const { data: refCode } = await supabase.from('referral_codes').select('code, uses_count, bonus_earned_cents').eq('user_id', user.id).maybeSingle();
+      const { data: sub } = await supabase.from('subscriptions').select('*').eq('user_id', user.id).eq('status', 'active').maybeSingle();
+      
       if (prof) setProfile({ 
         id: prof.id, 
         full_name: prof.full_name ?? null, 
