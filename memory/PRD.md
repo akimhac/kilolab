@@ -34,6 +34,12 @@ Le 1er service de laverie à domicile en France. Marketplace connectant les clie
 - [x] **Webhook Stripe amélioré** : Emails de confirmation client + admin après paiement
 - [x] **Auto-assignation Washers** : Algorithme intelligent basé sur localisation et disponibilité
 - [x] **Service washerAssignment** : Scoring des washers par proximité géographique
+- [x] **Suivi GPS temps réel** : Composant OrderTracking avec position du washer
+  - Barre de progression des étapes
+  - Infos washer avec appel direct
+  - Carte de position animée
+  - Mise à jour temps réel (Supabase Realtime)
+  - Bouton "Suivre en temps réel" dans les commandes actives
 
 ### Sprint 8 - Alertes Admin & Annulation Commandes (01/03/2026)
 - [x] **Alertes Email Admin** : Notifications automatiques pour nouvelles inscriptions et commandes

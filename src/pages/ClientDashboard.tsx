@@ -10,6 +10,7 @@ import { SubscriptionCard } from '../components/Subscription';
 import { ReferralSystem } from '../components/ReferralSystem';
 import { Chat, ChatBubble } from '../components/Chat';
 import NotificationToggle from '../components/NotificationToggle';
+import OrderTracking from '../components/OrderTracking';
 import {
   Package, Clock, CheckCircle, MapPin, Loader2, ArrowRight,
   Star, RefreshCw, Plus, Sparkles, Phone, TrendingUp,
@@ -159,10 +160,11 @@ function RatingModal({ order, onClose, onSubmit }: { order: Order; onClose: () =
   );
 }
 
-function ActiveOrderCard({ order, onCancel, onRate }: { order: Order; onCancel?: (id: string) => void; onRate?: (o: Order) => void }) {
+function ActiveOrderCard({ order, onCancel, onRate, onTrack }: { order: Order; onCancel?: (id: string) => void; onRate?: (o: Order) => void; onTrack?: (id: string) => void }) {
   const si = STATUS_INFO[order.status] ?? { label: order.status, emoji: '📦', color: 'text-slate-600', bg: 'bg-slate-50 border-slate-200', desc: '' };
   const canRate = order.status === 'completed' && !order.client_rating && onRate;
   const isActive = ['pending','assigned','picked_up','washing','ready'].includes(order.status);
+  const canTrack = ['assigned','picked_up','ready'].includes(order.status) && order.washer_id;
   return (
     <div className="bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden">
       <div className={`px-5 py-4 border-b ${si.bg} ${si.color}`}>
@@ -256,6 +258,11 @@ function ActiveOrderCard({ order, onCancel, onRate }: { order: Order; onCancel?:
         {order.status === 'pending' && onCancel && (
           <button onClick={() => onCancel(order.id)} className="w-full py-2.5 text-red-400 text-sm font-semibold hover:text-red-600 transition border border-red-100 rounded-xl hover:bg-red-50">
             Annuler cette commande
+          </button>
+        )}
+        {canTrack && onTrack && (
+          <button onClick={() => onTrack(order.id)} className="w-full py-3.5 bg-gradient-to-r from-teal-500 to-cyan-500 text-white rounded-2xl font-black hover:shadow-lg transition flex items-center justify-center gap-2">
+            <MapPin size={16} /> Suivre en temps reel
           </button>
         )}
       </div>
@@ -376,6 +383,7 @@ export default function ClientDashboard() {
   const [activeTab, setActiveTab] = useState<'orders' | 'loyalty' | 'subscription' | 'referral'>('orders');
   const [showChat, setShowChat] = useState(false);
   const [chatOrder, setChatOrder] = useState<Order | null>(null);
+  const [trackingOrderId, setTrackingOrderId] = useState<string | null>(null);
   const fetchLockRef = useRef(false);
 
   const loadDashboard = useCallback(async () => {
@@ -577,7 +585,7 @@ export default function ClientDashboard() {
               </div>
               {activeOrders.map((order, idx) => (
                 <div key={order.id} style={{ animationDelay: `${idx * 100}ms` }} className="animate-in fade-in slide-in-from-bottom-4">
-                  <ActiveOrderCard order={order} onCancel={cancelling === order.id ? undefined : cancelOrder} onRate={setRatingOrder} />
+                  <ActiveOrderCard order={order} onCancel={cancelling === order.id ? undefined : cancelOrder} onRate={setRatingOrder} onTrack={setTrackingOrderId} />
                 </div>
               ))}
             </div>
@@ -786,6 +794,23 @@ export default function ClientDashboard() {
                 setChatOrder(null);
               }}
             />
+          </div>
+        </div>
+      )}
+
+      {/* GPS Tracking Modal */}
+      {trackingOrderId && (
+        <div className="fixed inset-0 bg-black/60 z-50 flex items-end sm:items-center justify-center p-4" onClick={() => setTrackingOrderId(null)}>
+          <div className="w-full max-w-md max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
+            <div className="relative">
+              <button 
+                onClick={() => setTrackingOrderId(null)}
+                className="absolute -top-12 right-0 w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-lg z-10"
+              >
+                <X size={20} />
+              </button>
+              <OrderTracking orderId={trackingOrderId} />
+            </div>
           </div>
         </div>
       )}
