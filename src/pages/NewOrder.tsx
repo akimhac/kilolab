@@ -684,7 +684,7 @@ export default function NewOrder() {
                 </button>
               </div>
 
-              <div className="flex-1 relative rounded-2xl overflow-hidden bg-gradient-to-br from-teal-50 to-cyan-50 border-2 border-teal-100 min-h-[300px]">
+              <div className="flex-1 relative rounded-2xl overflow-visible bg-gradient-to-br from-teal-50 to-cyan-50 border-2 border-teal-100 min-h-[280px]">
                 <div className="absolute inset-0 flex flex-col items-center justify-center p-4 text-center z-10">
                   {isSearching && (
                     <div className="bg-white/90 backdrop-blur-lg p-8 rounded-2xl shadow-xl border border-slate-200 animate-pulse">
@@ -694,31 +694,31 @@ export default function NewOrder() {
                   )}
 
                   {!isSearching && searchDone && (
-                    <div className="bg-white p-8 rounded-2xl shadow-2xl border-2 border-teal-200 animate-in zoom-in duration-300 max-w-md">
+                    <div className="bg-white p-6 rounded-2xl shadow-2xl border-2 border-teal-200 animate-in zoom-in duration-300 w-full max-w-sm mx-auto">
                       {filteredWashers.length > 0 ? (
                         <>
-                          <div className="w-20 h-20 bg-gradient-to-br from-teal-400 to-cyan-500 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
-                            <Sparkles size={36} className="text-white" />
+                          <div className="w-16 h-16 bg-gradient-to-br from-teal-400 to-cyan-500 rounded-full flex items-center justify-center mx-auto mb-3 shadow-lg">
+                            <Sparkles size={28} className="text-white" />
                           </div>
-                          <h3 className="text-2xl font-black text-slate-900 mb-2">Zone couverte ! 🎉</h3>
-                          <p className="text-slate-600 font-medium mb-6">
-                            {filteredWashers.length} Washer(s) disponible(s) près de chez vous
+                          <h3 className="text-xl font-black text-slate-900 mb-1">Zone couverte ! 🎉</h3>
+                          <p className="text-slate-600 font-medium mb-4 text-sm">
+                            {filteredWashers.length} Washer(s) disponible(s)
                           </p>
                         </>
                       ) : (
                         <>
-                          <div className="w-20 h-20 bg-gradient-to-br from-teal-400 to-cyan-500 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
-                            <CheckCircle size={36} className="text-white" />
+                          <div className="w-16 h-16 bg-gradient-to-br from-teal-400 to-cyan-500 rounded-full flex items-center justify-center mx-auto mb-3 shadow-lg">
+                            <CheckCircle size={28} className="text-white" />
                           </div>
-                          <h3 className="text-2xl font-black text-slate-900 mb-2">Bonne nouvelle ! ✨</h3>
-                          <p className="text-slate-600 font-medium mb-4">
+                          <h3 className="text-xl font-black text-slate-900 mb-1">Bonne nouvelle ! ✨</h3>
+                          <p className="text-slate-600 font-medium mb-3 text-sm">
                             Kilolab prend en charge votre zone
                           </p>
-                          <div className="bg-teal-50 rounded-xl p-4 mb-6 text-left">
-                            <div className="flex items-start gap-3">
-                              <CheckCircle size={18} className="text-teal-600 mt-0.5 shrink-0" />
-                              <p className="text-sm text-teal-800">
-                                <strong>Notre équipe partenaire</strong> s'occupera de votre linge avec le même soin et la même qualité.
+                          <div className="bg-teal-50 rounded-xl p-3 mb-4 text-left">
+                            <div className="flex items-start gap-2">
+                              <CheckCircle size={16} className="text-teal-600 mt-0.5 shrink-0" />
+                              <p className="text-xs text-teal-800">
+                                <strong>Notre équipe</strong> s'occupera de votre linge avec soin.
                               </p>
                             </div>
                           </div>
@@ -726,9 +726,9 @@ export default function NewOrder() {
                       )}
                       <button
                         onClick={() => setStep(3)}
-                        className="px-8 py-4 bg-teal-600 text-white rounded-xl font-bold hover:bg-teal-500 transition w-full flex items-center justify-center gap-2 shadow-lg"
+                        className="px-6 py-3.5 bg-gradient-to-r from-teal-500 to-cyan-500 text-white rounded-xl font-black hover:from-teal-600 hover:to-cyan-600 transition w-full flex items-center justify-center gap-2 shadow-lg text-base"
                       >
-                        Poursuivre <ArrowRight size={20} />
+                        Continuer <ArrowRight size={18} />
                       </button>
                     </div>
                   )}
