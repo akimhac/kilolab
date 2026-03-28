@@ -41,6 +41,14 @@ Le 1er service de laverie à domicile en France. Marketplace connectant les clie
   - Mise à jour temps réel (Supabase Realtime)
   - Bouton "Suivre en temps réel" dans les commandes actives
 
+### Sprint 12 - UX Client & Admin (28/03/2026)
+- [x] **Menu hamburger enrichi** : Mes commandes, Points fidélité, Mon compte
+- [x] **Page Profile** (`/profile`) : Modification nom, téléphone, adresse
+- [x] **Minimum 1kg** : Au lieu de 3kg dans NewOrder
+- [x] **Code promo mobile fix** : Layout responsive (vertical sur mobile)
+- [x] **Admin assignation manuelle** : Dropdown pour assigner un washer aux commandes en attente
+- [x] **Fix estimation IA photo** : Nettoyage du base64 et validation format
+
 ### Sprint 8 - Alertes Admin & Annulation Commandes (01/03/2026)
 - [x] **Alertes Email Admin** : Notifications automatiques pour nouvelles inscriptions et commandes
 - [x] **Annulation de Commande** : Modal dans Admin Dashboard avec message personnalisé au client
