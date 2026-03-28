@@ -49,6 +49,14 @@ Le 1er service de laverie à domicile en France. Marketplace connectant les clie
 - [x] **Admin assignation manuelle** : Dropdown pour assigner un washer aux commandes en attente
 - [x] **Fix estimation IA photo** : Nettoyage du base64 et validation format
 
+### Sprint 13 - Expérience Washer (28/03/2026)
+- [x] **Carte des missions** : Vue carte interactive avec Leaflet pour voir les commandes proches
+- [x] **Toggle carte/liste** : Bouton "Voir la carte" dans le dashboard washer
+- [x] **Notifications email washers** : API `/api/notify-washers` pour alerter les washers des nouvelles commandes
+- [x] **Préférence notifications** : Checkbox pour activer/désactiver les emails de nouvelles missions
+- [x] **Intégration webhook** : Le webhook Stripe appelle notify-washers après paiement
+- [x] **Calcul distance Haversine** : Algorithme pour trouver les washers dans le rayon d'action
+
 ### Sprint 8 - Alertes Admin & Annulation Commandes (01/03/2026)
 - [x] **Alertes Email Admin** : Notifications automatiques pour nouvelles inscriptions et commandes
 - [x] **Annulation de Commande** : Modal dans Admin Dashboard avec message personnalisé au client
