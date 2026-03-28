@@ -57,6 +57,33 @@ Le 1er service de laverie à domicile en France. Marketplace connectant les clie
 - [x] **Intégration webhook** : Le webhook Stripe appelle notify-washers après paiement
 - [x] **Calcul distance Haversine** : Algorithme pour trouver les washers dans le rayon d'action
 
+### Sprint 15 - Améliorations "Top Level" (28/03/2026)
+- [x] **Validation d'adresse stricte (API Gouv)** : Composant `AddressAutocomplete`
+  - Intégration api-adresse.data.gouv.fr
+  - Autocomplétion avec suggestions
+  - Validation officielle des adresses françaises
+  - Navigation clavier (flèches, Enter, Escape)
+  - Stockage des coordonnées GPS pour le washer
+- [x] **Ajustement du poids par le Washer** : Composant `WeightAdjustment`
+  - Modal accessible depuis MissionModal sur missions "assigned"
+  - Slider de 1 à 30kg avec boutons d'ajustement rapide
+  - Raison obligatoire pour écarts > 2kg
+  - Notification automatique au client avec nouveau prix
+  - Recalcul du prix total
+- [x] **Génération de factures PDF** : Composant `InvoiceGenerator`
+  - Bouton "Facture" sur commandes complétées (ClientDashboard)
+  - HTML imprimable dans nouvelle fenêtre
+  - Numéro de facture, TVA 20%, format professionnel français
+  - Informations client et détail du service
+- [x] **Système de notation Client → Washer** : Amélioration `submitRating`
+  - Mise à jour automatique de `washers.avg_rating` et `washers.total_ratings`
+  - Bonus +50 points fidélité pour chaque avis
+  - Affichage des étoiles sur profil washer
+- [x] **Historique des gains amélioré** : Onglet "Historique" WasherDashboard
+  - Résumé des gains (semaine, mois, total, moyenne)
+  - Ventilation mensuelle avec regroupement automatique
+  - Liste détaillée des missions avec ID et adresse
+
 ### Sprint 14 - Sécurité & Disponibilité Washer (28/03/2026)
 - [x] **Page AccountSettings** (`/account-settings`) : Gestion complète du compte
   - Onglet Profil : Modification infos personnelles
@@ -136,6 +163,7 @@ Le 1er service de laverie à domicile en France. Marketplace connectant les clie
 - [x] Traductions i18next + Fix Logo + Refonte Landing
 
 ## Tests
+- iteration_17.json: **100%** — 5 features "Top Level" vérifiées (28/03/2026)
 - API send-email: ✅ Testé avec curl (admin_new_order + admin_new_user)
 - iteration_12.json: **100%** — Test pré-lancement complet (16/03/2026)
 - iteration_9.json: **100%** (24 tests) — CRUD B2B + React Router v7
@@ -162,4 +190,4 @@ Le 1er service de laverie à domicile en France. Marketplace connectant les clie
 - [ ] App mobile React Native séparée
 
 ---
-*Dernière mise à jour: 01/03/2026 - Sprint 8 terminé*
+*Dernière mise à jour: 28/03/2026 - Sprint 15 terminé (5 améliorations "Top Level")*
