@@ -78,7 +78,7 @@
   "context_for_next_testing_agent": "Admin Dashboard dark theme refonte complete with slate-900 background, glass-morphism cards (bg-white/5 backdrop-blur), teal/cyan gradients. Admin login at /admin/login (not /super-access). BecomeWasher Live Counter uses Supabase washers table with Math.max() fallback for minimum display counts (3 today, 12 pending). All French translations working correctly via react-i18next.",
 
   "testing_environment": {
-    "server": "Vite preview on https://soap-go.preview.emergentagent.com",
+    "server": "Vite preview on https://kilolab-preview.preview.emergentagent.com",
     "framework": "React 18 + TypeScript + Vite",
     "styling": "TailwindCSS with custom glass-morphism",
     "i18n": "react-i18next (FR default)",

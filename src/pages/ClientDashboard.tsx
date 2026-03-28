@@ -15,9 +15,10 @@ import {
   Package, Clock, CheckCircle, MapPin, Loader2, ArrowRight,
   Star, RefreshCw, Plus, Sparkles, Phone, TrendingUp,
   Gift, Copy, ChevronDown, ChevronUp, ThumbsUp, X,
-  RotateCcw, Zap, Crown, Repeat, MessageCircle, Users
+  RotateCcw, Zap, Crown, Repeat, MessageCircle, Users, FileText
 } from 'lucide-react';
 import toast from 'react-hot-toast';
+import InvoiceGenerator from '../components/InvoiceGenerator';
 
 interface WasherInfo {
   id: string; first_name: string; last_name: string;
@@ -160,11 +161,12 @@ function RatingModal({ order, onClose, onSubmit }: { order: Order; onClose: () =
   );
 }
 
-function ActiveOrderCard({ order, onCancel, onRate, onTrack }: { order: Order; onCancel?: (id: string) => void; onRate?: (o: Order) => void; onTrack?: (id: string) => void }) {
+function ActiveOrderCard({ order, onCancel, onRate, onTrack, clientName, clientEmail }: { order: Order; onCancel?: (id: string) => void; onRate?: (o: Order) => void; onTrack?: (id: string) => void; clientName?: string; clientEmail?: string }) {
   const si = STATUS_INFO[order.status] ?? { label: order.status, emoji: '📦', color: 'text-slate-600', bg: 'bg-slate-50 border-slate-200', desc: '' };
   const canRate = order.status === 'completed' && !order.client_rating && onRate;
   const isActive = ['pending','assigned','picked_up','washing','ready'].includes(order.status);
   const canTrack = ['assigned','picked_up','ready'].includes(order.status) && order.washer_id;
+  const showInvoice = order.status === 'completed';
   return (
     <div className="bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden">
       <div className={`px-5 py-4 border-b ${si.bg} ${si.color}`}>
@@ -176,11 +178,28 @@ function ActiveOrderCard({ order, onCancel, onRate, onTrack }: { order: Order; o
               <p className="text-xs opacity-70 mt-0.5">{si.desc}</p>
             </div>
           </div>
-          {isActive && (
-            <span className="flex items-center gap-1.5 text-xs font-bold opacity-60">
-              <span className="w-2 h-2 rounded-full bg-current animate-pulse" /> Live
-            </span>
-          )}
+          <div className="flex items-center gap-2">
+            {showInvoice && clientName && clientEmail && (
+              <InvoiceGenerator
+                order={{
+                  id: order.id,
+                  created_at: order.created_at,
+                  weight: order.weight,
+                  formula: order.formula,
+                  total_price: order.total_price,
+                  pickup_address: order.pickup_address,
+                  status: order.status,
+                }}
+                clientName={clientName}
+                clientEmail={clientEmail}
+              />
+            )}
+            {isActive && (
+              <span className="flex items-center gap-1.5 text-xs font-bold opacity-60">
+                <span className="w-2 h-2 rounded-full bg-current animate-pulse" /> Live
+              </span>
+            )}
+          </div>
         </div>
       </div>
       <div className="px-5 pt-5 pb-4 border-b border-slate-50">
@@ -270,7 +289,7 @@ function ActiveOrderCard({ order, onCancel, onRate, onTrack }: { order: Order; o
   );
 }
 
-function HistoryRow({ order, onRate }: { order: Order; onRate?: (o: Order) => void }) {
+function HistoryRow({ order, onRate, clientName, clientEmail }: { order: Order; onRate?: (o: Order) => void; clientName?: string; clientEmail?: string }) {
   const [expanded, setExpanded] = useState(false);
   const canRate = !order.client_rating && onRate;
   return (
@@ -312,6 +331,23 @@ function HistoryRow({ order, onRate }: { order: Order; onRate?: (o: Order) => vo
             </div>
           )}
           <div className="flex gap-2">
+            {clientName && clientEmail && (
+              <div onClick={(e) => e.stopPropagation()}>
+                <InvoiceGenerator
+                  order={{
+                    id: order.id,
+                    created_at: order.created_at,
+                    weight: order.weight,
+                    formula: order.formula,
+                    total_price: order.total_price,
+                    pickup_address: order.pickup_address,
+                    status: order.status,
+                  }}
+                  clientName={clientName}
+                  clientEmail={clientEmail}
+                />
+              </div>
+            )}
             {canRate && (
               <button onClick={() => onRate!(order)} className="flex-1 py-2.5 bg-yellow-400 text-yellow-900 rounded-xl font-bold text-xs hover:bg-yellow-500 transition flex items-center justify-center gap-1">
                 <Star size={12} className="fill-yellow-900" /> Noter
@@ -375,6 +411,7 @@ export default function ClientDashboard() {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [subscription, setSubscription] = useState<Subscription | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
+  const [userEmail, setUserEmail] = useState<string>('');
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [cancelling, setCancelling] = useState<string | null>(null);
@@ -394,6 +431,7 @@ export default function ClientDashboard() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) { window.location.href = '/login'; return; }
       setUserId(user.id);
+      setUserEmail(user.email || '');
       
       const { data: orders, error } = await supabase
         .from('orders')
@@ -459,9 +497,49 @@ export default function ClientDashboard() {
 
   const submitRating = async (id: string, rating: number, review: string) => {
     try {
-      const { error } = await supabase.from('orders').update({ client_rating: rating, client_review: review }).eq('id', id);
+      // Get the order to find the washer
+      const { data: order } = await supabase.from('orders').select('washer_id').eq('id', id).single();
+      
+      // Update order with rating
+      const { error } = await supabase.from('orders').update({ 
+        client_rating: rating, 
+        client_review: review,
+        rated_at: new Date().toISOString()
+      }).eq('id', id);
       if (error) throw error;
-      toast.success('Merci pour votre avis !');
+      
+      // Update washer's average rating
+      if (order?.washer_id) {
+        // Get all ratings for this washer
+        const { data: washerOrders } = await supabase
+          .from('orders')
+          .select('client_rating')
+          .eq('washer_id', order.washer_id)
+          .not('client_rating', 'is', null);
+        
+        if (washerOrders && washerOrders.length > 0) {
+          const totalRatings = washerOrders.length;
+          const avgRating = washerOrders.reduce((sum, o) => sum + (o.client_rating || 0), 0) / totalRatings;
+          
+          // Update washer profile with new average
+          await supabase.from('washers').update({
+            avg_rating: parseFloat(avgRating.toFixed(2)),
+            total_ratings: totalRatings,
+            updated_at: new Date().toISOString()
+          }).eq('id', order.washer_id);
+        }
+      }
+      
+      // Award loyalty points for leaving a review
+      if (userId) {
+        await supabase.rpc('add_loyalty_points', { 
+          p_user_id: userId, 
+          p_points: 50,
+          p_reason: 'Avis laissé'
+        }).catch(() => {/* ignore if function doesn't exist */});
+      }
+      
+      toast.success('Merci pour votre avis ! +50 points fidélité');
       await loadDashboard();
     } catch { toast.error("Erreur lors de l'envoi"); }
   };
@@ -585,7 +663,14 @@ export default function ClientDashboard() {
               </div>
               {activeOrders.map((order, idx) => (
                 <div key={order.id} style={{ animationDelay: `${idx * 100}ms` }} className="animate-in fade-in slide-in-from-bottom-4">
-                  <ActiveOrderCard order={order} onCancel={cancelling === order.id ? undefined : cancelOrder} onRate={setRatingOrder} onTrack={setTrackingOrderId} />
+                  <ActiveOrderCard 
+                    order={order} 
+                    onCancel={cancelling === order.id ? undefined : cancelOrder} 
+                    onRate={setRatingOrder} 
+                    onTrack={setTrackingOrderId}
+                    clientName={profile?.full_name || 'Client'}
+                    clientEmail={userEmail}
+                  />
                 </div>
               ))}
             </div>
@@ -616,7 +701,7 @@ export default function ClientDashboard() {
                 </h2>
               </div>
               <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden hover:shadow-md transition-all duration-300">
-                {displayed.map(order => <HistoryRow key={order.id} order={order} onRate={setRatingOrder} />)}
+                {displayed.map(order => <HistoryRow key={order.id} order={order} onRate={setRatingOrder} clientName={profile?.full_name || 'Client'} clientEmail={userEmail} />)}
               </div>
               {pastOrders.length > 5 && (
                 <button onClick={() => setShowAllHistory(!showAllHistory)} className="w-full mt-3 py-3 bg-white border border-slate-200 rounded-2xl text-slate-500 font-bold text-sm hover:bg-slate-50 hover:scale-[1.02] transition-all duration-300 flex items-center justify-center gap-2">

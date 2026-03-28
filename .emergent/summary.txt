@@ -1,178 +1,171 @@
-<analysis>**original_problem_statement:**
-The user's initial goal was to build a professional-grade laundry marketplace. After several UI/UX and feature implementations, the core task has shifted to preparing the application for a market launch. The user's most recent requests focus on final bug fixes, security hardening, and enabling live payments.
+<analysis>**original_problem_statement**: 
+The user is building KiloLab, a professional laundry marketplace connecting clients and Washers. The goal is to launch a robust, bug-free, top-tier application capable of handling live payments, real-time tracking, washer management, and complex administrative operations. PRODUCT REQUIREMENTS are tracked in .
 
-The main requirements that were addressed in this session:
-1.  Fix bugs in the Admin Dashboard preventing order cancellation and messaging.
-2.  Force users to register/log in before placing an order.
-3.  Replace the landing page video and price comparator with more modern, benefit-oriented UI.
-4.  Generate a complete marketing kit (visuals and captions) for Instagram.
-5.  Perform a full code audit to find and fix security vulnerabilities and performance issues.
-6.  Configure Google Analytics and Sentry for monitoring.
-7.  Switch the application from Stripe's test mode to LIVE mode to accept real payments.
+**User's preferred language**: French (You MUST respond in the user's preferred language: French)
 
-PRODUCT REQUIREMENTS are tracked in .
+**what currently exists?** 
+A full-stack marketplace (React/Vite/TypeScript frontend, Supabase backend, Vercel Serverless Functions). It features PWA support, live Stripe payments with webhooks, push and email notifications, real-time GPS tracking for clients, an advanced Washer dashboard with interactive maps, and a comprehensive Admin dashboard with live stats.
 
-**User's preferred language**: French. The next agent MUST respond in French.
+**Last working item**: 
+- **Last item agent was working**: Implementing 5 top-level improvements requested by the user: Strict Address Validation (API Gouv), Washer weight adjustment at pickup, PDF Invoice Generation, Client-to-Washer rating system, and Improved earnings history. The agent *just* created the empty/stub files for the first three components.
+- **Status**: IN PROGRESS
+- **Agent Testing Done**: N
+- **Which testing method agent to use?**: Both. Use  once the components are fully integrated to ensure no regressions in the order and washer flows.
+- **User Testing Done**: N
 
-**what currently exists?**
-The application is a full-stack laundry marketplace with a React/Vite/TypeScript frontend, a Supabase backend (PostgreSQL, Auth, Triggers), and Vercel Serverless Functions. A local FastAPI server is used for testing in the preview environment.
+**All Pending/In progress Issue list**: 
+Issue 1: (P0) Integrate and Complete Top-Level Improvements
+Issue 2: (P2) Exposed Google API Key in Git History
 
-The last agent completed a major pre-launch sprint:
--   **Admin Features:** Implemented and debugged the order cancellation and client messaging system in the Admin Dashboard. Email alerts for new orders and signups are functional.
--   **UI Overhaul:** Replaced the price comparator on the landing and pricing pages with a modern Benefits section and updated the landing page video.
--   **Marketing Content:** Created two sets of Instagram marketing materials (AI-generated and real stock photos) with captions, saved in .
--   **Pre-Launch Features:** Built a Washer Waitlist dashboard to engage washers before launch and updated the legal notices page.
--   **Code Audit & Hardening:** Performed a code audit, removed the admin email from the source code into an environment variable, and cleaned up over 170  statements.
--   **Integrations:** Configured Google Analytics and Sentry with user-provided keys. Switched the Stripe frontend to use the LIVE public key.
+Issues Detail:
+- Issue 1:
+   - Attempted fixes: The agent created , , and , but has not written their logic or integrated them into the app.
+   - Next debug checklist: 
+     - Build  using  and integrate into  and .
+     - Build  and integrate into  so washers can correct weight upon collection (and notify clients).
+     - Build  and integrate into .
+     - Implement the Rating System and Earnings History.
+   - Why fix this issue and what will be achieved with the fix?: Fulfills the user's explicit request for a premium, foolproof user experience before full launch.
+   - Status: IN PROGRESS
+   - Is recurring issue? N
+   - Should Test frontend/backend/both after fix?: Both
 
-**Last working item**:
--   **Last item agent was working**: Configuring Stripe for LIVE payments and Sentry for error monitoring. The agent successfully added the user's Sentry DSN and Stripe LIVE **public key** to the frontend environment variables. The agent correctly identified that the Stripe **secret key** is also required for the backend to process payments but has not yet been configured.
--   **Status**: IN PROGRESS
--   **Agent Testing Done**: N
--   **Which testing method agent to use?**: backend testing agent. After the user configures the secret key, the  must be used to perform a full end-to-end payment test to validate the LIVE configuration.
--   **User Testing Done**: N
-
-**All Pending/In progress Issue list**:
--   **Issue 1**: **(P0) Complete Stripe LIVE Configuration.** The application cannot process real payments until the Stripe secret key is configured on the backend.
--   **Issue 2**: **(P0) Order Cancellation Fails Due to Supabase Trigger.** The admin cannot cancel orders, which is a critical operational function.
--   **Issue 3**: **(P1) Washer List Page () Fails to Load Real Data.** The page shows mock data because a Supabase RLS policy is blocking access.
--   **Issue 4**: **(P2) CRITICAL SECURITY RISK (Recurring).** An exposed Google API Key remains in the Git history.
-
-**Issues Detail**:
--   **Issue 1: Complete Stripe LIVE Configuration**
-    -   **Next debug checklist**:
-        1.  Instruct the user to add their Stripe **secret key** (the one starting with ) to their Vercel project's environment variables under the name .
-        2.  Emphasize that this key is highly confidential and must be added directly in the Vercel UI, not shared in the chat.
-        3.  Once the user confirms the key has been added, trigger a new Vercel deployment to apply the change.
-        4.  Run a full end-to-end payment test using the .
-    -   **Why fix this issue and what will be achieved with the fix?**: This is the final step to enable the application to legally and technically accept real money from customers.
-    -   **Status**: IN PROGRESS
-    -   **Is recurring issue?**: N
-    -   **Should Test frontend/backend/both after fix?**: both
-
--   **Issue 2: Order Cancellation Fails Due to Supabase Trigger**
-    -   **Attempted fixes**: The agent identified the error is in the  PostgreSQL function in Supabase, which incorrectly uses  instead of . The agent provided the correct SQL script to fix it.
-    -   **Next debug checklist**:
-        1.  Ask the user to confirm if they have run the provided SQL script in their Supabase SQL Editor.
-        2.  If not, provide the script again and guide them.
-        3.  After they confirm, ask them to test the cancellation feature again from the Admin Dashboard.
-    -   **Why fix this issue and what will be achieved with the fix?**: This unblocks a critical admin function required for launch.
-    -   **Status**: USER VERIFICATION PENDING
-    -   **Is recurring issue?**: Y
-    -   **Should Test frontend/backend/both after fix?**: backend
-
--   **Issue 3: Washer List Page () Fails to Load Real Data**
-    -   **Attempted fixes**: The agent implemented a temporary fallback that displays mock data when the API call to fetch washers fails with a 401 error.
-    -   **Next debug checklist**:
-        1.  Explain to the user that the issue is a Supabase Row Level Security (RLS) policy.
-        2.  Guide the user to navigate to their Supabase project's RLS policies for the  (or ) table.
-        3.  Instruct them to create a new policy or edit the existing one to allow public, read-only () access for anonymous users ( role).
-    -   **Why fix this issue and what will be achieved with the fix?**: This will allow potential customers to see real, available washers, which is a core part of the user acquisition funnel.
-    -   **Status**: IN PROGRESS
-    -   **Is recurring issue?**: N
-    -   **Should Test frontend/backend/both after fix?**: frontend
-
--   **Issue 4: Exposed Google API Key**
-    -   **Attempted fixes**: None, per user instruction.
-    -   **Next debug checklist**: After all launch-critical issues are resolved, strongly advise the user to address this by revoking the key and cleaning the git history.
-    -   **Why fix this issue and what will be achieved with the fix?**: To prevent fraudulent use of the user's Google Cloud account and avoid potential financial loss.
-    -   **Status**: NOT STARTED
-    -   **Is recurring issue?**: Y
-    -   **Should Test frontend/backend/both after fix?**: backend
-    -   **Blocked on other issue**: User's approval.
+- Issue 2:
+   - Attempted fixes: None, user deferred this action.
+   - Next debug checklist: Revoke the key in Google Cloud Console and purge from Git history.
+   - Why fix this issue and what will be achieved with the fix?: Security vulnerability.
+   - Status: NOT STARTED
+   - Is recurring issue? Y
+   - Should Test frontend/backend/both after fix?: NA
+   - Blocked on other issue: User approval to spend time on this.
 
 **In progress Task List**:
-None.
+Task 1: Strict Address Validation (API Gouv)
+Task 2: Washer Weight Adjustment at Pickup
+Task 3: PDF Invoice Generation
+Task 4: Client to Washer Rating System
+Task 5: Improved Washer Earnings History
+
+Task Detail:
+- Task 1:
+   - Where to resume:  and 
+   - What will be achieved with this?: Prevents clients from entering fake addresses (e.g., LOL) leading to failed washer routing.
+   - Status: IN PROGRESS
+   - Should Test frontend/backend/both after fix?: Frontend
+
+- Task 2:
+   - Where to resume:  and 
+   - What will be achieved with this?: Allows washers to update the actual weight and adjust the price if the client's estimate was wrong.
+   - Status: IN PROGRESS
+   - Should Test frontend/backend/both after fix?: Both
 
 **Upcoming and Future Tasks**
--   **Upcoming Tasks**:
-    -   **(P0)** Full pre-launch regression test of the entire application using  once all P0 issues are resolved.
--   **Future Tasks**:
-    -   **(P3)** Create a separate React Native project for a native mobile app.
+Upcoming Tasks:
+- (P1) Implement Twilio SMS notifications (User requested to delay this in favor of emails for now, but it's in the pipeline).
+Future Tasks:
+- (P3) Native React Native mobile app.
 
 **Completed work in this session**
--   **Admin Dashboard Features & Fixes**: Implemented and fully debugged the order cancellation and client messaging system.
--   **Email Alert System**: Created functional alerts for new user registrations and new orders via Resend.
--   **UI/UX Overhaul**: Replaced the landing page video and removed the price comparator from the  and  pages, replacing it with a modern Benefits section.
--   **Marketing Content Generation**: Created and delivered a full Instagram content kit with real stock photos, saved to .
--   **Washer Pre-Launch System**: Created a  dashboard to engage new washers with a waitlist, training modules, and referral system.
--   **Code Audit & Security Hardening**: Centralized the admin email check and moved the email to a  variable. Removed ~170  statements.
--   **3rd Party Integrations**: Configured Google Analytics, Sentry, and Stripe (frontend part) for production.
--   **Bug Fixes**: Corrected the user registration form layout and added a mandatory login/signup banner to the order creation page.
+- Stripe LIVE configuration & Webhook integration for emails and DB updates (DONE)
+- PWA Implementation (manifest, install banner, icons) (DONE)
+- Real-time GPS Tracking UI for Clients (DONE)
+- Live Admin Dashboard with real-time stats () (DONE)
+- Interactive Map for Washers (Leaflet) (DONE)
+- Washer Notifications via Resend () (DONE)
+- Washer Availability and Account Settings functionality (DONE)
+- Fixes: 1kg minimum weight, AI weight estimation crash, coupon UI,  errors (DONE)
+- Added  package to fix Vercel build crash (DONE)
 
 **Earlier issues found/mentioned but not fixed**
--   **Issue 1**: Exposed Google API Key in Git History. User is aware but has deferred the fix.
+Issue 1: 
+- Debug checklist: Exposed Google API Key in Git history.
+- Why to solve this issue and what will be achieved with this?: Prevents unauthorized usage of the GCP account.
+- Should Test frontend/backend/both after fix: NA
+- Is recurring issue? Y
 
 **Known issue recurrence from previous fork**
--   **Issue recurrence in previous fork**: Exposed Google API Key in Git history.
--   **Recurrence count**: 5+
--   **Status**: NOT STARTED
+- Issue recurrence in previous fork: Exposed Google API Key in Git history.
+- Recurrence count: 6
+- Status: NOT STARTED
 
 **Code Architecture**
 
 
 **Key Technical Concepts**
--   **Frontend**: React, TypeScript, Vite, TailwindCSS, 
--   **Backend**: Supabase (PostgreSQL, Auth, Realtime, Triggers)
--   **Serverless**: Vercel Serverless Functions
--   **Email**: Resend
--   **Payments**: Stripe (moving to LIVE mode)
--   **Monitoring**: Sentry, Google Analytics
+- Frontend: React, TypeScript, Vite, TailwindCSS, Leaflet (Maps)
+- Backend: Supabase (PostgreSQL, Auth, Edge Functions, RPCs), Vercel Serverless Functions
+- Payments: Stripe (LIVE Mode)
+- Emails/Notifications: Resend, Firebase Push
 
 **key DB schema**
--   **orders**:  (FK to user), . The  trigger on this table is faulty.
--   **user_profiles**: Stores user info like . Linked to  via .
--   **washers**: Public washer profiles. Read access is blocked by RLS policies.
+- washers: uid=0(root) gid=0(root) groups=0(root), , , , , , 
+- orders: uid=0(root) gid=0(root) groups=0(root), , , , , , 
+
+**changes in tech stack**
+- Added  to  for robust toast notifications.
+- Added  /  for washer map navigation.
 
 **All files of reference**
--    (Cancellation/messaging logic)
--    (Washer list with RLS issue)
--    (Holds all public keys and config)
--   **User's Cloud Dashboards**: The agent will need to guide the user in their **Vercel Dashboard** (for the Stripe secret key) and **Supabase Dashboard** (for the trigger SQL fix and RLS policy change).
+-  (Needs implementation)
+-  (Needs implementation)
+-  (Needs implementation)
+-  (Target for address autocomplete)
+-  (Target for weight adjustment)
+-  (Handles post-payment logic)
+
+**Areas that need refactoring**
+The three newly created component files are currently empty/stubs and must be completed and imported into their respective pages.
+
+**key api endpoints**
+-  (POST)
+-  (POST - Uses GPT-4o Vision)
+-  (POST - Sends assignment emails via Resend)
 
 **Critical Info for New Agent**
--   **Priority is Launch**: The user wants to launch and advertise. Your top priority is unblocking the two P0 issues: **Stripe LIVE payments** and **Order Cancellation**.
--   **Guide, Don't Code (for Supabase/Vercel)**: Two critical bugs (order cancellation, washer list) and the final Stripe setup step are not in the codebase. You **must** guide the user to make these changes in their Supabase and Vercel dashboards. You cannot fix them by editing code.
--   **Stripe LIVE Secret Key is Missing**: The app will not process payments until the user adds the  to their Vercel environment variables. This is the most critical step remaining.
--   **SQL Fix is Ready**: The SQL script to fix the order cancellation trigger has already been provided to the user. You need to follow up and ensure they have executed it.
--   **Admin Login Fails**: The admin credentials the user provided do not work. Do not attempt to log in to the admin dashboard for testing. Test APIs directly.
+- **User Tone:** The user is highly demanding and expects a top level and fluid experience without bugs. Always implement modern UI patterns and anticipate edge cases.
+- **Current Blockers:** You are mid-way through implementing 5 major requested features. Pick up exactly where the last agent left off by completing , , , the Rating System, and the Earnings History.
+- **Stripe & Supabase:** The app is currently pointing to Stripe LIVE. Supabase RLS and SQL schemas have recently been updated to support , , and account deletion flags.
 
 **documents and test reports created in this job**
--   
--   
+- 
+- 
+- 
+- 
+- 
+- 
 
 **Last 10 User Messages and any pending HUMAN messages**
-1.  **User**: Asks about Stripe test vs. live and legal requirements for collecting money.
-2.  **Agent**: Explains the difference, recommends creating an auto-entrepreneur status to get a SIRET and activate Stripe Live legally.
-3.  **User**: Re-requests the Supabase SQL fix, provides their Google Analytics ID, and asks how to configure Sentry and free washer notifications.
-4.  **Agent**: Provides all requested information and implements the notification system.
-5.  **User**: Provides their Sentry DSN and Stripe LIVE **public** key and asks the agent to verify everything.
-6.  **Agent**: Begins configuring Sentry and Stripe LIVE keys in the codebase.
+1. User asked if anything needs to be done on Supabase/Vercel.
+2. Agent provided SQL script for new DB columns and list of Vercel env vars.
+3. User asked about account deletion, security, and washer availability (vacations).
+4. Agent created  and , tested, and provided SQL for new columns.
+5. User reported Vercel build failure due to missing  package.
+6. Agent installed  and instructed user to redeploy.
+7. User confirmed SQL done, redeployed successfully, and asked what is left.
+8. Agent proposed 5 final improvements (Strict Address validation, Washer weight adjust, PDF invoices, Rating system, Earnings history).
+9. User explicitly requested: Fais tout les choses que tu as dites et donne des améliorations top niveau et implémentent direct ! (Do all of them, top level improvements, implement directly).
+10. Agent created the stub files for the new components and finished the task. *(Pending action: implement the contents of these files).*
 
 **Project Health Check:**
--   **Broken**:
-    -   **Live Payments**: Non-functional until the Stripe secret key is configured in the Vercel production environment.
-    -   **Order Cancellation**: The feature is blocked by a faulty Supabase trigger.
--   **Mocked**:
-    -   **Washer List**: The  page displays mock data as a fallback because Supabase RLS policies are blocking access to real data.
+- **Broken**: The three new components (, , ) are created but empty/unimplemented.
+- **Mocked**: None.
 
 **3rd Party Integrations**
--   **Supabase**: Backend DB, Auth, Realtime, Triggers.
--   **Resend**: Transactional emails.
--   **Stripe**: Payments (In progress of switching to LIVE mode).
--   **Vercel**: Deployment and Serverless Functions.
--   **OpenAI GPT-4o**: AI Weight Estimation (Uses **Emergent LLM Key**).
--   **i18next**: Multi-language support.
--   **Sentry**: Error Tracking (Configured, uses User API Key).
--   **Google Analytics**: User Metrics (Configured).
+- Stripe (Payments) — requires User API Key (LIVE keys are set)
+- Supabase (Backend/Auth) — requires User API Key
+- Resend (Emails) — requires User API Key
+- OpenAI GPT-4o Vision (AI Weight Estimation) — uses **Emergent LLM Key**
+- Firebase (Push Notifications) — requires User API Key
+- API Adresse (Data.gouv.fr) — Public API (No key required)
 
 **Testing status**
--   **Testing agent used after significant changes**: YES, but many critical changes have been made since the last run. A full regression test is required before launch.
--   **Test files created**: None in this session.
--   **Known regressions**: Order cancellation functionality is broken due to a database trigger issue.
+- Testing agent used after significant changes: YES (Iterations 12 through 16)
+- Troubleshoot agent used after agent stuck in loop: NO
+- Test files created: 
+- Known regressions: None currently known, but major unintegrated files need testing once hooked up.
 
 **Credentials to test flow:**
-The provided admin credentials ( / ) **do not work**. Do not attempt to use them.
+Use  for Admin access (added back to authorized list in ). Ensure Vercel preview URL is used for E2E tests.
 
 **What agent forgot to execute**
-The agent was in the process of configuring Stripe LIVE but has not yet guided the user through the most critical step: setting the  in the Vercel production environment. Without this, live payments will fail.</analysis>
+The agent proposed 5 features and successfully created the component files for 3 of them, but called  before writing the code inside them or wiring them up to the main application. You must implement these components.</analysis>

@@ -70,7 +70,7 @@
   "context_for_next_testing_agent": "Sprint final features tested: Live Washers Counter with Supabase integration working on BecomeWasher page. GPS Navigation page fully functional with 'Prêt à naviguer' state, GPS launch button, and queue with refresh. Note: GPS orders fetch shows Supabase API key error in console but falls back to mock data gracefully. Admin Dashboard Heatmap was mentioned but requires authentication to test.",
 
   "testing_environment": {
-    "server": "Vite preview on https://soap-go.preview.emergentagent.com",
+    "server": "Vite preview on https://kilolab-preview.preview.emergentagent.com",
     "framework": "React 18 + TypeScript + Vite",
     "styling": "TailwindCSS",
     "i18n": "react-i18next (FR default)",

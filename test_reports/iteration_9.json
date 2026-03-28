@@ -73,7 +73,7 @@
   "context_for_next_testing_agent": "React Router v7 future flags (v7_startTransition, v7_relativeSplatPath) confirmed working - no console warnings. BecomeWasher page route is /washers (not /devenir-washer). B2B CRUD in AdminDashboard is connected to real Supabase table 'b2b_partners'. Admin login at /admin/login with dark slate theme.",
 
   "testing_environment": {
-    "server": "Vite preview on https://soap-go.preview.emergentagent.com",
+    "server": "Vite preview on https://kilolab-preview.preview.emergentagent.com",
     "framework": "React 18 + TypeScript + Vite",
     "styling": "TailwindCSS with glass-morphism",
     "i18n": "react-i18next (FR default)",

@@ -13,10 +13,11 @@ import toast from "react-hot-toast";
 import {
   DollarSign, Package, Clock, MapPin, Check, TrendingUp, Loader2,
   AlertCircle, Bell, Calendar, ArrowRight, Settings, CreditCard,
-  RefreshCcw, Play, CheckCircle2, X, ChevronRight, Star, Map, Plane
+  RefreshCcw, Play, CheckCircle2, X, ChevronRight, Star, Map, Plane, Scale
 } from "lucide-react";
 import { lazy, Suspense } from 'react';
 import WasherAvailability from '../components/WasherAvailability';
+import WeightAdjustment from '../components/WeightAdjustment';
 
 // Lazy load the map component
 const OrdersMap = lazy(() => import('../components/OrdersMap'));
@@ -65,11 +66,12 @@ function formulaBadgeClass(f: string) {
 }
 
 /* ── MODALE DETAIL MISSION ── */
-function MissionModal({ mission, onClose, onAccept, onUpdate, isActive }: {
+function MissionModal({ mission, onClose, onAccept, onUpdate, isActive, onWeightAdjust }: {
   mission: Mission; onClose: () => void;
   onAccept?: (id: string) => void;
   onUpdate?: (id: string, status: OrderStatus) => void;
   isActive?: boolean;
+  onWeightAdjust?: (mission: Mission) => void;
 }) {
   const earning = commissionEarnings(mission.total_price);
   return (
@@ -102,6 +104,14 @@ function MissionModal({ mission, onClose, onAccept, onUpdate, isActive }: {
             <div className="bg-white/5 rounded-2xl p-4 border border-white/8">
               <p className="text-white/40 text-xs font-semibold uppercase tracking-wide mb-1">Poids</p>
               <p className="text-white font-black text-2xl">{mission.weight} kg</p>
+              {isActive && mission.status === "assigned" && onWeightAdjust && (
+                <button 
+                  onClick={() => onWeightAdjust(mission)}
+                  className="mt-2 text-xs text-orange-400 hover:text-orange-300 font-bold flex items-center gap-1"
+                >
+                  <Scale size={12} /> Ajuster
+                </button>
+              )}
             </div>
             <div className="bg-white/5 rounded-2xl p-4 border border-white/8">
               <p className="text-white/40 text-xs font-semibold uppercase tracking-wide mb-1">Date collecte</p>
@@ -134,7 +144,13 @@ function MissionModal({ mission, onClose, onAccept, onUpdate, isActive }: {
           </div>
         </div>
         {/* CTA */}
-        <div className="p-6 pt-0">
+        <div className="p-6 pt-0 space-y-3">
+          {isActive && mission.status === "assigned" && onWeightAdjust && (
+            <button onClick={() => onWeightAdjust(mission)}
+              className="w-full py-3 bg-orange-500/20 border border-orange-500/30 text-orange-400 rounded-2xl font-bold text-sm hover:bg-orange-500/30 transition flex items-center justify-center gap-2">
+              <Scale size={18} /> Ajuster le poids a la collecte
+            </button>
+          )}
           {!isActive && onAccept && (
             <button onClick={() => { onAccept(mission.id); onClose(); }}
               className="w-full py-4 bg-gradient-to-r from-teal-500 to-emerald-500 text-white rounded-2xl font-black text-base hover:shadow-2xl hover:shadow-teal-500/25 transition-all hover:-translate-y-0.5 flex items-center justify-center gap-2">
@@ -286,6 +302,7 @@ export default function WasherDashboard() {
   const [modalMode, setModalMode] = useState<"available"|"active">("available");
   const [showMap, setShowMap] = useState(false);
   const [showAvailability, setShowAvailability] = useState(false);
+  const [weightAdjustMission, setWeightAdjustMission] = useState<Mission|null>(null);
   const fetchLockRef = useRef(false);
 
   useEffect(() => {
@@ -501,7 +518,26 @@ export default function WasherDashboard() {
           onAccept={modalMode === "available" ? acceptMission : undefined}
           onUpdate={modalMode === "active" ? updateMissionStatus : undefined}
           isActive={modalMode === "active"}
+          onWeightAdjust={(mission) => {
+            setSelectedMission(null);
+            setWeightAdjustMission(mission);
+          }}
         />
+      )}
+
+      {/* Weight Adjustment Modal */}
+      {weightAdjustMission && (
+        <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
+          <WeightAdjustment
+            orderId={weightAdjustMission.id}
+            currentWeight={weightAdjustMission.weight}
+            clientId={weightAdjustMission.client_id || ''}
+            onUpdate={(newWeight) => {
+              fetchWasherData();
+            }}
+            onClose={() => setWeightAdjustMission(null)}
+          />
+        </div>
       )}
 
       <div className="pt-24 md:pt-28 px-4 max-w-6xl mx-auto pb-16">
@@ -779,26 +815,110 @@ export default function WasherDashboard() {
           </div>
         )}
 
-        {/* TAB HISTORIQUE */}
+        {/* TAB HISTORIQUE - Improved with earnings breakdown */}
         {activeTab === "history" && (
-          <div className="space-y-3">
-            {historyMissions.map(m => (
-              <div key={m.id} className="bg-[#0f1729] border border-white/8 rounded-2xl p-5 flex items-center justify-between hover:border-green-500/20 transition">
-                <div className="flex items-center gap-4">
-                  <div className="w-10 h-10 bg-green-500/10 rounded-xl flex items-center justify-center flex-shrink-0">
-                    <CheckCircle2 size={18} className="text-green-400" />
+          <div className="space-y-6">
+            {/* Earnings Summary */}
+            {historyMissions.length > 0 && (
+              <div className="bg-gradient-to-r from-green-500/10 to-emerald-500/10 border border-green-500/20 rounded-2xl p-5">
+                <h3 className="text-green-400 font-bold text-sm uppercase tracking-wide mb-4">Résumé des gains</h3>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                  <div className="bg-white/5 rounded-xl p-3 text-center">
+                    <p className="text-white/40 text-xs mb-1">Cette semaine</p>
+                    <p className="text-green-400 font-black text-xl">{stats.weekEarnings.toFixed(2)} €</p>
                   </div>
-                  <div>
-                    <div className="flex items-center gap-2 mb-0.5">
-                      <p className="text-green-400 font-black text-lg">+{commissionEarnings(m.total_price)} EUR</p>
-                      <span className="text-xs px-2 py-0.5 rounded-full bg-green-500/10 text-green-400 border border-green-500/20 font-bold">Paye</span>
-                    </div>
-                    <p className="text-white/30 text-xs">{formatDateFR(m.completed_at||m.created_at)} · {m.weight} kg · {formulaLabel(m.formula)}</p>
+                  <div className="bg-white/5 rounded-xl p-3 text-center">
+                    <p className="text-white/40 text-xs mb-1">Ce mois</p>
+                    <p className="text-green-400 font-black text-xl">
+                      {historyMissions
+                        .filter(m => {
+                          const d = new Date(m.completed_at || m.created_at);
+                          const now = new Date();
+                          return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+                        })
+                        .reduce((s, m) => s + safeNumber(m.total_price, 0) * 0.6, 0)
+                        .toFixed(2)} €
+                    </p>
+                  </div>
+                  <div className="bg-white/5 rounded-xl p-3 text-center">
+                    <p className="text-white/40 text-xs mb-1">Missions totales</p>
+                    <p className="text-white font-black text-xl">{historyMissions.length}</p>
+                  </div>
+                  <div className="bg-white/5 rounded-xl p-3 text-center">
+                    <p className="text-white/40 text-xs mb-1">Gain moyen</p>
+                    <p className="text-white font-black text-xl">
+                      {historyMissions.length > 0
+                        ? (historyMissions.reduce((s, m) => s + safeNumber(m.total_price, 0) * 0.6, 0) / historyMissions.length).toFixed(2)
+                        : 0} €
+                    </p>
                   </div>
                 </div>
-                <Star size={16} className="text-white/10" />
               </div>
-            ))}
+            )}
+
+            {/* Monthly breakdown */}
+            {historyMissions.length > 0 && (
+              <div className="bg-[#0f1729] border border-white/8 rounded-2xl p-5">
+                <h3 className="text-white/60 font-bold text-sm uppercase tracking-wide mb-4 flex items-center gap-2">
+                  <Calendar size={16} className="text-teal-500" /> Historique par mois
+                </h3>
+                {(() => {
+                  // Group missions by month
+                  const grouped = historyMissions.reduce((acc, m) => {
+                    const d = new Date(m.completed_at || m.created_at);
+                    const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+                    const label = d.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' });
+                    if (!acc[key]) acc[key] = { label, missions: [], total: 0 };
+                    acc[key].missions.push(m);
+                    acc[key].total += safeNumber(m.total_price, 0) * 0.6;
+                    return acc;
+                  }, {} as Record<string, { label: string; missions: Mission[]; total: number }>);
+
+                  return Object.entries(grouped)
+                    .sort((a, b) => b[0].localeCompare(a[0]))
+                    .slice(0, 6)
+                    .map(([key, { label, missions, total }]) => (
+                      <div key={key} className="flex items-center justify-between py-3 border-b border-white/5 last:border-0">
+                        <div>
+                          <p className="text-white font-bold capitalize">{label}</p>
+                          <p className="text-white/30 text-xs">{missions.length} mission(s)</p>
+                        </div>
+                        <p className="text-green-400 font-black text-lg">+{total.toFixed(2)} €</p>
+                      </div>
+                    ));
+                })()}
+              </div>
+            )}
+
+            {/* Mission list */}
+            <div>
+              <h3 className="text-white/60 font-bold text-sm uppercase tracking-wide mb-3">Détail des missions</h3>
+              <div className="space-y-3">
+                {historyMissions.map(m => (
+                  <div key={m.id} className="bg-[#0f1729] border border-white/8 rounded-2xl p-5 hover:border-green-500/20 transition">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-4">
+                        <div className="w-10 h-10 bg-green-500/10 rounded-xl flex items-center justify-center flex-shrink-0">
+                          <CheckCircle2 size={18} className="text-green-400" />
+                        </div>
+                        <div>
+                          <div className="flex items-center gap-2 mb-0.5">
+                            <p className="text-green-400 font-black text-lg">+{commissionEarnings(m.total_price)} EUR</p>
+                            <span className="text-xs px-2 py-0.5 rounded-full bg-green-500/10 text-green-400 border border-green-500/20 font-bold">Payé</span>
+                          </div>
+                          <p className="text-white/30 text-xs">{formatDateFR(m.completed_at||m.created_at)} · {m.weight} kg · {formulaLabel(m.formula)}</p>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-white/20 text-xs">#{m.id.slice(0, 8).toUpperCase()}</p>
+                        <p className="text-white/15 text-xs truncate max-w-[120px]">{trimAddress(m.pickup_address)}</p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
             {historyMissions.length === 0 && (
               <div className="bg-[#0f1729] border border-white/8 rounded-2xl py-16 text-center">
                 <TrendingUp size={40} className="mx-auto mb-4 text-white/15" />

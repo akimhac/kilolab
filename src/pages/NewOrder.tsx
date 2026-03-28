@@ -10,7 +10,6 @@ import {
   ArrowRight,
   Sparkles,
   Tag,
-  Search,
   Loader2,
   Calendar as CalendarIcon,
   Info,
@@ -19,8 +18,10 @@ import {
   Gift,
   Camera,
   X,
+  Search,
 } from "lucide-react";
 import toast from "react-hot-toast";
+import AddressAutocomplete from "../components/AddressAutocomplete";
 
 export default function NewOrder() {
   const navigate = useNavigate();
@@ -47,6 +48,8 @@ export default function NewOrder() {
   const [selectedWasherId, setSelectedWasherId] = useState("");
   const [finalAddress, setFinalAddress] = useState("");
   const [userLocation, setUserLocation] = useState(null);
+  const [addressValidated, setAddressValidated] = useState(false);
+  const [selectedAddressCoords, setSelectedAddressCoords] = useState<[number, number] | null>(null);
 
   // Coupons
   const [couponCode, setCouponCode] = useState("");
@@ -350,8 +353,8 @@ export default function NewOrder() {
           partner_id: null,
           weight,
           pickup_address: fullAddressInfo,
-          pickup_lat: userLocation?.lat || null,
-          pickup_lng: userLocation?.lng || null,
+          pickup_lat: selectedAddressCoords ? selectedAddressCoords[1] : userLocation?.lat || null,
+          pickup_lng: selectedAddressCoords ? selectedAddressCoords[0] : userLocation?.lng || null,
           pickup_date: cleanDate,
           total_price: finalPrice,
           status: "pending",
@@ -799,13 +802,37 @@ export default function NewOrder() {
 
                 <div>
                   <label className="block text-sm font-bold text-slate-700 mb-2">🏠 Adresse précise de retrait</label>
-                  <input
-                    type="text"
-                    placeholder="N°, Rue, Bâtiment, Digicode..."
+                  <AddressAutocomplete
                     value={finalAddress}
-                    onChange={(e) => setFinalAddress(e.target.value)}
-                    className="w-full p-4 bg-slate-50 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-teal-500 outline-none"
+                    onChange={(val) => {
+                      setFinalAddress(val);
+                      setAddressValidated(false);
+                    }}
+                    onSelect={(address) => {
+                      setFinalAddress(address.label);
+                      setAddressValidated(true);
+                      setSelectedAddressCoords(address.coordinates);
+                      // Auto-fill search query with city if empty
+                      if (!searchQuery && address.city) {
+                        setSearchQuery(address.city);
+                      }
+                      toast.success("Adresse validée !");
+                    }}
+                    placeholder="N°, Rue, Bâtiment..."
+                    required
                   />
+                  {finalAddress && !addressValidated && (
+                    <p className="mt-2 text-xs text-orange-600 flex items-center gap-1">
+                      <Info size={14} />
+                      Sélectionnez une adresse dans la liste pour la valider
+                    </p>
+                  )}
+                  {addressValidated && (
+                    <p className="mt-2 text-xs text-green-600 flex items-center gap-1">
+                      <CheckCircle size={14} />
+                      Adresse validée via API Gouvernement
+                    </p>
+                  )}
                 </div>
 
                 {filteredWashers.length > 0 && (
