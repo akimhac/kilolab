@@ -57,6 +57,24 @@ Le 1er service de laverie à domicile en France. Marketplace connectant les clie
 - [x] **Intégration webhook** : Le webhook Stripe appelle notify-washers après paiement
 - [x] **Calcul distance Haversine** : Algorithme pour trouver les washers dans le rayon d'action
 
+### Sprint 14 - Sécurité & Disponibilité Washer (28/03/2026)
+- [x] **Page AccountSettings** (`/account-settings`) : Gestion complète du compte
+  - Onglet Profil : Modification infos personnelles
+  - Onglet Notifications : Préférences email/push
+  - Onglet Sécurité : Reset mot de passe, déconnexion globale
+  - Onglet Supprimer : Suppression compte avec protections anti-fraude
+- [x] **Protection anti-fraude** :
+  - Blocage si commandes actives
+  - Blocage si paiements en attente (washers)
+  - Délai de 30 jours après dernier paiement
+  - Confirmation par saisie "SUPPRIMER"
+  - Anonymisation des données (conformité RGPD)
+- [x] **Système de disponibilité Washer** :
+  - Toggle disponible/indisponible
+  - Mode vacances avec dates
+  - Horaires de travail par jour
+  - Absences planifiées avec motif
+
 ### Sprint 8 - Alertes Admin & Annulation Commandes (01/03/2026)
 - [x] **Alertes Email Admin** : Notifications automatiques pour nouvelles inscriptions et commandes
 - [x] **Annulation de Commande** : Modal dans Admin Dashboard avec message personnalisé au client
