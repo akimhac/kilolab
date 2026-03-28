@@ -175,6 +175,11 @@ export default function Navbar() {
                   <span className="text-lg">⚙️</span>
                   Mon compte
                 </Link>
+                <Link to="/account-settings" onClick={() => setIsOpen(false)}
+                  className="flex items-center gap-3 px-4 py-3 text-slate-700 hover:bg-slate-50 rounded-xl font-medium">
+                  <span className="text-lg">🔒</span>
+                  Paramètres
+                </Link>
                 <div className="pt-2 border-t border-slate-100">
                   <Link to={getDashboardLink()} onClick={() => setIsOpen(false)}
                     className="flex items-center justify-center gap-2 px-4 py-3 bg-slate-100 text-slate-900 rounded-xl font-semibold">

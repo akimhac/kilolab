@@ -59,6 +59,7 @@ const SetPassword = lazy(() => import('./pages/SetPassword'));
 const ConnectStripe = lazy(() => import('./pages/ConnectStripe'));
 const OrderTracking = lazy(() => import('./pages/OrderTracking'));
 const Profile = lazy(() => import('./pages/Profile'));
+const AccountSettings = lazy(() => import('./pages/AccountSettings'));
 const PickupQR = lazy(() => import('./pages/PickupQR'));
 const Invoice = lazy(() => import('./pages/Invoice'));
 const NotFound = lazy(() => import('./pages/NotFound'));
@@ -258,6 +259,14 @@ export default function App() {
             element={
               <PrivateRoute>
                 <Profile />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/account-settings"
+            element={
+              <PrivateRoute>
+                <AccountSettings />
               </PrivateRoute>
             }
           />

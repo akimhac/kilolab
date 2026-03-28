@@ -13,9 +13,10 @@ import toast from "react-hot-toast";
 import {
   DollarSign, Package, Clock, MapPin, Check, TrendingUp, Loader2,
   AlertCircle, Bell, Calendar, ArrowRight, Settings, CreditCard,
-  RefreshCcw, Play, CheckCircle2, X, ChevronRight, Star, Map
+  RefreshCcw, Play, CheckCircle2, X, ChevronRight, Star, Map, Plane
 } from "lucide-react";
 import { lazy, Suspense } from 'react';
+import WasherAvailability from '../components/WasherAvailability';
 
 // Lazy load the map component
 const OrdersMap = lazy(() => import('../components/OrdersMap'));
@@ -284,6 +285,7 @@ export default function WasherDashboard() {
   const [selectedMission, setSelectedMission] = useState<Mission|null>(null);
   const [modalMode, setModalMode] = useState<"available"|"active">("available");
   const [showMap, setShowMap] = useState(false);
+  const [showAvailability, setShowAvailability] = useState(false);
   const fetchLockRef = useRef(false);
 
   useEffect(() => {
@@ -588,9 +590,18 @@ export default function WasherDashboard() {
           <div className="relative bg-[#0f1729] border border-white/8 rounded-3xl p-6 mb-8 overflow-hidden">
             <div className="absolute inset-0 opacity-5" style={{ backgroundImage: "linear-gradient(rgba(20,184,166,0.3) 1px, transparent 1px), linear-gradient(90deg, rgba(20,184,166,0.3) 1px, transparent 1px)", backgroundSize: "28px 28px" }} />
             <div className="relative">
-              <div className="flex items-center gap-2 mb-6">
-                <Settings size={18} className="text-teal-500" />
-                <h3 className="text-white font-bold">Mes preferences</h3>
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-2">
+                  <Settings size={18} className="text-teal-500" />
+                  <h3 className="text-white font-bold">Mes preferences</h3>
+                </div>
+                <button
+                  onClick={() => setShowAvailability(true)}
+                  className="px-4 py-2 bg-teal-500/20 text-teal-400 rounded-xl font-bold text-sm hover:bg-teal-500/30 transition flex items-center gap-2"
+                >
+                  <Plane size={16} />
+                  Gérer mes disponibilités
+                </button>
               </div>
               <div className="space-y-6">
                 <div>
@@ -632,6 +643,29 @@ export default function WasherDashboard() {
                     <span className="text-sm text-white/50">Recevoir un email pour chaque nouvelle commande proche</span>
                   </div>
                 </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* AVAILABILITY MODAL */}
+        {showAvailability && washerId && (
+          <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4 overflow-y-auto">
+            <div className="w-full max-w-2xl bg-[#0a0f1a] rounded-3xl border border-white/10 max-h-[90vh] overflow-y-auto">
+              <div className="sticky top-0 bg-[#0a0f1a] p-6 border-b border-white/10 flex items-center justify-between">
+                <h2 className="text-xl font-bold text-white flex items-center gap-3">
+                  <Plane className="text-teal-500" size={24} />
+                  Gérer mes disponibilités
+                </h2>
+                <button
+                  onClick={() => setShowAvailability(false)}
+                  className="p-2 text-white/50 hover:text-white hover:bg-white/10 rounded-xl transition"
+                >
+                  <X size={24} />
+                </button>
+              </div>
+              <div className="p-6">
+                <WasherAvailability washerId={washerId} />
               </div>
             </div>
           </div>
