@@ -24,10 +24,29 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { image_base64, mime_type = 'image/jpeg' } = req.body;
+    let { image_base64, mime_type = 'image/jpeg' } = req.body;
 
     if (!image_base64) {
       return res.status(400).json({ error: 'No image provided' });
+    }
+
+    // Clean the base64 string - remove data URI prefix if present
+    if (image_base64.includes(',')) {
+      const parts = image_base64.split(',');
+      image_base64 = parts[1] || parts[0];
+      // Extract mime type from data URI if available
+      const mimeMatch = parts[0].match(/data:([^;]+);/);
+      if (mimeMatch) {
+        mime_type = mimeMatch[1];
+      }
+    }
+    
+    // Remove any whitespace or newlines
+    image_base64 = image_base64.replace(/[\s\n\r]/g, '');
+    
+    // Validate base64
+    if (!/^[A-Za-z0-9+/=]+$/.test(image_base64)) {
+      return res.status(400).json({ error: 'Invalid base64 image format' });
     }
 
     // Use Emergent LLM Key (Universal Key) for OpenAI Vision

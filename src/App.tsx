@@ -58,6 +58,7 @@ const Settings = lazy(() => import('./pages/Settings'));
 const SetPassword = lazy(() => import('./pages/SetPassword'));
 const ConnectStripe = lazy(() => import('./pages/ConnectStripe'));
 const OrderTracking = lazy(() => import('./pages/OrderTracking'));
+const Profile = lazy(() => import('./pages/Profile'));
 const PickupQR = lazy(() => import('./pages/PickupQR'));
 const Invoice = lazy(() => import('./pages/Invoice'));
 const NotFound = lazy(() => import('./pages/NotFound'));
@@ -252,6 +253,14 @@ export default function App() {
 
           <Route path="/payment-success" element={<PaymentSuccess />} />
           <Route path="/payment-cancel" element={<PaymentCancel />} />
+          <Route
+            path="/profile"
+            element={
+              <PrivateRoute>
+                <Profile />
+              </PrivateRoute>
+            }
+          />
 
           <Route path="/admin/login" element={<SuperAccess />} />
           <Route

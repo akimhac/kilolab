@@ -160,11 +160,28 @@ export default function Navbar() {
           <div className="pt-4 border-t border-slate-200 space-y-3">
             {user ? (
               <>
-                <Link to={getDashboardLink()} onClick={() => setIsOpen(false)}
-                  className="flex items-center justify-center gap-2 px-4 py-3 bg-slate-100 text-slate-900 rounded-xl font-semibold">
-                  <User size={18} />
-                  {profile?.full_name || t('nav.myAccount')}
+                <Link to="/dashboard" onClick={() => setIsOpen(false)}
+                  className="flex items-center gap-3 px-4 py-3 text-slate-700 hover:bg-slate-50 rounded-xl font-medium">
+                  <span className="text-lg">📦</span>
+                  Mes commandes
                 </Link>
+                <Link to="/dashboard?tab=loyalty" onClick={() => setIsOpen(false)}
+                  className="flex items-center gap-3 px-4 py-3 text-slate-700 hover:bg-slate-50 rounded-xl font-medium">
+                  <span className="text-lg">🎁</span>
+                  Points fidélité
+                </Link>
+                <Link to="/profile" onClick={() => setIsOpen(false)}
+                  className="flex items-center gap-3 px-4 py-3 text-slate-700 hover:bg-slate-50 rounded-xl font-medium">
+                  <span className="text-lg">⚙️</span>
+                  Mon compte
+                </Link>
+                <div className="pt-2 border-t border-slate-100">
+                  <Link to={getDashboardLink()} onClick={() => setIsOpen(false)}
+                    className="flex items-center justify-center gap-2 px-4 py-3 bg-slate-100 text-slate-900 rounded-xl font-semibold">
+                    <User size={18} />
+                    {profile?.full_name || t('nav.myAccount')}
+                  </Link>
+                </div>
                 <button onClick={() => { handleLogout(); setIsOpen(false); }}
                   className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-red-50 text-red-600 rounded-xl font-semibold">
                   <LogOut size={18} /> {t('nav.logout')}

@@ -107,6 +107,7 @@ export default function AdminDashboard() {
   // Order Management State
   const [selectedOrder, setSelectedOrder] = useState<any | null>(null);
   const [showOrderModal, setShowOrderModal] = useState(false);
+  const [assigningWasher, setAssigningWasher] = useState(false);
   const [cancelMessage, setCancelMessage] = useState("");
   const [sendingEmail, setSendingEmail] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -805,6 +806,33 @@ export default function AdminDashboard() {
     if (error) return toast.error(error.message);
     toast.success("🗑️ Coupon supprimé");
     fetchData();
+  };
+
+  // --- ASSIGN WASHER TO ORDER ---
+  const assignWasherToOrder = async (orderId: string, washerId: string) => {
+    setAssigningWasher(true);
+    const t = toast.loading("⏳ Assignation en cours...");
+    try {
+      const { error } = await supabase
+        .from("orders")
+        .update({ 
+          washer_id: washerId,
+          status: "assigned",
+          updated_at: new Date().toISOString()
+        })
+        .eq("id", orderId);
+
+      if (error) throw error;
+
+      toast.success("✅ Washer assigné avec succès !", { id: t });
+      fetchData();
+      setShowOrderModal(false);
+      setSelectedOrder(null);
+    } catch (err: any) {
+      toast.error("❌ Erreur: " + err.message, { id: t });
+    } finally {
+      setAssigningWasher(false);
+    }
   };
 
   // --- STATS & FILTRES ---
@@ -2429,6 +2457,48 @@ export default function AdminDashboard() {
                 <p className="font-bold text-white">{selectedOrder.weight || "?"} kg</p>
               </div>
             </div>
+
+            {/* Assign Washer Section */}
+            {selectedOrder.status === "pending" && !selectedOrder.washer_id && (
+              <div className="mb-6 p-4 bg-teal-500/10 border border-teal-500/30 rounded-xl">
+                <p className="text-sm font-bold mb-3 text-teal-400 flex items-center gap-2">
+                  <Users size={16} /> Assigner un Washer
+                </p>
+                <select
+                  onChange={(e) => {
+                    if (e.target.value) {
+                      assignWasherToOrder(selectedOrder.id, e.target.value);
+                    }
+                  }}
+                  disabled={assigningWasher}
+                  className="w-full p-3 bg-white/10 border border-white/20 rounded-xl text-white focus:border-teal-500 focus:outline-none"
+                >
+                  <option value="" className="bg-slate-800">-- Sélectionner un Washer --</option>
+                  {washers.filter(w => w.status === 'approved').map((w) => (
+                    <option key={w.id} value={w.id} className="bg-slate-800">
+                      {w.full_name} - {w.city || 'Ville ?'} ({w.postal_code || '?'})
+                    </option>
+                  ))}
+                </select>
+                {assigningWasher && (
+                  <div className="flex items-center gap-2 mt-2 text-teal-400 text-sm">
+                    <Loader2 className="animate-spin" size={14} />
+                    Assignation en cours...
+                  </div>
+                )}
+              </div>
+            )}
+            
+            {selectedOrder.washer_id && (
+              <div className="mb-6 p-4 bg-emerald-500/10 border border-emerald-500/30 rounded-xl">
+                <p className="text-sm font-bold mb-1 text-emerald-400 flex items-center gap-2">
+                  <CheckCircle size={16} /> Washer assigné
+                </p>
+                <p className="text-white font-medium">
+                  {washers.find(w => w.id === selectedOrder.washer_id)?.full_name || 'Washer ID: ' + selectedOrder.washer_id.slice(0,8)}
+                </p>
+              </div>
+            )}
 
             {/* Message Input */}
             <div className="mb-6">

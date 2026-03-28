@@ -31,7 +31,7 @@ export default function NewOrder() {
   const [userEmail, setUserEmail] = useState<string | null>(null);
 
   const [formula, setFormula] = useState<"eco" | "express" | "express_2h">("eco");
-  const [weight, setWeight] = useState(5);
+  const [weight, setWeight] = useState(3);
   const [showWeightEstimator, setShowWeightEstimator] = useState(false);
 
   const [pickupDate, setPickupDate] = useState("");
@@ -607,7 +607,7 @@ export default function NewOrder() {
 
               <input
                 type="range"
-                min="3"
+                min="1"
                 max="30"
                 step="1"
                 value={weight}
@@ -900,19 +900,19 @@ export default function NewOrder() {
                         <Gift size={18} /> Code promo
                       </span>
                     </label>
-                    <div className="flex gap-2">
+                    <div className="flex flex-col sm:flex-row gap-2">
                       <input
                         type="text"
                         value={couponCode}
                         onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
                         placeholder="PROMO5"
-                        className="flex-1 px-4 py-2 border-2 border-teal-200 rounded-lg focus:border-teal-500 outline-none uppercase font-bold"
+                        className="flex-1 px-4 py-3 border-2 border-teal-200 rounded-lg focus:border-teal-500 outline-none uppercase font-bold text-center sm:text-left"
                       />
                       <button
                         type="button"
                         onClick={validateCoupon}
                         disabled={couponLoading || !couponCode.trim()}
-                        className="px-6 py-2 bg-teal-600 text-white rounded-lg font-bold hover:bg-teal-700 disabled:opacity-50 disabled:cursor-not-allowed transition flex items-center justify-center"
+                        className="px-6 py-3 bg-teal-600 text-white rounded-lg font-bold hover:bg-teal-700 disabled:opacity-50 disabled:cursor-not-allowed transition flex items-center justify-center min-w-[100px]"
                       >
                         {couponLoading ? <Loader2 className="animate-spin" size={18} /> : "Valider"}
                       </button>
