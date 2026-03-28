@@ -13,8 +13,12 @@ import toast from "react-hot-toast";
 import {
   DollarSign, Package, Clock, MapPin, Check, TrendingUp, Loader2,
   AlertCircle, Bell, Calendar, ArrowRight, Settings, CreditCard,
-  RefreshCcw, Play, CheckCircle2, X, ChevronRight, Star
+  RefreshCcw, Play, CheckCircle2, X, ChevronRight, Star, Map
 } from "lucide-react";
+import { lazy, Suspense } from 'react';
+
+// Lazy load the map component
+const OrdersMap = lazy(() => import('../components/OrdersMap'));
 
 type WasherStatus = "pending" | "approved" | "rejected";
 type OrderStatus = "pending" | "confirmed" | "assigned" | "in_progress" | "completed" | string;
@@ -279,6 +283,7 @@ export default function WasherDashboard() {
   const [refreshing, setRefreshing] = useState(false);
   const [selectedMission, setSelectedMission] = useState<Mission|null>(null);
   const [modalMode, setModalMode] = useState<"available"|"active">("available");
+  const [showMap, setShowMap] = useState(false);
   const fetchLockRef = useRef(false);
 
   useEffect(() => {
@@ -608,6 +613,25 @@ export default function WasherDashboard() {
                     <span className="text-sm text-white/50">Uniquement {washerData.city}</span>
                   </div>
                 </div>
+                <div className="pt-4 border-t border-white/8">
+                  <label className="block text-sm font-bold text-white/60 mb-2">Notifications email</label>
+                  <div className="flex items-center gap-3">
+                    <input 
+                      type="checkbox" 
+                      checked={washerData.email_notifications !== false}
+                      onChange={async (e) => {
+                        const checked = e.target.checked;
+                        const { error } = await supabase.from("washers").update({ email_notifications: checked }).eq("id", washerId);
+                        if (!error) {
+                          setWasherData((p: any) => ({ ...p, email_notifications: checked }));
+                          toast.success(checked ? "Notifications email activees" : "Notifications email desactivees");
+                        }
+                      }}
+                      className="w-4 h-4 accent-teal-500 cursor-pointer" 
+                    />
+                    <span className="text-sm text-white/50">Recevoir un email pour chaque nouvelle commande proche</span>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -622,6 +646,61 @@ export default function WasherDashboard() {
             <StatCard icon={<Clock className="text-orange-400" size={24} />} label="En cours" value={<CountUp end={stats.pendingOrders} duration={1500} />} accent="#f97316" />
           </div>
         </FadeInOnScroll>
+
+        {/* MAP VIEW TOGGLE */}
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-white font-bold text-lg flex items-center gap-2">
+            <Package size={20} className="text-teal-500" />
+            Missions disponibles
+          </h2>
+          <button
+            onClick={() => setShowMap(!showMap)}
+            className={`flex items-center gap-2 px-4 py-2 rounded-xl font-bold text-sm transition ${
+              showMap 
+                ? 'bg-teal-500 text-white' 
+                : 'bg-white/5 border border-white/10 text-white/60 hover:text-white hover:border-white/20'
+            }`}
+          >
+            <Map size={16} />
+            {showMap ? 'Masquer la carte' : 'Voir la carte'}
+          </button>
+        </div>
+
+        {/* MAP SECTION */}
+        {showMap && (
+          <div className="mb-8 h-[400px] rounded-2xl overflow-hidden border border-white/10">
+            <Suspense fallback={
+              <div className="h-full bg-slate-800 flex items-center justify-center">
+                <Loader2 className="animate-spin text-teal-500" size={32} />
+              </div>
+            }>
+              <OrdersMap
+                orders={availableMissions.map(m => ({
+                  id: m.id,
+                  pickup_address: m.pickup_address,
+                  city: m.pickup_address?.split(',').pop()?.trim(),
+                  lat: m.pickup_lat || undefined,
+                  lng: m.pickup_lng || undefined,
+                  weight: m.weight,
+                  total_price: m.total_price,
+                  formula: m.formula
+                }))}
+                washerLocation={washerData?.lat && washerData?.lng ? {
+                  lat: washerData.lat,
+                  lng: washerData.lng,
+                  maxDistance: washerData.service_radius || 10
+                } : null}
+                onOrderClick={(order) => {
+                  const mission = availableMissions.find(m => m.id === order.id);
+                  if (mission) {
+                    setSelectedMission(mission);
+                    setModalMode("available");
+                  }
+                }}
+              />
+            </Suspense>
+          </div>
+        )}
 
         {/* TABS */}
         <div className="flex gap-1 mb-6 bg-white/5 border border-white/8 rounded-2xl p-1">

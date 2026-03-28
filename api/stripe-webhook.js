@@ -227,6 +227,21 @@ module.exports = async (req, res) => {
       }
       await sendAdminNotification(order);
 
+      // Notify nearby washers if no washer was auto-assigned
+      if (!bestWasher) {
+        try {
+          const siteUrl = process.env.SITE_URL || 'https://kilolab.fr';
+          await fetch(`${siteUrl}/api/notify-washers`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ order_id: orderId, max_distance_km: 50 })
+          });
+          console.log('✅ Nearby washers notified');
+        } catch (notifyError) {
+          console.error('Failed to notify washers:', notifyError);
+        }
+      }
+
       break;
     }
 
