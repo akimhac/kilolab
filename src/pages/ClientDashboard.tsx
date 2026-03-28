@@ -407,6 +407,7 @@ export default function ClientDashboard() {
   const { t } = useTranslation();
   const [activeOrders, setActiveOrders] = useState<Order[]>([]);
   const [pastOrders, setPastOrders] = useState<Order[]>([]);
+  const [cancelledOrders, setCancelledOrders] = useState<Order[]>([]);
   const [stats, setStats] = useState({ totalOrders: 0, totalSpent: 0, totalKg: 0, avgOrderValue: 0 });
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [subscription, setSubscription] = useState<Subscription | null>(null);
@@ -421,6 +422,7 @@ export default function ClientDashboard() {
   const [showChat, setShowChat] = useState(false);
   const [chatOrder, setChatOrder] = useState<Order | null>(null);
   const [trackingOrderId, setTrackingOrderId] = useState<string | null>(null);
+  const [showCancelled, setShowCancelled] = useState(false);
   const fetchLockRef = useRef(false);
 
   const loadDashboard = useCallback(async () => {
@@ -443,8 +445,10 @@ export default function ClientDashboard() {
       const active = all.filter(o => ['pending','assigned','picked_up','washing','ready'].includes(o.status));
       const completedUnrated = all.filter(o => o.status === 'completed' && !o.client_rating);
       const past = all.filter(o => o.status === 'completed');
+      const cancelled = all.filter(o => o.status === 'cancelled');
       setActiveOrders([...active, ...completedUnrated]);
       setPastOrders(past);
+      setCancelledOrders(cancelled);
       const totalSpent = past.reduce((s, o) => s + (parseFloat(String(o.total_price)) || 0), 0);
       const totalKg = all.reduce((s, o) => s + (parseFloat(String(o.weight)) || 0), 0);
       const valid = all.filter(o => o.status !== 'cancelled');
@@ -705,9 +709,45 @@ export default function ClientDashboard() {
               </div>
               {pastOrders.length > 5 && (
                 <button onClick={() => setShowAllHistory(!showAllHistory)} className="w-full mt-3 py-3 bg-white border border-slate-200 rounded-2xl text-slate-500 font-bold text-sm hover:bg-slate-50 hover:scale-[1.02] transition-all duration-300 flex items-center justify-center gap-2">
-                  {showAllHistory ? <><ChevronUp size={15} /> Reduire</> : <><ChevronDown size={15} /> {pastOrders.length - 5} de plus</>}
+                  {showAllHistory ? <><ChevronUp size={15} /> Réduire</> : <><ChevronDown size={15} /> {pastOrders.length - 5} de plus</>}
                 </button>
               )}
+              
+              {/* Cancelled Orders Section */}
+              {cancelledOrders.length > 0 && (
+                <div className="mt-6">
+                  <button 
+                    onClick={() => setShowCancelled(!showCancelled)}
+                    className="flex items-center gap-2 text-slate-500 hover:text-slate-700 font-bold text-sm mb-3"
+                  >
+                    <X size={14} />
+                    Commandes annulées ({cancelledOrders.length})
+                    {showCancelled ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+                  </button>
+                  
+                  {showCancelled && (
+                    <div className="bg-slate-50 rounded-2xl border border-slate-200 overflow-hidden">
+                      {cancelledOrders.map(order => (
+                        <div key={order.id} className="px-4 py-3.5 border-b border-slate-100 last:border-0">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-3">
+                              <div className="w-9 h-9 bg-red-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                                <X size={17} className="text-red-500" />
+                              </div>
+                              <div>
+                                <p className="text-sm font-bold text-slate-600">#{order.id.slice(0,8).toUpperCase()}</p>
+                                <p className="text-xs text-slate-400">{formatDateRelative(order.created_at)} · {order.weight} kg</p>
+                              </div>
+                            </div>
+                            <span className="text-xs px-2 py-1 bg-red-100 text-red-600 rounded-full font-bold">Annulée</span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+              
               <div className="mt-5 text-center">
                 <button onClick={() => window.location.href = '/new-order'} className="text-teal-500 font-bold text-sm hover:underline inline-flex items-center gap-1 hover:gap-2 transition-all duration-300">
                   Commander a nouveau <ArrowRight size={13} />

@@ -57,6 +57,26 @@ Le 1er service de laverie à domicile en France. Marketplace connectant les clie
 - [x] **Intégration webhook** : Le webhook Stripe appelle notify-washers après paiement
 - [x] **Calcul distance Haversine** : Algorithme pour trouver les washers dans le rayon d'action
 
+### Sprint 16 - UX/UI Améliorations & Corrections (28/03/2026)
+- [x] **Suppression de l'IA d'estimation** : Remplacé par système de photos simple
+  - Composant `PhotoCapture` remplace `WeightEstimator`
+  - Bouton "Prendre une photo du linge" (optionnel, partagée avec Washer)
+  - Suppression de l'appel à l'API `/api/estimate-weight`
+- [x] **Amélioration du menu hamburger mobile** : Nouveau design
+  - Icônes colorées avec descriptions
+  - Cards pour chaque section (Commandes, Points, Compte, Paramètres)
+  - Meilleure hiérarchie visuelle
+- [x] **Onglet suppression compte corrigé** : Bouton "Contacter le support" ajouté
+  - Quand la suppression est bloquée → lien vers /contact
+  - Conformité RGPD garantie
+- [x] **Champs noirs corrigés** : Inputs avec `bg-white` et placeholders visibles
+- [x] **Message "API Gouvernement" enlevé** : Validation d'adresse discrète
+  - "Adresse confirmée" au lieu de "API Gouvernement"
+- [x] **Commandes annulées visibles** :
+  - ClientDashboard : Section "Commandes annulées" avec toggle
+  - WasherDashboard : Section "Missions annulées" avec toggle
+  - Historique complet visible mais masqué par défaut
+
 ### Sprint 15 - Améliorations "Top Level" (28/03/2026)
 - [x] **Validation d'adresse stricte (API Gouv)** : Composant `AddressAutocomplete`
   - Intégration api-adresse.data.gouv.fr
@@ -190,4 +210,4 @@ Le 1er service de laverie à domicile en France. Marketplace connectant les clie
 - [ ] App mobile React Native séparée
 
 ---
-*Dernière mise à jour: 28/03/2026 - Sprint 15 terminé (5 améliorations "Top Level")*
+*Dernière mise à jour: 28/03/2026 - Sprint 16 terminé (UX/UI Améliorations)*

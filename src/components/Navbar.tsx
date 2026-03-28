@@ -149,66 +149,94 @@ export default function Navbar() {
         </div>
       </div>
 
-      <div className={`lg:hidden overflow-hidden transition-all duration-300 ${isOpen ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'}`}>
-        <div className="bg-white border-t border-slate-200 shadow-xl px-4 py-6 space-y-2">
-          {navLinks.map((item) => (
-            <Link key={item.to} to={item.to} onClick={() => setIsOpen(false)}
-              className="block px-4 py-3 text-slate-700 font-medium hover:bg-slate-50 rounded-xl transition-colors">
-              {item.label}
-            </Link>
-          ))}
-          <div className="pt-4 border-t border-slate-200 space-y-3">
+      <div className={`lg:hidden overflow-hidden transition-all duration-300 ${isOpen ? 'max-h-[600px] opacity-100' : 'max-h-0 opacity-0'}`}>
+        <div className="bg-white border-t border-slate-100 shadow-2xl">
+          {/* Main nav links */}
+          <div className="px-4 py-3 space-y-1">
+            {navLinks.map((item) => (
+              <Link key={item.to} to={item.to} onClick={() => setIsOpen(false)}
+                className="flex items-center gap-3 px-4 py-3.5 text-slate-700 font-medium hover:bg-teal-50 hover:text-teal-700 rounded-xl transition-colors">
+                {item.label}
+              </Link>
+            ))}
+          </div>
+          
+          {/* User section */}
+          <div className="border-t border-slate-100 px-4 py-4">
             {user ? (
-              <>
+              <div className="space-y-2">
+                {/* User menu items with better design */}
                 <Link to="/dashboard" onClick={() => setIsOpen(false)}
-                  className="flex items-center gap-3 px-4 py-3 text-slate-700 hover:bg-slate-50 rounded-xl font-medium">
-                  <span className="text-lg">📦</span>
-                  Mes commandes
+                  className="flex items-center gap-4 px-4 py-3.5 bg-slate-50 hover:bg-teal-50 rounded-xl transition-colors group">
+                  <div className="w-10 h-10 bg-teal-100 rounded-xl flex items-center justify-center group-hover:bg-teal-200 transition-colors">
+                    <span className="text-lg">📦</span>
+                  </div>
+                  <div>
+                    <p className="font-bold text-slate-900">Mes commandes</p>
+                    <p className="text-xs text-slate-500">Suivi et historique</p>
+                  </div>
                 </Link>
                 <Link to="/dashboard?tab=loyalty" onClick={() => setIsOpen(false)}
-                  className="flex items-center gap-3 px-4 py-3 text-slate-700 hover:bg-slate-50 rounded-xl font-medium">
-                  <span className="text-lg">🎁</span>
-                  Points fidélité
+                  className="flex items-center gap-4 px-4 py-3.5 bg-slate-50 hover:bg-teal-50 rounded-xl transition-colors group">
+                  <div className="w-10 h-10 bg-amber-100 rounded-xl flex items-center justify-center group-hover:bg-amber-200 transition-colors">
+                    <span className="text-lg">🎁</span>
+                  </div>
+                  <div>
+                    <p className="font-bold text-slate-900">Points fidélité</p>
+                    <p className="text-xs text-slate-500">Vos récompenses</p>
+                  </div>
                 </Link>
                 <Link to="/profile" onClick={() => setIsOpen(false)}
-                  className="flex items-center gap-3 px-4 py-3 text-slate-700 hover:bg-slate-50 rounded-xl font-medium">
-                  <span className="text-lg">⚙️</span>
-                  Mon compte
+                  className="flex items-center gap-4 px-4 py-3.5 bg-slate-50 hover:bg-teal-50 rounded-xl transition-colors group">
+                  <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center group-hover:bg-blue-200 transition-colors">
+                    <span className="text-lg">👤</span>
+                  </div>
+                  <div>
+                    <p className="font-bold text-slate-900">Mon compte</p>
+                    <p className="text-xs text-slate-500">Profil et informations</p>
+                  </div>
                 </Link>
                 <Link to="/account-settings" onClick={() => setIsOpen(false)}
-                  className="flex items-center gap-3 px-4 py-3 text-slate-700 hover:bg-slate-50 rounded-xl font-medium">
-                  <span className="text-lg">🔒</span>
-                  Paramètres
+                  className="flex items-center gap-4 px-4 py-3.5 bg-slate-50 hover:bg-teal-50 rounded-xl transition-colors group">
+                  <div className="w-10 h-10 bg-slate-200 rounded-xl flex items-center justify-center group-hover:bg-slate-300 transition-colors">
+                    <span className="text-lg">⚙️</span>
+                  </div>
+                  <div>
+                    <p className="font-bold text-slate-900">Paramètres</p>
+                    <p className="text-xs text-slate-500">Sécurité et préférences</p>
+                  </div>
                 </Link>
-                <div className="pt-2 border-t border-slate-100">
+                
+                {/* Dashboard and logout */}
+                <div className="pt-3 mt-3 border-t border-slate-100 space-y-2">
                   <Link to={getDashboardLink()} onClick={() => setIsOpen(false)}
-                    className="flex items-center justify-center gap-2 px-4 py-3 bg-slate-100 text-slate-900 rounded-xl font-semibold">
+                    className="flex items-center justify-center gap-2 px-4 py-3.5 bg-teal-500 text-white rounded-xl font-bold hover:bg-teal-600 transition-colors">
                     <User size={18} />
                     {profile?.full_name || t('nav.myAccount')}
                   </Link>
+                  <button onClick={() => { handleLogout(); setIsOpen(false); }}
+                    className="w-full flex items-center justify-center gap-2 px-4 py-3 text-red-600 font-bold hover:bg-red-50 rounded-xl transition-colors">
+                    <LogOut size={18} /> {t('nav.logout')}
+                  </button>
                 </div>
-                <button onClick={() => { handleLogout(); setIsOpen(false); }}
-                  className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-red-50 text-red-600 rounded-xl font-semibold">
-                  <LogOut size={18} /> {t('nav.logout')}
-                </button>
-              </>
+              </div>
             ) : (
-              <>
+              <div className="space-y-3">
                 <Link to="/login" onClick={() => setIsOpen(false)}
-                  className="block px-4 py-3 bg-slate-100 text-slate-900 rounded-xl font-semibold text-center">
+                  className="block px-4 py-3.5 bg-slate-100 text-slate-900 rounded-xl font-bold text-center hover:bg-slate-200 transition-colors">
                   {t('nav.login')}
                 </Link>
                 <Link to="/washers" onClick={() => setIsOpen(false)}
-                  className="block px-4 py-3 bg-gradient-to-r from-teal-500 to-cyan-500 text-white rounded-xl font-semibold text-center">
+                  className="block px-4 py-3.5 bg-gradient-to-r from-teal-500 to-cyan-500 text-white rounded-xl font-bold text-center hover:shadow-lg transition-all">
                   {t('nav.becomeWasher')}
                 </Link>
                 <Link to="/new-order" onClick={() => setIsOpen(false)}
-                  className="block px-4 py-3 bg-slate-900 text-white rounded-xl font-semibold text-center">
+                  className="block px-4 py-3.5 bg-slate-900 text-white rounded-xl font-bold text-center hover:bg-slate-800 transition-colors">
                   {t('nav.order')}
                 </Link>
-              </>
+              </div>
             )}
-            <div className="flex items-center justify-center gap-3 pt-2">
+            <div className="flex items-center justify-center gap-3 pt-4 mt-3 border-t border-slate-100">
               <LanguageSelector variant="buttons" />
             </div>
           </div>

@@ -6,7 +6,7 @@ import Footer from '../components/Footer';
 import { 
   User, Mail, Phone, MapPin, Save, ArrowLeft, CheckCircle, Loader2,
   Trash2, AlertTriangle, Shield, Calendar, Clock, Bell, Eye, EyeOff,
-  Lock
+  Lock, MessageCircle
 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -291,7 +291,8 @@ export default function AccountSettings() {
                     type="text"
                     value={profile.full_name}
                     onChange={(e) => setProfile({ ...profile, full_name: e.target.value })}
-                    className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500"
+                    placeholder="Votre nom"
+                    className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500 text-slate-900 placeholder:text-slate-400"
                   />
                 </div>
                 <div>
@@ -300,7 +301,7 @@ export default function AccountSettings() {
                     type="email"
                     value={user?.email || ''}
                     disabled
-                    className="w-full px-4 py-3 bg-slate-100 border border-slate-200 rounded-xl text-slate-500"
+                    className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-500 cursor-not-allowed"
                   />
                 </div>
                 <div>
@@ -309,7 +310,8 @@ export default function AccountSettings() {
                     type="tel"
                     value={profile.phone}
                     onChange={(e) => setProfile({ ...profile, phone: e.target.value })}
-                    className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500"
+                    placeholder="06 12 34 56 78"
+                    className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500 text-slate-900 placeholder:text-slate-400"
                   />
                 </div>
                 <div>
@@ -318,7 +320,8 @@ export default function AccountSettings() {
                     type="text"
                     value={profile.address}
                     onChange={(e) => setProfile({ ...profile, address: e.target.value })}
-                    className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500"
+                    placeholder="12 rue de la Paix"
+                    className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500 text-slate-900 placeholder:text-slate-400"
                   />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
@@ -328,7 +331,8 @@ export default function AccountSettings() {
                       type="text"
                       value={profile.city}
                       onChange={(e) => setProfile({ ...profile, city: e.target.value })}
-                      className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500"
+                      placeholder="Paris"
+                      className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500 text-slate-900 placeholder:text-slate-400"
                     />
                   </div>
                   <div>
@@ -337,7 +341,8 @@ export default function AccountSettings() {
                       type="text"
                       value={profile.postal_code}
                       onChange={(e) => setProfile({ ...profile, postal_code: e.target.value })}
-                      className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500"
+                      placeholder="75001"
+                      className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500 text-slate-900 placeholder:text-slate-400"
                     />
                   </div>
                 </div>
@@ -465,12 +470,28 @@ export default function AccountSettings() {
                 </div>
 
                 {!canDelete ? (
-                  <div className="p-4 bg-orange-50 border border-orange-200 rounded-xl">
-                    <div className="flex items-center gap-3 mb-2">
-                      <Shield className="text-orange-600" size={20} />
-                      <p className="font-bold text-orange-800">Suppression bloquée</p>
+                  <div className="space-y-4">
+                    <div className="p-4 bg-orange-50 border border-orange-200 rounded-xl">
+                      <div className="flex items-center gap-3 mb-2">
+                        <Shield className="text-orange-600" size={20} />
+                        <p className="font-bold text-orange-800">Suppression bloquée</p>
+                      </div>
+                      <p className="text-sm text-orange-700">{deleteBlockReason}</p>
                     </div>
-                    <p className="text-sm text-orange-700">{deleteBlockReason}</p>
+                    
+                    {/* Alternative: contact support */}
+                    <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl">
+                      <p className="text-sm text-slate-600 mb-3">
+                        Besoin d'aide ? Vous pouvez nous contacter pour toute demande concernant vos données personnelles (RGPD).
+                      </p>
+                      <a
+                        href="/contact"
+                        className="w-full py-3 bg-slate-700 text-white rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-slate-800 transition"
+                      >
+                        <MessageCircle size={18} />
+                        Contacter le support
+                      </a>
+                    </div>
                   </div>
                 ) : (
                   <>
@@ -492,7 +513,7 @@ export default function AccountSettings() {
                             value={deleteReason}
                             onChange={(e) => setDeleteReason(e.target.value)}
                             placeholder="Aidez-nous à nous améliorer..."
-                            className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 h-24 resize-none"
+                            className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 h-24 resize-none text-slate-900 placeholder:text-slate-400"
                           />
                         </div>
                         <div>
@@ -504,7 +525,7 @@ export default function AccountSettings() {
                             value={deleteConfirmText}
                             onChange={(e) => setDeleteConfirmText(e.target.value)}
                             placeholder="SUPPRIMER"
-                            className="w-full px-4 py-3 border border-red-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500"
+                            className="w-full px-4 py-3 bg-white border border-red-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 text-slate-900 placeholder:text-slate-400"
                           />
                         </div>
                         <div className="flex gap-3">

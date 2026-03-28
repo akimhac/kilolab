@@ -13,7 +13,8 @@ import toast from "react-hot-toast";
 import {
   DollarSign, Package, Clock, MapPin, Check, TrendingUp, Loader2,
   AlertCircle, Bell, Calendar, ArrowRight, Settings, CreditCard,
-  RefreshCcw, Play, CheckCircle2, X, ChevronRight, Star, Map, Plane, Scale
+  RefreshCcw, Play, CheckCircle2, X, ChevronRight, Star, Map, Plane, Scale,
+  ChevronUp, ChevronDown
 } from "lucide-react";
 import { lazy, Suspense } from 'react';
 import WasherAvailability from '../components/WasherAvailability';
@@ -288,6 +289,7 @@ export default function WasherDashboard() {
   const [stats, setStats] = useState<WasherStats>({ totalEarnings:0, completedOrders:0, pendingOrders:0, avgRating:0, totalRatings:0, weekEarnings:0 });
   const [availableMissions, setAvailableMissions] = useState<Mission[]>([]);
   const [myMissions, setMyMissions] = useState<Mission[]>([]);
+  const [cancelledMissions, setCancelledMissions] = useState<Mission[]>([]);
   const [washerId, setWasherId] = useState<string|null>(null);
   const [washerStatus, setWasherStatus] = useState<WasherStatus>("pending");
   const [washerData, setWasherData] = useState<any>(null);
@@ -303,6 +305,7 @@ export default function WasherDashboard() {
   const [showMap, setShowMap] = useState(false);
   const [showAvailability, setShowAvailability] = useState(false);
   const [weightAdjustMission, setWeightAdjustMission] = useState<Mission|null>(null);
+  const [showCancelled, setShowCancelled] = useState(false);
   const fetchLockRef = useRef(false);
 
   useEffect(() => {
@@ -391,6 +394,8 @@ export default function WasherDashboard() {
       const { data: myOrders } = await supabase.from("orders").select("*").eq("washer_id", wp.id).order("created_at", { ascending: false });
       const missions = (myOrders||[]) as Mission[];
       setMyMissions(missions);
+      const cancelled = missions.filter(o => o.status === "cancelled");
+      setCancelledMissions(cancelled);
       const completed = missions.filter(o => o.status === "completed");
       const pending = missions.filter(o => o.status === "assigned" || o.status === "in_progress");
       const totalEarnings = completed.reduce((s,o) => s + safeNumber(o.total_price,0)*0.6, 0);
@@ -919,11 +924,46 @@ export default function WasherDashboard() {
               </div>
             </div>
 
-            {historyMissions.length === 0 && (
+            {historyMissions.length === 0 && cancelledMissions.length === 0 && (
               <div className="bg-[#0f1729] border border-white/8 rounded-2xl py-16 text-center">
                 <TrendingUp size={40} className="mx-auto mb-4 text-white/15" />
                 <p className="text-white/30 font-bold text-lg mb-2">Pas encore d'historique</p>
                 <p className="text-white/20 text-sm">Vos missions terminees apparaitront ici</p>
+              </div>
+            )}
+
+            {/* Cancelled Missions */}
+            {cancelledMissions.length > 0 && (
+              <div className="mt-6">
+                <button 
+                  onClick={() => setShowCancelled(!showCancelled)}
+                  className="flex items-center gap-2 text-white/40 hover:text-white/60 font-bold text-sm mb-3 transition"
+                >
+                  <X size={14} />
+                  Missions annulées ({cancelledMissions.length})
+                  {showCancelled ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+                </button>
+                
+                {showCancelled && (
+                  <div className="bg-[#0f1729] border border-red-500/20 rounded-2xl overflow-hidden">
+                    {cancelledMissions.map(m => (
+                      <div key={m.id} className="px-5 py-4 border-b border-white/5 last:border-0">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-4">
+                            <div className="w-10 h-10 bg-red-500/10 rounded-xl flex items-center justify-center flex-shrink-0">
+                              <X size={18} className="text-red-400" />
+                            </div>
+                            <div>
+                              <p className="text-white/60 font-bold text-sm">#{m.id.slice(0, 8).toUpperCase()}</p>
+                              <p className="text-white/30 text-xs">{formatDateFR(m.created_at)} · {m.weight} kg</p>
+                            </div>
+                          </div>
+                          <span className="text-xs px-2.5 py-1 rounded-full bg-red-500/10 text-red-400 border border-red-500/20 font-bold">Annulée</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             )}
           </div>

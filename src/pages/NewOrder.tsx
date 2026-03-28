@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "../lib/supabase";
 import Navbar from "../components/Navbar";
 import { FadeInOnScroll } from "../components/animations/ScrollAnimations";
-import { WeightEstimator } from "../components/WeightEstimator";
+import { PhotoCapture } from "../components/WeightEstimator";
 import {
   Scale,
   MapPin,
@@ -590,14 +590,17 @@ export default function NewOrder() {
                 <Scale className="text-teal-500" /> Quel poids de linge ?
               </h2>
 
-              {/* AI Estimation Button */}
+              {/* Photo Button - Just takes photo, no AI */}
               <button
                 onClick={() => setShowWeightEstimator(true)}
-                className="mb-6 w-full py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-2xl font-bold flex items-center justify-center gap-2 hover:shadow-lg transition-all"
+                className="mb-6 w-full py-3 bg-teal-500 text-white rounded-2xl font-bold flex items-center justify-center gap-2 hover:bg-teal-600 transition-all"
               >
                 <Camera size={20} />
-                📸 Estimer avec une photo (IA)
+                Prendre une photo du linge
               </button>
+              <p className="text-xs text-slate-400 mb-4 -mt-3">
+                Optionnel - Partagez avec votre Washer
+              </p>
 
               <div className="mb-8">
                 <div className="text-7xl font-black text-teal-600 mb-3">
@@ -822,15 +825,15 @@ export default function NewOrder() {
                     required
                   />
                   {finalAddress && !addressValidated && (
-                    <p className="mt-2 text-xs text-orange-600 flex items-center gap-1">
+                    <p className="mt-2 text-xs text-slate-500 flex items-center gap-1">
                       <Info size={14} />
-                      Sélectionnez une adresse dans la liste pour la valider
+                      Sélectionnez une adresse dans la liste
                     </p>
                   )}
                   {addressValidated && (
-                    <p className="mt-2 text-xs text-green-600 flex items-center gap-1">
+                    <p className="mt-2 text-xs text-teal-600 flex items-center gap-1">
                       <CheckCircle size={14} />
-                      Adresse validée via API Gouvernement
+                      Adresse confirmée
                     </p>
                   )}
                 </div>
@@ -1017,16 +1020,18 @@ export default function NewOrder() {
         </div>
       </div>
 
-      {/* Weight Estimator Modal */}
+      {/* Photo Capture Modal */}
       {showWeightEstimator && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-          <div className="w-full max-w-lg">
-            <WeightEstimator
+          <div className="w-full max-w-md">
+            <PhotoCapture
               onClose={() => setShowWeightEstimator(false)}
-              onEstimationComplete={(estimatedWeight) => {
-                setWeight(Math.round(estimatedWeight));
+              title="Photo du linge"
+              subtitle="Partagez avec votre Washer"
+              onPhotoCapture={(base64) => {
+                // Store photo for later sharing with washer
                 setShowWeightEstimator(false);
-                toast.success(`Poids estimé: ${Math.round(estimatedWeight)} kg`);
+                toast.success('Photo enregistrée ! Elle sera partagée avec votre Washer.');
               }}
             />
           </div>
