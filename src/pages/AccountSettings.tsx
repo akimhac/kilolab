@@ -89,13 +89,15 @@ export default function AccountSettings() {
 
   const checkCanDeleteAccount = async (userId: string, role: string) => {
     try {
-      // Check for active orders
-      const { data: activeOrders } = await supabase
+      // Check for active orders (exclude cancelled, completed, and refunded)
+      const { data: activeOrders, error } = await supabase
         .from('orders')
-        .select('id')
+        .select('id, status')
         .or(`client_id.eq.${userId},washer_id.eq.${userId}`)
-        .in('status', ['pending', 'assigned', 'picked_up', 'washing', 'ready'])
+        .not('status', 'in', '("cancelled","completed","refunded")')
         .limit(1);
+
+      console.log('Active orders check:', activeOrders, error);
 
       if (activeOrders && activeOrders.length > 0) {
         setCanDelete(false);

@@ -74,6 +74,8 @@ function getFormulaBadge(f: string) {
 
 const STATUS_STEPS = [
   { key: 'pending',   label: 'Recu',     icon: '📬' },
+  { key: 'confirmed', label: 'Confirme', icon: '✓' },
+  { key: 'paid',      label: 'Paye',     icon: '💳' },
   { key: 'assigned',  label: 'Washer',   icon: '👤' },
   { key: 'picked_up', label: 'Collecte', icon: '📦' },
   { key: 'washing',   label: 'Lavage',   icon: '🫧' },
@@ -82,11 +84,15 @@ const STATUS_STEPS = [
 ];
 const STATUS_INFO: Record<string, { label: string; emoji: string; color: string; bg: string; desc: string }> = {
   pending:   { label: 'En attente',      emoji: '📬', color: 'text-orange-600',  bg: 'bg-orange-50 border-orange-200',   desc: 'On cherche un washer disponible pres de vous' },
+  confirmed: { label: 'Commande confirmee', emoji: '✓', color: 'text-blue-600', bg: 'bg-blue-50 border-blue-200', desc: 'Votre commande est confirmee' },
+  paid:      { label: 'Paiement recu',   emoji: '💳', color: 'text-green-600',   bg: 'bg-green-50 border-green-200',     desc: 'Paiement confirme - recherche d\'un washer' },
   assigned:  { label: 'Washer assigne',  emoji: '👤', color: 'text-blue-600',    bg: 'bg-blue-50 border-blue-200',       desc: 'Votre washer se prepare a venir collecter' },
   picked_up: { label: 'Linge collecte',  emoji: '📦', color: 'text-violet-600',  bg: 'bg-violet-50 border-violet-200',   desc: 'Votre linge est en route vers le washer' },
   washing:   { label: 'Lavage en cours', emoji: '🫧', color: 'text-teal-600',    bg: 'bg-teal-50 border-teal-200',       desc: 'Lavage, sechage et pliage en cours...' },
   ready:     { label: 'Pret !',          emoji: '✅', color: 'text-emerald-600', bg: 'bg-emerald-50 border-emerald-200', desc: 'Votre linge est pret -- livraison en cours' },
   completed: { label: 'Livre !',         emoji: '🎉', color: 'text-green-600',   bg: 'bg-green-50 border-green-200',     desc: 'Votre linge a ete livre propre et plie' },
+  cancelled: { label: 'Annulee',         emoji: '❌', color: 'text-red-600',     bg: 'bg-red-50 border-red-200',         desc: 'Cette commande a ete annulee' },
+  refunded:  { label: 'Remboursee',      emoji: '💸', color: 'text-slate-600',   bg: 'bg-slate-50 border-slate-200',     desc: 'Cette commande a ete remboursee' },
 };
 
 function ProgressStepper({ status }: { status: string }) {
@@ -440,12 +446,21 @@ export default function ClientDashboard() {
         .select('*, washer:washers(id, first_name, last_name, avatar_url, avg_rating, total_ratings, phone)')
         .eq('client_id', user.id)
         .order('created_at', { ascending: false });
-      if (error) { /* Silently handle - user may have no orders yet */ }
+      
+      // Log errors for debugging
+      if (error) { 
+        console.error('Error fetching orders:', error);
+      }
+      
       const all = (orders ?? []) as Order[];
-      const active = all.filter(o => ['pending','assigned','picked_up','washing','ready'].includes(o.status));
+      console.log('All orders loaded:', all.length, all.map(o => ({ id: o.id.slice(0,8), status: o.status })));
+      
+      // Include ALL statuses that are not cancelled or completed as "active"
+      const inactiveStatuses = ['cancelled', 'completed', 'refunded'];
+      const active = all.filter(o => !inactiveStatuses.includes(o.status));
       const completedUnrated = all.filter(o => o.status === 'completed' && !o.client_rating);
       const past = all.filter(o => o.status === 'completed');
-      const cancelled = all.filter(o => o.status === 'cancelled');
+      const cancelled = all.filter(o => o.status === 'cancelled' || o.status === 'refunded');
       setActiveOrders([...active, ...completedUnrated]);
       setPastOrders(past);
       setCancelledOrders(cancelled);
