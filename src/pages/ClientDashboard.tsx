@@ -33,7 +33,7 @@ interface Order {
   client_rating?: number | null; client_review?: string | null;
 }
 interface UserProfile {
-  id: string; full_name: string | null; referral_code: string | null;
+  id: string; full_name: string | null; first_name?: string | null; referral_code: string | null;
   uses_count: number; bonus_earned_cents: number; referral_credit: number;
   loyalty_points?: number;
 }
@@ -471,13 +471,14 @@ export default function ClientDashboard() {
       
       // Fetch profile with loyalty points
       // Fetch profile data with error handling for each query
-      const { data: prof } = await supabase.from('user_profiles').select('id, full_name, referral_credit, loyalty_points').eq('id', user.id).maybeSingle();
+      const { data: prof } = await supabase.from('user_profiles').select('id, full_name, first_name, referral_credit, loyalty_points').eq('id', user.id).maybeSingle();
       const { data: refCode } = await supabase.from('referral_codes').select('code, uses_count, bonus_earned_cents').eq('user_id', user.id).maybeSingle();
       const { data: sub } = await supabase.from('subscriptions').select('*').eq('user_id', user.id).eq('status', 'active').maybeSingle();
       
       if (prof) setProfile({ 
         id: prof.id, 
-        full_name: prof.full_name ?? null, 
+        full_name: prof.full_name ?? null,
+        first_name: prof.first_name ?? null,
         referral_code: refCode?.code ?? null, 
         uses_count: refCode?.uses_count ?? 0, 
         bonus_earned_cents: refCode?.bonus_earned_cents ?? 0, 
@@ -572,7 +573,8 @@ export default function ClientDashboard() {
 
   const hasNoOrders = activeOrders.length === 0 && pastOrders.length === 0;
   const displayed = showAllHistory ? pastOrders : pastOrders.slice(0, 5);
-  const firstName = profile?.full_name?.split(' ')[0];
+  // Use first_name if available, otherwise extract from full_name
+  const firstName = profile?.first_name || profile?.full_name?.split(' ')[0];
 
   return (
     <div className="min-h-screen bg-[#f8fafc]">
