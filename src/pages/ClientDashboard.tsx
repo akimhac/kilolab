@@ -441,16 +441,18 @@ export default function ClientDashboard() {
       setUserId(user.id);
       setUserEmail(user.email || '');
       
+      // Simple query without join first
       const { data: orders, error } = await supabase
         .from('orders')
-        .select('*, washer:washers(id, first_name, last_name, avatar_url, avg_rating, total_ratings, phone)')
+        .select('*')
         .eq('client_id', user.id)
         .order('created_at', { ascending: false });
       
-      // Log errors for debugging
+      // Log for debugging
       if (error) { 
         console.error('Error fetching orders:', error);
       }
+      console.log('Orders query result:', { count: orders?.length, error, userId: user.id });
       
       const all = (orders ?? []) as Order[];
       console.log('All orders loaded:', all.length, all.map(o => ({ id: o.id.slice(0,8), status: o.status })));
@@ -571,10 +573,19 @@ export default function ClientDashboard() {
     </div>
   );
 
-  const hasNoOrders = activeOrders.length === 0 && pastOrders.length === 0;
+  const hasNoOrders = activeOrders.length === 0 && pastOrders.length === 0 && cancelledOrders.length === 0;
   const displayed = showAllHistory ? pastOrders : pastOrders.slice(0, 5);
   // Use first_name if available, otherwise extract from full_name
   const firstName = profile?.first_name || profile?.full_name?.split(' ')[0];
+  
+  // Debug info - remove after fixing
+  console.log('Dashboard state:', { 
+    activeOrders: activeOrders.length, 
+    pastOrders: pastOrders.length, 
+    cancelledOrders: cancelledOrders.length,
+    hasNoOrders,
+    userId 
+  });
 
   return (
     <div className="min-h-screen bg-[#f8fafc]">
