@@ -128,12 +128,13 @@ function RatingModal({ order, onClose, onSubmit }: { order: Order; onClose: () =
   const [hover, setHover] = useState(0);
   const [review, setReview] = useState('');
   const [submitting, setSubmitting] = useState(false);
-  const labels = ['', 'Decevant', 'Moyen', 'Bien', 'Tres bien', 'Excellent !'];
+  const { t } = useTranslation();
+  const labels = t('clientDashboard.ratingLabels', { returnObjects: true }) as string[];
   return (
     <div className="fixed inset-0 bg-black/50 z-50 flex items-end sm:items-center justify-center p-4" onClick={onClose}>
       <div className="bg-white rounded-3xl w-full max-w-sm p-6 shadow-2xl" onClick={e => e.stopPropagation()}>
         <div className="flex items-center justify-between mb-5">
-          <h3 className="text-lg font-black">Notez votre washer</h3>
+          <h3 className="text-lg font-black">{t('clientDashboard.rateWasher')}</h3>
           <button onClick={onClose} className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center"><X size={16} /></button>
         </div>
         {order.washer && (
@@ -155,12 +156,12 @@ function RatingModal({ order, onClose, onSubmit }: { order: Order; onClose: () =
           ))}
         </div>
         <p className="text-center text-sm font-bold text-slate-500 mb-4 h-5">{labels[hover || rating]}</p>
-        <textarea placeholder="Un commentaire ? (optionnel)" value={review} onChange={e => setReview(e.target.value)} rows={3}
+        <textarea placeholder={t('clientDashboard.ratePlaceholder')} value={review} onChange={e => setReview(e.target.value)} rows={3}
           className="w-full border border-slate-200 rounded-xl p-3 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-teal-400 mb-4" />
-        <button onClick={async () => { if (!rating) { toast.error('Choisissez une note'); return; } setSubmitting(true); await onSubmit(order.id, rating, review); setSubmitting(false); onClose(); }}
+        <button onClick={async () => { if (!rating) { toast.error(t('clientDashboard.chooseRating')); return; } setSubmitting(true); await onSubmit(order.id, rating, review); setSubmitting(false); onClose(); }}
           disabled={submitting || rating === 0}
           className="w-full py-3.5 bg-gradient-to-r from-teal-500 to-emerald-500 text-white rounded-xl font-bold hover:shadow-md transition disabled:opacity-50 flex items-center justify-center gap-2">
-          {submitting ? <Loader2 size={18} className="animate-spin" /> : <ThumbsUp size={18} />} Envoyer mon avis
+          {submitting ? <Loader2 size={18} className="animate-spin" /> : <ThumbsUp size={18} />} {t('clientDashboard.rateBtn')}
         </button>
       </div>
     </div>
@@ -590,9 +591,9 @@ export default function ClientDashboard() {
         }).catch(() => {/* ignore if function doesn't exist */});
       }
       
-      toast.success('Merci pour votre avis ! +50 points fidélité');
+      toast.success(t('clientDashboard.ratingThanks'));
       await loadDashboard();
-    } catch { toast.error("Erreur lors de l'envoi"); }
+    } catch { toast.error(t('clientDashboard.ratingError')); }
   };
 
   if (loading) return (
@@ -614,11 +615,11 @@ export default function ClientDashboard() {
       <div className="max-w-lg mx-auto px-4 pt-24 md:pt-28 pb-16">
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h1 className="text-2xl font-black text-slate-900">{firstName ? `Bonjour ${firstName} !` : 'Mes commandes'}</h1>
+            <h1 className="text-2xl font-black text-slate-900">{firstName ? t('clientDashboard.greeting', { name: firstName }) : t('clientDashboard.greetingDefault')}</h1>
             <p className="text-slate-400 text-sm mt-0.5">
               {activeOrders.filter(o => ['pending','assigned','picked_up','washing','ready'].includes(o.status)).length > 0
-                ? `${activeOrders.filter(o => ['pending','assigned','picked_up','washing','ready'].includes(o.status)).length} commande(s) en cours`
-                : 'Aucune commande active'}
+                ? `${activeOrders.filter(o => ['pending','assigned','picked_up','washing','ready'].includes(o.status)).length} ${t('clientDashboard.activeOrders')}`
+                : t('clientDashboard.noActiveOrders')}
             </p>
           </div>
           <div className="flex items-center gap-2">
@@ -626,7 +627,7 @@ export default function ClientDashboard() {
               <RefreshCw size={15} className={`text-slate-400 ${refreshing ? 'animate-spin' : ''}`} />
             </button>
             <button onClick={() => window.location.href = '/new-order'} className="flex items-center gap-1.5 bg-teal-500 text-white px-4 py-2.5 rounded-xl font-bold text-sm hover:bg-teal-600 transition shadow-sm">
-              <Plus size={15} /> Commander
+              <Plus size={15} /> {t('clientDashboard.order')}
             </button>
           </div>
         </div>
@@ -634,10 +635,10 @@ export default function ClientDashboard() {
           <FadeInOnScroll direction="up" delay={100}>
             <div className="grid grid-cols-4 gap-2 mb-6">
               {[
-                { label: 'Commandes', value: stats.totalOrders, color: 'text-teal-600', isCount: true },
-                { label: 'Kg laves', value: stats.totalKg, color: 'text-purple-600', suffix: ' kg', isCount: true },
-                { label: 'Total', value: stats.totalSpent, color: 'text-green-600', prefix: '', suffix: ' EUR', isCount: true },
-                { label: 'Points', value: profile?.loyalty_points || 0, color: 'text-amber-500', suffix: ' pts', isCount: true },
+                { label: t('clientDashboard.stats.orders'), value: stats.totalOrders, color: 'text-teal-600', isCount: true },
+                { label: t('clientDashboard.stats.kgWashed'), value: stats.totalKg, color: 'text-purple-600', suffix: ' kg', isCount: true },
+                { label: t('clientDashboard.stats.total'), value: stats.totalSpent, color: 'text-green-600', prefix: '', suffix: ' EUR', isCount: true },
+                { label: t('clientDashboard.stats.points'), value: profile?.loyalty_points || 0, color: 'text-amber-500', suffix: ' pts', isCount: true },
               ].map((s, i) => (
                 <div key={s.label} className="bg-white rounded-2xl p-3 text-center shadow-sm border border-slate-100 hover:shadow-md hover:scale-105 transition-all duration-300">
                   <p className={`font-black text-base ${s.color}`}>
@@ -710,7 +711,7 @@ export default function ClientDashboard() {
             <div className="mb-8 space-y-4">
               <div className="flex items-center gap-2">
                 <span className="w-2 h-2 rounded-full bg-teal-400 animate-pulse" />
-                <h2 className="font-black text-slate-900">En cours</h2>
+                <h2 className="font-black text-slate-900">{t('clientDashboard.active')}</h2>
                 <span className="text-sm text-slate-400">({activeOrders.filter(o => ['pending','assigned','picked_up','washing','ready'].includes(o.status)).length})</span>
               </div>
               {activeOrders.map((order, idx) => (
@@ -734,10 +735,10 @@ export default function ClientDashboard() {
               <div className="w-16 h-16 bg-teal-50 rounded-2xl flex items-center justify-center mx-auto mb-4 animate-bounce">
                 <Sparkles size={30} className="text-teal-500" />
               </div>
-              <h3 className="text-xl font-black text-slate-800 mb-2">Bienvenue sur Kilolab !</h3>
-              <p className="text-slate-400 text-sm mb-6">Votre linge lave, seche et plie -- sans bouger.</p>
+              <h3 className="text-xl font-black text-slate-800 mb-2">{t('clientDashboard.welcome')}</h3>
+              <p className="text-slate-400 text-sm mb-6">{t('clientDashboard.welcomeDesc')}</p>
               <button onClick={() => window.location.href = '/new-order'} className="bg-gradient-to-r from-teal-500 to-emerald-500 text-white px-8 py-3.5 rounded-2xl font-black hover:shadow-lg hover:scale-105 transition-all duration-300 inline-flex items-center gap-2">
-                Lancer ma premiere lessive <ArrowRight size={15} />
+                {t('clientDashboard.firstOrder')} <ArrowRight size={15} />
               </button>
             </div>
           </FadeInOnScroll>
@@ -748,7 +749,7 @@ export default function ClientDashboard() {
             <div>
               <div className="flex items-center justify-between mb-3">
                 <h2 className="font-black text-slate-900 flex items-center gap-2">
-                  <Clock size={16} className="text-slate-400" /> Historique
+                  <Clock size={16} className="text-slate-400" /> {t('clientDashboard.history')}
                   <span className="text-sm font-normal text-slate-400">({pastOrders.length})</span>
                 </h2>
               </div>
@@ -757,7 +758,7 @@ export default function ClientDashboard() {
               </div>
               {pastOrders.length > 5 && (
                 <button onClick={() => setShowAllHistory(!showAllHistory)} className="w-full mt-3 py-3 bg-white border border-slate-200 rounded-2xl text-slate-500 font-bold text-sm hover:bg-slate-50 hover:scale-[1.02] transition-all duration-300 flex items-center justify-center gap-2">
-                  {showAllHistory ? <><ChevronUp size={15} /> Réduire</> : <><ChevronDown size={15} /> {pastOrders.length - 5} de plus</>}
+                  {showAllHistory ? <><ChevronUp size={15} /> {t('clientDashboard.collapse')}</> : <><ChevronDown size={15} /> {pastOrders.length - 5} {t('clientDashboard.showMore')}</>}
                 </button>
               )}
               
@@ -787,7 +788,7 @@ export default function ClientDashboard() {
                                 <p className="text-xs text-slate-400">{formatDateRelative(order.created_at)} · {order.weight} kg</p>
                               </div>
                             </div>
-                            <span className="text-xs px-2 py-1 bg-red-100 text-red-600 rounded-full font-bold">Annulée</span>
+                            <span className="text-xs px-2 py-1 bg-red-100 text-red-600 rounded-full font-bold">{t('clientDashboard.cancelled')}</span>
                           </div>
                         </div>
                       ))}
@@ -798,7 +799,7 @@ export default function ClientDashboard() {
               
               <div className="mt-5 text-center">
                 <button onClick={() => window.location.href = '/new-order'} className="text-teal-500 font-bold text-sm hover:underline inline-flex items-center gap-1 hover:gap-2 transition-all duration-300">
-                  Commander a nouveau <ArrowRight size={13} />
+                  {t('clientDashboard.orderAgain')} <ArrowRight size={13} />
                 </button>
               </div>
             </div>

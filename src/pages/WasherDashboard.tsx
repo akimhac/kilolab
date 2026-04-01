@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
+import { useTranslation } from 'react-i18next';
 import { supabase } from "../lib/supabase";
 import { requestNotificationPermission } from "../lib/firebase";
 import { 
@@ -286,6 +287,7 @@ function ActiveMissionCard({ mission, onOpen }: { mission: Mission; onOpen: (m: 
 
 /* ── MAIN ── */
 export default function WasherDashboard() {
+  const { t } = useTranslation();
   const [stats, setStats] = useState<WasherStats>({ totalEarnings:0, completedOrders:0, pendingOrders:0, avgRating:0, totalRatings:0, weekEarnings:0 });
   const [availableMissions, setAvailableMissions] = useState<Mission[]>([]);
   const [myMissions, setMyMissions] = useState<Mission[]>([]);
@@ -424,7 +426,7 @@ export default function WasherDashboard() {
     try {
       const { error } = await supabase.from("orders").update({ washer_id: washerId, status: "assigned", assigned_at: new Date().toISOString(), updated_at: new Date().toISOString() }).eq("id", orderId).is("washer_id", null);
       if (error) throw error;
-      toast.success("Mission acceptee !");
+      toast.success(t('washerDashboard.missionAccepted'));
       setActiveTab("active");
       fetchWasherData();
     } catch { toast.error("Mission deja prise ou erreur"); }
@@ -487,7 +489,7 @@ export default function WasherDashboard() {
       <div className="pt-32 px-4 max-w-2xl mx-auto text-center">
         <div className="bg-[#0f1729] border border-white/10 rounded-3xl p-12">
           <Clock className="text-orange-400 mx-auto mb-6" size={64} />
-          <h1 className="text-3xl font-black text-white mb-4">Validation en cours</h1>
+          <h1 className="text-3xl font-black text-white mb-4">{t('washerDashboard.pendingTitle')}</h1>
           <p className="text-white/50 mb-6">Votre dossier est en cours de verification. Nous vous contacterons sous 24h.</p>
           <div className="bg-orange-500/10 border border-orange-500/20 rounded-xl p-4">
             <p className="text-sm text-orange-300">En attendant : Procurez-vous un peson digital et de la lessive hypoallergenique.</p>
@@ -555,7 +557,7 @@ export default function WasherDashboard() {
               <span className="text-teal-400 text-xs font-bold tracking-widest uppercase">Dashboard Washer</span>
             </div>
             <h1 className="text-2xl md:text-3xl font-black text-white">
-              {washerData?.first_name ? `Bonjour ${washerData.first_name}` : "Mon espace Washer"}
+              {washerData?.first_name ? t('washerDashboard.greeting', { name: washerData.first_name }) : t('washerDashboard.greetingDefault')}
             </h1>
             <p className="text-white/40 text-sm mt-0.5">Gerez vos missions et vos revenus</p>
           </div>
@@ -574,7 +576,7 @@ export default function WasherDashboard() {
             <button onClick={toggleAvailability}
               className={`px-5 py-2.5 rounded-xl font-bold flex items-center gap-2 transition-all text-sm ${isAvailable ? "bg-teal-500 text-white hover:bg-teal-400 shadow-lg shadow-teal-500/25" : "bg-white/8 text-white/50 border border-white/10 hover:bg-white/15"}`}>
               <div className={`w-2 h-2 rounded-full ${isAvailable ? "bg-white animate-pulse" : "bg-white/30"}`} />
-              {isAvailable ? "Disponible" : "Indisponible"}
+              {isAvailable ? t('washerDashboard.available') : t('washerDashboard.unavailable')}
             </button>
           </div>
         </div>
@@ -603,7 +605,7 @@ export default function WasherDashboard() {
                 <CreditCard size={22} className="text-purple-400" />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-purple-400 text-xs font-bold tracking-widest uppercase mb-1">Paiements</p>
+                <p className="text-purple-400 text-xs font-bold tracking-widest uppercase mb-1">{t('washerDashboard.stripeConnect')}</p>
                 <h3 className="text-white font-black text-xl mb-2">Configurez vos virements automatiques</h3>
                 <p className="text-white/40 text-sm mb-4">Connectez votre IBAN pour recevoir vos gains chaque dimanche.</p>
                 <button onClick={handleStripeConnect}
@@ -716,8 +718,8 @@ export default function WasherDashboard() {
         <FadeInOnScroll direction="up" delay={100}>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
             <StatCard icon={<DollarSign className="text-green-400" size={24} />} label="Gains totaux" value={<CountUp end={Math.round(stats.totalEarnings)} suffix=" EUR" duration={1500} />} accent="#22c55e" />
-            <StatCard icon={<TrendingUp className="text-teal-400" size={24} />} label="Cette semaine" value={<CountUp end={Math.round(stats.weekEarnings)} suffix=" EUR" duration={1500} />} accent="#14b8a6" />
-            <StatCard icon={<Package className="text-blue-400" size={24} />} label="Terminees" value={<CountUp end={stats.completedOrders} duration={1500} />} accent="#3b82f6" />
+            <StatCard icon={<TrendingUp className="text-teal-400" size={24} />} label={t('washerDashboard.stats.weekEarnings')} value={<CountUp end={Math.round(stats.weekEarnings)} suffix=" EUR" duration={1500} />} accent="#14b8a6" />
+            <StatCard icon={<Package className="text-blue-400" size={24} />} label={t('washerDashboard.stats.completed')} value={<CountUp end={stats.completedOrders} duration={1500} />} accent="#3b82f6" />
             <StatCard icon={<Clock className="text-orange-400" size={24} />} label="En cours" value={<CountUp end={stats.pendingOrders} duration={1500} />} accent="#f97316" />
           </div>
         </FadeInOnScroll>
@@ -726,7 +728,7 @@ export default function WasherDashboard() {
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-white font-bold text-lg flex items-center gap-2">
             <Package size={20} className="text-teal-500" />
-            Missions disponibles
+            {t('washerDashboard.tabs.available')}
           </h2>
           <button
             onClick={() => setShowMap(!showMap)}
@@ -737,7 +739,7 @@ export default function WasherDashboard() {
             }`}
           >
             <Map size={16} />
-            {showMap ? 'Masquer la carte' : 'Voir la carte'}
+            {showMap ? t('washerDashboard.hideMap') : t('washerDashboard.showMap')}
           </button>
         </div>
 
@@ -779,7 +781,7 @@ export default function WasherDashboard() {
 
         {/* TABS */}
         <div className="flex gap-1 mb-6 bg-white/5 border border-white/8 rounded-2xl p-1">
-          {([["available","Disponibles",availableMissions.length],["active","En cours",activeMissions.length],["history","Historique",historyMissions.length]] as const).map(([key,label,count]) => (
+          {([["available",t('washerDashboard.tabs.available'),availableMissions.length],["active",t('washerDashboard.tabs.active'),activeMissions.length],["history",t('washerDashboard.tabs.history'),historyMissions.length]] as const).map(([key,label,count]) => (
             <button key={key} onClick={() => setActiveTab(key as any)}
               className={`flex-1 py-2.5 px-3 rounded-xl font-bold text-sm transition-all ${activeTab === key ? "bg-teal-500 text-white shadow-lg shadow-teal-500/20" : "text-white/40 hover:text-white/70"}`}>
               {label} ({count})
@@ -796,8 +798,8 @@ export default function WasherDashboard() {
             {availableMissions.length === 0 && (
               <div className="col-span-full bg-[#0f1729] border border-white/8 rounded-2xl py-16 text-center">
                 <Package size={40} className="mx-auto mb-4 text-white/15" />
-                <p className="text-white/30 font-bold text-lg mb-2">Aucune mission disponible</p>
-                <p className="text-white/20 text-sm">Les nouvelles commandes apparaitront ici automatiquement</p>
+                <p className="text-white/30 font-bold text-lg mb-2">{t('washerDashboard.noMissions')}</p>
+                <p className="text-white/20 text-sm">{t('washerDashboard.noMissionsDesc')}</p>
                 <p className="text-white/15 text-xs mt-3">Mise a jour toutes les 30s</p>
               </div>
             )}
@@ -813,8 +815,8 @@ export default function WasherDashboard() {
             {activeMissions.length === 0 && (
               <div className="bg-[#0f1729] border border-white/8 rounded-2xl py-16 text-center">
                 <Clock size={40} className="mx-auto mb-4 text-white/15" />
-                <p className="text-white/30 font-bold text-lg mb-2">Aucune mission active</p>
-                <p className="text-white/20 text-sm">Acceptez des missions depuis l'onglet Disponibles</p>
+                <p className="text-white/30 font-bold text-lg mb-2">{t('washerDashboard.noActiveMissions')}</p>
+                <p className="text-white/20 text-sm">{t('washerDashboard.noMissionsDesc')}</p>
               </div>
             )}
           </div>
@@ -826,14 +828,14 @@ export default function WasherDashboard() {
             {/* Earnings Summary */}
             {historyMissions.length > 0 && (
               <div className="bg-gradient-to-r from-green-500/10 to-emerald-500/10 border border-green-500/20 rounded-2xl p-5">
-                <h3 className="text-green-400 font-bold text-sm uppercase tracking-wide mb-4">Résumé des gains</h3>
+                <h3 className="text-green-400 font-bold text-sm uppercase tracking-wide mb-4">{t('washerDashboard.earnings.title')}</h3>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                   <div className="bg-white/5 rounded-xl p-3 text-center">
-                    <p className="text-white/40 text-xs mb-1">Cette semaine</p>
+                    <p className="text-white/40 text-xs mb-1">{t('washerDashboard.earnings.week')}</p>
                     <p className="text-green-400 font-black text-xl">{stats.weekEarnings.toFixed(2)} €</p>
                   </div>
                   <div className="bg-white/5 rounded-xl p-3 text-center">
-                    <p className="text-white/40 text-xs mb-1">Ce mois</p>
+                    <p className="text-white/40 text-xs mb-1">{t('washerDashboard.earnings.month')}</p>
                     <p className="text-green-400 font-black text-xl">
                       {historyMissions
                         .filter(m => {
@@ -846,11 +848,11 @@ export default function WasherDashboard() {
                     </p>
                   </div>
                   <div className="bg-white/5 rounded-xl p-3 text-center">
-                    <p className="text-white/40 text-xs mb-1">Missions totales</p>
+                    <p className="text-white/40 text-xs mb-1">{t('washerDashboard.earnings.total')}</p>
                     <p className="text-white font-black text-xl">{historyMissions.length}</p>
                   </div>
                   <div className="bg-white/5 rounded-xl p-3 text-center">
-                    <p className="text-white/40 text-xs mb-1">Gain moyen</p>
+                    <p className="text-white/40 text-xs mb-1">{t('washerDashboard.earnings.average')}</p>
                     <p className="text-white font-black text-xl">
                       {historyMissions.length > 0
                         ? (historyMissions.reduce((s, m) => s + safeNumber(m.total_price, 0) * 0.6, 0) / historyMissions.length).toFixed(2)
@@ -927,8 +929,8 @@ export default function WasherDashboard() {
             {historyMissions.length === 0 && cancelledMissions.length === 0 && (
               <div className="bg-[#0f1729] border border-white/8 rounded-2xl py-16 text-center">
                 <TrendingUp size={40} className="mx-auto mb-4 text-white/15" />
-                <p className="text-white/30 font-bold text-lg mb-2">Pas encore d'historique</p>
-                <p className="text-white/20 text-sm">Vos missions terminees apparaitront ici</p>
+                <p className="text-white/30 font-bold text-lg mb-2">{t('washerDashboard.noHistory')}</p>
+                <p className="text-white/20 text-sm">{t('washerDashboard.noMissionsDesc')}</p>
               </div>
             )}
 
@@ -940,7 +942,7 @@ export default function WasherDashboard() {
                   className="flex items-center gap-2 text-white/40 hover:text-white/60 font-bold text-sm mb-3 transition"
                 >
                   <X size={14} />
-                  Missions annulées ({cancelledMissions.length})
+                  {t('washerDashboard.cancelledMissions')} ({cancelledMissions.length})
                   {showCancelled ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
                 </button>
                 

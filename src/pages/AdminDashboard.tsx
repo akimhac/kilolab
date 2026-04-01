@@ -811,7 +811,7 @@ export default function AdminDashboard() {
   // --- ASSIGN WASHER TO ORDER ---
   const assignWasherToOrder = async (orderId: string, washerId: string) => {
     setAssigningWasher(true);
-    const t = toast.loading("⏳ Assignation en cours...");
+    const t = toast.loading("Assignation en cours...");
     try {
       const { error } = await supabase
         .from("orders")
@@ -825,12 +825,44 @@ export default function AdminDashboard() {
 
       if (error) throw error;
 
-      toast.success("✅ Washer assigné avec succès !", { id: t });
+      // Send notification email to assigned washer
+      try {
+        const washer = washers.find(w => w.id === washerId);
+        const order = orders.find(o => o.id === orderId);
+        if (washer?.email || washer?.user_id) {
+          // Get washer email from user_profiles if not directly on washer
+          let washerEmail = washer.email;
+          if (!washerEmail && washer.user_id) {
+            const { data: prof } = await supabase.from('user_profiles').select('email').eq('id', washer.user_id).maybeSingle();
+            washerEmail = prof?.email;
+          }
+          if (washerEmail) {
+            const apiBase = window.location.origin;
+            await fetch(`${apiBase}/api/send-email`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                type: 'washer_assigned',
+                data: {
+                  washer_email: washerEmail,
+                  washer_name: washer.full_name || washer.first_name || 'Washer',
+                  order_id: orderId,
+                  pickup_address: order?.pickup_address || '',
+                  weight: order?.weight || '',
+                  estimated_earnings: order?.total_price ? (parseFloat(order.total_price) * 0.6).toFixed(2) : '?'
+                }
+              })
+            });
+          }
+        }
+      } catch { /* Silent fail - email is a bonus, not critical */ }
+
+      toast.success("Washer assigne avec succes !", { id: t });
       fetchData();
       setShowOrderModal(false);
       setSelectedOrder(null);
     } catch (err: any) {
-      toast.error("❌ Erreur: " + err.message, { id: t });
+      toast.error("Erreur: " + err.message, { id: t });
     } finally {
       setAssigningWasher(false);
     }
@@ -864,7 +896,7 @@ export default function AdminDashboard() {
   // --- REASSIGN WASHER (ADMIN) ---
   const reassignWasher = async (orderId: string, newWasherId: string) => {
     setAssigningWasher(true);
-    const t = toast.loading("⏳ Réassignation...");
+    const t = toast.loading("Reassignation...");
     try {
       const { error } = await supabase
         .from("orders")
@@ -876,13 +908,40 @@ export default function AdminDashboard() {
 
       if (error) throw error;
 
-      toast.success("✅ Washer réassigné !", { id: t });
+      // Send notification email to newly assigned washer
+      try {
+        const washer = washers.find(w => w.id === newWasherId);
+        const order = orders.find(o => o.id === orderId);
+        if (washer?.user_id) {
+          const { data: prof } = await supabase.from('user_profiles').select('email').eq('id', washer.user_id).maybeSingle();
+          if (prof?.email) {
+            const apiBase = window.location.origin;
+            await fetch(`${apiBase}/api/send-email`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                type: 'washer_assigned',
+                data: {
+                  washer_email: prof.email,
+                  washer_name: washer.full_name || washer.first_name || 'Washer',
+                  order_id: orderId,
+                  pickup_address: order?.pickup_address || '',
+                  weight: order?.weight || '',
+                  estimated_earnings: order?.total_price ? (parseFloat(order.total_price) * 0.6).toFixed(2) : '?'
+                }
+              })
+            });
+          }
+        }
+      } catch { /* Silent fail */ }
+
+      toast.success("Washer reassigne !", { id: t });
       fetchData();
       if (selectedOrder?.id === orderId) {
         setSelectedOrder((prev: any) => prev ? { ...prev, washer_id: newWasherId } : null);
       }
     } catch (err: any) {
-      toast.error("❌ Erreur: " + err.message, { id: t });
+      toast.error("Erreur: " + err.message, { id: t });
     } finally {
       setAssigningWasher(false);
     }
