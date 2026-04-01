@@ -429,6 +429,7 @@ export default function ClientDashboard() {
   const [chatOrder, setChatOrder] = useState<Order | null>(null);
   const [trackingOrderId, setTrackingOrderId] = useState<string | null>(null);
   const [showCancelled, setShowCancelled] = useState(false);
+  const [debugInfo, setDebugInfo] = useState<string>('Chargement...');
   const fetchLockRef = useRef(false);
 
   const loadDashboard = useCallback(async () => {
