@@ -578,18 +578,26 @@ export default function ClientDashboard() {
   // Use first_name if available, otherwise extract from full_name
   const firstName = profile?.first_name || profile?.full_name?.split(' ')[0];
   
-  // Debug info - remove after fixing
-  console.log('Dashboard state:', { 
-    activeOrders: activeOrders.length, 
-    pastOrders: pastOrders.length, 
-    cancelledOrders: cancelledOrders.length,
-    hasNoOrders,
-    userId 
-  });
+  // Debug banner - TEMPORARY
+  const [debugInfo, setDebugInfo] = useState<string>('');
+  useEffect(() => {
+    const checkAuth = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      const info = `User ID: ${user?.id || 'NOT LOGGED IN'} | Email: ${user?.email || 'N/A'} | Active: ${activeOrders.length} | Past: ${pastOrders.length}`;
+      setDebugInfo(info);
+    };
+    checkAuth();
+  }, [activeOrders, pastOrders]);
 
   return (
     <div className="min-h-screen bg-[#f8fafc]">
       <Navbar />
+      {/* DEBUG BANNER - TEMPORARY */}
+      {debugInfo && (
+        <div className="bg-yellow-100 border-b border-yellow-300 px-4 py-2 text-xs text-yellow-800 font-mono">
+          {debugInfo}
+        </div>
+      )}
       {ratingOrder && <RatingModal order={ratingOrder} onClose={() => setRatingOrder(null)} onSubmit={submitRating} />}
       <div className="max-w-lg mx-auto px-4 pt-24 md:pt-28 pb-16">
         <div className="flex items-center justify-between mb-6">
