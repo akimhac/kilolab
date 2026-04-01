@@ -429,7 +429,6 @@ export default function ClientDashboard() {
   const [chatOrder, setChatOrder] = useState<Order | null>(null);
   const [trackingOrderId, setTrackingOrderId] = useState<string | null>(null);
   const [showCancelled, setShowCancelled] = useState(false);
-  const [debugInfo, setDebugInfo] = useState<string>('Chargement...');
   const fetchLockRef = useRef(false);
 
   const loadDashboard = useCallback(async () => {
@@ -442,23 +441,54 @@ export default function ClientDashboard() {
       setUserId(user.id);
       setUserEmail(user.email || '');
       
-      // Simple query without join first
-      const { data: orders, error } = await supabase
+      // Try with washer join first, fallback to simple query
+      let orders: any[] | null = null;
+      let queryError: any = null;
+      
+      // Attempt 1: Query with left join on washers
+      const { data: ordersWithJoin, error: joinError } = await supabase
         .from('orders')
-        .select('*')
+        .select('*, washer:washers(id, first_name, last_name, avatar_url, avg_rating, total_ratings, phone)')
         .eq('client_id', user.id)
         .order('created_at', { ascending: false });
       
-      // Log for debugging
-      if (error) { 
-        console.error('Error fetching orders:', error);
+      if (!joinError && ordersWithJoin) {
+        orders = ordersWithJoin;
+      } else {
+        // Attempt 2: Simple query without join
+        const { data: simpleOrders, error: simpleError } = await supabase
+          .from('orders')
+          .select('*')
+          .eq('client_id', user.id)
+          .order('created_at', { ascending: false });
+        
+        orders = simpleOrders;
+        queryError = simpleError;
+        
+        // If we got orders, fetch washer info separately
+        if (simpleOrders && simpleOrders.length > 0) {
+          const washerIds = [...new Set(simpleOrders.filter(o => o.washer_id).map(o => o.washer_id))];
+          if (washerIds.length > 0) {
+            const { data: washers } = await supabase
+              .from('washers')
+              .select('id, first_name, last_name, avatar_url, avg_rating, total_ratings, phone')
+              .in('id', washerIds);
+            
+            if (washers) {
+              const washerMap = new Map(washers.map(w => [w.id, w]));
+              orders = simpleOrders.map(o => ({
+                ...o,
+                washer: o.washer_id ? washerMap.get(o.washer_id) ?? null : null,
+              }));
+            }
+          }
+        }
       }
-      console.log('Orders query result:', { count: orders?.length, error, userId: user.id });
+      
+      if (queryError) console.error('Error fetching orders:', queryError);
       
       const all = (orders ?? []) as Order[];
-      console.log('All orders loaded:', all.length, all.map(o => ({ id: o.id.slice(0,8), status: o.status })));
       
-      // Include ALL statuses that are not cancelled or completed as "active"
       const inactiveStatuses = ['cancelled', 'completed', 'refunded'];
       const active = all.filter(o => !inactiveStatuses.includes(o.status));
       const completedUnrated = all.filter(o => o.status === 'completed' && !o.client_rating);
@@ -472,8 +502,6 @@ export default function ClientDashboard() {
       const valid = all.filter(o => o.status !== 'cancelled');
       setStats({ totalOrders: valid.length, totalSpent, totalKg, avgOrderValue: past.length > 0 ? totalSpent / past.length : 0 });
       
-      // Fetch profile with loyalty points
-      // Fetch profile data with error handling for each query
       const { data: prof } = await supabase.from('user_profiles').select('id, full_name, first_name, referral_credit, loyalty_points').eq('id', user.id).maybeSingle();
       const { data: refCode } = await supabase.from('referral_codes').select('code, uses_count, bonus_earned_cents').eq('user_id', user.id).maybeSingle();
       const { data: sub } = await supabase.from('subscriptions').select('*').eq('user_id', user.id).eq('status', 'active').maybeSingle();
@@ -578,27 +606,10 @@ export default function ClientDashboard() {
   const displayed = showAllHistory ? pastOrders : pastOrders.slice(0, 5);
   // Use first_name if available, otherwise extract from full_name
   const firstName = profile?.first_name || profile?.full_name?.split(' ')[0];
-  
-  // Debug banner - TEMPORARY
-  const [debugInfo, setDebugInfo] = useState<string>('');
-  useEffect(() => {
-    const checkAuth = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      const info = `User ID: ${user?.id || 'NOT LOGGED IN'} | Email: ${user?.email || 'N/A'} | Active: ${activeOrders.length} | Past: ${pastOrders.length}`;
-      setDebugInfo(info);
-    };
-    checkAuth();
-  }, [activeOrders, pastOrders]);
 
   return (
     <div className="min-h-screen bg-[#f8fafc]">
       <Navbar />
-      {/* DEBUG BANNER - TEMPORARY */}
-      {debugInfo && (
-        <div className="bg-yellow-100 border-b border-yellow-300 px-4 py-2 text-xs text-yellow-800 font-mono">
-          {debugInfo}
-        </div>
-      )}
       {ratingOrder && <RatingModal order={ratingOrder} onClose={() => setRatingOrder(null)} onSubmit={submitRating} />}
       <div className="max-w-lg mx-auto px-4 pt-24 md:pt-28 pb-16">
         <div className="flex items-center justify-between mb-6">
