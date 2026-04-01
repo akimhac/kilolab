@@ -149,8 +149,8 @@ export default function Navbar() {
         </div>
       </div>
 
-      <div className={`lg:hidden overflow-hidden transition-all duration-300 ${isOpen ? 'max-h-[600px] opacity-100' : 'max-h-0 opacity-0'}`}>
-        <div className="bg-white border-t border-slate-100 shadow-2xl">
+      <div className={`lg:hidden overflow-y-auto transition-all duration-300 ${isOpen ? 'max-h-[85vh] opacity-100' : 'max-h-0 opacity-0'}`}>
+        <div className="bg-white border-t border-slate-100 shadow-2xl pb-6">
           {/* Main nav links */}
           <div className="px-4 py-3 space-y-1">
             {navLinks.map((item) => (
