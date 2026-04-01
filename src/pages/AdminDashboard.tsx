@@ -818,6 +818,7 @@ export default function AdminDashboard() {
         .update({ 
           washer_id: washerId,
           status: "assigned",
+          assigned_at: new Date().toISOString(),
           updated_at: new Date().toISOString()
         })
         .eq("id", orderId);
@@ -832,6 +833,82 @@ export default function AdminDashboard() {
       toast.error("❌ Erreur: " + err.message, { id: t });
     } finally {
       setAssigningWasher(false);
+    }
+  };
+
+  // --- CHANGE ORDER STATUS (ADMIN) ---
+  const changeOrderStatus = async (orderId: string, newStatus: string) => {
+    const t = toast.loading("⏳ Mise à jour...");
+    try {
+      const updates: any = { status: newStatus, updated_at: new Date().toISOString() };
+      if (newStatus === "completed") updates.completed_at = new Date().toISOString();
+      if (newStatus === "assigned") updates.assigned_at = new Date().toISOString();
+      
+      const { error } = await supabase
+        .from("orders")
+        .update(updates)
+        .eq("id", orderId);
+
+      if (error) throw error;
+
+      toast.success(`✅ Statut changé → ${newStatus}`, { id: t });
+      fetchData();
+      if (selectedOrder?.id === orderId) {
+        setSelectedOrder((prev: any) => prev ? { ...prev, status: newStatus } : null);
+      }
+    } catch (err: any) {
+      toast.error("❌ Erreur: " + err.message, { id: t });
+    }
+  };
+
+  // --- REASSIGN WASHER (ADMIN) ---
+  const reassignWasher = async (orderId: string, newWasherId: string) => {
+    setAssigningWasher(true);
+    const t = toast.loading("⏳ Réassignation...");
+    try {
+      const { error } = await supabase
+        .from("orders")
+        .update({ 
+          washer_id: newWasherId,
+          updated_at: new Date().toISOString()
+        })
+        .eq("id", orderId);
+
+      if (error) throw error;
+
+      toast.success("✅ Washer réassigné !", { id: t });
+      fetchData();
+      if (selectedOrder?.id === orderId) {
+        setSelectedOrder((prev: any) => prev ? { ...prev, washer_id: newWasherId } : null);
+      }
+    } catch (err: any) {
+      toast.error("❌ Erreur: " + err.message, { id: t });
+    } finally {
+      setAssigningWasher(false);
+    }
+  };
+
+  // --- REMOVE WASHER FROM ORDER (ADMIN) ---
+  const removeWasherFromOrder = async (orderId: string) => {
+    const t = toast.loading("⏳ Retrait du washer...");
+    try {
+      const { error } = await supabase
+        .from("orders")
+        .update({ 
+          washer_id: null,
+          status: "paid",
+          updated_at: new Date().toISOString()
+        })
+        .eq("id", orderId);
+
+      if (error) throw error;
+
+      toast.success("✅ Washer retiré, commande remise en attente", { id: t });
+      fetchData();
+      setShowOrderModal(false);
+      setSelectedOrder(null);
+    } catch (err: any) {
+      toast.error("❌ Erreur: " + err.message, { id: t });
     }
   };
 
@@ -2458,8 +2535,8 @@ export default function AdminDashboard() {
               </div>
             </div>
 
-            {/* Assign Washer Section */}
-            {selectedOrder.status === "pending" && !selectedOrder.washer_id && (
+            {/* Assign / Reassign Washer Section */}
+            {selectedOrder.status !== "cancelled" && selectedOrder.status !== "completed" && !selectedOrder.washer_id && (
               <div className="mb-6 p-4 bg-teal-500/10 border border-teal-500/30 rounded-xl">
                 <p className="text-sm font-bold mb-3 text-teal-400 flex items-center gap-2">
                   <Users size={16} /> Assigner un Washer
@@ -2497,6 +2574,64 @@ export default function AdminDashboard() {
                 <p className="text-white font-medium">
                   {washers.find(w => w.id === selectedOrder.washer_id)?.full_name || 'Washer ID: ' + selectedOrder.washer_id.slice(0,8)}
                 </p>
+                {selectedOrder.status !== "cancelled" && selectedOrder.status !== "completed" && (
+                  <div className="mt-3 flex gap-2">
+                    <select
+                      onChange={(e) => {
+                        if (e.target.value) {
+                          reassignWasher(selectedOrder.id, e.target.value);
+                        }
+                      }}
+                      disabled={assigningWasher}
+                      className="flex-1 p-2 bg-white/10 border border-white/20 rounded-lg text-white text-sm focus:border-teal-500 focus:outline-none"
+                    >
+                      <option value="" className="bg-slate-800">Réassigner...</option>
+                      {washers.filter(w => w.status === 'approved' && w.id !== selectedOrder.washer_id).map((w) => (
+                        <option key={w.id} value={w.id} className="bg-slate-800">
+                          {w.full_name} - {w.city || '?'}
+                        </option>
+                      ))}
+                    </select>
+                    <button
+                      onClick={() => removeWasherFromOrder(selectedOrder.id)}
+                      className="px-3 py-2 bg-red-500/20 text-red-400 rounded-lg text-sm font-bold hover:bg-red-500/30 transition"
+                    >
+                      Retirer
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Admin Status Control */}
+            {selectedOrder.status !== "cancelled" && selectedOrder.status !== "completed" && (
+              <div className="mb-6 p-4 bg-purple-500/10 border border-purple-500/30 rounded-xl">
+                <p className="text-sm font-bold mb-3 text-purple-400 flex items-center gap-2">
+                  <Activity size={16} /> Changer le statut
+                </p>
+                <div className="grid grid-cols-3 gap-2">
+                  {["pending", "confirmed", "paid", "assigned", "picked_up", "washing", "ready", "completed"].map((s) => (
+                    <button
+                      key={s}
+                      onClick={() => changeOrderStatus(selectedOrder.id, s)}
+                      disabled={selectedOrder.status === s}
+                      className={`py-2 px-2 rounded-lg text-xs font-bold transition ${
+                        selectedOrder.status === s
+                          ? 'bg-purple-500 text-white'
+                          : 'bg-white/5 text-slate-400 hover:bg-white/10 hover:text-white'
+                      }`}
+                    >
+                      {s === "pending" ? "En attente" 
+                        : s === "confirmed" ? "Confirmé"
+                        : s === "paid" ? "Payé"
+                        : s === "assigned" ? "Assigné"
+                        : s === "picked_up" ? "Collecté"
+                        : s === "washing" ? "Lavage"
+                        : s === "ready" ? "Prêt"
+                        : s === "completed" ? "Livré" : s}
+                    </button>
+                  ))}
+                </div>
               </div>
             )}
 

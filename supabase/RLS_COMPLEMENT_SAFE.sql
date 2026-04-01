@@ -15,7 +15,7 @@ TO authenticated
 USING (
   washer_id IS NULL
   AND partner_id IS NULL
-  AND status IN ('pending', 'confirmed')
+  AND status IN ('pending', 'confirmed', 'paid')
   AND EXISTS (
     SELECT 1 FROM public.washers w
     WHERE w.user_id = auth.uid()

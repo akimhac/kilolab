@@ -389,7 +389,7 @@ export default function WasherDashboard() {
         }, e => console.log("GPS refused:", e));
       }
       if (wp.status !== "approved") { setLoading(false); return; }
-      const { data: available } = await supabase.from("orders").select("*").is("washer_id", null).is("partner_id", null).in("status", ["pending","confirmed"]).order("created_at", { ascending: false }).limit(20);
+      const { data: available } = await supabase.from("orders").select("*").is("washer_id", null).is("partner_id", null).in("status", ["pending","confirmed","paid"]).order("created_at", { ascending: false }).limit(20);
       setAvailableMissions((available||[]) as Mission[]);
       const { data: myOrders } = await supabase.from("orders").select("*").eq("washer_id", wp.id).order("created_at", { ascending: false });
       const missions = (myOrders||[]) as Mission[];
