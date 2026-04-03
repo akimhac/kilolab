@@ -407,23 +407,50 @@ export default function AdminDashboard() {
     }
 
     setSendingEmail(true);
-    const t = toast.loading("Annulation en cours...");
+    const t = toast.loading("Annulation + remboursement en cours...");
 
     try {
-      // 1. Update order status in Supabase (only status)
+      // 1. Auto-refund Stripe if payment was made
+      let refundResult = null;
+      if (order.stripe_payment_id) {
+        try {
+          const apiBase = window.location.origin;
+          const refundRes = await fetch(`${apiBase}/api/stripe-refund`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              payment_intent_id: order.stripe_payment_id,
+              reason: 'requested_by_customer'
+            })
+          });
+          refundResult = await refundRes.json();
+          if (!refundResult.success) {
+            console.error('Stripe refund failed:', refundResult);
+          }
+        } catch (refundErr) {
+          console.error('Stripe refund error:', refundErr);
+        }
+      }
+
+      // 2. Update order status in Supabase
+      const updateData: any = { 
+        status: "cancelled",
+        updated_at: new Date().toISOString()
+      };
+      if (refundResult?.success) {
+        updateData.status = "refunded";
+        updateData.refund_id = refundResult.refund_id;
+      }
+
       const { error: updateError } = await supabase
         .from("orders")
-        .update({ 
-          status: "cancelled"
-        })
+        .update(updateData)
         .eq("id", order.id);
 
       if (updateError) throw updateError;
 
-      // 2. Get client email from profiles or fallback
+      // 3. Get client email from profiles or fallback
       let clientEmail = order.profiles?.email;
-      
-      // If no email in profiles, try to get it from client_id
       if (!clientEmail && order.client_id) {
         const { data: profile } = await supabase
           .from("user_profiles")
@@ -434,32 +461,33 @@ export default function AdminDashboard() {
       }
       
       if (clientEmail) {
-        // 3. Send cancellation email to client
+        const refundNote = refundResult?.success 
+          ? `<p style="color: #059669; font-weight: bold; margin: 15px 0;">Votre remboursement de ${refundResult.amount || order.total_price} EUR a ete initie automatiquement. Il apparaitra sur votre compte sous 5-7 jours ouvres.</p>`
+          : `<p style="color: #334155; font-size: 16px; line-height: 1.6;">Si vous avez effectue un paiement, il sera rembourse sous 5-7 jours ouvres.</p>`;
+
         const emailHtml = `
           <!DOCTYPE html>
           <html>
           <head><meta charset="utf-8"></head>
           <body style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f8fafc;">
             <div style="background: linear-gradient(135deg, #ef4444 0%, #f97316 100%); padding: 25px; border-radius: 16px 16px 0 0; text-align: center;">
-              <h1 style="color: white; margin: 0; font-size: 22px;">Commande annulée</h1>
+              <h1 style="color: white; margin: 0; font-size: 22px;">Commande annulee</h1>
             </div>
             <div style="background: white; padding: 25px; border-radius: 0 0 16px 16px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
               <p style="color: #334155; font-size: 16px; line-height: 1.6;">Bonjour,</p>
               <p style="color: #334155; font-size: 16px; line-height: 1.6;">
-                Nous sommes désolés de vous informer que votre commande <strong>#${order.id.slice(0, 8).toUpperCase()}</strong> a été annulée.
+                Nous sommes desoles de vous informer que votre commande <strong>#${order.id.slice(0, 8).toUpperCase()}</strong> a ete annulee.
               </p>
               
               <div style="background: #fef2f2; border-left: 4px solid #ef4444; padding: 15px; margin: 20px 0; border-radius: 0 8px 8px 0;">
-                <p style="color: #991b1b; margin: 0; font-weight: bold;">Message de l'équipe Kilolab :</p>
+                <p style="color: #991b1b; margin: 0; font-weight: bold;">Message de l'equipe Kilolab :</p>
                 <p style="color: #7f1d1d; margin: 10px 0 0 0; font-style: italic;">"${message}"</p>
               </div>
+
+              ${refundNote}
               
               <p style="color: #334155; font-size: 16px; line-height: 1.6;">
-                Si vous avez effectué un paiement, il sera remboursé sous 5-7 jours ouvrés.
-              </p>
-              
-              <p style="color: #334155; font-size: 16px; line-height: 1.6;">
-                N'hésitez pas à passer une nouvelle commande quand vous le souhaitez.
+                N'hesitez pas a passer une nouvelle commande quand vous le souhaitez.
               </p>
               
               <a href="https://kilolab.fr/new-order" style="display: block; background: linear-gradient(135deg, #14b8a6 0%, #06b6d4 100%); color: white; text-align: center; padding: 15px 30px; border-radius: 12px; text-decoration: none; font-weight: bold; margin-top: 20px;">
@@ -467,30 +495,34 @@ export default function AdminDashboard() {
               </a>
               
               <p style="color: #64748b; font-size: 14px; text-align: center; margin-top: 20px;">
-                Des questions ? Contactez-nous à contact@kilolab.fr
+                Des questions ? Contactez-nous a contact@kilolab.fr
               </p>
             </div>
-            <p style="text-align: center; color: #94a3b8; font-size: 12px; margin-top: 20px;">
-              © 2025 Kilolab - Le pressing au kilo
-            </p>
           </body>
           </html>
         `;
 
-        // Call the email API
         await fetch('/api/send-email', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             to: clientEmail,
-            subject: `❌ Commande #${order.id.slice(0, 8).toUpperCase()} annulée - Kilolab`,
+            subject: `Commande #${order.id.slice(0, 8).toUpperCase()} annulee - Kilolab`,
             html: emailHtml,
             type: 'order_cancelled'
           })
         });
       }
 
-      toast.success("Commande annulée et client notifié !", { id: t });
+      const successMsg = refundResult?.success
+        ? "Commande annulee + rembourse automatiquement sur Stripe !"
+        : refundResult?.already_refunded
+        ? "Commande annulee (deja remboursee) !"
+        : order.stripe_payment_id
+        ? "Commande annulee (remboursement Stripe echoue - verifiez manuellement)"
+        : "Commande annulee et client notifie !";
+      
+      toast.success(successMsg, { id: t });
       setShowOrderModal(false);
       setCancelMessage("");
       setSelectedOrder(null);
@@ -1577,10 +1609,69 @@ export default function AdminDashboard() {
                 {filteredWashers.length === 0 ? (
                   <div className="text-center py-16 bg-white/5 rounded-2xl border border-white/10">
                     <Users size={64} className="mx-auto mb-4 text-slate-500" />
-                    <p className="text-xl font-bold text-slate-400">Aucun washer trouvé</p>
+                    <p className="text-xl font-bold text-slate-400">Aucun washer trouve</p>
                   </div>
                 ) : (
-                  <div className="overflow-x-auto">
+                  <>
+                  {/* Mobile: Cards */}
+                  <div className="md:hidden space-y-3">
+                    {filteredWashers.map((washer) => (
+                      <div key={washer.id} className="bg-white/5 border border-white/10 rounded-2xl p-4">
+                        <div className="flex items-center justify-between mb-3">
+                          <div className="flex items-center gap-3 min-w-0">
+                            <div className="w-10 h-10 bg-violet-500/20 rounded-xl flex items-center justify-center text-violet-400 font-bold text-sm flex-shrink-0">
+                              {(washer.full_name || '?')[0]}
+                            </div>
+                            <div className="min-w-0">
+                              <p className="font-bold text-white truncate">{washer.full_name || 'Sans nom'}</p>
+                              <p className="text-xs text-slate-400 truncate">{washer.email}</p>
+                            </div>
+                          </div>
+                          <span className={`px-2.5 py-1 rounded-full text-xs font-bold flex-shrink-0 ${
+                            washer.status === "approved" ? "bg-emerald-500/20 text-emerald-400"
+                            : washer.status === "pending" ? "bg-orange-500/20 text-orange-400"
+                            : "bg-red-500/20 text-red-400"
+                          }`}>
+                            {washer.status === "approved" ? "Approuve" : washer.status === "pending" ? "En attente" : "Rejete"}
+                          </span>
+                        </div>
+                        <div className="flex items-center justify-between text-xs text-slate-400 mb-3">
+                          <span>{washer.phone}</span>
+                          <span>{washer.city} ({washer.postal_code})</span>
+                        </div>
+                        {washer.is_blocked && (
+                          <span className="px-2 py-0.5 rounded-full text-xs font-bold bg-red-600 text-white mb-3 inline-block">BLOQUE</span>
+                        )}
+                        <div className="flex gap-2 pt-2 border-t border-white/5">
+                          {washer.status === "pending" && (
+                            <>
+                              <button onClick={() => approveWasher(washer.id)} className="flex-1 py-2 bg-emerald-500/20 text-emerald-400 rounded-xl text-sm font-bold hover:bg-emerald-500/30 transition flex items-center justify-center gap-1">
+                                <CheckCircle size={14} /> Approuver
+                              </button>
+                              <button onClick={() => rejectWasher(washer.id)} className="flex-1 py-2 bg-red-500/20 text-red-400 rounded-xl text-sm font-bold hover:bg-red-500/30 transition flex items-center justify-center gap-1">
+                                <XCircle size={14} /> Rejeter
+                              </button>
+                            </>
+                          )}
+                          {washer.status === "approved" && !washer.is_blocked && (
+                            <button onClick={() => blockWasher(washer.id)} className="flex-1 py-2 bg-orange-500/20 text-orange-400 rounded-xl text-sm font-bold hover:bg-orange-500/30 transition flex items-center justify-center gap-1">
+                              <AlertTriangle size={14} /> Bloquer
+                            </button>
+                          )}
+                          {washer.is_blocked && (
+                            <button onClick={() => unblockWasher(washer.id)} className="flex-1 py-2 bg-blue-500/20 text-blue-400 rounded-xl text-sm font-bold hover:bg-blue-500/30 transition flex items-center justify-center gap-1">
+                              <CheckCircle size={14} /> Debloquer
+                            </button>
+                          )}
+                          <button onClick={() => { setSelectedWasher(washer); setShowWasherModal(true); }} className="py-2 px-3 bg-blue-500/20 text-blue-400 rounded-xl text-sm font-bold hover:bg-blue-500/30 transition">
+                            <FileText size={14} />
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  {/* Desktop: Table */}
+                  <div className="hidden md:block overflow-x-auto">
                     <table className="w-full">
                       <thead className="bg-white/5 border-b border-white/10">
                         <tr>
@@ -1691,6 +1782,7 @@ export default function AdminDashboard() {
                       </tbody>
                     </table>
                   </div>
+                  </>
                 )}
               </div>
             )}
@@ -1698,6 +1790,28 @@ export default function AdminDashboard() {
             {/* TAB CLIENTS */}
             {activeTab === "clients" && (
               <div>
+                {/* Mobile: Cards */}
+                <div className="md:hidden space-y-3">
+                  {clients.map((client) => (
+                    <div key={client.id} className="bg-white/5 border border-white/10 rounded-2xl p-4">
+                      <div className="flex items-center gap-3 mb-2">
+                        <div className="w-10 h-10 bg-teal-500/20 rounded-xl flex items-center justify-center text-teal-400 font-bold text-sm flex-shrink-0">
+                          {(client.full_name || client.email)?.[0]?.toUpperCase()}
+                        </div>
+                        <div className="min-w-0">
+                          <p className="font-bold text-white truncate">{client.full_name || 'Sans nom'}</p>
+                          <p className="text-xs text-slate-400 truncate">{client.email}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center justify-between text-xs text-slate-400 mt-2 pt-2 border-t border-white/5">
+                        <span>{client.city || '-'}</span>
+                        <span>{new Date(client.created_at).toLocaleDateString("fr-FR")}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                {/* Desktop: Table */}
+                <div className="hidden md:block">
                 <table className="w-full">
                   <thead className="bg-white/5 border-b border-white/10">
                     <tr>
@@ -1722,12 +1836,64 @@ export default function AdminDashboard() {
                     ))}
                   </tbody>
                 </table>
+                </div>
               </div>
             )}
 
             {/* TAB ORDERS */}
             {activeTab === "orders" && (
               <div>
+                {/* Mobile: Cards */}
+                <div className="md:hidden space-y-3">
+                  {filteredOrdersByTime.map((order) => {
+                    const statusColors: Record<string,string> = {
+                      completed: "bg-emerald-500/20 text-emerald-400",
+                      cancelled: "bg-red-500/20 text-red-400",
+                      refunded: "bg-orange-500/20 text-orange-400",
+                      pending: "bg-orange-500/20 text-orange-400",
+                      paid: "bg-blue-500/20 text-blue-400",
+                      assigned: "bg-cyan-500/20 text-cyan-400",
+                      picked_up: "bg-indigo-500/20 text-indigo-400",
+                      washing: "bg-violet-500/20 text-violet-400",
+                      ready: "bg-teal-500/20 text-teal-400",
+                    };
+                    const statusLabels: Record<string,string> = {
+                      completed: "Termine", cancelled: "Annule", refunded: "Rembourse",
+                      pending: "En attente", paid: "Paye", assigned: "Assigne",
+                      picked_up: "Collecte", washing: "Lavage", ready: "Pret",
+                    };
+                    return (
+                      <div key={order.id} 
+                        className="bg-white/5 border border-white/10 rounded-2xl p-4 active:bg-white/10 transition cursor-pointer"
+                        onClick={() => { setSelectedOrder(order); setCancelMessage(""); setShowOrderModal(true); }}
+                      >
+                        <div className="flex items-center justify-between mb-3">
+                          <span className="font-mono text-xs text-teal-400 font-bold">#{order.id.slice(0, 8)}</span>
+                          <span className={`px-2.5 py-1 rounded-full text-xs font-bold ${statusColors[order.status] || "bg-white/10 text-slate-400"}`}>
+                            {statusLabels[order.status] || order.status}
+                          </span>
+                        </div>
+                        <div className="flex items-center justify-between mb-2">
+                          <p className="text-sm text-white font-medium truncate max-w-[60%]">
+                            {order.profiles?.email || order.client_email || '-'}
+                          </p>
+                          <p className="font-bold text-emerald-400">{order.total_price} EUR</p>
+                        </div>
+                        <div className="flex items-center justify-between text-xs text-slate-500">
+                          <span className="truncate max-w-[65%]">{order.pickup_address || '-'}</span>
+                          <span>{new Date(order.created_at).toLocaleDateString("fr-FR")}</span>
+                        </div>
+                        {order.stripe_payment_id && (
+                          <div className="mt-2 pt-2 border-t border-white/5">
+                            <span className="text-xs text-violet-400 font-mono">Stripe: {order.stripe_payment_id.slice(0, 15)}...</span>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+                {/* Desktop: Table */}
+                <div className="hidden md:block">
                 <table className="w-full">
                   <thead className="bg-white/5 border-b border-white/10">
                     <tr>
@@ -1805,6 +1971,7 @@ export default function AdminDashboard() {
                     ))}
                   </tbody>
                 </table>
+                </div>
               </div>
             )}
 

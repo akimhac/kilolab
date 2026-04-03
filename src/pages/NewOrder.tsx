@@ -66,6 +66,23 @@ export default function NewOrder() {
     };
     checkAuth();
     
+    // Pre-fill from URL params (quick reorder)
+    const params = new URLSearchParams(window.location.search);
+    const prefillAddress = params.get('address');
+    const prefillFormula = params.get('formula');
+    const prefillWeight = params.get('weight');
+    if (prefillAddress) {
+      setFinalAddress(prefillAddress);
+      setAddressValidated(true);
+    }
+    if (prefillFormula === 'premium' || prefillFormula === 'express') {
+      setFormula('express');
+    }
+    if (prefillWeight) {
+      const w = parseFloat(prefillWeight);
+      if (w >= 1) setWeight(Math.min(w, 30));
+    }
+    
     // Listen to auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_, session) => {
       setIsAuthenticated(!!session?.user);

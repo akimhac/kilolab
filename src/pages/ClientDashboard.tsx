@@ -430,6 +430,7 @@ export default function ClientDashboard() {
   const [chatOrder, setChatOrder] = useState<Order | null>(null);
   const [trackingOrderId, setTrackingOrderId] = useState<string | null>(null);
   const [showCancelled, setShowCancelled] = useState(false);
+  const [quickReorderSaved, setQuickReorderSaved] = useState<any>(null);
   const fetchLockRef = useRef(false);
 
   const loadDashboard = useCallback(async () => {
@@ -518,6 +519,17 @@ export default function ClientDashboard() {
         loyalty_points: prof.loyalty_points ?? 0,
       });
       if (sub) setSubscription(sub);
+
+      // Load saved quick reorder preferences from last completed order
+      if (past.length > 0) {
+        const lastOrder = past[0];
+        setQuickReorderSaved({
+          pickup_address: lastOrder.pickup_address,
+          formula: lastOrder.formula || 'standard',
+          weight: lastOrder.weight,
+          total_price: lastOrder.total_price,
+        });
+      }
     } catch (err) { console.error(err); }
     finally { setLoading(false); setRefreshing(false); fetchLockRef.current = false; }
   }, []);
@@ -658,6 +670,36 @@ export default function ClientDashboard() {
           </FadeInOnScroll>
         )}
 
+        {/* Quick Re-order */}
+        {quickReorderSaved && activeOrders.length === 0 && (
+          <FadeInOnScroll direction="up" delay={200}>
+            <div className="mb-6 bg-gradient-to-r from-teal-500 to-emerald-500 rounded-2xl p-4 text-white shadow-lg shadow-teal-500/20">
+              <div className="flex items-center justify-between">
+                <div className="min-w-0 mr-3">
+                  <p className="font-bold text-sm">{t('clientDashboard.reorder')}</p>
+                  <p className="text-teal-100 text-xs mt-0.5 truncate">
+                    {quickReorderSaved.weight} kg · {quickReorderSaved.formula === 'premium' ? 'Premium' : 'Standard'} · {quickReorderSaved.pickup_address?.split(',')[0] || ''}
+                  </p>
+                </div>
+                <button 
+                  onClick={() => {
+                    const params = new URLSearchParams({
+                      address: quickReorderSaved.pickup_address || '',
+                      formula: quickReorderSaved.formula || 'standard',
+                      weight: String(quickReorderSaved.weight || ''),
+                    });
+                    window.location.href = `/new-order?${params.toString()}`;
+                  }}
+                  className="flex-shrink-0 bg-white text-teal-600 px-4 py-2.5 rounded-xl font-bold text-sm hover:bg-teal-50 transition flex items-center gap-1.5"
+                  data-testid="quick-reorder-btn"
+                >
+                  <RefreshCw size={14} /> Go !
+                </button>
+              </div>
+            </div>
+          </FadeInOnScroll>
+        )}
+
         {/* Tabs Navigation */}
         {stats.totalOrders > 0 && (
           <div className="flex gap-2 mb-6 overflow-x-auto pb-2">
@@ -767,28 +809,35 @@ export default function ClientDashboard() {
                 <div className="mt-6">
                   <button 
                     onClick={() => setShowCancelled(!showCancelled)}
-                    className="flex items-center gap-2 text-slate-500 hover:text-slate-700 font-bold text-sm mb-3"
+                    className="flex items-center gap-2 w-full bg-red-50 border border-red-200 rounded-2xl p-3 text-red-600 font-bold text-sm hover:bg-red-100 transition"
+                    data-testid="cancelled-orders-toggle"
                   >
                     <X size={14} />
-                    Commandes annulées ({cancelledOrders.length})
-                    {showCancelled ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+                    {t('clientDashboard.cancelledOrders')} ({cancelledOrders.length})
+                    <span className="ml-auto">{showCancelled ? <ChevronUp size={14} /> : <ChevronDown size={14} />}</span>
                   </button>
                   
                   {showCancelled && (
-                    <div className="bg-slate-50 rounded-2xl border border-slate-200 overflow-hidden">
+                    <div className="bg-slate-50 rounded-2xl border border-slate-200 overflow-hidden mt-2">
                       {cancelledOrders.map(order => (
                         <div key={order.id} className="px-4 py-3.5 border-b border-slate-100 last:border-0">
                           <div className="flex items-center justify-between">
                             <div className="flex items-center gap-3">
-                              <div className="w-9 h-9 bg-red-100 rounded-xl flex items-center justify-center flex-shrink-0">
-                                <X size={17} className="text-red-500" />
+                              <div className={`w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 ${order.status === 'refunded' ? 'bg-orange-100' : 'bg-red-100'}`}>
+                                <X size={17} className={order.status === 'refunded' ? 'text-orange-500' : 'text-red-500'} />
                               </div>
                               <div>
                                 <p className="text-sm font-bold text-slate-600">#{order.id.slice(0,8).toUpperCase()}</p>
-                                <p className="text-xs text-slate-400">{formatDateRelative(order.created_at)} · {order.weight} kg</p>
+                                <p className="text-xs text-slate-400">{formatDateRelative(order.created_at)} · {order.weight} kg · {order.total_price} EUR</p>
                               </div>
                             </div>
-                            <span className="text-xs px-2 py-1 bg-red-100 text-red-600 rounded-full font-bold">{t('clientDashboard.cancelled')}</span>
+                            <span className={`text-xs px-2 py-1 rounded-full font-bold ${
+                              order.status === 'refunded' 
+                                ? 'bg-orange-100 text-orange-600'
+                                : 'bg-red-100 text-red-600'
+                            }`}>
+                              {order.status === 'refunded' ? t('orderStatus.refunded') : t('clientDashboard.cancelled')}
+                            </span>
                           </div>
                         </div>
                       ))}
