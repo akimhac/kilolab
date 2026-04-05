@@ -75,7 +75,7 @@ export function OrderTracker({ orderId }: { orderId: string }) {
         .from('orders')
         .select(`
           *,
-          washer:washers(first_name, last_name, phone, avatar_url, avg_rating)
+          washer:washers(first_name, last_name, phone, avg_rating)
         `)
         .eq('id', orderId)
         .single();
@@ -141,7 +141,7 @@ export function OrderTracker({ orderId }: { orderId: string }) {
         status: order.status,
         washer_name: order.washer ? `${order.washer.first_name} ${order.washer.last_name?.[0] || ''}.` : 'En attente',
         washer_phone: order.washer?.phone,
-        washer_photo: order.washer?.avatar_url,
+        washer_photo: null,
         washer_rating: order.washer?.avg_rating,
         pickup_address: order.pickup_address,
         eta_minutes: order.eta_minutes,

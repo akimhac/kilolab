@@ -22,7 +22,7 @@ import InvoiceGenerator from '../components/InvoiceGenerator';
 
 interface WasherInfo {
   id: string; first_name: string; last_name: string;
-  avatar_url: string | null; avg_rating: number | null;
+  avg_rating: number | null;
   total_ratings: number | null; phone: string | null;
 }
 interface Order {
@@ -1009,7 +1009,7 @@ export default function ClientDashboard() {
               participant={{
                 id: chatOrder.washer.id,
                 name: `${chatOrder.washer.first_name} ${chatOrder.washer.last_name}`,
-                avatar_url: chatOrder.washer.avatar_url || undefined,
+                avatar_url: undefined,
                 role: 'washer',
               }}
               onClose={() => {

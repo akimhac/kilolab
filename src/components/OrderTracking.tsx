@@ -113,7 +113,7 @@ export default function OrderTracking({ orderId }: { orderId: string }) {
           city,
           created_at,
           updated_at,
-          washer:washers(id, full_name, phone, avatar_url, lat, lng)
+          washer:washers(id, full_name, phone, lat, lng)
         `)
         .eq('id', orderId)
         .single();
@@ -150,7 +150,7 @@ export default function OrderTracking({ orderId }: { orderId: string }) {
         status: order.status as OrderStatus,
         washerName: washer?.full_name || null,
         washerPhone: washer?.phone || null,
-        washerPhoto: washer?.avatar_url || null,
+        washerPhoto: null,
         washerLocation: washer?.lat && washer?.lng ? { lat: washer.lat, lng: washer.lng } : null,
         pickupAddress: order.pickup_address || order.city || 'Non spécifiée',
         estimatedTime,

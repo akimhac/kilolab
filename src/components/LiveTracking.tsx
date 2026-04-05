@@ -19,7 +19,6 @@ interface WasherInfo {
   id: string;
   first_name: string;
   last_name: string;
-  avatar_url?: string;
   phone?: string;
   rating?: number;
 }
@@ -132,7 +131,7 @@ export function LiveWasherTracking({ orderId, washerId, pickupLat, pickupLng, on
       // Fetch washer info
       const { data: washer, error: washerError } = await supabase
         .from('user_profiles')
-        .select('id, first_name, last_name, avatar_url, phone')
+        .select('id, first_name, last_name, phone')
         .eq('id', washerId)
         .single();
 
@@ -228,11 +227,7 @@ export function LiveWasherTracking({ orderId, washerId, pickupLat, pickupLng, on
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-12 h-12 bg-teal-100 rounded-full flex items-center justify-center overflow-hidden">
-              {washerInfo?.avatar_url ? (
-                <img src={washerInfo.avatar_url} alt={washerInfo.first_name} className="w-full h-full object-cover" />
-              ) : (
-                <User className="text-teal-600" size={24} />
-              )}
+              <User className="text-teal-600" size={24} />
             </div>
             <div>
               <h3 className="font-bold text-slate-900">
