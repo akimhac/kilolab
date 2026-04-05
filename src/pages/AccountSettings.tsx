@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
+import AddressAutocomplete from '../components/AddressAutocomplete';
 import { 
   User, Mail, Phone, MapPin, Save, ArrowLeft, CheckCircle, Loader2,
   Trash2, AlertTriangle, Shield, Calendar, Clock, Bell, Eye, EyeOff,
@@ -16,7 +17,7 @@ export default function AccountSettings() {
   const [saving, setSaving] = useState(false);
   const [user, setUser] = useState<any>(null);
   const [userRole, setUserRole] = useState<'client' | 'washer' | null>(null);
-  const [activeTab, setActiveTab] = useState<'profile' | 'security' | 'notifications' | 'delete'>('profile');
+  const [activeTab, setActiveTab] = useState<'profile' | 'security' | 'notifications'>('profile');
   
   // Profile data
   const [profile, setProfile] = useState({
@@ -264,7 +265,6 @@ export default function AccountSettings() {
               { id: 'profile', label: 'Profil', icon: User },
               { id: 'notifications', label: 'Notifications', icon: Bell },
               { id: 'security', label: 'Sécurité', icon: Shield },
-              { id: 'delete', label: 'Supprimer', icon: Trash2 },
             ].map((tab) => (
               <button
                 key={tab.id}
@@ -318,12 +318,16 @@ export default function AccountSettings() {
                 </div>
                 <div>
                   <label className="block text-sm font-bold text-slate-700 mb-2">Adresse</label>
-                  <input
-                    type="text"
+                  <AddressAutocomplete
                     value={profile.address}
-                    onChange={(e) => setProfile({ ...profile, address: e.target.value })}
-                    placeholder="12 rue de la Paix"
-                    className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500 text-slate-900 placeholder:text-slate-400"
+                    onChange={(val) => setProfile({ ...profile, address: val })}
+                    onSelect={(addr) => setProfile({ 
+                      ...profile, 
+                      address: addr.label,
+                      city: addr.city, 
+                      postal_code: addr.postcode 
+                    })}
+                    placeholder="12 rue de la Paix, Paris"
                   />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
@@ -415,145 +419,119 @@ export default function AccountSettings() {
                 <div className="p-4 bg-teal-50 border border-teal-200 rounded-xl">
                   <div className="flex items-center gap-3 mb-2">
                     <Shield className="text-teal-600" size={20} />
-                    <p className="font-bold text-teal-800">Connexion sécurisée</p>
+                    <p className="font-bold text-teal-800">Connexion securisee</p>
                   </div>
                   <p className="text-sm text-teal-700">
-                    Votre compte est protégé par l'authentification Supabase.
+                    Votre compte est protege par l'authentification Supabase.
                   </p>
                 </div>
                 
                 <div className="space-y-4">
-                  <p className="font-bold text-slate-900">Changer le mot de passe</p>
+                  <p className="font-bold text-slate-900">Modifier le mot de passe</p>
+                  <p className="text-sm text-slate-500">Un email de reinitialisation sera envoye a {user?.email}</p>
                   <button
                     onClick={async () => {
-                      const { error } = await supabase.auth.resetPasswordForEmail(user?.email, {
-                        redirectTo: `${window.location.origin}/reset-password`,
-                      });
-                      if (!error) {
-                        toast.success('Email de réinitialisation envoyé !');
-                      } else {
-                        toast.error('Erreur: ' + error.message);
+                      const t = toast.loading('Envoi en cours...');
+                      try {
+                        const { error } = await supabase.auth.resetPasswordForEmail(user?.email || '', {
+                          redirectTo: `${window.location.origin}/reset-password`,
+                        });
+                        if (!error) {
+                          toast.success('Email de reinitialisation envoye ! Verifiez votre boite mail.', { id: t, duration: 6000 });
+                        } else {
+                          toast.error('Erreur: ' + error.message, { id: t });
+                        }
+                      } catch (e: any) {
+                        toast.error('Erreur: ' + e.message, { id: t });
                       }
                     }}
-                    className="w-full py-3 border-2 border-teal-500 text-teal-600 rounded-xl font-bold hover:bg-teal-50 transition flex items-center justify-center gap-2"
+                    className="w-full py-3.5 border-2 border-teal-500 text-teal-600 rounded-xl font-bold hover:bg-teal-50 transition flex items-center justify-center gap-2"
+                    data-testid="reset-password-btn"
                   >
                     <Lock size={18} />
-                    Réinitialiser par email
+                    Envoyer le lien de reinitialisation
                   </button>
                 </div>
 
                 <div className="pt-4 border-t border-slate-200">
-                  <p className="font-bold text-slate-900 mb-2">Sessions actives</p>
-                  <p className="text-sm text-slate-500 mb-4">Déconnectez-vous de tous les appareils</p>
+                  <p className="font-bold text-slate-900 mb-2">Deconnexion</p>
                   <button
                     onClick={async () => {
                       await supabase.auth.signOut({ scope: 'global' });
                       navigate('/login');
                     }}
                     className="w-full py-3 bg-slate-100 text-slate-700 rounded-xl font-bold hover:bg-slate-200 transition"
+                    data-testid="logout-all-btn"
                   >
-                    Se déconnecter partout
+                    Se deconnecter de tous les appareils
                   </button>
                 </div>
-              </div>
-            )}
 
-            {/* Delete Account Tab */}
-            {activeTab === 'delete' && (
-              <div className="p-6">
-                <div className="p-4 bg-red-50 border border-red-200 rounded-xl mb-6">
-                  <div className="flex items-center gap-3 mb-2">
-                    <AlertTriangle className="text-red-600" size={20} />
-                    <p className="font-bold text-red-800">Zone dangereuse</p>
+                {/* Danger Zone - Account Deletion */}
+                <div className="pt-6 border-t-2 border-red-200">
+                  <div className="p-4 bg-red-50 border border-red-200 rounded-xl mb-4">
+                    <div className="flex items-center gap-3 mb-2">
+                      <AlertTriangle className="text-red-600" size={20} />
+                      <p className="font-bold text-red-800">Zone dangereuse</p>
+                    </div>
+                    <p className="text-sm text-red-700">
+                      La suppression de votre compte est irreversible. Vos donnees seront anonymisees.
+                    </p>
                   </div>
-                  <p className="text-sm text-red-700">
-                    La suppression de votre compte est irréversible. Vos données seront anonymisées.
-                  </p>
-                </div>
 
-                {!canDelete ? (
-                  <div className="space-y-4">
-                    <div className="p-4 bg-orange-50 border border-orange-200 rounded-xl">
-                      <div className="flex items-center gap-3 mb-2">
-                        <Shield className="text-orange-600" size={20} />
-                        <p className="font-bold text-orange-800">Suppression bloquée</p>
+                  {!canDelete && deleteBlockReason && (
+                    <div className="p-3 bg-amber-50 border border-amber-200 rounded-xl mb-4">
+                      <p className="text-sm text-amber-800 font-medium">{deleteBlockReason}</p>
+                    </div>
+                  )}
+
+                  {canDelete && (
+                    <div className="space-y-4">
+                      <div>
+                        <p className="text-sm text-slate-600 mb-2">Raison de la suppression (optionnel) :</p>
+                        <textarea
+                          value={deleteReason}
+                          onChange={(e) => setDeleteReason(e.target.value)}
+                          rows={2}
+                          className="w-full border border-slate-200 rounded-xl p-3 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-red-400 bg-white"
+                          placeholder="Dites-nous pourquoi vous partez..."
+                        />
                       </div>
-                      <p className="text-sm text-orange-700">{deleteBlockReason}</p>
-                    </div>
-                    
-                    {/* Alternative: contact support */}
-                    <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl">
-                      <p className="text-sm text-slate-600 mb-3">
-                        Besoin d'aide ? Vous pouvez nous contacter pour toute demande concernant vos données personnelles (RGPD).
-                      </p>
-                      <a
-                        href="/contact"
-                        className="w-full py-3 bg-slate-700 text-white rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-slate-800 transition"
-                      >
-                        <MessageCircle size={18} />
-                        Contacter le support
-                      </a>
-                    </div>
-                  </div>
-                ) : (
-                  <>
-                    {!showDeleteConfirm ? (
+                      <div>
+                        <p className="text-sm text-slate-600 mb-2">Tapez <strong>SUPPRIMER</strong> pour confirmer :</p>
+                        <input
+                          type="text"
+                          value={deleteConfirmText}
+                          onChange={(e) => setDeleteConfirmText(e.target.value)}
+                          className="w-full border border-red-200 rounded-xl p-3 text-sm focus:outline-none focus:ring-2 focus:ring-red-400 bg-white"
+                          placeholder="SUPPRIMER"
+                          data-testid="delete-confirm-input"
+                        />
+                      </div>
                       <button
-                        onClick={() => setShowDeleteConfirm(true)}
-                        className="w-full py-4 bg-red-500 text-white rounded-xl font-bold hover:bg-red-600 transition flex items-center justify-center gap-2"
+                        onClick={handleDeleteAccount}
+                        disabled={deleteConfirmText !== 'SUPPRIMER'}
+                        className="w-full py-3.5 bg-red-500 text-white rounded-xl font-bold hover:bg-red-600 transition flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                        data-testid="delete-account-btn"
                       >
-                        <Trash2 size={20} />
-                        Supprimer mon compte
+                        <Trash2 size={18} />
+                        Supprimer definitivement mon compte
                       </button>
-                    ) : (
-                      <div className="space-y-4">
-                        <div>
-                          <label className="block text-sm font-bold text-slate-700 mb-2">
-                            Pourquoi souhaitez-vous partir ? (optionnel)
-                          </label>
-                          <textarea
-                            value={deleteReason}
-                            onChange={(e) => setDeleteReason(e.target.value)}
-                            placeholder="Aidez-nous à nous améliorer..."
-                            className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 h-24 resize-none text-slate-900 placeholder:text-slate-400"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-sm font-bold text-slate-700 mb-2">
-                            Tapez <span className="text-red-600">SUPPRIMER</span> pour confirmer
-                          </label>
-                          <input
-                            type="text"
-                            value={deleteConfirmText}
-                            onChange={(e) => setDeleteConfirmText(e.target.value)}
-                            placeholder="SUPPRIMER"
-                            className="w-full px-4 py-3 bg-white border border-red-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 text-slate-900 placeholder:text-slate-400"
-                          />
-                        </div>
-                        <div className="flex gap-3">
-                          <button
-                            onClick={() => {
-                              setShowDeleteConfirm(false);
-                              setDeleteConfirmText('');
-                            }}
-                            className="flex-1 py-3 bg-slate-100 text-slate-700 rounded-xl font-bold hover:bg-slate-200 transition"
-                          >
-                            Annuler
-                          </button>
-                          <button
-                            onClick={handleDeleteAccount}
-                            disabled={deleteConfirmText !== 'SUPPRIMER'}
-                            className="flex-1 py-3 bg-red-500 text-white rounded-xl font-bold hover:bg-red-600 transition disabled:opacity-50 disabled:cursor-not-allowed"
-                          >
-                            Confirmer
-                          </button>
-                        </div>
-                      </div>
-                    )}
-                  </>
-                )}
+                    </div>
+                  )}
+
+                  {!canDelete && (
+                    <a 
+                      href="mailto:contact@kilolab.fr?subject=Demande%20de%20suppression%20de%20compte"
+                      className="block w-full py-3.5 border-2 border-red-300 text-red-500 rounded-xl font-bold text-center hover:bg-red-50 transition"
+                    >
+                      Contacter le support pour suppression
+                    </a>
+                  )}
+                </div>
               </div>
             )}
+
           </div>
         </div>
       </div>

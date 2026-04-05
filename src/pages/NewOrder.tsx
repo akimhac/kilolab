@@ -181,7 +181,7 @@ export default function NewOrder() {
   };
 
   // Recherche locale dans les washers avec validation d'adresse
-  const handleSearchLocally = () => {
+  const handleSearchLocally = async () => {
     const query = searchQuery.trim();
     
     if (!query) {
@@ -189,57 +189,73 @@ export default function NewOrder() {
       return;
     }
 
-    // Validation basique : au moins 2 caractères et pas que des caractères spéciaux
     const isValidInput = /^[a-zA-ZÀ-ÿ0-9\s-]{2,}$/.test(query);
     if (!isValidInput) {
       toast.error("Veuillez entrer une ville ou un code postal valide");
       return;
     }
 
-    // Vérifier si c'est un code postal français (5 chiffres)
-    const isPostalCode = /^\d{5}$/.test(query);
-    const isPartialPostal = /^\d{2,4}$/.test(query);
-    
-    // Si ce n'est pas un code postal, vérifier que ça ressemble à une ville (au moins 2 lettres)
-    const looksLikeCity = /[a-zA-ZÀ-ÿ]{2,}/.test(query);
-    
-    if (!isPostalCode && !isPartialPostal && !looksLikeCity) {
-      toast.error("Format invalide. Essayez : 75001 ou Paris");
-      return;
-    }
-
     setIsSearching(true);
     setSearchDone(false);
 
-    setTimeout(() => {
-      const searchLower = query.toLowerCase();
+    try {
+      // Validate via French Address API (municipalities)
+      const frRes = await fetch(`https://api-adresse.data.gouv.fr/search/?q=${encodeURIComponent(query)}&limit=1&type=municipality`);
+      const frData = await frRes.json();
+      let frCity = frData.features?.[0];
 
-      // Matching amélioré (ville, CP, département)
+      // If not found as municipality, try general search
+      if (!frCity) {
+        const frRes2 = await fetch(`https://api-adresse.data.gouv.fr/search/?q=${encodeURIComponent(query)}&limit=1`);
+        const frData2 = await frRes2.json();
+        frCity = frData2.features?.[0];
+      }
+
+      // Validate via Belgian API (Nominatim) if not found in France
+      let beCity = null;
+      if (!frCity) {
+        try {
+          const beRes = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&countrycodes=be&limit=1`, { headers: { 'Accept-Language': 'fr' } });
+          const beData = await beRes.json();
+          beCity = beData[0];
+        } catch { /* ignore */ }
+      }
+
+      if (!frCity && !beCity) {
+        toast.error("Ville ou code postal introuvable en France/Belgique");
+        setIsSearching(false);
+        return;
+      }
+
+      // Valid city found
+      const validCityName = frCity?.properties?.city || frCity?.properties?.label?.split(',')[0] || beCity?.display_name?.split(',')?.[0] || query;
+      const validPostcode = frCity?.properties?.postcode || '';
+
+      const searchLower = validCityName.toLowerCase();
       const results = allWashers.filter((w) => {
         const cityMatch = String(w.city || "").toLowerCase().includes(searchLower);
-        const postalMatch = String(w.postal_code || "").includes(query);
-
-        const userDept = query.length >= 2 ? query.substring(0, 2) : "";
+        const postalMatch = validPostcode && String(w.postal_code || "").includes(validPostcode);
+        const userDept = validPostcode.length >= 2 ? validPostcode.substring(0, 2) : "";
         const washerDept = String(w.postal_code || "").substring(0, 2);
         const deptMatch = userDept && washerDept === userDept;
-
         return cityMatch || postalMatch || deptMatch;
       });
 
       setFilteredWashers(results);
-      setIsSearching(false);
       setSearchDone(true);
 
       if (results.length > 0) {
         setSelectedWasherId(results[0].id);
-        toast.success(`✅ ${results.length} Washer(s) trouvé(s) !`);
+        toast.success(`${results.length} Washer(s) disponible(s) !`);
       } else {
         setSelectedWasherId("waiting_list");
-        toast.success("✅ Zone prise en charge par Kilolab !", {
-          duration: 4000,
-        });
+        toast.success("Zone prise en charge par Kilolab !", { duration: 4000 });
       }
-    }, 900);
+    } catch {
+      toast.error("Erreur de verification. Reessayez.");
+    } finally {
+      setIsSearching(false);
+    }
   };
 
   useEffect(() => {
@@ -882,7 +898,7 @@ export default function NewOrder() {
                   ← Retour
                 </button>
                 <button
-                  disabled={!finalAddress || !pickupDate || !pickupSlot}
+                  disabled={!finalAddress || !addressValidated || !pickupDate || !pickupSlot}
                   onClick={() => setStep(4)}
                   className="px-8 py-4 bg-teal-600 text-white rounded-xl font-bold hover:bg-teal-500 transition shadow-lg flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                 >

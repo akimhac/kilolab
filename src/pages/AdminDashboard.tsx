@@ -109,6 +109,9 @@ export default function AdminDashboard() {
   const [showOrderModal, setShowOrderModal] = useState(false);
   const [assigningWasher, setAssigningWasher] = useState(false);
   const [cancelMessage, setCancelMessage] = useState("");
+  const [selectedClient, setSelectedClient] = useState<any>(null);
+  const [showClientModal, setShowClientModal] = useState(false);
+  const [clientMessage, setClientMessage] = useState('');
   const [sendingEmail, setSendingEmail] = useState(false);
   const [loading, setLoading] = useState(true);
 
@@ -1793,7 +1796,8 @@ export default function AdminDashboard() {
                 {/* Mobile: Cards */}
                 <div className="md:hidden space-y-3">
                   {clients.map((client) => (
-                    <div key={client.id} className="bg-white/5 border border-white/10 rounded-2xl p-4">
+                    <div key={client.id} className="bg-white/5 border border-white/10 rounded-2xl p-4 cursor-pointer hover:bg-white/10 transition"
+                      onClick={() => { setSelectedClient(client); setShowClientModal(true); setClientMessage(''); }}>
                       <div className="flex items-center gap-3 mb-2">
                         <div className="w-10 h-10 bg-teal-500/20 rounded-xl flex items-center justify-center text-teal-400 font-bold text-sm flex-shrink-0">
                           {(client.full_name || client.email)?.[0]?.toUpperCase()}
@@ -1823,7 +1827,8 @@ export default function AdminDashboard() {
                   </thead>
                   <tbody>
                     {clients.map((client) => (
-                      <tr key={client.id} className="border-b border-white/5 hover:bg-white/5 transition">
+                      <tr key={client.id} className="border-b border-white/5 hover:bg-white/5 transition cursor-pointer"
+                        onClick={() => { setSelectedClient(client); setShowClientModal(true); setClientMessage(''); }}>
                         <td className="p-4 font-bold text-white">
                           {client.full_name || client.email}
                         </td>
@@ -2622,7 +2627,7 @@ export default function AdminDashboard() {
               <div className="space-y-6">
                 <div className="bg-white/5 p-6 rounded-2xl border border-white/10">
                   <h3 className="text-lg font-bold mb-4 flex items-center gap-2 text-white">
-                    <Calendar size={18} className="text-teal-400" /> Inscription
+                    <Calendar size={18} className="text-teal-400" /> Inscription & Documents
                   </h3>
                   <div className="space-y-3">
                     <div className="flex justify-between">
@@ -2635,12 +2640,88 @@ export default function AdminDashboard() {
                         })}
                       </span>
                     </div>
+                    <div className="flex justify-between">
+                      <span className="text-slate-400">Disponible</span>
+                      <span className={`font-bold ${selectedWasher.is_available ? 'text-emerald-400' : 'text-red-400'}`}>
+                        {selectedWasher.is_available ? 'Oui' : 'Non'}
+                      </span>
+                    </div>
+                    {selectedWasher.avg_rating > 0 && (
+                      <div className="flex justify-between">
+                        <span className="text-slate-400">Note moyenne</span>
+                        <span className="font-medium text-yellow-400">{selectedWasher.avg_rating?.toFixed(1)} / 5 ({selectedWasher.total_ratings} avis)</span>
+                      </div>
+                    )}
                   </div>
+                </div>
+
+                {/* Documents / Pieces jointes */}
+                <div className="bg-white/5 p-6 rounded-2xl border border-white/10">
+                  <h3 className="text-lg font-bold mb-4 flex items-center gap-2 text-white">
+                    <FileText size={18} className="text-violet-400" /> Documents
+                  </h3>
+                  {selectedWasher.identity_document_url || selectedWasher.id_document_url || selectedWasher.document_url ? (
+                    <div className="space-y-2">
+                      {[selectedWasher.identity_document_url, selectedWasher.id_document_url, selectedWasher.document_url].filter(Boolean).map((url: string, idx: number) => (
+                        <a key={idx} href={url} target="_blank" rel="noopener noreferrer" 
+                          className="flex items-center gap-2 text-teal-400 hover:text-teal-300 text-sm font-medium">
+                          <FileText size={14} /> Document {idx + 1} ↗
+                        </a>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-slate-500 text-sm">Aucun document joint</p>
+                  )}
+                </div>
+
+                {/* Commandes du washer */}
+                <div className="bg-white/5 p-6 rounded-2xl border border-white/10">
+                  <h3 className="text-lg font-bold mb-4 flex items-center gap-2 text-white">
+                    <ShoppingBag size={18} className="text-blue-400" /> Commandes
+                  </h3>
+                  {(() => {
+                    const washerOrders = orders.filter((o: any) => o.washer_id === selectedWasher.id);
+                    if (washerOrders.length === 0) return <p className="text-slate-500 text-sm">Aucune commande</p>;
+                    return (
+                      <div className="space-y-2 max-h-48 overflow-y-auto">
+                        {washerOrders.slice(0, 10).map((o: any) => (
+                          <div key={o.id} className="flex items-center justify-between p-2 bg-white/5 rounded-lg text-sm">
+                            <span className="text-teal-400 font-mono">#{o.id.slice(0,6)}</span>
+                            <span className={`px-2 py-0.5 rounded-full text-xs font-bold ${
+                              o.status === 'completed' ? 'bg-emerald-500/20 text-emerald-400' :
+                              o.status === 'cancelled' ? 'bg-red-500/20 text-red-400' : 'bg-blue-500/20 text-blue-400'
+                            }`}>{o.status}</span>
+                            <span className="text-slate-400">{o.total_price} EUR</span>
+                          </div>
+                        ))}
+                        {washerOrders.length > 10 && <p className="text-slate-500 text-xs text-center">+{washerOrders.length - 10} autres</p>}
+                      </div>
+                    );
+                  })()}
                 </div>
               </div>
             </div>
 
-            <div className="mt-8 pt-6 border-t border-white/10 flex justify-end gap-3 flex-wrap">
+            <div className="mt-8 pt-6 border-t border-white/10 flex justify-between flex-wrap gap-3">
+              {/* Delete washer button */}
+              <button
+                onClick={async () => {
+                  if (!confirm("Supprimer ce washer definitivement ?")) return;
+                  const t = toast.loading("Suppression...");
+                  try {
+                    const { error } = await supabase.from("washers").delete().eq("id", selectedWasher.id);
+                    if (error) throw error;
+                    toast.success("Washer supprime", { id: t });
+                    setShowWasherModal(false);
+                    fetchData();
+                  } catch (e: any) { toast.error("Erreur: " + e.message, { id: t }); }
+                }}
+                className="px-4 py-3 bg-red-500/20 text-red-400 border border-red-500/30 rounded-xl font-bold hover:bg-red-500/30 transition flex items-center gap-2"
+              >
+                <Trash2 size={16} /> Supprimer
+              </button>
+
+              <div className="flex gap-3 flex-wrap">
               <button
                 onClick={() => setShowWasherModal(false)}
                 className="px-6 py-3 bg-white/10 border border-white/10 rounded-xl font-bold text-white hover:bg-white/20 transition"
@@ -2679,9 +2760,138 @@ export default function AdminDashboard() {
                   onClick={() => unblockWasher(selectedWasher.id)}
                   className="px-6 py-3 bg-emerald-500 text-white rounded-xl font-bold hover:bg-emerald-600 shadow-lg shadow-emerald-500/30 transition"
                 >
-                  Débloquer ce Washer
+                  Debloquer
                 </button>
               )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODALE CLIENT - DETAILS / MESSAGE / SUPPRESSION */}
+      {showClientModal && selectedClient && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-slate-800 border border-white/10 rounded-3xl p-6 md:p-8 max-w-3xl w-full max-h-[90vh] overflow-y-auto relative shadow-2xl">
+            <button onClick={() => { setShowClientModal(false); setSelectedClient(null); setClientMessage(''); }}
+              className="absolute top-4 right-4 p-2 bg-white/10 rounded-full hover:bg-white/20 transition text-white">
+              <X size={20} />
+            </button>
+
+            <div className="flex items-center gap-4 mb-6">
+              <div className="w-14 h-14 bg-gradient-to-br from-teal-400 to-cyan-500 rounded-2xl flex items-center justify-center text-white text-xl font-bold">
+                {(selectedClient.full_name || selectedClient.email || '?')[0].toUpperCase()}
+              </div>
+              <div>
+                <h2 className="text-2xl font-black text-white">{selectedClient.full_name || 'Sans nom'}</h2>
+                <p className="text-slate-400 text-sm">{selectedClient.email}</p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+              <div className="bg-white/5 p-5 rounded-2xl border border-white/10">
+                <h3 className="font-bold text-white mb-3 flex items-center gap-2"><Users size={16} className="text-teal-400" /> Informations</h3>
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between"><span className="text-slate-400">Ville</span><span className="text-white">{selectedClient.city || '-'}</span></div>
+                  <div className="flex justify-between"><span className="text-slate-400">Telephone</span><span className="text-white">{selectedClient.phone || '-'}</span></div>
+                  <div className="flex justify-between"><span className="text-slate-400">Adresse</span><span className="text-white text-right max-w-[200px] truncate">{selectedClient.address || '-'}</span></div>
+                  <div className="flex justify-between"><span className="text-slate-400">Inscrit le</span><span className="text-white">{new Date(selectedClient.created_at).toLocaleDateString("fr-FR")}</span></div>
+                  <div className="flex justify-between"><span className="text-slate-400">Points fidelite</span><span className="text-amber-400 font-bold">{selectedClient.loyalty_points || 0} pts</span></div>
+                </div>
+              </div>
+
+              <div className="bg-white/5 p-5 rounded-2xl border border-white/10">
+                <h3 className="font-bold text-white mb-3 flex items-center gap-2"><ShoppingBag size={16} className="text-blue-400" /> Commandes</h3>
+                {(() => {
+                  const clientOrders = orders.filter((o: any) => o.client_id === selectedClient.id);
+                  if (clientOrders.length === 0) return <p className="text-slate-500 text-sm">Aucune commande</p>;
+                  return (
+                    <div className="space-y-2 max-h-48 overflow-y-auto">
+                      {clientOrders.map((o: any) => (
+                        <div key={o.id} className="flex items-center justify-between p-2 bg-white/5 rounded-lg text-sm cursor-pointer hover:bg-white/10 transition"
+                          onClick={() => { setSelectedOrder(o); setCancelMessage(''); setShowOrderModal(true); setShowClientModal(false); }}>
+                          <span className="text-teal-400 font-mono">#{o.id.slice(0,6)}</span>
+                          <span className={`px-2 py-0.5 rounded-full text-xs font-bold ${
+                            o.status === 'completed' ? 'bg-emerald-500/20 text-emerald-400' :
+                            o.status === 'cancelled' ? 'bg-red-500/20 text-red-400' :
+                            o.status === 'refunded' ? 'bg-orange-500/20 text-orange-400' : 'bg-blue-500/20 text-blue-400'
+                          }`}>{o.status}</span>
+                          <span className="text-slate-400">{o.total_price || '?'} EUR</span>
+                        </div>
+                      ))}
+                    </div>
+                  );
+                })()}
+              </div>
+            </div>
+
+            {/* Send message to client */}
+            <div className="bg-white/5 p-5 rounded-2xl border border-white/10 mb-6">
+              <h3 className="font-bold text-white mb-3 flex items-center gap-2"><Mail size={16} className="text-purple-400" /> Envoyer un message</h3>
+              <textarea
+                value={clientMessage}
+                onChange={(e) => setClientMessage(e.target.value)}
+                rows={3}
+                className="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-white text-sm resize-none focus:outline-none focus:ring-2 focus:ring-teal-500 mb-3"
+                placeholder="Ecrivez votre message au client..."
+              />
+              <button
+                onClick={async () => {
+                  if (!clientMessage.trim()) { toast.error("Ecrivez un message"); return; }
+                  setSendingEmail(true);
+                  const t = toast.loading("Envoi...");
+                  try {
+                    await fetch(`${window.location.origin}/api/send-email`, {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({
+                        to: selectedClient.email,
+                        subject: 'Message de Kilolab',
+                        html: `<div style="font-family:Arial;max-width:600px;margin:0 auto;padding:20px;">
+                          <div style="background:linear-gradient(135deg,#14b8a6,#06b6d4);padding:20px;border-radius:16px 16px 0 0;text-align:center;">
+                            <h1 style="color:white;margin:0;font-size:20px;">Message de Kilolab</h1>
+                          </div>
+                          <div style="background:white;padding:25px;border-radius:0 0 16px 16px;box-shadow:0 4px 6px rgba(0,0,0,.1);">
+                            <p style="color:#334155;font-size:16px;line-height:1.6;">${clientMessage.replace(/\n/g, '<br/>')}</p>
+                            <p style="color:#94a3b8;font-size:12px;margin-top:20px;text-align:center;">Kilolab - Le pressing au kilo</p>
+                          </div>
+                        </div>`,
+                        type: 'admin_message'
+                      })
+                    });
+                    toast.success("Message envoye !", { id: t });
+                    setClientMessage('');
+                  } catch (e: any) { toast.error("Erreur: " + e.message, { id: t }); }
+                  finally { setSendingEmail(false); }
+                }}
+                disabled={sendingEmail || !clientMessage.trim()}
+                className="w-full py-3 bg-teal-500 text-white rounded-xl font-bold hover:bg-teal-600 transition disabled:opacity-50 flex items-center justify-center gap-2"
+              >
+                <Mail size={16} /> Envoyer
+              </button>
+            </div>
+
+            <div className="flex justify-between flex-wrap gap-3">
+              <button
+                onClick={async () => {
+                  if (!confirm("Supprimer ce client definitivement ?")) return;
+                  const t = toast.loading("Suppression...");
+                  try {
+                    const { error } = await supabase.from("user_profiles").delete().eq("id", selectedClient.id);
+                    if (error) throw error;
+                    toast.success("Client supprime", { id: t });
+                    setShowClientModal(false);
+                    fetchData();
+                  } catch (e: any) { toast.error("Erreur: " + e.message, { id: t }); }
+                }}
+                className="px-4 py-3 bg-red-500/20 text-red-400 border border-red-500/30 rounded-xl font-bold hover:bg-red-500/30 transition flex items-center gap-2"
+              >
+                <Trash2 size={16} /> Supprimer
+              </button>
+              <button onClick={() => { setShowClientModal(false); setSelectedClient(null); }}
+                className="px-6 py-3 bg-white/10 border border-white/10 rounded-xl font-bold text-white hover:bg-white/20 transition">
+                Fermer
+              </button>
             </div>
           </div>
         </div>

@@ -375,9 +375,9 @@ export default function WasherDashboard() {
     try {
       setRefreshing(true);
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) { toast.error("Non authentifie"); setLoading(false); return; }
-      const { data: wp, error: we } = await supabase.from("washers").select("*").eq("user_id", user.id).single();
-      if (we || !wp) { toast.error("Profil Washer introuvable"); setLoading(false); return; }
+      if (!user) { toast.error(t('washerDashboard.notAuthenticated')); setLoading(false); fetchLockRef.current = false; return; }
+      const { data: wp, error: we } = await supabase.from("washers").select("*").eq("user_id", user.id).maybeSingle();
+      if (we || !wp) { toast.error(t('washerDashboard.washerNotFound')); setLoading(false); fetchLockRef.current = false; return; }
       setWasherId(wp.id); setWasherStatus((wp.status||"pending") as WasherStatus);
       setIsAvailable(wp.is_available??true); setWasherData(wp);
       if (wp.fcm_token) { setFcmToken(wp.fcm_token); setNotificationsEnabled(true); }

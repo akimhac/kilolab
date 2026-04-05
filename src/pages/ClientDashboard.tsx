@@ -450,7 +450,7 @@ export default function ClientDashboard() {
       // Attempt 1: Query with left join on washers
       const { data: ordersWithJoin, error: joinError } = await supabase
         .from('orders')
-        .select('*, washer:washers(id, first_name, last_name, avatar_url, avg_rating, total_ratings, phone)')
+        .select('*, washer:washers(id, first_name, last_name, avg_rating, total_ratings, phone)')
         .eq('client_id', user.id)
         .order('created_at', { ascending: false });
       
@@ -473,7 +473,7 @@ export default function ClientDashboard() {
           if (washerIds.length > 0) {
             const { data: washers } = await supabase
               .from('washers')
-              .select('id, first_name, last_name, avatar_url, avg_rating, total_ratings, phone')
+              .select('id, first_name, last_name, avg_rating, total_ratings, phone')
               .in('id', washerIds);
             
             if (washers) {
