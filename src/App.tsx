@@ -62,6 +62,7 @@ const Profile = lazy(() => import('./pages/Profile'));
 const AccountSettings = lazy(() => import('./pages/AccountSettings'));
 const PickupQR = lazy(() => import('./pages/PickupQR'));
 const Invoice = lazy(() => import('./pages/Invoice'));
+const Subscription = lazy(() => import('./pages/Subscription'));
 const NotFound = lazy(() => import('./pages/NotFound'));
 const WasherGPSNavigation = lazy(() => import('./components/WasherGPSNavigation'));
 const LiveStatus = lazy(() => import('./pages/LiveStatus'));
@@ -218,6 +219,14 @@ export default function App() {
             element={
               <PrivateRoute>
                 <Invoice />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/subscription"
+            element={
+              <PrivateRoute>
+                <Subscription />
               </PrivateRoute>
             }
           />

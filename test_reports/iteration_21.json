@@ -1,0 +1,132 @@
+{
+  "summary": "Frontend testing of new subscription page and admin distance sorting features. All 8 requested features verified: 1) /subscription route exists and redirects to login when not authenticated (expected), 2) Landing page loads correctly, 3) App.tsx has Subscription route inside PrivateRoute (lines 225-231), 4) ClientDashboard subscription button points to /subscription (line 936), 5) AdminDashboard has haversine distance functions (lines 87-110), 6) AdminDashboard smart assign shows washers sorted by distance with km labels (lines 3001-3044), 7) No 'voisin' word found in any .tsx/.ts files, 8) Subscription.tsx has 4-step form with AddressAutocomplete and data-testid attributes.",
+
+  "backend_issues": {
+    "critical": [],
+    "minor": [
+      {"endpoint": "Supabase API", "issue": "Returns 403 in preview env - Supabase API key may be invalid (expected per agent context)"}
+    ]
+  },
+
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+
+  "passed_tests": [
+    "Landing page loads on desktop (1920x1080) with French content",
+    "/subscription route exists and redirects to /select-dashboard when not authenticated (expected behavior)",
+    "404 page works for non-existent routes",
+    "App.tsx has Subscription lazy import (line 65) and route inside PrivateRoute (lines 225-231)",
+    "ClientDashboard.tsx subscription button points to /subscription (line 936)",
+    "AdminDashboard.tsx has haversineKm function (lines 87-93)",
+    "AdminDashboard.tsx has getWashersSortedByDistance function (lines 95-111)",
+    "AdminDashboard.tsx smart assign section shows washers sorted by distance with km labels (lines 3001-3044)",
+    "No occurrences of 'voisin' or 'voisins' in any .tsx/.ts files in /app/src/",
+    "Subscription.tsx has 4-step form (step state, PLANS, DAYS, SLOTS)",
+    "Subscription.tsx uses AddressAutocomplete component (line 349)",
+    "Subscription.tsx has proper data-testid attributes (subscription-form, plan-*, formula-*, day-*, slot-*, next-step-btn, prev-step-btn, submit-subscription-btn)"
+  ],
+
+  "code_verification": {
+    "subscription_route": {
+      "file": "/app/src/App.tsx",
+      "status": "VERIFIED",
+      "details": "Line 65: lazy import, Lines 225-231: Route inside PrivateRoute"
+    },
+    "client_dashboard_subscription_button": {
+      "file": "/app/src/pages/ClientDashboard.tsx",
+      "status": "VERIFIED",
+      "details": "Line 936: onClick={() => window.location.href = '/subscription'"
+    },
+    "admin_haversine_functions": {
+      "file": "/app/src/pages/AdminDashboard.tsx",
+      "status": "VERIFIED",
+      "details": "Lines 87-93: haversineKm function, Lines 95-111: getWashersSortedByDistance function"
+    },
+    "admin_smart_assign_ui": {
+      "file": "/app/src/pages/AdminDashboard.tsx",
+      "status": "VERIFIED",
+      "details": "Lines 3001-3044: Smart assign section with distance sorting, km labels, color coding (<5km green, <15km amber, >15km red)"
+    },
+    "no_voisin_word": {
+      "status": "VERIFIED",
+      "details": "grep -rn 'voisin' /app/src/ --include='*.tsx' --include='*.ts' returned no results"
+    },
+    "subscription_page_structure": {
+      "file": "/app/src/pages/Subscription.tsx",
+      "status": "VERIFIED",
+      "details": "4-step form (step 1: plan, step 2: weight/formula, step 3: schedule, step 4: address/confirm), AddressAutocomplete integration, proper data-testid attributes"
+    }
+  },
+
+  "test_report_links": [
+    "/app/test_reports/iteration_21.json"
+  ],
+
+  "action_items": [],
+
+  "critical_code_review_comments": [
+    "Good: Subscription.tsx has proper 4-step wizard with clear progression",
+    "Good: AddressAutocomplete integration validates addresses before submission",
+    "Good: haversineKm uses standard Haversine formula for accurate distance calculation",
+    "Good: getWashersSortedByDistance handles null coordinates gracefully",
+    "Good: Smart assign UI shows distance with color coding for quick visual assessment",
+    "Good: All interactive elements have data-testid attributes for testing"
+  ],
+
+  "updated_files": [],
+
+  "success_rate": {
+    "backend": "N/A - Supabase API key invalid in preview env",
+    "frontend": "100% - All 8 features verified"
+  },
+
+  "test_credentials": "No credentials needed - tested public pages and code verification",
+  "seed_data_creation": "None",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+
+  "context_for_next_testing_agent": "New features verified: 1) /subscription page with 4-step form and AddressAutocomplete, 2) AdminDashboard haversine distance sorting for washer assignment, 3) ClientDashboard subscription button updated to /subscription, 4) No 'voisin' word in codebase. Cannot test authenticated flows due to invalid Supabase API key in preview env.",
+
+  "screenshots_taken": [
+    ".screenshots/landing_page_test.png - Landing page on desktop (1920x1080)",
+    ".screenshots/subscription_route_test.png - /subscription redirects to /select-dashboard (expected)"
+  ],
+
+  "feature_verification": {
+    "subscription_route": {
+      "status": "PASS",
+      "details": "Route exists, redirects to login when not authenticated"
+    },
+    "landing_page": {
+      "status": "PASS",
+      "details": "Loads correctly with French content"
+    },
+    "app_tsx_subscription_route": {
+      "status": "PASS",
+      "details": "Lines 65, 225-231 - lazy import and PrivateRoute wrapper"
+    },
+    "client_dashboard_button": {
+      "status": "PASS",
+      "details": "Line 936 points to /subscription"
+    },
+    "admin_haversine_functions": {
+      "status": "PASS",
+      "details": "Lines 87-110 - haversineKm and getWashersSortedByDistance"
+    },
+    "admin_smart_assign_ui": {
+      "status": "PASS",
+      "details": "Lines 3001-3044 - distance sorting with km labels"
+    },
+    "no_voisin_word": {
+      "status": "PASS",
+      "details": "grep found no occurrences"
+    },
+    "subscription_page_structure": {
+      "status": "PASS",
+      "details": "4-step form, AddressAutocomplete, data-testid attributes"
+    }
+  }
+}

@@ -83,6 +83,33 @@ interface B2BPartner {
   created_at: string;
 }
 
+// Haversine distance (km) between two GPS points
+function haversineKm(lat1: number, lon1: number, lat2: number, lon2: number): number {
+  const R = 6371;
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLon = (lon2 - lon1) * Math.PI / 180;
+  const a = Math.sin(dLat / 2) ** 2 + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon / 2) ** 2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+
+function getWashersSortedByDistance(washersArr: any[], orderLat: number | null, orderLng: number | null, excludeId?: string) {
+  const approved = washersArr.filter(w => w.status === 'approved' && (!excludeId || w.id !== excludeId));
+  if (!orderLat || !orderLng) {
+    return approved.map(w => ({ ...w, _distance: null }));
+  }
+  return approved
+    .map(w => ({
+      ...w,
+      _distance: (w.lat && w.lng) ? haversineKm(orderLat, orderLng, w.lat, w.lng) : null,
+    }))
+    .sort((a, b) => {
+      if (a._distance === null && b._distance === null) return 0;
+      if (a._distance === null) return 1;
+      if (b._distance === null) return -1;
+      return a._distance - b._distance;
+    });
+}
+
 export default function AdminDashboard() {
   // --- ÉTATS ---
   const [orders, setOrders] = useState<any[]>([]);
@@ -2971,28 +2998,50 @@ export default function AdminDashboard() {
               </div>
             </div>
 
-            {/* Assign / Reassign Washer Section */}
+            {/* Smart Assign Washer Section - Sorted by distance */}
             {selectedOrder.status !== "cancelled" && selectedOrder.status !== "completed" && !selectedOrder.washer_id && (
               <div className="mb-6 p-4 bg-teal-500/10 border border-teal-500/30 rounded-xl">
-                <p className="text-sm font-bold mb-3 text-teal-400 flex items-center gap-2">
-                  <Users size={16} /> Assigner un Washer
+                <p className="text-sm font-bold mb-1 text-teal-400 flex items-center gap-2">
+                  <MapPin size={16} /> Assigner un Washer (tri par proximité)
                 </p>
-                <select
-                  onChange={(e) => {
-                    if (e.target.value) {
-                      assignWasherToOrder(selectedOrder.id, e.target.value);
-                    }
-                  }}
-                  disabled={assigningWasher}
-                  className="w-full p-3 bg-white/10 border border-white/20 rounded-xl text-white focus:border-teal-500 focus:outline-none"
-                >
-                  <option value="" className="bg-slate-800">-- Sélectionner un Washer --</option>
-                  {washers.filter(w => w.status === 'approved').map((w) => (
-                    <option key={w.id} value={w.id} className="bg-slate-800">
-                      {w.full_name} - {w.city || 'Ville ?'} ({w.postal_code || '?'})
-                    </option>
+                <p className="text-xs text-slate-400 mb-3">
+                  {selectedOrder.pickup_lat && selectedOrder.pickup_lng
+                    ? "Les washers les plus proches apparaissent en premier"
+                    : "Coordonnées GPS de la commande indisponibles — tri par nom"}
+                </p>
+                <div className="max-h-60 overflow-y-auto space-y-2 custom-scrollbar" data-testid="smart-assign-list">
+                  {getWashersSortedByDistance(washers, selectedOrder.pickup_lat, selectedOrder.pickup_lng).map((w, idx) => (
+                    <button
+                      key={w.id}
+                      onClick={() => assignWasherToOrder(selectedOrder.id, w.id)}
+                      disabled={assigningWasher}
+                      className="w-full flex items-center justify-between p-3 bg-white/5 hover:bg-teal-500/20 border border-white/10 hover:border-teal-500/40 rounded-xl transition-all text-left group"
+                      data-testid={`assign-washer-${w.id}`}
+                    >
+                      <div className="flex items-center gap-3 min-w-0">
+                        {idx === 0 && w._distance !== null && (
+                          <span className="flex-shrink-0 px-1.5 py-0.5 bg-emerald-500/30 text-emerald-400 text-[10px] font-black rounded-md">TOP</span>
+                        )}
+                        <div className="min-w-0">
+                          <p className="font-bold text-white text-sm truncate">{w.full_name || 'Sans nom'}</p>
+                          <p className="text-xs text-slate-400 truncate">{w.city || '?'} ({w.postal_code || '?'})</p>
+                        </div>
+                      </div>
+                      <div className="flex-shrink-0 text-right">
+                        {w._distance !== null ? (
+                          <span className={`text-sm font-black ${w._distance < 5 ? 'text-emerald-400' : w._distance < 15 ? 'text-amber-400' : 'text-red-400'}`}>
+                            {w._distance < 1 ? `${Math.round(w._distance * 1000)}m` : `${w._distance.toFixed(1)} km`}
+                          </span>
+                        ) : (
+                          <span className="text-xs text-slate-500">? km</span>
+                        )}
+                      </div>
+                    </button>
                   ))}
-                </select>
+                  {getWashersSortedByDistance(washers, selectedOrder.pickup_lat, selectedOrder.pickup_lng).length === 0 && (
+                    <p className="text-slate-500 text-sm text-center py-2">Aucun washer approuvé disponible</p>
+                  )}
+                </div>
                 {assigningWasher && (
                   <div className="flex items-center gap-2 mt-2 text-teal-400 text-sm">
                     <Loader2 className="animate-spin" size={14} />
@@ -3009,30 +3058,42 @@ export default function AdminDashboard() {
                 </p>
                 <p className="text-white font-medium">
                   {washers.find(w => w.id === selectedOrder.washer_id)?.full_name || 'Washer ID: ' + selectedOrder.washer_id.slice(0,8)}
+                  {(() => {
+                    const aw = washers.find(w => w.id === selectedOrder.washer_id);
+                    if (aw?.lat && aw?.lng && selectedOrder.pickup_lat && selectedOrder.pickup_lng) {
+                      const d = haversineKm(selectedOrder.pickup_lat, selectedOrder.pickup_lng, aw.lat, aw.lng);
+                      return <span className="ml-2 text-xs text-emerald-400/70">({d < 1 ? `${Math.round(d * 1000)}m` : `${d.toFixed(1)} km`})</span>;
+                    }
+                    return null;
+                  })()}
                 </p>
                 {selectedOrder.status !== "cancelled" && selectedOrder.status !== "completed" && (
-                  <div className="mt-3 flex gap-2">
-                    <select
-                      onChange={(e) => {
-                        if (e.target.value) {
-                          reassignWasher(selectedOrder.id, e.target.value);
-                        }
-                      }}
-                      disabled={assigningWasher}
-                      className="flex-1 p-2 bg-white/10 border border-white/20 rounded-lg text-white text-sm focus:border-teal-500 focus:outline-none"
-                    >
-                      <option value="" className="bg-slate-800">Réassigner...</option>
-                      {washers.filter(w => w.status === 'approved' && w.id !== selectedOrder.washer_id).map((w) => (
-                        <option key={w.id} value={w.id} className="bg-slate-800">
-                          {w.full_name} - {w.city || '?'}
-                        </option>
+                  <div className="mt-3">
+                    <p className="text-xs text-slate-400 mb-2">Réassigner (par proximité) :</p>
+                    <div className="max-h-40 overflow-y-auto space-y-1.5">
+                      {getWashersSortedByDistance(washers, selectedOrder.pickup_lat, selectedOrder.pickup_lng, selectedOrder.washer_id).map((w) => (
+                        <button
+                          key={w.id}
+                          onClick={() => reassignWasher(selectedOrder.id, w.id)}
+                          disabled={assigningWasher}
+                          className="w-full flex items-center justify-between p-2 bg-white/5 hover:bg-emerald-500/20 border border-white/10 hover:border-emerald-500/30 rounded-lg transition-all text-left text-sm"
+                        >
+                          <span className="text-white font-medium truncate">{w.full_name} - {w.city || '?'}</span>
+                          {w._distance !== null ? (
+                            <span className={`flex-shrink-0 ml-2 font-bold text-xs ${w._distance < 5 ? 'text-emerald-400' : w._distance < 15 ? 'text-amber-400' : 'text-red-400'}`}>
+                              {w._distance < 1 ? `${Math.round(w._distance * 1000)}m` : `${w._distance.toFixed(1)} km`}
+                            </span>
+                          ) : (
+                            <span className="text-xs text-slate-500">? km</span>
+                          )}
+                        </button>
                       ))}
-                    </select>
+                    </div>
                     <button
                       onClick={() => removeWasherFromOrder(selectedOrder.id)}
-                      className="px-3 py-2 bg-red-500/20 text-red-400 rounded-lg text-sm font-bold hover:bg-red-500/30 transition"
+                      className="w-full mt-2 px-3 py-2 bg-red-500/20 text-red-400 rounded-lg text-sm font-bold hover:bg-red-500/30 transition"
                     >
-                      Retirer
+                      Retirer le washer
                     </button>
                   </div>
                 )}

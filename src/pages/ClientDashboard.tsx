@@ -933,7 +933,7 @@ export default function ClientDashboard() {
                     </div>
                   </div>
                   <button 
-                    onClick={() => window.location.href = '/new-order?subscription=true'}
+                    onClick={() => window.location.href = '/subscription'}
                     className="w-full py-3 bg-white text-purple-600 rounded-2xl font-bold hover:bg-white/90 transition-all flex items-center justify-center gap-2"
                   >
                     Créer mon abonnement <ArrowRight size={16} />
