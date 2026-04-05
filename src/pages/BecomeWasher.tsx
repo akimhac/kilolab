@@ -422,7 +422,7 @@ export default function BecomeWasher() {
                   {[
                     { name: 'Marie L.', city: 'Lille', quote: "Je gagne 450€/mois en complément de mon mi-temps. C'est flexible et ça me permet de rester à la maison avec mes enfants.", stars: 5, revenue: '450€/mois' },
                     { name: 'Karim B.', city: 'Nantes', quote: "Étudiant, je fais 3-4 machines par jour entre les cours. L'app est simple et les paiements tombent chaque semaine.", stars: 5, revenue: '320€/mois' },
-                    { name: 'Sophie R.', city: 'Bordeaux', quote: "Retraitée, je cherchais une activité. Kilolab m'a permis de rencontrer des voisins et de gagner un complément de retraite.", stars: 5, revenue: '280€/mois' },
+                    { name: 'Sophie R.', city: 'Bordeaux', quote: "Retraitee, je cherchais une activite. Kilolab m'a permis de gagner un complement de retraite tout en rendant service.", stars: 5, revenue: '280€/mois' },
                   ].map((t, idx) => (
                     <AnimateOnScroll key={idx} delay={idx * 100}>
                       <div className="bg-white/[0.04] border border-white/[0.08] rounded-3xl p-8 hover:bg-white/[0.07] transition-all">
