@@ -193,7 +193,7 @@ export default function BecomeWasher() {
   return (
     <>
       <Helmet>
-        <title>Devenir Washer - Gagnez jusqu'à 600€/mois | Kilolab France</title>
+        <title>Devenir Washer - Gagnez jusqu'à 800€/mois | Kilolab France</title>
         <meta name="description" content="Rejoignez le réseau Kilolab France et générez un revenu complémentaire en lavant du linge depuis chez vous." />
         <link rel="canonical" href="https://kilolab.fr/become-washer" />
       </Helmet>
@@ -293,9 +293,9 @@ export default function BecomeWasher() {
 
                 <div className="grid md:grid-cols-3 gap-6">
                   {[
-                    { icon: <DollarSign size={28} />, title: "Revenus complémentaires", desc: "Générez jusqu'à 600\u20AC/mois. Fixez vos tarifs et augmentez votre volume à votre rythme.", gradient: 'from-teal-500 to-emerald-500', glow: 'shadow-teal-500/20' },
-                    { icon: <Home size={28} />, title: "Travaillez de chez vous", desc: "Zéro déplacement, zéro bureau. Votre salon devient votre espace de travail. Acceptez uniquement les missions qui vous conviennent.", gradient: 'from-violet-500 to-purple-500', glow: 'shadow-violet-500/20' },
-                    { icon: <ShieldCheck size={28} />, title: "Plateforme sécurisée", desc: "Paiements garantis, assurance incluse, support 7j/7. Concentrez-vous sur le lavage, on gère le reste.", gradient: 'from-orange-500 to-red-500', glow: 'shadow-orange-500/20' },
+                    { icon: <DollarSign size={28} />, title: "Revenus attractifs", desc: "Gagnez jusqu'à 800\u20AC/mois en activité partielle. Jusqu'à 60% de commission sur chaque commande, versée chaque semaine sur votre compte.", gradient: 'from-teal-500 to-emerald-500', glow: 'shadow-teal-500/20' },
+                    { icon: <Home size={28} />, title: "Liberté totale", desc: "Choisissez vos horaires, vos missions et votre rythme. Pas d'investissement initial — vous utilisez votre propre machine. Travaillez depuis chez vous.", gradient: 'from-violet-500 to-purple-500', glow: 'shadow-violet-500/20' },
+                    { icon: <ShieldCheck size={28} />, title: "Missions régulières", desc: "Les abonnés garantissent un flux constant de commandes. Application dédiée avec GPS, suivi en temps réel et notifications. Support réactif 7j/7.", gradient: 'from-orange-500 to-red-500', glow: 'shadow-orange-500/20' },
                   ].map((item, idx) => (
                     <AnimateOnScroll key={idx} delay={idx * 120}>
                       <div className={`group relative bg-white/[0.03] backdrop-blur-sm border border-white/[0.08] rounded-3xl p-8 hover:bg-white/[0.06] transition-all duration-500 hover:-translate-y-2 hover:${item.glow} hover:shadow-2xl`}>
@@ -325,10 +325,10 @@ export default function BecomeWasher() {
                   <div className="hidden md:block absolute left-1/2 top-0 bottom-0 w-px bg-gradient-to-b from-teal-500/0 via-teal-500/30 to-teal-500/0" />
 
                   {[
-                    { n: '01', title: 'Inscrivez-vous', desc: 'Formulaire en 3 minutes. Aucun frais.', icon: <Sparkles size={24} />, color: 'teal' },
-                    { n: '02', title: 'Validation express', desc: 'Notre équipe vérifie votre profil sous 24h.', icon: <Clock size={24} />, color: 'violet' },
-                    { n: '03', title: 'Recevez des missions', desc: 'Acceptez les commandes près de chez vous.', icon: <MapPin size={24} />, color: 'cyan' },
-                    { n: '04', title: 'Soyez payé', desc: 'Virement automatique chaque semaine.', icon: <DollarSign size={24} />, color: 'emerald' },
+                    { n: '01', title: 'Inscription en 5 min', desc: 'Remplissez le formulaire avec vos infos et votre zone. Aucun diplôme requis, aucun frais.', icon: <Sparkles size={24} />, color: 'teal' },
+                    { n: '02', title: 'Vérification sous 24h', desc: 'Notre équipe valide votre profil et votre identité pour garantir la confiance des clients.', icon: <Clock size={24} />, color: 'violet' },
+                    { n: '03', title: 'Recevez des missions', desc: 'Notifications de commandes dans votre zone. Collectez, lavez chez vous, et livrez propre et plié.', icon: <MapPin size={24} />, color: 'cyan' },
+                    { n: '04', title: 'Payé chaque semaine', desc: 'Jusqu\'à 60% du montant de chaque commande. Paiement direct via Stripe Connect sur votre compte.', icon: <DollarSign size={24} />, color: 'emerald' },
                   ].map((s, idx) => (
                     <AnimateOnScroll key={idx} delay={idx * 100}>
                       <div className={`flex items-center gap-6 md:gap-10 mb-8 last:mb-0 ${idx % 2 === 1 ? 'md:flex-row-reverse' : ''}`}>

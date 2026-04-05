@@ -381,6 +381,94 @@ export default function Landing() {
 
         <HowItWorks />
 
+        {/* PARCOURS CLIENT - Commercial Journey */}
+        <section className="py-24 bg-gradient-to-b from-white to-slate-50 overflow-hidden">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <AnimateOnScroll>
+              <div className="text-center mb-16">
+                <span className="inline-block px-4 py-1.5 bg-gradient-to-r from-teal-100 to-cyan-100 text-teal-700 rounded-full text-sm font-semibold mb-4">
+                  Votre parcours
+                </span>
+                <h2 className="font-heading text-3xl md:text-5xl font-bold text-slate-900 mb-4">
+                  Du canapé au linge propre,<br className="hidden sm:block" />
+                  <span className="bg-gradient-to-r from-teal-600 to-cyan-600 bg-clip-text text-transparent">en toute sérénité</span>
+                </h2>
+                <p className="text-lg text-slate-500 max-w-2xl mx-auto">Fini les heures perdues en laverie. Votre linge est collecté, lavé et livré par des professionnels certifiés.</p>
+              </div>
+            </AnimateOnScroll>
+
+            <div className="grid md:grid-cols-5 gap-4 mb-16">
+              {[
+                { step: '1', title: 'Commandez', desc: 'Choisissez votre formule, indiquez le poids et le créneau. 30 secondes suffisent.', accent: 'teal', icon: '📱' },
+                { step: '2', title: 'On collecte', desc: 'Un Washer vérifié, proche de vous, se déplace et récupère votre linge à domicile.', accent: 'violet', icon: '🚪' },
+                { step: '3', title: 'Suivi live', desc: 'Suivez chaque étape en temps réel : collecte, lavage, séchage, pliage, livraison.', accent: 'cyan', icon: '📍' },
+                { step: '4', title: 'Livraison', desc: 'Votre linge revient propre, plié et parfumé. Express 24h ou Standard 48h.', accent: 'emerald', icon: '✨' },
+                { step: '5', title: 'Abonnement', desc: 'Programmez vos lavages et économisez jusqu\'à 15%. Sans engagement.', accent: 'purple', icon: '🔄' },
+              ].map((item, idx) => (
+                <AnimateOnScroll key={idx} delay={idx * 80}>
+                  <div className="relative group">
+                    {idx < 4 && <div className="hidden md:block absolute top-10 right-0 translate-x-1/2 w-full h-px bg-gradient-to-r from-slate-200 to-transparent z-0" />}
+                    <div className="relative bg-white rounded-2xl p-5 border border-slate-100 shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1 z-10">
+                      <div className="text-3xl mb-3">{item.icon}</div>
+                      <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-black mb-2 bg-${item.accent}-100 text-${item.accent}-700`}>
+                        Étape {item.step}
+                      </div>
+                      <h3 className="font-bold text-slate-900 text-lg mb-2">{item.title}</h3>
+                      <p className="text-slate-500 text-sm leading-relaxed">{item.desc}</p>
+                    </div>
+                  </div>
+                </AnimateOnScroll>
+              ))}
+            </div>
+
+            {/* Client advantages */}
+            <AnimateOnScroll delay={300}>
+              <div className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-3xl p-8 md:p-10 relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-64 h-64 bg-teal-500/10 rounded-full blur-3xl" />
+                <div className="relative grid md:grid-cols-2 gap-8 items-center">
+                  <div>
+                    <h3 className="text-2xl font-bold text-white mb-6">Pourquoi nos clients adorent Kilolab</h3>
+                    <div className="space-y-3">
+                      {[
+                        { text: '4h+ économisées par semaine', highlight: true },
+                        { text: 'Qualité professionnelle dès 3€/kg', highlight: false },
+                        { text: 'Paiement sécurisé Stripe', highlight: false },
+                        { text: 'Facturation et historique complets', highlight: false },
+                        { text: 'Programme fidélité et parrainage', highlight: false },
+                        { text: 'Disponible partout en France', highlight: true },
+                      ].map((item, i) => (
+                        <div key={i} className="flex items-center gap-3">
+                          <div className={`w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 ${item.highlight ? 'bg-teal-500' : 'bg-white/20'}`}>
+                            <Check size={14} className="text-white" />
+                          </div>
+                          <span className={`${item.highlight ? 'text-white font-semibold' : 'text-slate-300'}`}>{item.text}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="text-center">
+                    <div className="inline-block bg-gradient-to-br from-teal-500/20 to-cyan-500/20 backdrop-blur-sm rounded-3xl p-8 border border-teal-500/30">
+                      <p className="text-teal-400 font-semibold mb-2">Abonnement récurrent</p>
+                      <div className="flex items-baseline justify-center gap-1">
+                        <span className="text-5xl font-black text-white">-15%</span>
+                      </div>
+                      <p className="text-slate-400 text-sm mt-2">sur chaque commande hebdo</p>
+                      <Link
+                        to="/new-order"
+                        data-testid="journey-cta-btn"
+                        className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-teal-500 to-cyan-500 text-white rounded-xl font-bold mt-6 hover:shadow-xl hover:shadow-teal-500/30 transition-all hover:scale-105"
+                      >
+                        Commander maintenant
+                        <ArrowRight size={18} />
+                      </Link>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </AnimateOnScroll>
+          </div>
+        </section>
+
         {/* OUR STORY */}
         <section className="bg-white py-24 px-4 overflow-hidden border-t border-slate-100">
           <div className="max-w-7xl mx-auto">
