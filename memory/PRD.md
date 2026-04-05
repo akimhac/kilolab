@@ -10,6 +10,16 @@ Le 1er service de laverie a domicile en France et Belgique.
 - Paiements: Stripe | Emails: Resend | Push: Firebase
 - i18n: react-i18next (FR/EN) | Maps: React-Leaflet
 
+## Sprint 20 - Abonnement + Assignation Smart (05/04/2026)
+- [x] Page Abonnement dédiée (/subscription) - Formulaire 4 étapes avec AddressAutocomplete
+- [x] Bouton "Créer mon abonnement" redirige vers /subscription (ClientDashboard)
+- [x] Algorithme d'assignation intelligent par distance (Haversine) dans AdminDashboard
+- [x] Washers triés par proximité GPS (vert <5km, orange <15km, rouge >15km)
+- [x] Section réassignation aussi triée par distance
+- [x] Purge du mot "voisins" de tout le codebase
+- [x] Texte commercial parcours Client et Washer rédigé
+- [x] Tests: iteration_21.json - 100% pass (8/8 features)
+
 ## Sprint 19 - Mega Bug Fix + Admin Enhanced (05/04/2026)
 - [x] Fix avatar_url column error (ClientDashboard washer join)
 - [x] WasherDashboard robustness (maybeSingle au lieu de single)
@@ -33,22 +43,20 @@ Le 1er service de laverie a domicile en France et Belgique.
 ## Flux de commande
 1. Client commande -> pending -> paid (Stripe)
 2. Washer voit (pending/confirmed/paid) et accepte -> assigned
-3. Admin peut assigner/reassigner + notification email
+3. Admin peut assigner/reassigner + notification email (washers triés par distance)
 4. picked_up -> washing -> ready -> completed
 5. Annulation admin -> remboursement Stripe auto + email client
 
 ## Actions Admin
 - Clients: voir details, commandes, envoyer message, supprimer
 - Washers: voir documents, commandes, approuver/rejeter/bloquer, supprimer
-- Commandes: assigner/reassigner/retirer washer, changer statut, annuler+refund
+- Commandes: assigner/reassigner/retirer washer (TRI PAR DISTANCE), changer statut, annuler+refund
 - Vue responsive mobile (cartes au lieu de tableaux)
 
 ## Backlog
 - [ ] Traduction EN AdminDashboard (P2)
-- [ ] Page abonnement dediee (P2)
-- [ ] Algorithme d'assignation intelligent par distance (P2)
 - [ ] SMS Twilio (P2)
 - [ ] App mobile React Native (P3)
 
 ---
-*Derniere MAJ: 05/04/2026 - Sprint 19*
+*Derniere MAJ: 05/04/2026 - Sprint 20*
