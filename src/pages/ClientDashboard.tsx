@@ -11,6 +11,7 @@ import { ReferralSystem } from '../components/ReferralSystem';
 import { Chat, ChatBubble } from '../components/Chat';
 import NotificationToggle from '../components/NotificationToggle';
 import OrderTracking from '../components/OrderTracking';
+import { useClientOrderNotifications, requestNotifPermission } from '../hooks/useOrderPolling';
 import {
   Package, Clock, CheckCircle, MapPin, Loader2, ArrowRight,
   Star, RefreshCw, Plus, Sparkles, Phone, TrendingUp,
@@ -422,6 +423,9 @@ export default function ClientDashboard() {
   const [userEmail, setUserEmail] = useState<string>('');
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  
+  // Polling notifications - check for order updates every 15s
+  useClientOrderNotifications(userId, !loading);
   const [cancelling, setCancelling] = useState<string | null>(null);
   const [ratingOrder, setRatingOrder] = useState<Order | null>(null);
   const [showAllHistory, setShowAllHistory] = useState(false);
@@ -442,6 +446,8 @@ export default function ClientDashboard() {
       if (!user) { window.location.href = '/login'; return; }
       setUserId(user.id);
       setUserEmail(user.email || '');
+      // Request notification permission
+      requestNotifPermission();
       
       // Try with washer join first, fallback to simple query
       let orders: any[] | null = null;

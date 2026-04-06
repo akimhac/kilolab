@@ -6,6 +6,7 @@ import {
   showBrowserNotification,
   requestNotificationPermission
 } from "../services/washerNotifications";
+import { useWasherMissionNotifications, requestNotifPermission } from "../hooks/useOrderPolling";
 import Navbar from "../components/Navbar";
 import { FadeInOnScroll, CountUp } from "../components/animations/ScrollAnimations";
 import { WasherDashboardSkeleton } from "../components/animations/Skeleton";
@@ -308,9 +309,13 @@ export default function WasherDashboard() {
   const [weightAdjustMission, setWeightAdjustMission] = useState<Mission|null>(null);
   const [showCancelled, setShowCancelled] = useState(false);
   const fetchLockRef = useRef(false);
+  
+  // Polling for new available missions
+  const { newMissions, resetNewMissions } = useWasherMissionNotifications(washerId, washerData?.postal_code, washerStatus === 'approved');
 
   useEffect(() => {
     fetchWasherData();
+    requestNotifPermission();
     const t = setInterval(fetchWasherData, 30000);
     return () => clearInterval(t);
   }, []);
@@ -852,9 +857,14 @@ export default function WasherDashboard() {
         {/* TABS */}
         <div className="flex gap-1 mb-6 bg-white/5 border border-white/8 rounded-2xl p-1">
           {([["available",t('washerDashboard.tabs.available'),availableMissions.length],["active",t('washerDashboard.tabs.active'),activeMissions.length],["history",t('washerDashboard.tabs.history'),historyMissions.length]] as const).map(([key,label,count]) => (
-            <button key={key} onClick={() => setActiveTab(key as any)}
-              className={`flex-1 py-2.5 px-3 rounded-xl font-bold text-sm transition-all ${activeTab === key ? "bg-teal-500 text-white shadow-lg shadow-teal-500/20" : "text-white/40 hover:text-white/70"}`}>
+            <button key={key} onClick={() => { setActiveTab(key as any); if (key === 'available') resetNewMissions(); }}
+              className={`flex-1 py-2.5 px-3 rounded-xl font-bold text-sm transition-all relative ${activeTab === key ? "bg-teal-500 text-white shadow-lg shadow-teal-500/20" : "text-white/40 hover:text-white/70"}`}>
               {label} ({count})
+              {key === 'available' && newMissions > 0 && activeTab !== 'available' && (
+                <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-[10px] font-black rounded-full flex items-center justify-center animate-pulse">
+                  {newMissions}
+                </span>
+              )}
             </button>
           ))}
         </div>
