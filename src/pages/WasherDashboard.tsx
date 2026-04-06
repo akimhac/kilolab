@@ -18,6 +18,7 @@ import {
   ChevronUp, ChevronDown
 } from "lucide-react";
 import { lazy, Suspense } from 'react';
+import { ErrorBoundary } from '../components/ErrorBoundary';
 import WasherAvailability from '../components/WasherAvailability';
 import WeightAdjustment from '../components/WeightAdjustment';
 
@@ -472,12 +473,37 @@ export default function WasherDashboard() {
     try {
       const updates: any = { status: newStatus, updated_at: new Date().toISOString() };
       if (newStatus === "completed") updates.completed_at = new Date().toISOString();
-      const { error } = await supabase.from("orders").update(updates).eq("id", orderId).eq("washer_id", washerId);
+      
+      console.log("Updating order:", orderId, "to status:", newStatus, "washer:", washerId, "payload:", updates);
+      
+      const { data, error, count } = await supabase
+        .from("orders")
+        .update(updates)
+        .eq("id", orderId)
+        .eq("washer_id", washerId)
+        .select();
+      
       if (error) {
         console.error("Update order error:", JSON.stringify(error));
-        toast.error("Erreur: " + (error.message || error.code || "Mise a jour impossible"));
+        
+        // Provide specific error messages based on error code
+        if (error.code === '42501') {
+          toast.error("Permission refusee. Le script RLS doit etre execute par l'admin dans Supabase SQL Editor.", { duration: 8000 });
+        } else if (error.code === 'PGRST301') {
+          toast.error("Erreur d'authentification. Reconnectez-vous.", { duration: 5000 });
+        } else {
+          toast.error("Erreur: " + (error.message || error.code || "Mise a jour impossible"), { duration: 5000 });
+        }
         return;
       }
+      
+      // Check if any row was actually updated
+      if (!data || data.length === 0) {
+        console.warn("Update returned 0 rows. Possible RLS issue or order not found.");
+        toast.error("Mise a jour impossible : verifiez que la commande vous est bien assignee.", { duration: 5000 });
+        return;
+      }
+      
       toast.success(newStatus === "completed" ? "Mission terminee !" : "Statut mis a jour !");
       
       // Send email notification to client
@@ -491,7 +517,8 @@ export default function WasherDashboard() {
               washing: "Votre linge est en cours de lavage",
               ready: "Votre linge est pret",
               completed: "Votre commande est terminee",
-              delivered: "Votre linge a ete livre"
+              delivered: "Votre linge a ete livre",
+              in_progress: "Votre commande est en cours de traitement"
             };
             const subject = statusLabels[newStatus] || "Commande mise a jour";
             await fetch("/api/send-email", {
@@ -821,36 +848,38 @@ export default function WasherDashboard() {
         {/* MAP SECTION */}
         {showMap && (
           <div className="mb-8 h-[400px] rounded-2xl overflow-hidden border border-white/10">
-            <Suspense fallback={
-              <div className="h-full bg-slate-800 flex items-center justify-center">
-                <Loader2 className="animate-spin text-teal-500" size={32} />
-              </div>
-            }>
-              <OrdersMap
-                orders={availableMissions.map(m => ({
-                  id: m.id,
-                  pickup_address: m.pickup_address,
-                  city: m.pickup_address?.split(',').pop()?.trim(),
-                  lat: m.pickup_lat || undefined,
-                  lng: m.pickup_lng || undefined,
-                  weight: m.weight,
-                  total_price: m.total_price,
-                  formula: m.formula
-                }))}
-                washerLocation={washerData?.lat && washerData?.lng ? {
-                  lat: washerData.lat,
-                  lng: washerData.lng,
-                  maxDistance: washerData.service_radius || 10
-                } : null}
-                onOrderClick={(order) => {
-                  const mission = availableMissions.find(m => m.id === order.id);
-                  if (mission) {
-                    setSelectedMission(mission);
-                    setModalMode("available");
-                  }
-                }}
-              />
-            </Suspense>
+            <ErrorBoundary fallbackTitle="La carte n'a pas pu se charger">
+              <Suspense fallback={
+                <div className="h-full bg-slate-800 flex items-center justify-center">
+                  <Loader2 className="animate-spin text-teal-500" size={32} />
+                </div>
+              }>
+                <OrdersMap
+                  orders={availableMissions.map(m => ({
+                    id: m.id,
+                    pickup_address: m.pickup_address,
+                    city: m.pickup_address?.split(',').pop()?.trim(),
+                    lat: m.pickup_lat || undefined,
+                    lng: m.pickup_lng || undefined,
+                    weight: m.weight,
+                    total_price: m.total_price,
+                    formula: m.formula
+                  }))}
+                  washerLocation={washerData?.lat && washerData?.lng ? {
+                    lat: washerData.lat,
+                    lng: washerData.lng,
+                    maxDistance: washerData.service_radius || 10
+                  } : null}
+                  onOrderClick={(order) => {
+                    const mission = availableMissions.find(m => m.id === order.id);
+                    if (mission) {
+                      setSelectedMission(mission);
+                      setModalMode("available");
+                    }
+                  }}
+                />
+              </Suspense>
+            </ErrorBoundary>
           </div>
         )}
 
