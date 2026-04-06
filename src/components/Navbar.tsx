@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { Menu, X, User, LogOut } from 'lucide-react';
+import { Menu, X, User, LogOut, ArrowLeftRight } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { supabase } from '../lib/supabase';
 import { LanguageSelector } from './LanguageSelector';
@@ -11,6 +11,8 @@ export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [user, setUser] = useState<any>(null);
   const [profile, setProfile] = useState<any>(null);
+  const [isAlsoWasher, setIsAlsoWasher] = useState(false);
+  const [currentSpace, setCurrentSpace] = useState<'client' | 'washer'>('client');
   const [scrolled, setScrolled] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
@@ -41,6 +43,18 @@ export default function Navbar() {
   const fetchProfile = async (userId: string) => {
     const { data } = await supabase.from('user_profiles').select('role, full_name').eq('id', userId).single();
     setProfile(data);
+    // Check if the user also has a washer record
+    const { data: washer } = await supabase.from('washers').select('id, status').eq('user_id', userId).maybeSingle();
+    const hasWasher = !!(washer && washer.status === 'approved');
+    setIsAlsoWasher(hasWasher);
+    // Auto-detect current space from URL
+    if (location.pathname.includes('washer-dashboard')) {
+      setCurrentSpace('washer');
+    } else if (data?.role === 'washer' || (hasWasher && !location.pathname.includes('client-dashboard'))) {
+      setCurrentSpace('washer');
+    } else {
+      setCurrentSpace('client');
+    }
   };
 
   const handleLogout = async () => {
@@ -54,9 +68,19 @@ export default function Navbar() {
     if (!profile) return '/dashboard';
     if (profile.role === 'admin') return '/admin';
     if (profile.role === 'partner') return '/partner-dashboard';
-    if (profile.role === 'washer') return '/washer-dashboard';
-    return '/dashboard';
+    if (isAlsoWasher && currentSpace === 'washer') return '/washer-dashboard';
+    if (profile.role === 'washer' && currentSpace === 'washer') return '/washer-dashboard';
+    return '/client-dashboard';
   };
+
+  const handleSwitchSpace = () => {
+    const newSpace = currentSpace === 'washer' ? 'client' : 'washer';
+    setCurrentSpace(newSpace);
+    setIsOpen(false);
+    navigate(newSpace === 'washer' ? '/washer-dashboard' : '/client-dashboard');
+  };
+
+  const showSpaceSwitch = user && isAlsoWasher && profile?.role !== 'admin';
 
   const navBg = scrolled || !isDarkHero
     ? 'bg-white/95 backdrop-blur-xl border-b border-slate-200/80 shadow-sm'
@@ -105,6 +129,18 @@ export default function Navbar() {
                   <User size={18} />
                   <span className="max-w-[120px] truncate">{profile?.full_name || t('nav.myAccount')}</span>
                 </Link>
+                {showSpaceSwitch && (
+                  <button onClick={handleSwitchSpace} data-testid="space-switch-btn"
+                    className={`flex items-center gap-1.5 px-3 py-2 rounded-full text-xs font-bold transition-all duration-300 ${
+                      currentSpace === 'washer'
+                        ? (scrolled || !isDarkHero ? 'bg-teal-100 text-teal-700 hover:bg-teal-200' : 'bg-teal-500/20 text-teal-300 hover:bg-teal-500/30')
+                        : (scrolled || !isDarkHero ? 'bg-blue-100 text-blue-700 hover:bg-blue-200' : 'bg-blue-500/20 text-blue-300 hover:bg-blue-500/30')
+                    }`}
+                    title={currentSpace === 'washer' ? 'Passer en mode Client' : 'Passer en mode Washer'}>
+                    <ArrowLeftRight size={14} />
+                    {currentSpace === 'washer' ? 'Client' : 'Washer'}
+                  </button>
+                )}
                 <Link to="/settings" data-testid="settings-link" title={t('nav.settings')}
                   className={`p-2 rounded-full transition-all duration-200 ${
                     scrolled || !isDarkHero ? 'text-slate-500 hover:text-teal-600 hover:bg-teal-50' : 'text-white/70 hover:text-white hover:bg-white/10'
@@ -165,18 +201,37 @@ export default function Navbar() {
           <div className="border-t border-slate-100 px-4 py-4">
             {user ? (
               <div className="space-y-2">
+                {/* Space switch toggle for dual-role users */}
+                {showSpaceSwitch && (
+                  <button onClick={handleSwitchSpace} data-testid="mobile-space-switch"
+                    className={`w-full flex items-center justify-between px-4 py-3.5 rounded-xl font-bold transition-all ${
+                      currentSpace === 'washer'
+                        ? 'bg-gradient-to-r from-teal-500 to-emerald-500 text-white'
+                        : 'bg-gradient-to-r from-blue-500 to-cyan-500 text-white'
+                    }`}>
+                    <div className="flex items-center gap-3">
+                      <ArrowLeftRight size={18} />
+                      <span>
+                        {currentSpace === 'washer' ? 'Espace Washer' : 'Espace Client'}
+                      </span>
+                    </div>
+                    <span className="text-xs opacity-80 bg-white/20 px-2 py-1 rounded-full">
+                      Passer en {currentSpace === 'washer' ? 'Client' : 'Washer'}
+                    </span>
+                  </button>
+                )}
                 {/* Smart dashboard link */}
                 <Link to={getDashboardLink()} onClick={() => setIsOpen(false)}
                   className="flex items-center gap-4 px-4 py-3.5 bg-slate-50 hover:bg-teal-50 rounded-xl transition-colors group">
                   <div className="w-10 h-10 bg-teal-100 rounded-xl flex items-center justify-center group-hover:bg-teal-200 transition-colors">
-                    <span className="text-lg">{profile?.role === 'washer' ? '🧺' : '📦'}</span>
+                    <span className="text-lg">{currentSpace === 'washer' ? '🧺' : '📦'}</span>
                   </div>
                   <div>
-                    <p className="font-bold text-slate-900">{profile?.role === 'washer' ? 'Mes missions' : 'Mes commandes'}</p>
-                    <p className="text-xs text-slate-500">{profile?.role === 'washer' ? 'Dashboard Washer' : 'Suivi et historique'}</p>
+                    <p className="font-bold text-slate-900">{currentSpace === 'washer' ? 'Mes missions' : 'Mes commandes'}</p>
+                    <p className="text-xs text-slate-500">{currentSpace === 'washer' ? 'Dashboard Washer' : 'Suivi et historique'}</p>
                   </div>
                 </Link>
-                {profile?.role !== 'washer' && profile?.role !== 'admin' && (
+                {currentSpace === 'client' && profile?.role !== 'admin' && (
                   <Link to="/client-dashboard?tab=loyalty" onClick={() => setIsOpen(false)}
                     className="flex items-center gap-4 px-4 py-3.5 bg-slate-50 hover:bg-teal-50 rounded-xl transition-colors group">
                     <div className="w-10 h-10 bg-amber-100 rounded-xl flex items-center justify-center group-hover:bg-amber-200 transition-colors">
