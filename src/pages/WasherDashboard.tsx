@@ -424,11 +424,42 @@ export default function WasherDashboard() {
     if (!isAvailable) { toast.error("Activez votre disponibilite d'abord"); return; }
     try {
       const { error } = await supabase.from("orders").update({ washer_id: washerId, status: "assigned", assigned_at: new Date().toISOString(), updated_at: new Date().toISOString() }).eq("id", orderId).is("washer_id", null);
-      if (error) throw error;
+      if (error) {
+        console.error("Accept mission error:", error);
+        throw error;
+      }
       toast.success(t('washerDashboard.missionAccepted'));
       setActiveTab("active");
+      
+      // Notify client by email
+      try {
+        const { data: order } = await supabase.from("orders").select("client_id").eq("id", orderId).single();
+        if (order?.client_id) {
+          const { data: client } = await supabase.from("user_profiles").select("email, first_name").eq("id", order.client_id).single();
+          const { data: washer } = await supabase.from("washers").select("full_name").eq("id", washerId).single();
+          if (client?.email) {
+            await fetch("/api/send-email", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                to: client.email,
+                subject: "Kilolab - Un Washer a accepté votre commande !",
+                html: `<div style="font-family:sans-serif;max-width:500px;margin:auto;padding:20px;">
+                  <h2 style="color:#0d9488;">Kilolab</h2>
+                  <p>Bonjour ${client.first_name || ''},</p>
+                  <p><strong>${washer?.full_name || 'Un Washer'}</strong> a accepté votre commande #${orderId.slice(0,8)} !</p>
+                  <p>Vous pouvez suivre votre commande en temps réel.</p>
+                  <a href="https://www.kilolab.fr/client-dashboard" style="display:inline-block;padding:12px 24px;background:#0d9488;color:white;text-decoration:none;border-radius:8px;font-weight:bold;margin-top:10px;">Suivre ma commande</a>
+                  <p style="color:#999;font-size:12px;margin-top:20px;">L'équipe Kilolab</p>
+                </div>`
+              })
+            });
+          }
+        }
+      } catch (emailErr) { console.warn("Email notification failed:", emailErr); }
+      
       fetchWasherData();
-    } catch { toast.error("Mission deja prise ou erreur"); }
+    } catch(e: any) { toast.error("Erreur: " + (e?.message || "Mission deja prise")); }
   };
 
   const updateMissionStatus = async (orderId: string, newStatus: OrderStatus) => {
@@ -437,10 +468,50 @@ export default function WasherDashboard() {
       const updates: any = { status: newStatus, updated_at: new Date().toISOString() };
       if (newStatus === "completed") updates.completed_at = new Date().toISOString();
       const { error } = await supabase.from("orders").update(updates).eq("id", orderId).eq("washer_id", washerId);
-      if (error) throw error;
+      if (error) {
+        console.error("Update order error:", JSON.stringify(error));
+        toast.error("Erreur: " + (error.message || error.code || "Mise a jour impossible"));
+        return;
+      }
       toast.success(newStatus === "completed" ? "Mission terminee !" : "Statut mis a jour !");
+      
+      // Send email notification to client
+      try {
+        const { data: order } = await supabase.from("orders").select("client_id").eq("id", orderId).single();
+        if (order?.client_id) {
+          const { data: client } = await supabase.from("user_profiles").select("email, first_name").eq("id", order.client_id).single();
+          if (client?.email) {
+            const statusLabels: Record<string, string> = {
+              picked_up: "Votre linge a ete collecte",
+              washing: "Votre linge est en cours de lavage",
+              ready: "Votre linge est pret",
+              completed: "Votre commande est terminee",
+              delivered: "Votre linge a ete livre"
+            };
+            const subject = statusLabels[newStatus] || "Commande mise a jour";
+            await fetch("/api/send-email", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                to: client.email,
+                subject: `Kilolab - ${subject}`,
+                html: `<div style="font-family:sans-serif;max-width:500px;margin:auto;padding:20px;">
+                  <h2 style="color:#0d9488;">Kilolab</h2>
+                  <p>Bonjour ${client.first_name || ''},</p>
+                  <p><strong>${subject}</strong></p>
+                  <p>Commande #${orderId.slice(0,8)}</p>
+                  <p>Suivez votre commande en temps reel sur votre dashboard.</p>
+                  <a href="https://www.kilolab.fr/client-dashboard" style="display:inline-block;padding:12px 24px;background:#0d9488;color:white;text-decoration:none;border-radius:8px;font-weight:bold;margin-top:10px;">Voir ma commande</a>
+                  <p style="color:#999;font-size:12px;margin-top:20px;">L'equipe Kilolab</p>
+                </div>`
+              })
+            });
+          }
+        }
+      } catch (emailErr) { console.warn("Email notification failed:", emailErr); }
+      
       fetchWasherData();
-    } catch { toast.error("Erreur de mise a jour"); }
+    } catch(e: any) { toast.error("Erreur: " + (e?.message || "Mise a jour impossible")); }
   };
 
   const handleStripeConnect = async () => {
