@@ -6,6 +6,7 @@ import { HelmetProvider } from 'react-helmet-async';
 import ScrollToTop from './components/ScrollToTop';
 import ProtectedAdminRoute from './components/ProtectedAdminRoute';
 import PrivateRoute from './components/PrivateRoute';
+import { ErrorBoundary } from './components/ErrorBoundary';
 
 // ✅ AJOUT : Popup Instagram
 import InstagramPromoPopup from './components/InstagramPromoPopup';
@@ -103,6 +104,7 @@ export default function App() {
       {/* ✅ PWA INSTALL BANNER */}
       <PWAInstallBanner />
 
+      <ErrorBoundary>
       <Suspense fallback={<PageLoader />}>
         <Routes>
           <Route path="/" element={<Landing />} />
@@ -332,6 +334,7 @@ export default function App() {
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Suspense>
+      </ErrorBoundary>
     </HelmetProvider>
   );
 }

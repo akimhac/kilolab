@@ -1,5 +1,6 @@
 import { initializeApp } from 'firebase/app';
-import { getMessaging, getToken, onMessage } from 'firebase/messaging';
+import { getMessaging, getToken, onMessage, isSupported } from 'firebase/messaging';
+import type { Messaging } from 'firebase/messaging';
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -10,16 +11,40 @@ const firebaseConfig = {
   appId: import.meta.env.VITE_FIREBASE_APP_ID,
 };
 
-const app = initializeApp(firebaseConfig);
-const messaging = getMessaging(app);
+let app: any = null;
+let messaging: Messaging | null = null;
+
+try {
+  app = initializeApp(firebaseConfig);
+} catch (e) {
+  console.warn('Firebase init failed:', e);
+}
+
+// Lazy init messaging only when supported
+async function getMessagingInstance(): Promise<Messaging | null> {
+  if (messaging) return messaging;
+  try {
+    const supported = await isSupported();
+    if (supported && app) {
+      messaging = getMessaging(app);
+      return messaging;
+    }
+  } catch (e) {
+    console.warn('Firebase Messaging not supported:', e);
+  }
+  return null;
+}
 
 // Fonction pour demander la permission et obtenir le token
 export const requestNotificationPermission = async (): Promise<string | null> => {
   try {
+    if (!('Notification' in window)) return null;
     const permission = await Notification.requestPermission();
     
     if (permission === 'granted') {
-      const token = await getToken(messaging, {
+      const msg = await getMessagingInstance();
+      if (!msg) return null;
+      const token = await getToken(msg, {
         vapidKey: import.meta.env.VITE_FIREBASE_VAPID_KEY,
       });
       return token;
@@ -27,15 +52,22 @@ export const requestNotificationPermission = async (): Promise<string | null> =>
       return null;
     }
   } catch (error) {
-    console.error('Erreur obtention token FCM:', error);
+    console.warn('Erreur obtention token FCM:', error);
     return null;
   }
 };
 
 // Écouter les messages en avant-plan
 export const onMessageListener = () =>
-  new Promise((resolve) => {
-    onMessage(messaging, (payload) => {
-      resolve(payload);
-    });
+  new Promise(async (resolve) => {
+    try {
+      const msg = await getMessagingInstance();
+      if (msg) {
+        onMessage(msg, (payload) => {
+          resolve(payload);
+        });
+      }
+    } catch (e) {
+      console.warn('onMessage listener failed:', e);
+    }
   });
