@@ -11,32 +11,28 @@ Le 1er service de laverie a domicile en France et Belgique.
 - i18n: react-i18next (FR/EN) | Maps: React-Leaflet
 
 ## Sprint 20 - Abonnement + Smart Assignment + Commercial + Bugfix (05/04/2026)
-- [x] Page Abonnement dédiée (/subscription) - Formulaire 4 étapes avec AddressAutocomplete
-- [x] Bouton "Créer mon abonnement" redirige vers /subscription (ClientDashboard)
+- [x] Page Abonnement dédiée (/subscription) - Formulaire 4 étapes
 - [x] Algorithme d'assignation intelligent par distance (Haversine) dans AdminDashboard
-- [x] Washers triés par proximité GPS (vert <5km, orange <15km, rouge >15km)
 - [x] Textes commerciaux intégrés dans Landing.tsx et BecomeWasher.tsx
-- [x] Purge du mot "voisins" de tout le codebase
-- [x] FIX CRITIQUE: Suppression avatar_url de toutes les requêtes Supabase (OrderTracking, OrderTracker, LiveTracking, ClientDashboard)
-- [x] Tests: iterations 21, 22, 23 - 100% pass
+- [x] FIX: Suppression avatar_url de toutes les requêtes Supabase (4 fichiers)
+- [x] FIX: Suppression column 'city' des requêtes orders (OrderTracking, washerAssignment, AdminDashboard, OrdersMap)
+- [x] FIX: SmartDashboard - routing intelligent selon le rôle (washer→washer-dashboard, admin→admin, client→client)
+- [x] FIX: Navbar role-aware (Mes missions pour washers, Mes commandes pour clients, fidélité masqué pour washers/admins)
+- [x] Tests: iterations 21-24 - 100% pass
 
 ## Sprint 19 - Mega Bug Fix + Admin Enhanced (05/04/2026)
-- [x] Fix avatar_url column error (ClientDashboard washer join)
-- [x] Validation adresse France + Belgique
-- [x] Remboursement Stripe automatique
-- [x] Admin: modals enrichis, tableaux responsives
+- [x] Validation adresse, Remboursement Stripe auto, Admin modals, Tableaux responsives
 - [x] Tests: iteration_20.json - 100% pass
 
-## Sprint 17-18 (01-03/04/2026)
-- [x] Fix page blanche ClientDashboard, traductions FR/EN, preferences client, nettoyage RLS
-
-## Sprint 1-16 (28/02-28/03/2026)
+## Sprint 1-18 (28/02-03/04/2026)
 - [x] Landing, i18n, BecomeWasher, Heatmap, B2B, Admin, PWA, GPS, Auto-assignment, PhotoCapture, Rating, Invoice
+- [x] Fix page blanche ClientDashboard, traductions FR/EN, nettoyage RLS
 
 ## Bugs connus resolus
-- [x] avatar_url inexistant dans la table washers causait des erreurs Supabase (Sprint 20)
-- [x] Page blanche ClientDashboard - hooks React (Sprint 18)
-- [x] RLS policies orders (Sprint 18)
+- [x] avatar_url inexistant dans la table washers (Sprint 20)
+- [x] column orders.city inexistant (Sprint 20)
+- [x] Washer redirigé vers ClientDashboard (Sprint 20 - SmartDashboard)
+- [x] Menu hamburger identique pour tous les rôles (Sprint 20)
 
 ## Backlog
 - [ ] Traduction EN AdminDashboard (P2)
