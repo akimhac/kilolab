@@ -6,10 +6,8 @@ import { supabase } from '../lib/supabase';
 type Order = {
   id: string;
   pickup_address: string;
-  city?: string;
-  postal_code?: string;
-  lat?: number;
-  lng?: number;
+  pickup_lat?: number;
+  pickup_lng?: number;
   washer_id?: string;
   status: string;
 };
@@ -68,36 +66,12 @@ export async function findBestWasherForOrder(order: Order): Promise<Washer | nul
     const scoredWashers = washers.map((washer: Washer) => {
       let score = 100;
 
-      // 1. Location match (highest priority)
-      const orderPostal = order.postal_code || '';
-      const washerPostal = washer.postal_code || '';
-      
-      // Exact postal code match
-      if (orderPostal && washerPostal === orderPostal) {
-        score += 50;
-      }
-      // Same department (first 2 digits)
-      else if (orderPostal.substring(0, 2) === washerPostal.substring(0, 2)) {
-        score += 30;
-      }
-      // Same region (first digit)
-      else if (orderPostal.substring(0, 1) === washerPostal.substring(0, 1)) {
-        score += 10;
-      }
-
-      // 2. City match
-      const orderCity = (order.city || '').toLowerCase();
-      const washerCity = (washer.city || '').toLowerCase();
-      if (orderCity && washerCity.includes(orderCity)) {
-        score += 20;
-      }
-
-      // 3. GPS distance (if available)
-      if (order.lat && order.lng && washer.lat && washer.lng) {
-        const distance = calculateDistance(order.lat, order.lng, washer.lat, washer.lng);
-        if (distance < 5) score += 40;
-        else if (distance < 10) score += 25;
-        else if (distance < 20) score += 10;
+      // 1. GPS distance (highest priority - using pickup coordinates)
+      if (order.pickup_lat && order.pickup_lng && washer.lat && washer.lng) {
+        const distance = calculateDistance(order.pickup_lat, order.pickup_lng, washer.lat, washer.lng);
+        if (distance < 5) score += 50;
+        else if (distance < 10) score += 35;
+        else if (distance < 20) score += 15;
         else if (distance > 50) score -= 20;
       }
 
@@ -133,7 +107,7 @@ export async function autoAssignPendingOrders(): Promise<{ assigned: number; fai
     // Get all pending orders without a washer
     const { data: pendingOrders, error } = await supabase
       .from('orders')
-      .select('id, pickup_address, city, postal_code, lat, lng, washer_id, status')
+      .select('id, pickup_address, pickup_lat, pickup_lng, washer_id, status')
       .eq('status', 'pending')
       .is('washer_id', null)
       .order('created_at', { ascending: true });

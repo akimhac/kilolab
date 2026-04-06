@@ -63,6 +63,7 @@ const AccountSettings = lazy(() => import('./pages/AccountSettings'));
 const PickupQR = lazy(() => import('./pages/PickupQR'));
 const Invoice = lazy(() => import('./pages/Invoice'));
 const Subscription = lazy(() => import('./pages/Subscription'));
+const SmartDashboard = lazy(() => import('./pages/SmartDashboard'));
 const NotFound = lazy(() => import('./pages/NotFound'));
 const WasherGPSNavigation = lazy(() => import('./components/WasherGPSNavigation'));
 const LiveStatus = lazy(() => import('./pages/LiveStatus'));
@@ -170,7 +171,7 @@ export default function App() {
             path="/dashboard"
             element={
               <PrivateRoute>
-                <ClientDashboard />
+                <SmartDashboard />
               </PrivateRoute>
             }
           />

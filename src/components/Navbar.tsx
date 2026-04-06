@@ -165,27 +165,29 @@ export default function Navbar() {
           <div className="border-t border-slate-100 px-4 py-4">
             {user ? (
               <div className="space-y-2">
-                {/* User menu items with better design */}
-                <Link to="/dashboard" onClick={() => setIsOpen(false)}
+                {/* Smart dashboard link */}
+                <Link to={getDashboardLink()} onClick={() => setIsOpen(false)}
                   className="flex items-center gap-4 px-4 py-3.5 bg-slate-50 hover:bg-teal-50 rounded-xl transition-colors group">
                   <div className="w-10 h-10 bg-teal-100 rounded-xl flex items-center justify-center group-hover:bg-teal-200 transition-colors">
-                    <span className="text-lg">📦</span>
+                    <span className="text-lg">{profile?.role === 'washer' ? '🧺' : '📦'}</span>
                   </div>
                   <div>
-                    <p className="font-bold text-slate-900">Mes commandes</p>
-                    <p className="text-xs text-slate-500">Suivi et historique</p>
+                    <p className="font-bold text-slate-900">{profile?.role === 'washer' ? 'Mes missions' : 'Mes commandes'}</p>
+                    <p className="text-xs text-slate-500">{profile?.role === 'washer' ? 'Dashboard Washer' : 'Suivi et historique'}</p>
                   </div>
                 </Link>
-                <Link to="/dashboard?tab=loyalty" onClick={() => setIsOpen(false)}
-                  className="flex items-center gap-4 px-4 py-3.5 bg-slate-50 hover:bg-teal-50 rounded-xl transition-colors group">
-                  <div className="w-10 h-10 bg-amber-100 rounded-xl flex items-center justify-center group-hover:bg-amber-200 transition-colors">
-                    <span className="text-lg">🎁</span>
-                  </div>
-                  <div>
-                    <p className="font-bold text-slate-900">Points fidélité</p>
-                    <p className="text-xs text-slate-500">Vos récompenses</p>
-                  </div>
-                </Link>
+                {profile?.role !== 'washer' && profile?.role !== 'admin' && (
+                  <Link to="/client-dashboard?tab=loyalty" onClick={() => setIsOpen(false)}
+                    className="flex items-center gap-4 px-4 py-3.5 bg-slate-50 hover:bg-teal-50 rounded-xl transition-colors group">
+                    <div className="w-10 h-10 bg-amber-100 rounded-xl flex items-center justify-center group-hover:bg-amber-200 transition-colors">
+                      <span className="text-lg">🎁</span>
+                    </div>
+                    <div>
+                      <p className="font-bold text-slate-900">Points fidélité</p>
+                      <p className="text-xs text-slate-500">Vos récompenses</p>
+                    </div>
+                  </Link>
+                )}
                 <Link to="/profile" onClick={() => setIsOpen(false)}
                   className="flex items-center gap-4 px-4 py-3.5 bg-slate-50 hover:bg-teal-50 rounded-xl transition-colors group">
                   <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center group-hover:bg-blue-200 transition-colors">

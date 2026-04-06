@@ -2296,7 +2296,7 @@ export default function AdminDashboard() {
                     <p className="text-sm text-slate-400 mt-1">Commandes totales</p>
                   </div>
                   <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6 text-center">
-                    <p className="text-3xl font-black text-violet-400">{new Set(orders.map(o => o.city || 'N/A')).size}</p>
+                    <p className="text-3xl font-black text-violet-400">{new Set(orders.map(o => o.pickup_city || 'N/A')).size}</p>
                     <p className="text-sm text-slate-400 mt-1">Villes actives</p>
                   </div>
                   <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6 text-center">

@@ -1,0 +1,121 @@
+{
+  "summary": "Bug fix verification for 'column orders.city does not exist' error. Verified: 1) OrderTracking.tsx query does NOT include 'city' column (lines 109-117), 2) washerAssignment.ts orders query uses 'pickup_lat, pickup_lng' not 'city' (line 110), 3) SmartDashboard.tsx exists and checks washers table for role-based routing, 4) App.tsx /dashboard route uses SmartDashboard (lines 170-176), 5) Navbar.tsx shows 'Mes missions' for washers and hides 'Points fidélité' for washers/admins (lines 175, 179-190). All public pages load correctly.",
+
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+
+  "passed_tests": [
+    "No 'avatar_url' in any Supabase .select() queries on orders table (grep verified)",
+    "No 'city' column reference in any .select() Supabase query on 'orders' table (grep verified)",
+    "OrderTracking.tsx query does NOT include 'city' column (lines 109-117: id, status, pickup_address, created_at, updated_at, washer)",
+    "washerAssignment.ts orders query uses 'pickup_lat, pickup_lng' not 'city, postal_code, lat, lng' (line 110)",
+    "washerAssignment.ts washers query uses 'city, postal_code, lat, lng' for washers table (line 45) - CORRECT",
+    "SmartDashboard.tsx exists and checks washers table for role-based routing (lines 32-41)",
+    "App.tsx /dashboard route uses SmartDashboard instead of ClientDashboard (lines 170-176)",
+    "Navbar.tsx shows 'Mes missions' for washers, 'Mes commandes' for clients (line 175)",
+    "Navbar.tsx 'Points fidélité' hidden for washers and admins (lines 179-190)",
+    "Landing page (/) loads correctly with Kilolab branding",
+    "BecomeWasher page (/become-washer) loads correctly",
+    "NewOrder page (/new-order) loads and shows form with 5 steps (Formule, Poids, Localisation, Date, Paiement)",
+    "/subscription route exists and redirects to /select-dashboard when not authenticated",
+    "/dashboard route uses SmartDashboard and redirects unauthenticated users to /select-dashboard",
+    "AdminDashboard haversine distance functions exist (lines 87-92, 103, 3064)",
+    "All routes in App.tsx compile without error",
+    "No word 'voisins' in any tsx/ts files (grep verified)",
+    "Tarifs page (/tarifs) loads correctly with pricing content"
+  ],
+
+  "code_verification": {
+    "city_column_removal": {
+      "OrderTracking.tsx": {
+        "status": "VERIFIED",
+        "lines": "109-117",
+        "details": "Query selects: id, status, pickup_address, created_at, updated_at, washer:washers(id, full_name, phone, lat, lng) - NO 'city' column"
+      },
+      "washerAssignment.ts": {
+        "status": "VERIFIED",
+        "lines": "110",
+        "details": "Orders query: 'id, pickup_address, pickup_lat, pickup_lng, washer_id, status' - NO 'city' column"
+      }
+    },
+    "smart_dashboard": {
+      "status": "VERIFIED",
+      "file": "/app/src/pages/SmartDashboard.tsx",
+      "details": "Checks user_profiles for admin role, washers table for washer role, partners table for partner role, defaults to client-dashboard"
+    },
+    "navbar_role_aware": {
+      "status": "VERIFIED",
+      "file": "/app/src/components/Navbar.tsx",
+      "details": "Line 175: Shows 'Mes missions' for washers, 'Mes commandes' for clients. Lines 179-190: 'Points fidélité' hidden for washers and admins"
+    },
+    "app_tsx_dashboard_route": {
+      "status": "VERIFIED",
+      "file": "/app/src/App.tsx",
+      "lines": "170-176",
+      "details": "/dashboard route uses SmartDashboard component wrapped in PrivateRoute"
+    },
+    "haversine_functions": {
+      "status": "VERIFIED",
+      "file": "/app/src/pages/AdminDashboard.tsx",
+      "lines": "87-92",
+      "details": "haversineKm() function exists and is used at lines 103 and 3064"
+    },
+    "no_voisins_word": {
+      "status": "VERIFIED",
+      "details": "grep -rn 'voisins' returned exit code 1 (no matches found)"
+    },
+    "avatar_url_check": {
+      "status": "VERIFIED",
+      "details": "avatar_url NOT in any Supabase .select() queries. Only in TypeScript interfaces (Chat.tsx) and hardcoded undefined (ClientDashboard.tsx)"
+    }
+  },
+
+  "test_report_links": [
+    "/app/test_reports/iteration_24.json"
+  ],
+
+  "action_items": [],
+
+  "critical_code_review_comments": [
+    "GOOD: 'city' column successfully removed from OrderTracking.tsx Supabase query on orders table",
+    "GOOD: washerAssignment.ts orders query uses pickup_lat, pickup_lng instead of city",
+    "GOOD: SmartDashboard.tsx correctly implements role-based routing (admin → admin-dashboard, washer → washer-dashboard, partner → partner-dashboard, default → client-dashboard)",
+    "GOOD: App.tsx /dashboard route correctly uses SmartDashboard component",
+    "GOOD: Navbar.tsx correctly shows role-aware menu ('Mes missions' for washers, 'Mes commandes' for clients)",
+    "GOOD: Navbar.tsx correctly hides 'Points fidélité' for washers and admins",
+    "GOOD: haversine distance functions exist in AdminDashboard.tsx",
+    "GOOD: No 'voisins' word in codebase",
+    "NOTE: washerAssignment.ts line 45 queries 'city, postal_code' from WASHERS table (not orders) - this is CORRECT as washers table has these columns"
+  ],
+
+  "updated_files": [],
+
+  "success_rate": {
+    "backend": "N/A - Supabase API key invalid in preview environment",
+    "frontend": "100% - All pages load correctly, all code verifications passed"
+  },
+
+  "test_credentials": "Admin: akim.hachili@gmail.com, Client: sousouait59600@gmail.com (passwords managed by Supabase Auth)",
+  "seed_data_creation": "None",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+
+  "context_for_next_testing_agent": "Bug fixes verified for iteration 24: 1) 'column orders.city does not exist' error fixed - OrderTracking.tsx and washerAssignment.ts no longer query 'city' from orders table. 2) SmartDashboard.tsx implements role-based routing. 3) Navbar.tsx shows role-aware menu. Preview environment has invalid Supabase API key (401 errors expected). To test authenticated flows, use production kilolab.fr.",
+
+  "screenshots_taken": [
+    ".screenshots/iteration24_landing.png - Landing page loads correctly",
+    ".screenshots/iteration24_become_washer.png - BecomeWasher page loads",
+    ".screenshots/iteration24_new_order.png - NewOrder page with 5 steps visible",
+    ".screenshots/iteration24_subscription.png - /subscription redirects to select-dashboard",
+    ".screenshots/iteration24_dashboard.png - /dashboard redirects via SmartDashboard",
+    ".screenshots/iteration24_tarifs.png - Tarifs page loads correctly"
+  ]
+}

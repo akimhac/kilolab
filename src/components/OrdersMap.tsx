@@ -156,7 +156,7 @@ export default function OrdersMap({
                 </div>
                 <div className="flex items-center gap-2 text-slate-600 text-sm mb-2">
                   <MapPin size={14} />
-                  <span className="truncate">{order.city || order.postal_code || 'Zone non précisée'}</span>
+                  <span className="truncate">{order.pickup_city || order.pickup_address || 'Zone non précisée'}</span>
                 </div>
                 <div className="flex items-center justify-between pt-2 border-t border-slate-100">
                   <span className="text-xs text-slate-500">Votre gain</span>
