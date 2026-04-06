@@ -101,8 +101,8 @@ export default function App() {
       {/* ✅ AJOUT : POPUP INSTAGRAM */}
       <InstagramPromoPopup />
 
-      {/* ✅ PWA INSTALL BANNER */}
-      <PWAInstallBanner />
+      {/* PWA INSTALL BANNER - Desactive en attendant l'app native */}
+      {/* <PWAInstallBanner /> */}
 
       <ErrorBoundary>
       <Suspense fallback={<PageLoader />}>
