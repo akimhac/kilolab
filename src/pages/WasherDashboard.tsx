@@ -1,11 +1,10 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from 'react-i18next';
 import { supabase } from "../lib/supabase";
-import { requestNotificationPermission } from "../lib/firebase";
 import { 
   subscribeToZoneOrders, 
   showBrowserNotification,
-  requestNotificationPermission as requestBrowserNotif 
+  requestNotificationPermission
 } from "../services/washerNotifications";
 import Navbar from "../components/Navbar";
 import { FadeInOnScroll, CountUp } from "../components/animations/ScrollAnimations";
@@ -346,7 +345,7 @@ export default function WasherDashboard() {
     if (!washerId || washerStatus !== "approved" || !washerData?.postal_code) return;
     
     // Request browser notification permission
-    requestBrowserNotif();
+    requestNotificationPermission();
     
     // Subscribe to new orders in zone
     const unsubscribe = subscribeToZoneOrders(
