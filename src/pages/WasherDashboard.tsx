@@ -69,12 +69,13 @@ function formulaBadgeClass(f: string) {
 }
 
 /* ── MODALE DETAIL MISSION ── */
-function MissionModal({ mission, onClose, onAccept, onUpdate, isActive, onWeightAdjust }: {
+function MissionModal({ mission, onClose, onAccept, onUpdate, isActive, onWeightAdjust, stripeReady }: {
   mission: Mission; onClose: () => void;
   onAccept?: (id: string) => void;
   onUpdate?: (id: string, status: OrderStatus) => void;
   isActive?: boolean;
   onWeightAdjust?: (mission: Mission) => void;
+  stripeReady?: boolean;
 }) {
   const earning = commissionEarnings(mission.total_price);
   return (
@@ -167,10 +168,27 @@ function MissionModal({ mission, onClose, onAccept, onUpdate, isActive, onWeight
             </button>
           )}
           {isActive && onUpdate && mission.status === "in_progress" && (
-            <button onClick={() => { onUpdate(mission.id, "completed"); onClose(); }}
-              className="w-full py-4 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-2xl font-black text-base hover:shadow-2xl transition-all flex items-center justify-center gap-2">
-              <CheckCircle2 size={20} /> Marquer comme terminee
-            </button>
+            <>
+              {!stripeReady && (
+                <div className="bg-orange-500/10 border border-orange-500/20 rounded-2xl p-4 flex items-start gap-3">
+                  <AlertCircle className="text-orange-400 flex-shrink-0 mt-0.5" size={18} />
+                  <div>
+                    <p className="text-orange-300 text-sm font-bold">Compte bancaire non configure</p>
+                    <p className="text-orange-300/60 text-xs mt-1">Configurez Stripe Connect pour recevoir vos gains avant de valider la commande.</p>
+                  </div>
+                </div>
+              )}
+              <button 
+                onClick={() => { onUpdate(mission.id, "completed"); onClose(); }}
+                disabled={!stripeReady}
+                className={`w-full py-4 rounded-2xl font-black text-base transition-all flex items-center justify-center gap-2 ${
+                  stripeReady 
+                    ? "bg-gradient-to-r from-green-500 to-emerald-500 text-white hover:shadow-2xl" 
+                    : "bg-white/5 text-white/30 border border-white/10 cursor-not-allowed"
+                }`}>
+                <CheckCircle2 size={20} /> {stripeReady ? "Marquer comme terminee" : "Configurez Stripe d'abord"}
+              </button>
+            </>
           )}
         </div>
       </div>
@@ -470,6 +488,13 @@ export default function WasherDashboard() {
 
   const updateMissionStatus = async (orderId: string, newStatus: OrderStatus) => {
     if (!washerId) return;
+    
+    // Block completion if Stripe Connect is not configured
+    if ((newStatus === "completed" || newStatus === "delivered") && !stripeConnectStatus.completed) {
+      toast.error("Configurez votre compte bancaire (Stripe) avant de valider une commande. Vous ne pourrez pas recevoir vos gains sans cela.", { duration: 8000 });
+      return;
+    }
+    
     try {
       const updates: any = { status: newStatus, updated_at: new Date().toISOString() };
       if (newStatus === "completed") updates.completed_at = new Date().toISOString();
@@ -627,6 +652,7 @@ export default function WasherDashboard() {
           onAccept={modalMode === "available" ? acceptMission : undefined}
           onUpdate={modalMode === "active" ? updateMissionStatus : undefined}
           isActive={modalMode === "active"}
+          stripeReady={stripeConnectStatus.completed}
           onWeightAdjust={(mission) => {
             setSelectedMission(null);
             setWeightAdjustMission(mission);
