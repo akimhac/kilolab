@@ -20,6 +20,9 @@ import {
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import InvoiceGenerator from '../components/InvoiceGenerator';
+import ReorderButton from '../components/ReorderButton';
+import LiveTracking from '../components/LiveTracking';
+import GoogleReviewPrompt from '../components/GoogleReviewPrompt';
 
 interface WasherInfo {
   id: string; first_name: string; last_name: string;
@@ -260,6 +263,16 @@ function ActiveOrderCard({ order, onCancel, onRate, onTrack, clientName, clientE
             </div>
           )}
         </div>
+        {/* Live tracking map for active orders with washer */}
+        {canTrack && order.washer_id && (
+          <LiveTracking
+            orderId={order.id}
+            washerId={order.washer_id}
+            pickupLat={order.pickup_lat}
+            pickupLng={order.pickup_lng}
+            pickupAddress={order.pickup_address}
+          />
+        )}
         {!order.washer_id && (
           <div className="flex items-center gap-3 bg-orange-50 border border-orange-100 rounded-2xl p-3.5">
             <Loader2 size={18} className="text-orange-400 animate-spin flex-shrink-0" />
@@ -281,6 +294,9 @@ function ActiveOrderCard({ order, onCancel, onRate, onTrack, clientName, clientE
           <button onClick={() => onRate!(order)} className="w-full py-3.5 bg-gradient-to-r from-yellow-400 to-orange-400 text-white rounded-2xl font-black hover:shadow-lg transition flex items-center justify-center gap-2">
             <Star size={16} className="fill-white" /> Notez votre washer
           </button>
+        )}
+        {order.status === 'completed' && (
+          <ReorderButton order={{ id: order.id, pickup_address: order.pickup_address, weight: order.weight, formula: order.formula, pickup_slot: order.pickup_slot }} />
         )}
         {order.status === 'pending' && onCancel && (
           <button onClick={() => onCancel(order.id)} className="w-full py-2.5 text-red-400 text-sm font-semibold hover:text-red-600 transition border border-red-100 rounded-xl hover:bg-red-50">

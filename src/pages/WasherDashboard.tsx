@@ -20,6 +20,9 @@ import {
 import { lazy, Suspense } from 'react';
 import { ErrorBoundary } from '../components/ErrorBoundary';
 import WasherAvailability from '../components/WasherAvailability';
+import WasherEarnings from '../components/WasherEarnings';
+import WasherOnboarding from '../components/WasherOnboarding';
+import WasherCalendar from '../components/WasherCalendar';
 import WeightAdjustment from '../components/WeightAdjustment';
 
 // Lazy load the map component
@@ -709,6 +712,16 @@ export default function WasherDashboard() {
           </div>
         </div>
 
+        {/* ONBOARDING - Guided first steps for new washers */}
+        {washerData && !washerData.onboarding_completed && (
+          <WasherOnboarding
+            washerId={washerId}
+            washerData={washerData}
+            stripeCompleted={stripeConnectStatus.completed}
+            onComplete={fetchWasherData}
+          />
+        )}
+
         {/* ALERTES */}
         {!isAvailable && (
           <div className="bg-orange-500/10 border border-orange-500/20 rounded-2xl p-4 mb-4 flex items-center gap-3">
@@ -753,6 +766,20 @@ export default function WasherDashboard() {
               <p className="font-bold text-green-300 text-sm">Compte bancaire connecte</p>
               <p className="text-green-400/60 text-xs">Virements chaque dimanche soir</p>
             </div>
+          </div>
+        )}
+
+        {/* EARNINGS DASHBOARD */}
+        {washerId && (
+          <div className="mb-6">
+            <WasherEarnings washerId={washerId} />
+          </div>
+        )}
+
+        {/* AVAILABILITY CALENDAR */}
+        {washerId && (
+          <div className="mb-6">
+            <WasherCalendar washerId={washerId} />
           </div>
         )}
 

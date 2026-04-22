@@ -82,6 +82,20 @@ export default function NewOrder() {
       const w = parseFloat(prefillWeight);
       if (w >= 1) setWeight(Math.min(w, 30));
     }
+
+    // Pre-fill from sessionStorage (ReorderButton)
+    const reorderData = sessionStorage.getItem('reorder');
+    if (reorderData) {
+      try {
+        const r = JSON.parse(reorderData);
+        if (r.pickup_address) { setFinalAddress(r.pickup_address); setAddressValidated(true); }
+        if (r.formula === 'express' || r.formula === 'express_2h') setFormula(r.formula);
+        else if (r.formula === 'eco') setFormula('eco');
+        if (r.weight && r.weight >= 1) setWeight(Math.min(r.weight, 30));
+        sessionStorage.removeItem('reorder');
+        toast.success('Commande pre-remplie depuis votre historique', { duration: 3000 });
+      } catch { /* ignore parse errors */ }
+    }
     
     // Listen to auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_, session) => {

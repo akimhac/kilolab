@@ -62,7 +62,9 @@ type Tab =
   | "logs"
   | "coupons"
   | "heatmap"
-  | "b2b";
+  | "b2b"
+  | "fraud"
+  | "finance";
 
 type PartnerStatusFilter = "all" | "active" | "pending";
 type WasherFilter = "all" | "pending" | "approved" | "rejected";
@@ -109,6 +111,182 @@ function getWashersSortedByDistance(washersArr: any[], orderLat: number | null, 
       return a._distance - b._distance;
     });
 }
+
+
+/* ── FRAUD ALERTS TAB ── */
+function FraudAlertsTab() {
+  const [alerts, setAlerts] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchAlerts = async () => {
+      const { data } = await supabase.from('fraud_alerts').select('*').order('created_at', { ascending: false }).limit(50);
+      setAlerts(data || []);
+      setLoading(false);
+    };
+    fetchAlerts();
+  }, []);
+
+  const resolveAlert = async (id: string) => {
+    const user = (await supabase.auth.getUser()).data.user;
+    await supabase.from('fraud_alerts').update({ resolved: true, resolved_by: user?.id, resolved_at: new Date().toISOString() }).eq('id', id);
+    setAlerts(prev => prev.map(a => a.id === id ? { ...a, resolved: true } : a));
+    toast.success('Alerte resolue');
+  };
+
+  if (loading) return <div className="text-center py-12"><Loader2 className="animate-spin text-teal-500 mx-auto" size={32} /></div>;
+
+  const unresolved = alerts.filter(a => !a.resolved);
+  const resolved = alerts.filter(a => a.resolved);
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <h2 className="text-xl font-black text-white">Detection de fraude</h2>
+        {unresolved.length > 0 && (
+          <span className="bg-red-500/20 text-red-400 px-3 py-1 rounded-full text-xs font-bold">
+            {unresolved.length} alerte{unresolved.length !== 1 ? 's' : ''} active{unresolved.length !== 1 ? 's' : ''}
+          </span>
+        )}
+      </div>
+
+      {unresolved.length === 0 && (
+        <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-2xl p-8 text-center">
+          <p className="text-emerald-400 font-bold text-sm">Aucune alerte de fraude</p>
+          <p className="text-emerald-300/50 text-xs mt-1">Tout est normal</p>
+        </div>
+      )}
+
+      {unresolved.map(alert => (
+        <div key={alert.id} className={`rounded-2xl p-5 border ${
+          alert.severity === 'critical' ? 'bg-red-500/10 border-red-500/30' :
+          alert.severity === 'high' ? 'bg-orange-500/10 border-orange-500/30' :
+          'bg-yellow-500/10 border-yellow-500/30'
+        }`}>
+          <div className="flex items-center justify-between mb-3">
+            <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${
+              alert.severity === 'critical' ? 'bg-red-500/30 text-red-300' :
+              alert.severity === 'high' ? 'bg-orange-500/30 text-orange-300' :
+              'bg-yellow-500/30 text-yellow-300'
+            }`}>
+              {alert.severity?.toUpperCase()}
+            </span>
+            <span className="text-white/30 text-xs">{new Date(alert.created_at).toLocaleString('fr-FR')}</span>
+          </div>
+          <p className="text-white font-bold text-sm">{alert.description}</p>
+          <p className="text-white/40 text-xs mt-1">Type: {alert.alert_type}</p>
+          <button onClick={() => resolveAlert(alert.id)} className="mt-3 px-4 py-2 bg-white/10 text-white rounded-lg text-xs font-bold hover:bg-white/20 transition">
+            Marquer comme resolu
+          </button>
+        </div>
+      ))}
+
+      {resolved.length > 0 && (
+        <div>
+          <h3 className="text-white/50 text-sm font-bold mb-3">Alertes resolues ({resolved.length})</h3>
+          {resolved.slice(0, 5).map(alert => (
+            <div key={alert.id} className="bg-white/5 rounded-xl p-3 mb-2 opacity-50">
+              <p className="text-white/60 text-xs">{alert.description}</p>
+              <p className="text-white/30 text-[10px] mt-1">{new Date(alert.created_at).toLocaleString('fr-FR')}</p>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ── FINANCE TAB ── */
+function FinanceTab({ orders: allOrders }: { orders: any[] }) {
+  const completedOrders = allOrders.filter(o => o.status === 'completed' || o.status === 'delivered');
+  const cancelledOrders = allOrders.filter(o => o.status === 'cancelled');
+
+  const totalRevenue = completedOrders.reduce((s, o) => s + (parseFloat(o.total_price || '0')), 0);
+  const totalWasherPayout = totalRevenue * 0.6;
+  const totalKilolabCommission = totalRevenue * 0.4;
+  const totalRefunds = cancelledOrders.reduce((s, o) => s + (parseFloat(o.total_price || '0')), 0);
+
+  // Monthly breakdown
+  const monthlyData: Record<string, { revenue: number; payout: number; commission: number; orders: number }> = {};
+  completedOrders.forEach(o => {
+    const month = (o.completed_at || o.created_at || '').substring(0, 7);
+    if (!month) return;
+    if (!monthlyData[month]) monthlyData[month] = { revenue: 0, payout: 0, commission: 0, orders: 0 };
+    const price = parseFloat(o.total_price || '0');
+    monthlyData[month].revenue += price;
+    monthlyData[month].payout += price * 0.6;
+    monthlyData[month].commission += price * 0.4;
+    monthlyData[month].orders++;
+  });
+
+  const months = Object.keys(monthlyData).sort().reverse();
+
+  return (
+    <div className="space-y-6">
+      <h2 className="text-xl font-black text-white">Reconciliation financiere</h2>
+
+      {/* Summary cards */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="bg-teal-500/10 border border-teal-500/20 rounded-2xl p-5 text-center">
+          <p className="text-teal-400/60 text-xs font-bold">Revenus totaux</p>
+          <p className="text-teal-400 font-black text-2xl mt-1">{totalRevenue.toFixed(2)} EUR</p>
+          <p className="text-teal-400/40 text-xs">{completedOrders.length} commandes</p>
+        </div>
+        <div className="bg-purple-500/10 border border-purple-500/20 rounded-2xl p-5 text-center">
+          <p className="text-purple-400/60 text-xs font-bold">Payouts Washers (60%)</p>
+          <p className="text-purple-400 font-black text-2xl mt-1">{totalWasherPayout.toFixed(2)} EUR</p>
+        </div>
+        <div className="bg-cyan-500/10 border border-cyan-500/20 rounded-2xl p-5 text-center">
+          <p className="text-cyan-400/60 text-xs font-bold">Commission Kilolab (40%)</p>
+          <p className="text-cyan-400 font-black text-2xl mt-1">{totalKilolabCommission.toFixed(2)} EUR</p>
+        </div>
+        <div className="bg-red-500/10 border border-red-500/20 rounded-2xl p-5 text-center">
+          <p className="text-red-400/60 text-xs font-bold">Remboursements</p>
+          <p className="text-red-400 font-black text-2xl mt-1">{totalRefunds.toFixed(2)} EUR</p>
+          <p className="text-red-400/40 text-xs">{cancelledOrders.length} annulations</p>
+        </div>
+      </div>
+
+      {/* Monthly breakdown */}
+      <div className="bg-white/5 rounded-2xl border border-white/10 overflow-hidden">
+        <div className="p-4 border-b border-white/10">
+          <h3 className="text-white font-bold text-sm">Detail mensuel</h3>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="text-white/40 text-xs border-b border-white/10">
+                <th className="p-3 text-left">Mois</th>
+                <th className="p-3 text-right">Commandes</th>
+                <th className="p-3 text-right">Revenus</th>
+                <th className="p-3 text-right">Washers</th>
+                <th className="p-3 text-right">Kilolab</th>
+              </tr>
+            </thead>
+            <tbody>
+              {months.map(month => {
+                const d = monthlyData[month];
+                return (
+                  <tr key={month} className="border-b border-white/5 hover:bg-white/5">
+                    <td className="p-3 text-white font-bold">{month}</td>
+                    <td className="p-3 text-right text-white/60">{d.orders}</td>
+                    <td className="p-3 text-right text-teal-400 font-bold">{d.revenue.toFixed(2)} EUR</td>
+                    <td className="p-3 text-right text-purple-400">{d.payout.toFixed(2)} EUR</td>
+                    <td className="p-3 text-right text-cyan-400">{d.commission.toFixed(2)} EUR</td>
+                  </tr>
+                );
+              })}
+              {months.length === 0 && (
+                <tr><td colSpan={5} className="p-8 text-center text-white/30 text-xs">Aucune donnee</td></tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 
 export default function AdminDashboard() {
   // --- ÉTATS ---
@@ -1370,7 +1548,7 @@ export default function AdminDashboard() {
         {/* NAVIGATION TABS - Modern pills */}
         <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl mb-8 overflow-hidden">
           <div className="flex border-b border-white/10 overflow-x-auto p-2 gap-1">
-            {(["overview", "partners", "washers", "clients", "orders", "messages", "heatmap", "b2b", "logs", "coupons"] as const).map(
+            {(["overview", "partners", "washers", "clients", "orders", "messages", "heatmap", "b2b", "logs", "coupons", "fraud", "finance"] as const).map(
               (tab) => (
                 <button
                   key={tab}
@@ -1399,6 +1577,10 @@ export default function AdminDashboard() {
                     ? "B2B / API"
                     : tab === "logs"
                     ? `Logs (${stats.criticalErrors})`
+                    : tab === "fraud"
+                    ? "Fraude"
+                    : tab === "finance"
+                    ? "Finance"
                     : `Coupons (${coupons.length})`}
 
                   {tab === "washers" && stats.pendingWashers > 0 && (
@@ -3361,6 +3543,17 @@ export default function AdminDashboard() {
           </div>
         </div>
       )}
+
+            {/* FRAUD DETECTION TAB */}
+            {activeTab === "fraud" && (
+              <FraudAlertsTab />
+            )}
+
+            {/* FINANCIAL RECONCILIATION TAB */}
+            {activeTab === "finance" && (
+              <FinanceTab orders={orders} />
+            )}
+
     </div>
   );
 }
