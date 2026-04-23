@@ -49,7 +49,7 @@ ALTER TABLE IF EXISTS loyalty_rewards ENABLE ROW LEVEL SECURITY;
 ALTER TABLE IF EXISTS loyalty_transactions ENABLE ROW LEVEL SECURITY;
 ALTER TABLE IF EXISTS partner_promotions ENABLE ROW LEVEL SECURITY;
 ALTER TABLE IF EXISTS promo_codes ENABLE ROW LEVEL SECURITY;
-ALTER TABLE IF EXISTS promo_stats ENABLE ROW LEVEL SECURITY;
+-- promo_stats est une VIEW, pas une table → RLS non applicable
 ALTER TABLE IF EXISTS promo_usage ENABLE ROW LEVEL SECURITY;
 ALTER TABLE IF EXISTS referral_codes ENABLE ROW LEVEL SECURITY;
 ALTER TABLE IF EXISTS washer_ratings ENABLE ROW LEVEL SECURITY;
@@ -70,7 +70,7 @@ BEGIN
     'washer_locations','analytics_events','error_logs','order_photos',
     'support_responses','account_deletions','documents','loyalty_redemptions',
     'loyalty_rewards','loyalty_transactions','partner_promotions','promo_codes',
-    'promo_stats','promo_usage','referral_codes','washer_ratings','washer_orders',
+    'promo_usage','referral_codes','washer_ratings','washer_orders',
     'washer_location_history','reward_redemptions'
   ])
   LOOP
