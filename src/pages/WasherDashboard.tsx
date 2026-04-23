@@ -23,6 +23,8 @@ import WasherAvailability from '../components/WasherAvailability';
 import WasherEarnings from '../components/WasherEarnings';
 import WasherOnboarding from '../components/WasherOnboarding';
 import WasherCalendar from '../components/WasherCalendar';
+import { Chat, ChatBubble } from '../components/Chat';
+import RouteOptimizer from '../components/RouteOptimizer';
 import WeightAdjustment from '../components/WeightAdjustment';
 
 // Lazy load the map component
@@ -36,7 +38,7 @@ interface WasherStats {
   avgRating: number; totalRatings: number; weekEarnings: number;
 }
 interface Mission {
-  id: string; client_id?: string | null; weight: number; formula: string;
+  id: string; client_id?: string | null; client_name?: string | null; weight: number; formula: string;
   total_price: number; status: OrderStatus; pickup_address: string;
   pickup_date: string; pickup_slot?: string | null;
   pickup_lat?: number | null; pickup_lng?: number | null;
@@ -327,6 +329,8 @@ export default function WasherDashboard() {
   const [selectedMission, setSelectedMission] = useState<Mission|null>(null);
   const [modalMode, setModalMode] = useState<"available"|"active">("available");
   const [showMap, setShowMap] = useState(false);
+  const [showChat, setShowChat] = useState(false);
+  const [chatMission, setChatMission] = useState<Mission | null>(null);
   const [showAvailability, setShowAvailability] = useState(false);
   const [weightAdjustMission, setWeightAdjustMission] = useState<Mission|null>(null);
   const [showCancelled, setShowCancelled] = useState(false);
@@ -953,19 +957,26 @@ export default function WasherDashboard() {
 
         {/* TAB DISPONIBLES */}
         {activeTab === "available" && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {availableMissions.map(m => (
-              <MissionCard key={m.id} mission={m} onOpen={mission => { setSelectedMission(mission); setModalMode("available"); }} />
-            ))}
-            {availableMissions.length === 0 && (
-              <div className="col-span-full bg-[#0f1729] border border-white/8 rounded-2xl py-16 text-center">
-                <Package size={40} className="mx-auto mb-4 text-white/15" />
-                <p className="text-white/30 font-bold text-lg mb-2">{t('washerDashboard.noMissions')}</p>
-                <p className="text-white/20 text-sm">{t('washerDashboard.noMissionsDesc')}</p>
-                <p className="text-white/15 text-xs mt-3">Mise a jour toutes les 30s</p>
-              </div>
+          <>
+            {/* Route optimizer for nearby missions */}
+            <RouteOptimizer
+              missions={availableMissions}
+              onSelectMission={(m) => { setSelectedMission(m as any); setModalMode("available"); }}
+            />
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {availableMissions.map(m => (
+                <MissionCard key={m.id} mission={m} onOpen={mission => { setSelectedMission(mission); setModalMode("available"); }} />
+              ))}
+              {availableMissions.length === 0 && (
+                <div className="col-span-full bg-[#0f1729] border border-white/8 rounded-2xl py-16 text-center">
+                  <Package size={40} className="mx-auto mb-4 text-white/15" />
+                  <p className="text-white/30 font-bold text-lg mb-2">{t('washerDashboard.noMissions')}</p>
+                  <p className="text-white/20 text-sm">{t('washerDashboard.noMissionsDesc')}</p>
+                  <p className="text-white/15 text-xs mt-3">Mise a jour toutes les 30s</p>
+                </div>
             )}
           </div>
+          </>
         )}
 
         {/* TAB ACTIVES */}
@@ -1137,6 +1148,34 @@ export default function WasherDashboard() {
           Derniere actualisation : {new Date().toLocaleTimeString("fr-FR")} · Mise a jour auto toutes les 30s
         </div>
       </div>
+
+      {/* Chat Bubble - Show when there are active missions with clients */}
+      {activeMissions.filter(m => m.client_id && ['assigned', 'in_progress', 'picked_up', 'washing', 'ready'].includes(m.status)).length > 0 && !showChat && (
+        <ChatBubble
+          onClick={() => {
+            const missionWithClient = activeMissions.find(m => m.client_id);
+            if (missionWithClient) {
+              setChatMission(missionWithClient);
+              setShowChat(true);
+            }
+          }}
+          unreadCount={0}
+        />
+      )}
+
+      {/* Chat Modal */}
+      {showChat && chatMission && chatMission.client_id && userId && (
+        <Chat
+          orderId={chatMission.id}
+          currentUserId={userId}
+          participant={{
+            id: chatMission.client_id,
+            name: chatMission.client_name || 'Client',
+            role: 'client',
+          }}
+          onClose={() => setShowChat(false)}
+        />
+      )}
     </div>
   );
 }
