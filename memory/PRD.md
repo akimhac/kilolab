@@ -11,59 +11,52 @@ Le 1er service de laverie a domicile en France et Belgique.
 - Maps: Leaflet vanilla (iOS Safari compatible)
 - CDN: Vercel Edge + cache headers (1 an assets, 1 jour images)
 
-## Sprint 24 - MEGA UPDATE Securite + Experience + Finance (19/04/2026)
+## Sprint 24 - MEGA UPDATE (19/04/2026) - COMPLETE
 
-### Securite (Partie 1)
-- [x] RLS active sur ~35 tables (MEGA_FIX_ALL.sql)
-- [x] Admin bypass policies sur toutes les tables
-- [x] Fix policy SELECT/UPDATE orders pour washers
-- [x] Rate limiting API send-email (10/min/IP)
-- [x] Rate limiting API stripe-refund (5/min/IP)
-- [x] Validation serveur montants Stripe refund
-- [x] Headers securite Vercel (X-Content-Type-Options, X-Frame-Options, X-XSS-Protection)
-- [x] Audit logs sur remboursements Stripe
+### Securite
+- [x] RLS sur ~35 tables (MEGA_FIX_ALL.sql)
+- [x] Rate limiting send-email (10/min) + stripe-refund (5/min)
+- [x] Validation serveur montants Stripe
+- [x] Headers securite Vercel (nosniff, X-Frame, XSS)
+- [x] Audit logs remboursements
 
-### Experience Client (Partie 2)
-- [x] Bouton "Re-commander" sur commandes terminees (ReorderButton.tsx)
-- [x] Pre-remplissage auto du formulaire commande depuis historique
-- [x] Suivi en temps reel washer sur carte (LiveTracking.tsx) - polling 10s
-- [x] Prompt avis Google apres note 5 etoiles (GoogleReviewPrompt.tsx)
+### Experience Client
+- [x] Re-commander 1 clic (ReorderButton + pre-remplissage NewOrder)
+- [x] Suivi temps reel washer sur carte (LiveTracking, polling 10s)
+- [x] Prompt avis Google apres 5 etoiles
+- [x] Chat in-app client <-> washer (deja existant cote client, AJOUTE cote washer)
 
-### Experience Washer (Partie 3)
-- [x] Dashboard gains jour/semaine/mois/total (WasherEarnings.tsx)
-- [x] Badges gamification auto (1/10/50/100 missions) + trigger SQL
-- [x] Onboarding guide 4 etapes (WasherOnboarding.tsx) : profil, Stripe, zone, notifs
-- [x] Calendrier disponibilites semaine + jours off (WasherCalendar.tsx)
+### Experience Washer
+- [x] Dashboard gains jour/semaine/mois (WasherEarnings)
+- [x] Badges gamification auto (1/10/50/100 missions)
+- [x] Onboarding guide 4 etapes (WasherOnboarding)
+- [x] Calendrier disponibilites + jours off (WasherCalendar)
+- [x] Optimisation tournee par proximite (RouteOptimizer, Haversine clustering)
+- [x] Chat in-app washer -> client (ChatBubble)
 
-### Securite Financiere (Partie 4)
-- [x] Detection fraude auto : annulations excessives (>5/30j), validations suspectes (>8/1h)
-- [x] Table fraud_alerts + trigger SQL
-- [x] Onglet Fraude dans Admin Dashboard (FraudAlertsTab)
-- [x] Onglet Finance dans Admin Dashboard (FinanceTab) : revenus, payouts, commissions, mensuel
-- [x] Audit logs remboursements avec IP, montant, raison
+### Securite Financiere
+- [x] Detection fraude auto (annulations, validations suspectes)
+- [x] Onglet Fraude admin
+- [x] Onglet Finance admin (revenus, payouts, commissions, mensuel)
+- [x] Audit logs remboursements
 
-### Technique P2 (Partie 5)
-- [x] CDN cache headers Vercel (1 an JS/CSS/fonts, 1 jour images)
-- [x] Headers securite API (nosniff, DENY frame, XSS protection)
+### Technique
+- [x] CDN cache headers Vercel (1 an JS/CSS, 1 jour images)
+- [x] Headers securite API
 
-### Tests
-- [x] Iteration 28 : 22/22 (100%) - tests initiaux
-- [x] Iteration 29 : 20/20 (100%) - apres mega update
-- [ ] ACTION UTILISATEUR : Executer MEGA_FIX_ALL.sql dans Supabase
+### Tests : 3 iterations 100%
+- [x] Iteration 28 : 22/22 pass
+- [x] Iteration 29 : 20/20 pass
+- [x] Iteration 30 : 22/22 pass
 
-## Sprint 22-23 (precedents)
-- [x] Carte vanilla Leaflet (fix iOS)
-- [x] Notifications Uber (T+5/10/20 min)
-- [x] Blocage Stripe Connect
-- [x] Fix triggers total_amount
-- [x] Banniere PWA desactivee
+### Action utilisateur
+- [ ] Executer MEGA_FIX_ALL.sql dans Supabase SQL Editor
+- [ ] Cliquer "Save to GitHub" pour deployer
 
 ## Backlog
-- [ ] SMS Twilio (P2)
-- [ ] Chat in-app client-washer (P2)
-- [ ] Programme parrainage actif avec lien partageable (P2)
-- [ ] Optimisation tournee washer (P2)
+- [ ] Programme parrainage actif avec lien partageable (P2) - base ReferralSystem existe deja
+- [ ] SMS Twilio (P2) - necessite API key
 - [ ] App mobile React Native (P3)
 
 ---
-*Derniere MAJ: 19/04/2026 - Sprint 24*
+*Derniere MAJ: 19/04/2026 - Sprint 24 COMPLETE*
