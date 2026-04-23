@@ -1,6 +1,7 @@
 -- ═══════════════════════════════════════════════════════════════════════
--- KILOLAB MEGA FIX - SECURITE + EXPERIENCE + FINANCE
--- Date: 19/04/2026 - A executer EN UNE SEULE FOIS
+-- KILOLAB MEGA FIX V3 - SECURITE + EXPERIENCE + FINANCE
+-- Date: 23/04/2026 - A executer EN UNE SEULE FOIS
+-- FIX: Skip automatique des VIEWS (promo_stats etc.)
 -- ═══════════════════════════════════════════════════════════════════════
 
 -- ══════════════════════════════════════════════
@@ -17,48 +18,37 @@ $$ LANGUAGE plpgsql SECURITY DEFINER STABLE;
 
 -- ══════════════════════════════════════════════
 -- PARTIE 1 : SECURITE - RLS SUR TOUTES LES TABLES
+-- (Skip automatique si la relation est une VIEW)
 -- ══════════════════════════════════════════════
+DO $$
+DECLARE
+  tbl TEXT;
+BEGIN
+  FOR tbl IN SELECT unnest(ARRAY[
+    'user_profiles','orders','washers','partners','reviews','messages',
+    'notifications','coupons','disputes','referrals','loyalty_points',
+    'contact_messages','subscriptions','b2b_partners','b2b_api_logs',
+    'washer_locations','analytics_events',
+    'error_logs','order_photos','support_responses','account_deletions',
+    'documents','loyalty_redemptions','loyalty_rewards','loyalty_transactions',
+    'partner_promotions','promo_codes','promo_stats','promo_usage',
+    'referral_codes','washer_ratings','washer_orders',
+    'washer_location_history','reward_redemptions','profiles'
+  ])
+  LOOP
+    -- Verifie que c'est bien une TABLE (pas une view)
+    IF EXISTS (SELECT 1 FROM pg_tables WHERE schemaname = 'public' AND tablename = tbl) THEN
+      EXECUTE format('ALTER TABLE public.%I ENABLE ROW LEVEL SECURITY', tbl);
+      RAISE NOTICE 'RLS active sur table: %', tbl;
+    ELSE
+      RAISE NOTICE 'SKIP (view ou inexistant): %', tbl;
+    END IF;
+  END LOOP;
+END $$;
 
--- Tables principales
-ALTER TABLE IF EXISTS user_profiles ENABLE ROW LEVEL SECURITY;
-ALTER TABLE IF EXISTS orders ENABLE ROW LEVEL SECURITY;
-ALTER TABLE IF EXISTS washers ENABLE ROW LEVEL SECURITY;
-ALTER TABLE IF EXISTS partners ENABLE ROW LEVEL SECURITY;
-ALTER TABLE IF EXISTS reviews ENABLE ROW LEVEL SECURITY;
-ALTER TABLE IF EXISTS messages ENABLE ROW LEVEL SECURITY;
-ALTER TABLE IF EXISTS notifications ENABLE ROW LEVEL SECURITY;
-ALTER TABLE IF EXISTS coupons ENABLE ROW LEVEL SECURITY;
-ALTER TABLE IF EXISTS disputes ENABLE ROW LEVEL SECURITY;
-ALTER TABLE IF EXISTS referrals ENABLE ROW LEVEL SECURITY;
-ALTER TABLE IF EXISTS loyalty_points ENABLE ROW LEVEL SECURITY;
-ALTER TABLE IF EXISTS contact_messages ENABLE ROW LEVEL SECURITY;
-ALTER TABLE IF EXISTS subscriptions ENABLE ROW LEVEL SECURITY;
-ALTER TABLE IF EXISTS b2b_partners ENABLE ROW LEVEL SECURITY;
-ALTER TABLE IF EXISTS b2b_api_logs ENABLE ROW LEVEL SECURITY;
-ALTER TABLE IF EXISTS washer_locations ENABLE ROW LEVEL SECURITY;
-ALTER TABLE IF EXISTS analytics_events ENABLE ROW LEVEL SECURITY;
-
--- Tables secondaires (potentiellement sans RLS)
-ALTER TABLE IF EXISTS error_logs ENABLE ROW LEVEL SECURITY;
-ALTER TABLE IF EXISTS order_photos ENABLE ROW LEVEL SECURITY;
-ALTER TABLE IF EXISTS support_responses ENABLE ROW LEVEL SECURITY;
-ALTER TABLE IF EXISTS account_deletions ENABLE ROW LEVEL SECURITY;
-ALTER TABLE IF EXISTS documents ENABLE ROW LEVEL SECURITY;
-ALTER TABLE IF EXISTS loyalty_redemptions ENABLE ROW LEVEL SECURITY;
-ALTER TABLE IF EXISTS loyalty_rewards ENABLE ROW LEVEL SECURITY;
-ALTER TABLE IF EXISTS loyalty_transactions ENABLE ROW LEVEL SECURITY;
-ALTER TABLE IF EXISTS partner_promotions ENABLE ROW LEVEL SECURITY;
-ALTER TABLE IF EXISTS promo_codes ENABLE ROW LEVEL SECURITY;
--- promo_stats est une VIEW, pas une table → RLS non applicable
-ALTER TABLE IF EXISTS promo_usage ENABLE ROW LEVEL SECURITY;
-ALTER TABLE IF EXISTS referral_codes ENABLE ROW LEVEL SECURITY;
-ALTER TABLE IF EXISTS washer_ratings ENABLE ROW LEVEL SECURITY;
-ALTER TABLE IF EXISTS washer_orders ENABLE ROW LEVEL SECURITY;
-ALTER TABLE IF EXISTS washer_location_history ENABLE ROW LEVEL SECURITY;
-ALTER TABLE IF EXISTS reward_redemptions ENABLE ROW LEVEL SECURITY;
-ALTER TABLE IF EXISTS profiles ENABLE ROW LEVEL SECURITY;
-
--- Policies admin bypass sur toutes les tables principales
+-- ══════════════════════════════════════════════
+-- PARTIE 1b : Policies admin bypass sur toutes les tables
+-- ══════════════════════════════════════════════
 DO $$
 DECLARE
   tbl TEXT;
@@ -81,27 +71,55 @@ BEGIN
   END LOOP;
 END $$;
 
--- Policies utilisateur pour tables secondaires
-DROP POLICY IF EXISTS auth_insert_error_logs ON error_logs;
-CREATE POLICY auth_insert_error_logs ON error_logs FOR INSERT TO authenticated WITH CHECK (true);
-DROP POLICY IF EXISTS auth_select_error_logs ON error_logs;
-CREATE POLICY auth_select_error_logs ON error_logs FOR SELECT TO authenticated USING (is_admin());
+-- ══════════════════════════════════════════════
+-- PARTIE 1c : Policies utilisateur specifiques
+-- ══════════════════════════════════════════════
 
-DROP POLICY IF EXISTS users_view_order_photos ON order_photos;
-CREATE POLICY users_view_order_photos ON order_photos FOR SELECT TO authenticated USING (true);
-DROP POLICY IF EXISTS users_insert_order_photos ON order_photos;
-CREATE POLICY users_insert_order_photos ON order_photos FOR INSERT TO authenticated WITH CHECK (true);
+-- error_logs
+DO $$ BEGIN
+  IF EXISTS (SELECT 1 FROM pg_tables WHERE schemaname='public' AND tablename='error_logs') THEN
+    DROP POLICY IF EXISTS auth_insert_error_logs ON error_logs;
+    CREATE POLICY auth_insert_error_logs ON error_logs FOR INSERT TO authenticated WITH CHECK (true);
+    DROP POLICY IF EXISTS auth_select_error_logs ON error_logs;
+    CREATE POLICY auth_select_error_logs ON error_logs FOR SELECT TO authenticated USING (is_admin());
+  END IF;
+END $$;
 
-DROP POLICY IF EXISTS public_view_rewards ON loyalty_rewards;
-CREATE POLICY public_view_rewards ON loyalty_rewards FOR SELECT TO authenticated USING (true);
+-- order_photos
+DO $$ BEGIN
+  IF EXISTS (SELECT 1 FROM pg_tables WHERE schemaname='public' AND tablename='order_photos') THEN
+    DROP POLICY IF EXISTS users_view_order_photos ON order_photos;
+    CREATE POLICY users_view_order_photos ON order_photos FOR SELECT TO authenticated USING (true);
+    DROP POLICY IF EXISTS users_insert_order_photos ON order_photos;
+    CREATE POLICY users_insert_order_photos ON order_photos FOR INSERT TO authenticated WITH CHECK (true);
+  END IF;
+END $$;
 
-DROP POLICY IF EXISTS public_view_promo_codes ON promo_codes;
-CREATE POLICY public_view_promo_codes ON promo_codes FOR SELECT TO authenticated USING (true);
+-- loyalty_rewards
+DO $$ BEGIN
+  IF EXISTS (SELECT 1 FROM pg_tables WHERE schemaname='public' AND tablename='loyalty_rewards') THEN
+    DROP POLICY IF EXISTS public_view_rewards ON loyalty_rewards;
+    CREATE POLICY public_view_rewards ON loyalty_rewards FOR SELECT TO authenticated USING (true);
+  END IF;
+END $$;
 
-DROP POLICY IF EXISTS public_view_ratings ON washer_ratings;
-CREATE POLICY public_view_ratings ON washer_ratings FOR SELECT USING (true);
-DROP POLICY IF EXISTS clients_create_ratings ON washer_ratings;
-CREATE POLICY clients_create_ratings ON washer_ratings FOR INSERT TO authenticated WITH CHECK (true);
+-- promo_codes
+DO $$ BEGIN
+  IF EXISTS (SELECT 1 FROM pg_tables WHERE schemaname='public' AND tablename='promo_codes') THEN
+    DROP POLICY IF EXISTS public_view_promo_codes ON promo_codes;
+    CREATE POLICY public_view_promo_codes ON promo_codes FOR SELECT TO authenticated USING (true);
+  END IF;
+END $$;
+
+-- washer_ratings
+DO $$ BEGIN
+  IF EXISTS (SELECT 1 FROM pg_tables WHERE schemaname='public' AND tablename='washer_ratings') THEN
+    DROP POLICY IF EXISTS public_view_ratings ON washer_ratings;
+    CREATE POLICY public_view_ratings ON washer_ratings FOR SELECT USING (true);
+    DROP POLICY IF EXISTS clients_create_ratings ON washer_ratings;
+    CREATE POLICY clients_create_ratings ON washer_ratings FOR INSERT TO authenticated WITH CHECK (true);
+  END IF;
+END $$;
 
 -- Fix orders SELECT pour washers (washer_id = washers.id, PAS auth.uid)
 DROP POLICY IF EXISTS clients_view_own_orders ON orders;
@@ -222,22 +240,18 @@ BEGIN
     w_id := NEW.washer_id;
     SELECT COUNT(*) INTO completed_count FROM orders WHERE washer_id = w_id AND status = 'completed';
 
-    -- Badge 1ere mission
     IF completed_count = 1 THEN
       INSERT INTO washer_badges (washer_id, badge_type, badge_name)
       VALUES (w_id, 'first_mission', 'Premiere Mission') ON CONFLICT DO NOTHING;
     END IF;
-    -- 10 missions
     IF completed_count >= 10 THEN
       INSERT INTO washer_badges (washer_id, badge_type, badge_name)
       VALUES (w_id, 'ten_missions', '10 Missions') ON CONFLICT DO NOTHING;
     END IF;
-    -- 50 missions
     IF completed_count >= 50 THEN
       INSERT INTO washer_badges (washer_id, badge_type, badge_name)
       VALUES (w_id, 'fifty_missions', 'Expert 50') ON CONFLICT DO NOTHING;
     END IF;
-    -- 100 missions
     IF completed_count >= 100 THEN
       INSERT INTO washer_badges (washer_id, badge_type, badge_name)
       VALUES (w_id, 'hundred_missions', 'Legende 100') ON CONFLICT DO NOTHING;
@@ -285,7 +299,6 @@ DECLARE
   cancel_count INTEGER;
   complete_count_1h INTEGER;
 BEGIN
-  -- Fraude: client annule plus de 5 commandes
   IF NEW.status = 'cancelled' AND OLD.status != 'cancelled' THEN
     SELECT COUNT(*) INTO cancel_count FROM orders
     WHERE client_id = NEW.client_id AND status = 'cancelled'
@@ -299,7 +312,6 @@ BEGIN
     END IF;
   END IF;
 
-  -- Fraude: washer valide plus de 8 commandes en 1h
   IF NEW.status = 'completed' AND OLD.status != 'completed' AND NEW.washer_id IS NOT NULL THEN
     SELECT COUNT(*) INTO complete_count_1h FROM orders
     WHERE washer_id = NEW.washer_id AND status = 'completed'
@@ -330,13 +342,8 @@ CREATE TRIGGER trigger_fraud_detection
 -- PARTIE 6 : COLONNES SUPPLEMENTAIRES
 -- ══════════════════════════════════════════════
 
--- Re-order tracking
 ALTER TABLE orders ADD COLUMN IF NOT EXISTS reorder_from UUID REFERENCES orders(id);
-
--- Session timeout (ajouter last_active pour tracking)
 ALTER TABLE user_profiles ADD COLUMN IF NOT EXISTS last_active_at TIMESTAMPTZ;
-
--- Washer onboarding tracking
 ALTER TABLE washers ADD COLUMN IF NOT EXISTS onboarding_completed BOOLEAN DEFAULT false;
 ALTER TABLE washers ADD COLUMN IF NOT EXISTS onboarding_step INTEGER DEFAULT 0;
 
