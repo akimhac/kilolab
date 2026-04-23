@@ -405,7 +405,7 @@ export default function Trouver() {
           {/* CTA */}
           <div className="mt-16 bg-gradient-to-r from-teal-600 to-cyan-600 rounded-2xl p-8 text-center text-white">
             <h2 className="text-3xl font-black mb-4">Devenez Washer dans votre quartier 💰</h2>
-            <p className="text-xl mb-6 text-teal-100">Gagnez jusqu&apos;à 600€/mois avec votre machine à laver</p>
+            <p className="text-xl mb-6 text-teal-100">Gagnez jusqu&apos;à 2000€/mois avec votre machine à laver</p>
             <Link
               to="/become-washer"
               className="inline-block px-8 py-4 bg-white text-teal-600 rounded-xl font-bold hover:bg-slate-100 transition shadow-xl"

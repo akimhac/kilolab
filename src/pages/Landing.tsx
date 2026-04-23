@@ -25,6 +25,52 @@ function AnimateOnScroll({ children, delay = 0, className = "" }: { children: Re
   );
 }
 
+function AnimatedCounter({ target, suffix = "", duration = 2000 }: { target: string; suffix?: string; duration?: number }) {
+  const ref = useRef<HTMLSpanElement>(null);
+  const [display, setDisplay] = useState("0");
+  const [started, setStarted] = useState(false);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting && !started) { setStarted(true); observer.disconnect(); }
+    }, { threshold: 0.3 });
+    if (ref.current) observer.observe(ref.current);
+    return () => observer.disconnect();
+  }, [started]);
+
+  useEffect(() => {
+    if (!started) return;
+    const numericPart = parseFloat(target.replace(/[^0-9.]/g, ''));
+    const hasPlus = target.includes('+');
+    const hasSlash = target.includes('/');
+    if (isNaN(numericPart)) { setDisplay(target); return; }
+
+    const startTime = performance.now();
+    const isDecimal = target.includes('.') || target.includes('/');
+
+    const animate = (now: number) => {
+      const elapsed = now - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      const current = numericPart * eased;
+
+      if (hasSlash) {
+        setDisplay(current.toFixed(1) + '/5');
+      } else if (isDecimal) {
+        setDisplay(current.toFixed(1) + (hasPlus ? '+' : '') + suffix);
+      } else {
+        setDisplay(Math.floor(current).toString() + (hasPlus ? '+' : '') + suffix);
+      }
+
+      if (progress < 1) requestAnimationFrame(animate);
+      else setDisplay(target);
+    };
+    requestAnimationFrame(animate);
+  }, [started, target, suffix, duration]);
+
+  return <span ref={ref}>{display}</span>;
+}
+
 export default function Landing() {
   const { t } = useTranslation();
   const [reduceMotion, setReduceMotion] = useState(false);
@@ -92,7 +138,8 @@ export default function Landing() {
 
               <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12 animate-slide-up" style={{ animationDelay: '300ms' }}>
                 <Link to="/new-order" data-testid="cta-primary"
-                  className="group inline-flex items-center justify-center gap-3 px-8 py-4 bg-teal-500 hover:bg-teal-400 text-white rounded-full font-semibold text-lg transition-all duration-300 shadow-[0_0_40px_rgba(20,184,166,0.4)] hover:shadow-[0_0_60px_rgba(20,184,166,0.5)] hover:scale-[1.02] active:scale-[0.98]">
+                  className="group relative inline-flex items-center justify-center gap-3 px-8 py-4 bg-teal-500 hover:bg-teal-400 text-white rounded-full font-semibold text-lg transition-all duration-300 shadow-[0_0_40px_rgba(20,184,166,0.4)] hover:shadow-[0_0_60px_rgba(20,184,166,0.5)] hover:scale-[1.02] active:scale-[0.98] overflow-hidden">
+                  <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full animate-[shimmer_3s_infinite]" />
                   {t('hero.cta')}
                   <ArrowRight className="group-hover:translate-x-1 transition-transform duration-300" size={20} />
                 </Link>
@@ -165,7 +212,7 @@ export default function Landing() {
                   <div key={i} className="relative group">
                     <div className={`absolute inset-0 bg-gradient-to-r ${stat.glow} rounded-2xl blur-xl opacity-20 group-hover:opacity-40 transition-opacity`} />
                     <div className="relative bg-white rounded-2xl p-6 border border-slate-100 shadow-sm hover:shadow-lg transition-all text-center">
-                      <p className={`text-4xl md:text-5xl font-black ${stat.color} mb-1`}>{stat.value}</p>
+                      <p className={`text-4xl md:text-5xl font-black ${stat.color} mb-1`}><AnimatedCounter target={stat.value} /></p>
                       <p className="text-sm text-slate-600 font-medium">{stat.label}</p>
                     </div>
                   </div>

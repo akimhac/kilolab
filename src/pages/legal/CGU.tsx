@@ -78,6 +78,8 @@ export default function CGU() {
               <li><strong>Paiement garanti :</strong> Le Washer est assuré de recevoir son paiement dans un délai maximum de <strong>7 jours ouvrés</strong> après validation de la commande, via Stripe Connect.</li>
               <li><strong>Droit de refus :</strong> Le Washer peut refuser une mission sans pénalité si elle est jugée incompatible (distance excessive, linge inapproprié).</li>
               <li><strong>Protection contre les abus :</strong> Kilolab surveille les comportements clients abusifs (annulations répétées, réclamations frauduleuses) et peut suspendre un client en cas de manquement avéré.</li>
+              <li><strong>Responsabilité limitée :</strong> En cas de litige sur le linge, la responsabilité du Washer est <strong>strictement limitée au montant de la commande concernée</strong>. Le Washer ne peut en aucun cas être tenu responsable au-delà de cette somme.</li>
+              <li><strong>Exclusion vêtements délicats :</strong> Le Washer n'est pas responsable des dommages causés aux articles nécessitant un traitement spécial (soie, cachemire, cuir, fourrure, vêtements de marque de luxe) que le Client n'aurait pas signalés au préalable. Le Client assume l'entière responsabilité de la déclaration de ses articles fragiles.</li>
               <li><strong>Transparence :</strong> Le Washer a accès en temps réel à ses revenus, commissions, et statistiques via son tableau de bord.</li>
               <li><strong>Aucune clause d'exclusivité :</strong> Le Washer est libre de travailler avec d'autres plateformes ou en direct.</li>
             </ul>
@@ -86,7 +88,9 @@ export default function CGU() {
           <section className="bg-blue-50 p-6 rounded-xl border border-blue-100">
             <h2 className="text-xl font-bold text-blue-900 mb-2">7. Protection des Clients</h2>
             <ul className="list-disc pl-5 space-y-2 text-blue-900">
-              <li><strong>Fonds de garantie :</strong> En cas de dommage avéré et non résolu à l'amiable sous 72h, Kilolab peut indemniser le Client à hauteur de <strong>200€ maximum</strong> par commande.</li>
+              <li><strong>Arbitrage Kilolab :</strong> En cas de litige entre un Client et un Washer, <strong>Kilolab agit systématiquement en tant qu'arbitre</strong>. Aucune indemnisation n'est versée sans décision préalable de Kilolab.</li>
+              <li><strong>Indemnisation plafonnée :</strong> En cas de dommage avéré au linge standard et non résolu à l'amiable sous 72h, Kilolab peut indemniser le Client à hauteur du <strong>montant de la commande concernée</strong> uniquement.</li>
+              <li><strong>Exclusion des articles délicats :</strong> Kilolab et le Washer <strong>déclinent toute responsabilité</strong> pour les articles nécessitant un soin spécifique (soie, cachemire, cuir, fourrure, lingerie de luxe, vêtements de créateur) non déclarés par le Client lors de la commande. Le Client est tenu de signaler tout article fragile ou de valeur.</li>
               <li><strong>Washers vérifiés :</strong> Chaque Washer fait l'objet d'une vérification d'identité (KYC) et de qualité avant approbation.</li>
               <li><strong>Paiement sécurisé :</strong> Les fonds sont séquestrés par Stripe jusqu'à confirmation de la bonne exécution du service.</li>
               <li><strong>Suivi en temps réel :</strong> Le Client peut suivre l'état de sa commande en direct via la Plateforme.</li>
@@ -140,8 +144,13 @@ export default function CGU() {
               des pertes de données, ou de l'indisponibilité temporaire de la Plateforme pour maintenance ou cas de force majeure.
             </p>
             <p className="mt-2">
-              La responsabilité financière de Kilolab est limitée au montant de la commission perçue sur la transaction litigieuse, 
-              sauf application du fonds de garantie prévu à l'article 7.
+              La responsabilité financière de Kilolab est <strong>strictement limitée au montant de la commande litigieuse</strong>. 
+              En aucun cas Kilolab ne pourra être tenu d'indemniser un Client au-delà de la valeur de la prestation commandée.
+            </p>
+            <p className="mt-2">
+              Les articles de luxe, vêtements de créateur, et tout article dont la valeur unitaire excède 100€ 
+              doivent faire l'objet d'une déclaration préalable par le Client. À défaut, Kilolab et le Washer 
+              déclinent toute responsabilité en cas de dommage sur ces articles.
             </p>
           </section>
 

@@ -227,7 +227,7 @@ export default function BecomeWasher() {
 
                 <p className="text-lg sm:text-xl text-slate-300 max-w-2xl mx-auto leading-relaxed mb-10 font-light animate-slide-up" style={{ animationDelay: '100ms' }}>
                   Transformez votre machine à laver en source de revenus.<br className="hidden sm:block" />
-                  Jusqu'à <strong className="text-white font-semibold">600&euro;/mois</strong>, depuis chez vous, à votre rythme.
+                  Jusqu'à <strong className="text-white font-semibold">2000&euro;/mois</strong>, depuis chez vous, à votre rythme.
                 </p>
 
                 <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12 animate-slide-up" style={{ animationDelay: '200ms' }}>
@@ -402,7 +402,7 @@ export default function BecomeWasher() {
                       <div className="bg-gradient-to-r from-teal-500/20 to-cyan-500/20 border border-teal-500/30 rounded-2xl p-5">
                         <div className="flex items-center gap-3 text-teal-300">
                           <Zap size={20} className="flex-shrink-0" />
-                          <p className="text-sm">Calcul basé sur <strong>2.80€/kg</strong> de commission moyenne. Les top Washers gagnent jusqu'à <strong>1200€/mois</strong>.</p>
+                          <p className="text-sm">Calcul basé sur <strong>2.80€/kg</strong> de commission moyenne. Les top Washers gagnent jusqu'à <strong>2000€/mois</strong>.</p>
                         </div>
                       </div>
                     </div>

@@ -61,23 +61,34 @@ export default function CGV() {
           </section>
 
           <section className="bg-orange-50 p-6 rounded-xl border border-orange-100">
-            <h2 className="text-xl font-bold text-orange-900 mb-2">5. Responsabilité & Garantie Kilolab</h2>
+            <h2 className="text-xl font-bold text-orange-900 mb-2">5. Responsabilité, Garantie & Arbitrage Kilolab</h2>
             <p className="mb-4 text-orange-800">
-              Bien que Kilolab agisse en qualité d'intermédiaire, nous avons mis en place une protection pour nos utilisateurs.
+              Kilolab agit en qualité d'intermédiaire et d'<strong>arbitre unique</strong> en cas de litige. Aucune indemnisation n'est versée sans décision préalable de Kilolab.
             </p>
             <ul className="list-disc pl-5 space-y-2 text-orange-900 font-medium">
               <li>
-                <strong>Responsabilité du Washer :</strong> Le Washer est personnellement responsable des dommages causés au linge confié (perte, détérioration, retard excessif).
+                <strong>Responsabilité du Washer :</strong> Le Washer est responsable des dommages causés au linge standard confié. Sa responsabilité est <strong>strictement limitée au montant de la commande concernée</strong>.
               </li>
               <li>
-                <strong>Fonds de Garantie Kilolab :</strong> En cas de litige avéré et non résolu à l'amiable sous 72h, Kilolab peut indemniser le client à hauteur de <strong>200€ maximum</strong> par commande.
+                <strong>Arbitrage obligatoire :</strong> En cas de litige, le Client et le Washer s'engagent à soumettre le différend à <strong>Kilolab qui arbitre</strong>. Le remboursement ou l'indemnisation ne peut excéder le montant de la commande.
               </li>
               <li>
                 <strong>Processus de réclamation :</strong> Le Client dispose de <strong>24h après restitution</strong> pour signaler un problème via le chat intégré ou à <a href="mailto:contact@kilolab.fr" className="underline">contact@kilolab.fr</a>.
               </li>
+              <li className="text-red-800 font-bold">
+                <strong>EXCLUSIONS DE RESPONSABILITE :</strong> Kilolab et le Washer <strong>déclinent toute responsabilité</strong> pour :
+                <ul className="list-disc pl-5 mt-2 font-normal space-y-1">
+                  <li>Les vêtements délicats ou de valeur non déclarés par le Client (soie, cachemire, cuir, fourrure, lingerie de luxe, vêtements de créateur)</li>
+                  <li>Les articles dont la valeur unitaire excède 100€ sans déclaration préalable</li>
+                  <li>L'usure normale des vêtements</li>
+                  <li>Les vêtements sans étiquette d'entretien</li>
+                  <li>Les objets oubliés dans les poches</li>
+                  <li>Les dommages résultant d'un défaut de fabrication du vêtement</li>
+                </ul>
+              </li>
               <li>
                 <span className="text-xs font-normal text-orange-700 block mt-1">
-                  *Sont exclus de la garantie : l'usure normale, les vêtements sans étiquette d'entretien, les articles non conformes (cuir, fourrure, soie fine), et les objets oubliés dans les poches.
+                  *Le Client est seul responsable de déclarer ses articles fragiles et de valeur lors de la commande. À défaut, il renonce à toute réclamation les concernant.
                 </span>
               </li>
             </ul>
