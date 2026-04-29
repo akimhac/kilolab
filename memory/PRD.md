@@ -23,6 +23,12 @@ https://kilolab.fr
 - One-click reorder functionality
 - Stripe Connect live payments with payout sequestration
 
+### Rating & Tips System
+- **Star rating (1-5)** after each completed order with optional comment
+- **Tip/Pourboire modal** (2€, 5€, 10€ or custom) triggered after rating — 100% to Washer
+- Average rating auto-calculated and displayed on Washer profiles
+- **Public reviews section** on landing page (real reviews from DB + fallback static)
+
 ### Dashboards
 - **Client Dashboard**: Orders, tracking, chat, reorder, Google review prompt
 - **Washer Dashboard**: Earnings, onboarding, calendar, route optimizer
