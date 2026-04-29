@@ -1,0 +1,50 @@
+{
+  "summary": "Frontend-only E2E test of KiloLab marketplace PWA on preview URL https://marketplace-debug-11.preview.emergentagent.com. Tested all critical pages and new features added in this session: AnimatedCounter on stats, Shimmer CTA button, PublicReviews section on landing, TipModal component, updated legal pages (CGU 16 articles, CGV with arbitrage/exclusions, Privacy with RGPD tables, Cookies with sb-token/stripe table), and 600€→2000€ revenue update on /washers and /trouver. All 14 test cases PASSED.",
+  "backend_issues": {
+    "critical": [],
+    "minor": [
+      {"endpoint": "Supabase calls", "issue": "Some 401/403 errors in console (expected for unauthenticated preview env)", "priority": "LOW"}
+    ]
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "passed_tests": [
+    "Landing page loads: title 'Kilolab France - Le 1er Service de Laverie a Domicile', hero 'Libérez votre temps' visible, CTA 'Confier mon linge' shimmer button, '4.9/5 (500+ avis)' badge, 42 star icons rendered (counters/reviews)",
+    "Navigation: /tarifs, /trouver, /washers, /faq, /login, /signup all load successfully",
+    "/login page renders with email input, password input, submit button",
+    "/signup page renders with email, password, name/text inputs",
+    "/new-order page loads order form with steps: Formule (STANDARD 3€/kg), Poids, Localisation, Date, Paiement - shows login prompt for unauthenticated users (expected protected flow)",
+    "/washers page contains '2000€/mois' revenue claim, NO '600€' present (verified)",
+    "/trouver page contains '2000€/mois' (verified)",
+    "/cgu loads with 16 articles confirmed via h2 headings: '1. Objet et Acceptation' through '16. Droit Applicable et Juridiction', INCLUDING '6. Protection des Washers' and '7. Protection des Clients'",
+    "/cgv loads with 'Arbitrage', 'EXCLUSIONS' and 'Responsabilité' sections present",
+    "/privacy loads with 2 RGPD tables, sous-traitants and durée de conservation content",
+    "/cookies loads with 1 cookies table containing 'sb-*-auth-token' and '__stripe_mid'",
+    "PublicReviews section on landing page renders with star icons (33 stars) and 'avis' keyword",
+    "TipModal component file exists at /app/src/components/TipModal.tsx and is imported (line 26) and integrated (line 655) in ClientDashboard.tsx",
+    "Mobile responsive at 430px viewport: hamburger menu present, hero/CTA/badges all render correctly, public reviews keyword visible at scroll bottom"
+  ],
+  "test_report_links": [
+    "/app/test_reports/iteration_31.json"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "GOOD: All 16 CGU articles properly numbered with semantic h2 headings",
+    "GOOD: 600€ → 2000€/mois update applied on both /washers and /trouver pages",
+    "GOOD: Legal pages (CGV, Privacy, Cookies) have proper structured tables for RGPD compliance",
+    "GOOD: TipModal correctly imported and integrated alongside RatingModal in ClientDashboard",
+    "GOOD: PublicReviews component renders fallback static reviews on landing page",
+    "GOOD: Mobile responsive layout works correctly at 430px (iPhone Pro size)",
+    "MINOR: A few 401/403 console errors from Supabase on unauthenticated pages - benign for anonymous browsing"
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "N/A (skipped per request)", "frontend": "100%"},
+  "test_credentials": "None used - all tests anonymous/public per request",
+  "seed_data_creation": "None",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "App is a Vite/React PWA at /app (not /app/frontend). Source at /app/src. Preview URL https://marketplace-debug-11.preview.emergentagent.com works. All public/unauthenticated routes verified. Auth-protected routes (client-dashboard, washer-dashboard, /new-order final step) require Supabase login which cannot be tested without password. TipModal full flow (rate→tip) requires logged-in client with completed order - only static verification done."
+}

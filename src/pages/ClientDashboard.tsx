@@ -23,6 +23,7 @@ import InvoiceGenerator from '../components/InvoiceGenerator';
 import ReorderButton from '../components/ReorderButton';
 import LiveTracking from '../components/LiveTracking';
 import GoogleReviewPrompt from '../components/GoogleReviewPrompt';
+import TipModal from '../components/TipModal';
 
 interface WasherInfo {
   id: string; first_name: string; last_name: string;
@@ -444,6 +445,7 @@ export default function ClientDashboard() {
   useClientOrderNotifications(userId, !loading);
   const [cancelling, setCancelling] = useState<string | null>(null);
   const [ratingOrder, setRatingOrder] = useState<Order | null>(null);
+  const [tipOrder, setTipOrder] = useState<Order | null>(null);
   const [showAllHistory, setShowAllHistory] = useState(false);
   const [activeTab, setActiveTab] = useState<'orders' | 'loyalty' | 'subscription' | 'referral'>('orders');
   const [showChat, setShowChat] = useState(false);
@@ -626,6 +628,9 @@ export default function ClientDashboard() {
       }
       
       toast.success(t('clientDashboard.ratingThanks'));
+      // Trigger tip modal after rating
+      const ratedOrder = activeOrders.find(o => o.id === id) || pastOrders.find(o => o.id === id);
+      if (ratedOrder) setTipOrder(ratedOrder);
       await loadDashboard();
     } catch { toast.error(t('clientDashboard.ratingError')); }
   };
@@ -646,6 +651,14 @@ export default function ClientDashboard() {
     <div className="min-h-screen bg-[#f8fafc]">
       <Navbar />
       {ratingOrder && <RatingModal order={ratingOrder} onClose={() => setRatingOrder(null)} onSubmit={submitRating} />}
+      {tipOrder && tipOrder.washer && (
+        <TipModal
+          washerName={`${tipOrder.washer.first_name} ${tipOrder.washer.last_name?.[0] || ''}.`}
+          orderId={tipOrder.id}
+          onClose={() => setTipOrder(null)}
+          onTipSent={() => { setTipOrder(null); loadDashboard(); }}
+        />
+      )}
       <div className="max-w-lg mx-auto px-4 pt-24 md:pt-28 pb-16">
         <div className="flex items-center justify-between mb-6">
           <div>

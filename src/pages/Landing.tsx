@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import { useEffect, useMemo, useState, useRef, ReactNode } from "react";
 import HowItWorks from "../components/HowItWorks";
+import PublicReviews from "../components/PublicReviews";
 
 function AnimateOnScroll({ children, delay = 0, className = "" }: { children: ReactNode; delay?: number; className?: string }) {
   const ref = useRef<HTMLDivElement>(null);
@@ -551,6 +552,9 @@ export default function Landing() {
             </div>
           </div>
         </section>
+
+        {/* PUBLIC REVIEWS */}
+        <PublicReviews />
 
         {/* FINAL CTA */}
         <section className="py-24 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white relative overflow-hidden">
