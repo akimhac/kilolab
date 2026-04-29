@@ -137,6 +137,14 @@ export default function Landing() {
                 <span className="text-xl text-white/70">{t('hero.priceUnit')}</span>
               </div>
 
+              {/* PROMO BANNER */}
+              <div className="mb-8 animate-slide-up" style={{ animationDelay: '250ms' }}>
+                <div className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-amber-500/20 to-orange-500/20 backdrop-blur-xl rounded-full border border-amber-400/40" data-testid="promo-banner">
+                  <Sparkles size={16} className="text-amber-400" />
+                  <span className="text-amber-200 font-semibold text-sm">Code <span className="text-white font-black">BIENVENUE50</span> = -50% sur votre 1er lavage</span>
+                </div>
+              </div>
+
               <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12 animate-slide-up" style={{ animationDelay: '300ms' }}>
                 <Link to="/new-order" data-testid="cta-primary"
                   className="group relative inline-flex items-center justify-center gap-3 px-8 py-4 bg-teal-500 hover:bg-teal-400 text-white rounded-full font-semibold text-lg transition-all duration-300 shadow-[0_0_40px_rgba(20,184,166,0.4)] hover:shadow-[0_0_60px_rgba(20,184,166,0.5)] hover:scale-[1.02] active:scale-[0.98] overflow-hidden">
